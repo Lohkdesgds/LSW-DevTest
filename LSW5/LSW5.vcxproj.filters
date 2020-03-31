@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="LSW5">
+      <UniqueIdentifier>{298a9cee-b1d5-4a09-890d-a80539366e03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\DEBUG">
+      <UniqueIdentifier>{615c53fe-1de3-4f5c-b786-01f4e299fe5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\DATA">
+      <UniqueIdentifier>{93bbf2b7-fe4e-45dc-8d74-223772b9a80f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\SPRITE">
+      <UniqueIdentifier>{a62d0a63-4a1a-41e0-b48b-79b9ed7955fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\DISPLAY">
+      <UniqueIdentifier>{c15d374f-03d1-4e54-a04d-388fa18e100f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\MUSIC">
+      <UniqueIdentifier>{24b08925-17f6-43e8-a498-261a78ab729b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\resources">
+      <UniqueIdentifier>{223c3072-18ad-4bac-8031-cf91700e0ec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\resources\filesystem">
+      <UniqueIdentifier>{195c98ca-a78d-4f4e-99a0-a3b66daa9458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\resources\autocaster">
+      <UniqueIdentifier>{d9e997fa-add2-4f60-b58e-0ed27da608ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\resources\socketsystem">
+      <UniqueIdentifier>{bea351d5-4abc-4812-b4f1-c15b91e3eca6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\resources\supermap">
+      <UniqueIdentifier>{1f4d8122-3fb7-4d17-bef7-208fece20f3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\resources\superresource">
+      <UniqueIdentifier>{71a092bc-fe89-4caa-b1b4-565004f03f6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\resources\supertimer">
+      <UniqueIdentifier>{5f5ccd0c-d6b7-4d0d-a4e9-0ef8bf6f1221}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Library\coming.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Library\LSW5\filesystem\filesystem.cpp">
+      <Filter>LSW5\resources\filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\autocaster\autocaster.cpp">
+      <Filter>LSW5\resources\autocaster</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\supertimer\supertimer.cpp">
+      <Filter>LSW5\resources\supertimer</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\superresource\superresource.cpp">
+      <Filter>LSW5\resources\superresource</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\supermap\supermap.cpp">
+      <Filter>LSW5\resources\supermap</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\socketsystem\socketsystem.cpp">
+      <Filter>LSW5\resources\socketsystem</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Library\LSW5\filesystem\filesystem.h">
+      <Filter>LSW5\resources\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\autocaster\autocaster.h">
+      <Filter>LSW5\resources\autocaster</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\supertimer\supertimer.h">
+      <Filter>LSW5\resources\supertimer</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\superresource\superresource.h">
+      <Filter>LSW5\resources\superresource</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\supermap\supermap.h">
+      <Filter>LSW5\resources\supermap</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\socketsystem\socketsystem.h">
+      <Filter>LSW5\resources\socketsystem</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

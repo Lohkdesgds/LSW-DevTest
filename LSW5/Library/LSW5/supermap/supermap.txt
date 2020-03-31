@@ -1,0 +1,1 @@
+SuperMap is a huge implementation based on std::map to handle multiple different keys to the same value.

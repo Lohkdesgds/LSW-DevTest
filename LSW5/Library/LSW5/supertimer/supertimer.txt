@@ -1,0 +1,1 @@
+SuperTimer is a multiple timing trigger setup that can help handle multiple things timed easily.
