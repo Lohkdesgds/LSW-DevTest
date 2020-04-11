@@ -4,127 +4,188 @@
     <Filter Include="LSW5">
       <UniqueIdentifier>{298a9cee-b1d5-4a09-890d-a80539366e03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\CORE">
-      <UniqueIdentifier>{18107e2d-dfb1-4d12-922c-bdd2790f0f18}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LSW5\CORE\DATA">
-      <UniqueIdentifier>{93bbf2b7-fe4e-45dc-8d74-223772b9a80f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LSW5\CORE\DISPLAY">
-      <UniqueIdentifier>{c15d374f-03d1-4e54-a04d-388fa18e100f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LSW5\CORE\MUSIC">
-      <UniqueIdentifier>{24b08925-17f6-43e8-a498-261a78ab729b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LSW5\CORE\SPRITE">
-      <UniqueIdentifier>{a62d0a63-4a1a-41e0-b48b-79b9ed7955fb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LSW5\side">
+    <Filter Include="LSW5\Library">
       <UniqueIdentifier>{223c3072-18ad-4bac-8031-cf91700e0ec1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\filesystem">
+    <Filter Include="LSW5\Library\filesystem">
       <UniqueIdentifier>{195c98ca-a78d-4f4e-99a0-a3b66daa9458}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\autocaster">
+    <Filter Include="LSW5\Library\autocaster">
       <UniqueIdentifier>{d9e997fa-add2-4f60-b58e-0ed27da608ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\socketsystem">
+    <Filter Include="LSW5\Library\socketsystem">
       <UniqueIdentifier>{bea351d5-4abc-4812-b4f1-c15b91e3eca6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\supermap">
+    <Filter Include="LSW5\Library\supermap">
       <UniqueIdentifier>{1f4d8122-3fb7-4d17-bef7-208fece20f3a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\superresource">
+    <Filter Include="LSW5\Library\superresource">
       <UniqueIdentifier>{71a092bc-fe89-4caa-b1b4-565004f03f6a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\supertimer">
+    <Filter Include="LSW5\Library\supertimer">
       <UniqueIdentifier>{5f5ccd0c-d6b7-4d0d-a4e9-0ef8bf6f1221}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\abort">
+    <Filter Include="LSW5\Library\abort">
       <UniqueIdentifier>{a0dcc01c-a13c-4fcc-b13b-ef34b2e3b545}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\allegroinitialization">
+    <Filter Include="LSW5\Library\allegroinitialization">
       <UniqueIdentifier>{a9c42788-07c5-4479-a31b-1119177bb18b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\logger">
+    <Filter Include="LSW5\Library\logger">
       <UniqueIdentifier>{d6db5187-2729-4bc5-afc6-eddadf8f0c14}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\side\tools">
+    <Filter Include="LSW5\Library\tools">
       <UniqueIdentifier>{f029abc9-9b7f-4e7c-a880-1aa3856e0e8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\database">
+      <UniqueIdentifier>{094bf148-9c1a-4d99-8dc6-a7f33be2d817}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\camera">
+      <UniqueIdentifier>{5d3d7ab6-3e28-4c9d-a9f4-58b1dd1ac3b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\display">
+      <UniqueIdentifier>{0c641a94-4b2d-43b7-8137-44dbf872663b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\superthread">
+      <UniqueIdentifier>{6d311c11-e4de-458a-979a-4aafa4a23382}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\downloader">
+      <UniqueIdentifier>{8a74b659-f694-4391-8851-d604390d6853}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\hash">
+      <UniqueIdentifier>{fb65d02d-5ea3-4ca4-874f-7a677eb864d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\launcher">
+      <UniqueIdentifier>{fb8f3416-7a6e-42f7-aad8-cff738192c8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\core">
+      <UniqueIdentifier>{b58e2175-ddf8-466a-b53d-a519cfff92d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\shared">
+      <UniqueIdentifier>{2fd24662-6140-4e61-8d6a-169655cc7469}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Library\dependencies.md" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Library\coming.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Library\LSW5\filesystem\filesystem.cpp">
-      <Filter>LSW5\side\filesystem</Filter>
+      <Filter>LSW5\Library\filesystem</Filter>
     </ClCompile>
     <ClCompile Include="Library\LSW5\superresource\superresource.cpp">
-      <Filter>LSW5\side\superresource</Filter>
+      <Filter>LSW5\Library\superresource</Filter>
     </ClCompile>
     <ClCompile Include="Library\LSW5\socketsystem\socketsystem.cpp">
-      <Filter>LSW5\side\socketsystem</Filter>
+      <Filter>LSW5\Library\socketsystem</Filter>
     </ClCompile>
     <ClCompile Include="Library\LSW5\abort\abort.cpp">
-      <Filter>LSW5\side\abort</Filter>
+      <Filter>LSW5\Library\abort</Filter>
     </ClCompile>
     <ClCompile Include="Library\LSW5\logger\logger.cpp">
-      <Filter>LSW5\side\logger</Filter>
+      <Filter>LSW5\Library\logger</Filter>
     </ClCompile>
     <ClCompile Include="Library\LSW5\logger\coloured_string.cpp">
-      <Filter>LSW5\side\logger</Filter>
+      <Filter>LSW5\Library\logger</Filter>
     </ClCompile>
     <ClCompile Include="Library\LSW5\tools\tools.cpp">
-      <Filter>LSW5\side\tools</Filter>
+      <Filter>LSW5\Library\tools</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Library\LSW5\logger\printer.cpp">
-      <Filter>LSW5\side\logger</Filter>
+      <Filter>LSW5\Library\logger</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\database\database.cpp">
+      <Filter>LSW5\Library\database</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\camera\camera.cpp">
+      <Filter>LSW5\Library\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\display\display.cpp">
+      <Filter>LSW5\Library\display</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\download\download.cpp">
+      <Filter>LSW5\Library\downloader</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\hash\sha256.cpp">
+      <Filter>LSW5\Library\hash</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\launcher\launcher.cpp">
+      <Filter>LSW5\Library\launcher</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\core\core.cpp">
+      <Filter>LSW5\Library\core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\LSW5\filesystem\filesystem.h">
-      <Filter>LSW5\side\filesystem</Filter>
+      <Filter>LSW5\Library\filesystem</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\autocaster\autocaster.h">
-      <Filter>LSW5\side\autocaster</Filter>
+      <Filter>LSW5\Library\autocaster</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\supertimer\supertimer.h">
-      <Filter>LSW5\side\supertimer</Filter>
+      <Filter>LSW5\Library\supertimer</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\superresource\superresource.h">
-      <Filter>LSW5\side\superresource</Filter>
+      <Filter>LSW5\Library\superresource</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\supermap\supermap.h">
-      <Filter>LSW5\side\supermap</Filter>
+      <Filter>LSW5\Library\supermap</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\socketsystem\socketsystem.h">
-      <Filter>LSW5\side\socketsystem</Filter>
+      <Filter>LSW5\Library\socketsystem</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\supermap\superpair.h">
-      <Filter>LSW5\side\supermap</Filter>
+      <Filter>LSW5\Library\supermap</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\abort\abort.h">
-      <Filter>LSW5\side\abort</Filter>
+      <Filter>LSW5\Library\abort</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\allegroinitialization\allegroinitialization.h">
-      <Filter>LSW5\side\allegroinitialization</Filter>
+      <Filter>LSW5\Library\allegroinitialization</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\logger\logger.h">
-      <Filter>LSW5\side\logger</Filter>
+      <Filter>LSW5\Library\logger</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\logger\coloured_string.h">
-      <Filter>LSW5\side\logger</Filter>
+      <Filter>LSW5\Library\logger</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\logger\printer.h">
-      <Filter>LSW5\side\logger</Filter>
+      <Filter>LSW5\Library\logger</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\tools\tools.h">
-      <Filter>LSW5\side\tools</Filter>
+      <Filter>LSW5\Library\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\database\database.h">
+      <Filter>LSW5\Library\database</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\camera\camera.h">
+      <Filter>LSW5\Library\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\display\display.h">
+      <Filter>LSW5\Library\display</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\superthread\superthread.h">
+      <Filter>LSW5\Library\superthread</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\download\download.h">
+      <Filter>LSW5\Library\downloader</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\hash\sha256.h">
+      <Filter>LSW5\Library\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\launcher\launcher.h">
+      <Filter>LSW5\Library\launcher</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\core\core.h">
+      <Filter>LSW5\Library\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\shared\shared.h">
+      <Filter>LSW5\Library\shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

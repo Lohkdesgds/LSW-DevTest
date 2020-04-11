@@ -6,6 +6,7 @@
 ColouredString header:
 
 - Coloured string is a string with color
+# WORKING since 20200410
 
 = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =
 */
@@ -30,15 +31,26 @@ namespace LSW {
 			template<size_t siz> coloured_string(const char(&oth)[siz]) { *this = oth; }
 			coloured_string(std::string&);
 
+			coloured_string(const char&);
+			coloured_string(const int&);
+			coloured_string(const float&);
+			coloured_string(const double&);
+			coloured_string(const unsigned&);
+			coloured_string(const long&);
+			coloured_string(const long long&);
+			coloured_string(const size_t&);
+
+
+
 			char_c pop();
 			size_t size() const;
 
 			coloured_string& operator+=(coloured_string&);
 			template<size_t siz> coloured_string& operator+=(const char(&oth)[siz]) {
 				std::string aa = oth;
-				return (this->operator=(aa));
+				return (this->operator+=(aa));
 			}
-			coloured_string& operator+=(std::string);
+			coloured_string& operator+=(const std::string&);
 			coloured_string& operator+=(const char&);
 			coloured_string& operator+=(const int&);
 			coloured_string& operator+=(const float&);
@@ -48,7 +60,21 @@ namespace LSW {
 			coloured_string& operator+=(const long long&);
 			coloured_string& operator+=(const size_t&);
 
-			template<typename T> coloured_string& operator=(T&& a) { str.clear(); this->operator+=(a); return *this; }
+			coloured_string& operator=(coloured_string&);
+			template<size_t siz> coloured_string& operator=(const char(&oth)[siz]) {
+				str.clear();
+				std::string aa = oth;
+				return (this->operator=(aa));
+			}
+			coloured_string& operator=(const std::string&);
+			coloured_string& operator=(const char&);
+			coloured_string& operator=(const int&);
+			coloured_string& operator=(const float&);
+			coloured_string& operator=(const double&);
+			coloured_string& operator=(const unsigned&);
+			coloured_string& operator=(const long&);
+			coloured_string& operator=(const long long&);
+			coloured_string& operator=(const size_t&);
 
 
 

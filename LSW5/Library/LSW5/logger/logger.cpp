@@ -32,7 +32,7 @@ namespace LSW {
 		{
 			ALLEGRO_EVENT evv;
 			evv.user.data1 = (intptr_t)&g.memline[g.memlinecount];
-			evv.type = static_cast<int>(logger::CUSTOM_EVENT_LOG_STRING);
+			evv.type = static_cast<int>(Shared::my_events::CUSTOM_EVENT_LOG_STRING);
 			al_emit_user_event(&g.evsrc, &evv, nullptr);
 
 			if (++g.memlinecount >= logger::max_lines_stored_by_memlog) g.memlinecount = 0;
@@ -171,6 +171,19 @@ namespace LSW {
 			return *this;
 		}
 
+		Logger& Logger::operator<<(coloured_string&& clstr)
+		{
+			lsw_print(clstr);
+			g.memline[g.memlinecount] += clstr;
+			return *this;
+		}
+		Logger& Logger::operator<<(coloured_string& clstr)
+		{
+			lsw_print(clstr);
+			g.memline[g.memlinecount] += clstr;
+			return *this;
+		}
+
 		const std::string fsr(std::string fname_pretty, const E situation)
 		{
 			if (fname_pretty.length() < logger::len_class) {
@@ -210,5 +223,43 @@ namespace LSW {
 
 			return back_str;
 		}
-	}
+		Logger& Logger::operator<<(const std::string& o)
+		{
+			coloured_string cstr;
+			cstr = o.c_str();
+			return (this->operator<<(cstr));
+		}
+		Logger& Logger::operator<<(const char& o)
+		{
+			return (this->operator<<(coloured_string(o)));
+		}
+		Logger& Logger::operator<<(const int& o)
+		{
+			return (this->operator<<(coloured_string(o)));
+		}
+		Logger& Logger::operator<<(const float& o)
+		{
+			return (this->operator<<(coloured_string(o)));
+		}
+		Logger& Logger::operator<<(const double& o)
+		{
+			return (this->operator<<(coloured_string(o)));
+		}
+		Logger& Logger::operator<<(const unsigned& o)
+		{
+			return (this->operator<<(coloured_string(o)));
+		}
+		Logger& Logger::operator<<(const long& o)
+		{
+			return (this->operator<<(coloured_string(o)));
+		}
+		Logger& Logger::operator<<(const long long& o)
+		{
+			return (this->operator<<(coloured_string(o)));
+		}
+		Logger& Logger::operator<<(const size_t& o)
+		{
+			return (this->operator<<(coloured_string(o)));
+		}
+}
 }

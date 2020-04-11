@@ -10,6 +10,46 @@ namespace LSW {
 			*this = oth;
 		}
 
+		coloured_string::coloured_string(const char& o)
+		{
+			*this = o;
+		}
+
+		coloured_string::coloured_string(const int& o)
+		{
+			*this = o;
+		}
+
+		coloured_string::coloured_string(const float& o)
+		{
+			*this = o;
+		}
+
+		coloured_string::coloured_string(const double& o)
+		{
+			*this = o;
+		}
+
+		coloured_string::coloured_string(const unsigned& o)
+		{
+			*this = o;
+		}
+
+		coloured_string::coloured_string(const long& o)
+		{
+			*this = o;
+		}
+
+		coloured_string::coloured_string(const long long& o)
+		{
+			*this = o;
+		}
+
+		coloured_string::coloured_string(const size_t& o)
+		{
+			*this = o;
+		}
+
 		char_c coloured_string::pop() {
 			if (str.size() > 0) {
 				char_c cpy = str.front();
@@ -29,7 +69,7 @@ namespace LSW {
 			}
 			return *this;
 		}
-		coloured_string& coloured_string::operator+=(std::string rstr) {
+		coloured_string& coloured_string::operator+=(const std::string& rstr) {
 			str.clear();
 			C curr_color = C::WHITE, last_added_color = C::WHITE;
 			bool ignore_once = false;
@@ -115,6 +155,66 @@ namespace LSW {
 		coloured_string& coloured_string::operator+=(const size_t& a)
 		{
 			return this->operator+=(std::to_string(a));
+		}
+
+		coloured_string& coloured_string::operator=(coloured_string& a)
+		{
+			str.clear();
+			return this->operator+=(a);
+		}
+
+		coloured_string& coloured_string::operator=(const std::string& a)
+		{
+			str.clear();
+			return this->operator+=(a);
+		}
+
+		coloured_string& coloured_string::operator=(const char& a)
+		{
+			str.clear();
+			return this->operator+=(a);
+		}
+
+		coloured_string& coloured_string::operator=(const int& a)
+		{
+			str.clear();
+			return this->operator+=(a);
+		}
+
+		coloured_string& coloured_string::operator=(const float& a)
+		{
+			str.clear();
+			return this->operator+=(a);
+		}
+
+		coloured_string& coloured_string::operator=(const double& a)
+		{
+			str.clear();
+			return this->operator+=(a);
+		}
+
+		coloured_string& coloured_string::operator=(const unsigned& a)
+		{
+			str.clear();
+			return this->operator+=(a);
+		}
+
+		coloured_string& coloured_string::operator=(const long& a)
+		{
+			str.clear();
+			return this->operator+=(a);
+		}
+
+		coloured_string& coloured_string::operator=(const long long& a)
+		{
+			str.clear();
+			return this->operator+=(a);
+		}
+
+		coloured_string& coloured_string::operator=(const size_t& a)
+		{
+			str.clear();
+			return this->operator+=(a);
 		}
 
 		std::basic_string<char_c>::const_iterator coloured_string::begin() const {

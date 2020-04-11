@@ -71,21 +71,65 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <Allegro_AddonImage>true</Allegro_AddonImage>
+    <Allegro_AddonTTF>true</Allegro_AddonTTF>
+    <Allegro_AddonPrimitives>true</Allegro_AddonPrimitives>
+    <Allegro_AddonAudio>true</Allegro_AddonAudio>
+    <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonPhysfs>true</Allegro_AddonPhysfs>
+    <Allegro_AddonDialog>true</Allegro_AddonDialog>
+    <Allegro_AddonMemfile>true</Allegro_AddonMemfile>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
+    <Allegro_AddonColor>true</Allegro_AddonColor>
+    <Allegro_AddonVideo>true</Allegro_AddonVideo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <Allegro_AddonImage>true</Allegro_AddonImage>
+    <Allegro_AddonTTF>true</Allegro_AddonTTF>
+    <Allegro_AddonPrimitives>true</Allegro_AddonPrimitives>
+    <Allegro_AddonAudio>true</Allegro_AddonAudio>
+    <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonPhysfs>true</Allegro_AddonPhysfs>
+    <Allegro_AddonDialog>true</Allegro_AddonDialog>
+    <Allegro_AddonMemfile>true</Allegro_AddonMemfile>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
+    <Allegro_AddonColor>true</Allegro_AddonColor>
+    <Allegro_AddonVideo>true</Allegro_AddonVideo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <Allegro_AddonImage>true</Allegro_AddonImage>
+    <Allegro_AddonTTF>true</Allegro_AddonTTF>
+    <Allegro_AddonPrimitives>true</Allegro_AddonPrimitives>
+    <Allegro_AddonAudio>true</Allegro_AddonAudio>
+    <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonPhysfs>true</Allegro_AddonPhysfs>
+    <Allegro_AddonDialog>true</Allegro_AddonDialog>
+    <Allegro_AddonMemfile>true</Allegro_AddonMemfile>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
+    <Allegro_AddonColor>true</Allegro_AddonColor>
+    <Allegro_AddonVideo>true</Allegro_AddonVideo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <Allegro_AddonImage>true</Allegro_AddonImage>
+    <Allegro_AddonTTF>true</Allegro_AddonTTF>
+    <Allegro_AddonPrimitives>true</Allegro_AddonPrimitives>
+    <Allegro_AddonAudio>true</Allegro_AddonAudio>
+    <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonPhysfs>true</Allegro_AddonPhysfs>
+    <Allegro_AddonDialog>true</Allegro_AddonDialog>
+    <Allegro_AddonMemfile>true</Allegro_AddonMemfile>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
+    <Allegro_AddonColor>true</Allegro_AddonColor>
+    <Allegro_AddonVideo>true</Allegro_AddonVideo>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PROJECTNAME="$(ProjectName)";_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
@@ -98,7 +142,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PROJECTNAME="$(ProjectName)";_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
@@ -113,7 +157,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PROJECTNAME="$(ProjectName)";NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
@@ -130,7 +174,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PROJECTNAME="$(ProjectName)";NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
@@ -142,6 +186,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="Library\dependencies.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -149,7 +194,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Library\LSW5\abort\abort.cpp" />
+    <ClCompile Include="Library\LSW5\camera\camera.cpp" />
+    <ClCompile Include="Library\LSW5\core\core.cpp" />
+    <ClCompile Include="Library\LSW5\database\database.cpp" />
+    <ClCompile Include="Library\LSW5\display\display.cpp" />
+    <ClCompile Include="Library\LSW5\download\download.cpp" />
     <ClCompile Include="Library\LSW5\filesystem\filesystem.cpp" />
+    <ClCompile Include="Library\LSW5\hash\sha256.cpp" />
+    <ClCompile Include="Library\LSW5\launcher\launcher.cpp" />
     <ClCompile Include="Library\LSW5\logger\coloured_string.cpp" />
     <ClCompile Include="Library\LSW5\logger\logger.cpp" />
     <ClCompile Include="Library\LSW5\logger\printer.cpp" />
@@ -162,14 +214,23 @@
     <ClInclude Include="Library\LSW5\abort\abort.h" />
     <ClInclude Include="Library\LSW5\allegroinitialization\allegroinitialization.h" />
     <ClInclude Include="Library\LSW5\autocaster\autocaster.h" />
+    <ClInclude Include="Library\LSW5\camera\camera.h" />
+    <ClInclude Include="Library\LSW5\core\core.h" />
+    <ClInclude Include="Library\LSW5\database\database.h" />
+    <ClInclude Include="Library\LSW5\display\display.h" />
+    <ClInclude Include="Library\LSW5\download\download.h" />
     <ClInclude Include="Library\LSW5\filesystem\filesystem.h" />
+    <ClInclude Include="Library\LSW5\hash\sha256.h" />
+    <ClInclude Include="Library\LSW5\launcher\launcher.h" />
     <ClInclude Include="Library\LSW5\logger\coloured_string.h" />
     <ClInclude Include="Library\LSW5\logger\logger.h" />
     <ClInclude Include="Library\LSW5\logger\printer.h" />
+    <ClInclude Include="Library\LSW5\shared\shared.h" />
     <ClInclude Include="Library\LSW5\socketsystem\socketsystem.h" />
     <ClInclude Include="Library\LSW5\supermap\supermap.h" />
     <ClInclude Include="Library\LSW5\supermap\superpair.h" />
     <ClInclude Include="Library\LSW5\superresource\superresource.h" />
+    <ClInclude Include="Library\LSW5\superthread\superthread.h" />
     <ClInclude Include="Library\LSW5\supertimer\supertimer.h" />
     <ClInclude Include="Library\LSW5\tools\tools.h" />
   </ItemGroup>

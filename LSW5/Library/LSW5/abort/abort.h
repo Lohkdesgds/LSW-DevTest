@@ -1,8 +1,11 @@
 #pragma once
 
+// C
+#include <Windows.h>
 // C++
 #include <string>
 #include <functional>
+#include <thread>
 
 namespace LSW {
 	namespace v5 {
@@ -22,6 +25,20 @@ namespace LSW {
 				const std::string& getDetails();
 				const abort_level& getLevel();
 				void runFunctionIfAny();
+			};
+
+
+			class AutoAbort {
+				ULONGLONG t = 0;
+				std::thread* thr = nullptr;
+				std::function<void(void)> autodrop, call_death;
+				bool drop = false;
+			public:
+				// milliseconds
+				AutoAbort(const unsigned, std::function<void(void)> = std::function<void(void)>());
+
+				// abort the autoabort
+				void abort();
 			};
 
 		}

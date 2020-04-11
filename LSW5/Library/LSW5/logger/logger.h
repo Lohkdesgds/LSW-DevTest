@@ -1,10 +1,24 @@
 #pragma once
 
-#include <allegro5/allegro.h>
 
+/*
+= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =
+Logger header:
+
+- Logger is a huge logging class that handles almost everything.
+# WORKING since 20200410
+
+= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =
+*/
+
+
+
+// C
+#include <allegro5/allegro.h>
 #include <Windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+// C++
 #include <string>
 #include <mutex>
 
@@ -14,6 +28,8 @@
 #include "printer.h"
 #include "..\allegroinitialization\allegroinitialization.h"
 #include "..\tools\tools.h"
+#include "..\shared\shared.h"
+#include "..\autocaster\autocaster.h"
 
 
 namespace LSW {
@@ -22,7 +38,6 @@ namespace LSW {
 			constexpr size_t max_lines_stored_by_memlog = 10;
 			constexpr size_t each_line_stored_by_memlog = 140;
 			constexpr size_t len_class = 45;
-			constexpr auto CUSTOM_EVENT_LOG_STRING = 512;
 		}
 
 		enum class L { EL, SL, SLF, ELF };
@@ -58,14 +73,23 @@ namespace LSW {
 
 			ALLEGRO_EVENT_SOURCE* getEvent();
 
+
 			Logger& operator<<(const L&);
-			template<typename T> Logger& operator<<(T var) {
-				coloured_string clstr;
-				clstr = var;
-				lsw_print(clstr);
-				g.memline[g.memlinecount] += var; // vai dar erro
-				return *this;
+			Logger& operator<<(coloured_string&&);
+			Logger& operator<<(coloured_string&);
+			template<size_t siz> Logger& operator<<(const char(&oth)[siz]) {
+				coloured_string aa = oth;
+				return (this->operator<<(aa));
 			}
+			Logger& operator<<(const std::string&);
+			Logger& operator<<(const char&);
+			Logger& operator<<(const int&);
+			Logger& operator<<(const float&);
+			Logger& operator<<(const double&);
+			Logger& operator<<(const unsigned&);
+			Logger& operator<<(const long&);
+			Logger& operator<<(const long long&);
+			Logger& operator<<(const size_t&);
 		};
 
 
