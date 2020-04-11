@@ -2,22 +2,12 @@
 //- About
 //+ dependencies
 
-
-# DEBUGGING CORE
-- Must set default log path
-- It will watch other stuff working around (any part available)
-- Has a class that can be inherited by sub stuff
-- Available from anywhere, can register sub-class of the above one
-- Actually does log stuff
-+ none
-
 # DATA CORE
 - Holds all data, from files and stuff
 - Can set default load path
 - Can load any amount of Allegro Config files
 - Can hold any SuperMap key stuff
 - Saves automatically when dead
-+ DEBUGGING
 
 # SPRITE CORE
 - Can be text
@@ -27,7 +17,6 @@
 - Does have collision properties
 - Can hold draw function to be drawn inside it
 - This function can mess the internal data (like position and stuff automatically)
-+ DEBUGGING
 
 # DISPLAY CORE
 - Handle a display, events of the display and stuff.
@@ -35,7 +24,6 @@
 - Saves full size display
 - Handle its events by itself
 - Draws Sprite
-+ DEBUGGING
 
 # MUSIC CORE
 - Handle any music playback

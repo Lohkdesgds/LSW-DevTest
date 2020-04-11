@@ -29,27 +29,27 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -148,20 +148,30 @@
     <Text Include="Library\coming.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Library\LSW5\autocaster\autocaster.cpp" />
+    <ClCompile Include="Library\LSW5\abort\abort.cpp" />
     <ClCompile Include="Library\LSW5\filesystem\filesystem.cpp" />
+    <ClCompile Include="Library\LSW5\logger\coloured_string.cpp" />
+    <ClCompile Include="Library\LSW5\logger\logger.cpp" />
+    <ClCompile Include="Library\LSW5\logger\printer.cpp" />
     <ClCompile Include="Library\LSW5\socketsystem\socketsystem.cpp" />
-    <ClCompile Include="Library\LSW5\supermap\supermap.cpp" />
     <ClCompile Include="Library\LSW5\superresource\superresource.cpp" />
-    <ClCompile Include="Library\LSW5\supertimer\supertimer.cpp" />
+    <ClCompile Include="Library\LSW5\tools\tools.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Library\LSW5\abort\abort.h" />
+    <ClInclude Include="Library\LSW5\allegroinitialization\allegroinitialization.h" />
     <ClInclude Include="Library\LSW5\autocaster\autocaster.h" />
     <ClInclude Include="Library\LSW5\filesystem\filesystem.h" />
+    <ClInclude Include="Library\LSW5\logger\coloured_string.h" />
+    <ClInclude Include="Library\LSW5\logger\logger.h" />
+    <ClInclude Include="Library\LSW5\logger\printer.h" />
     <ClInclude Include="Library\LSW5\socketsystem\socketsystem.h" />
     <ClInclude Include="Library\LSW5\supermap\supermap.h" />
+    <ClInclude Include="Library\LSW5\supermap\superpair.h" />
     <ClInclude Include="Library\LSW5\superresource\superresource.h" />
     <ClInclude Include="Library\LSW5\supertimer\supertimer.h" />
+    <ClInclude Include="Library\LSW5\tools\tools.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

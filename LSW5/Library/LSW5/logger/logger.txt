@@ -1,0 +1,1 @@
+Logger registers everything to you easily.
