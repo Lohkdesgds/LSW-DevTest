@@ -15,13 +15,18 @@
 #include <allegro5/allegro_ttf.h>
 #include <physfs.h>
 
-#include "..\Abort\abort.h"
+#include "..\abort\abort.h"
 #include "..\supertimer\supertimer.h"
 #include "..\supermap\supermap.h"
-#include "..\Logger\logger.h"
-#include "..\Display\display.h"
+#include "..\logger\logger.h"
+#include "..\display\display.h"
 #include "..\shared\shared.h"
 #include "..\autocaster\autocaster.h"
+
+/*
+LATER: add a way to create threads to specific layers of collision
+- this way a thread is responsible to do the work in a layer
+*/
 
 
 namespace LSW {
