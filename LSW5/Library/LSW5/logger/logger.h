@@ -78,8 +78,11 @@ namespace LSW {
 			Logger& operator<<(coloured_string&&);
 			Logger& operator<<(coloured_string&);
 			template<size_t siz> Logger& operator<<(const char(&oth)[siz]) {
-				coloured_string aa = oth;
-				return (this->operator<<(aa));
+				coloured_string cstr;
+				char format[3];
+				sprintf_s(format, "&%x", Cast::s_cast<int>(g.last_c));
+				cstr = (format + std::string(oth)).c_str();
+				return (this->operator<<(cstr));
 			}
 			Logger& operator<<(const std::string&);
 			Logger& operator<<(const char&);

@@ -2,6 +2,9 @@
 
 namespace LSW {
 	namespace v5 {
+
+		Camera* Camera::last_camera_applied = nullptr;
+
 		ALLEGRO_TRANSFORM Camera::transf(ALLEGRO_BITMAP* d, const float x, const float y, const float sx, const float sy, const float r)
 		{
 			ALLEGRO_TRANSFORM& t = data.transformation;
@@ -24,9 +27,7 @@ namespace LSW {
 		{
 			lsw_al_init();
 
-			al_identity_transform(&data.transformation);
-			reset();
-			refresh();
+			reset(); // refresh(); auto
 		}
 
 		Camera::Camera(Camera& other)
@@ -45,9 +46,39 @@ namespace LSW {
 			data.double_data  = camera::e_double_defaults;
 			data.boolean_data = camera::e_boolean_defaults;
 			data.integer_data = camera::e_integer_defaults;
+			data.layers.clear();
 
 			al_identity_transform(&data.transformation);
 			refresh();
+		}
+
+		void Camera::setLayer(const Camera::camera_data::layer_config v)
+		{
+			for (size_t p = 0; p < data.layers.size(); p++) {
+				if (data.layers[p].getID() == v.getID()) {
+					data.layers[p].setElasticity(v.getElasticity());
+					return;
+				}
+			}
+			data.layers.push_back(v);
+		}
+
+		void Camera::delLayer(const int v)
+		{
+			for (size_t p = 0; p < data.layers.size(); p++) {
+				if (data.layers[p].getID() == v) {
+					data.layers.erase(data.layers.begin() + p);
+					return;
+				}
+			}
+		}
+
+		Camera::camera_data::layer_config* Camera::getLayer(const int v)
+		{
+			for (size_t p = 0; p < data.layers.size(); p++) {
+				if (data.layers[p].getID() == v) return &data.layers[p];
+			}
+			return nullptr;
 		}
 
 		void Camera::set(const camera::e_double e, double v)
@@ -72,7 +103,7 @@ namespace LSW {
 		{
 			auto* ptr = data.double_data(e.c_str(), e.length());
 			if (!ptr) data.double_data.add({ v, e.c_str(), e.length() });
-			else *ptr =v;
+			else *ptr = v;
 		}
 
 		void Camera::set(const std::string e, bool v)
@@ -181,6 +212,12 @@ namespace LSW {
 		void Camera::apply()
 		{
 			al_use_transform(&data.transformation);
+			last_camera_applied = this;
+		}
+
+		Camera* Camera::getLastCameraApply() const
+		{
+			return last_camera_applied;
 		}
 
 		Camera::camera_data& Camera::copyRAW()

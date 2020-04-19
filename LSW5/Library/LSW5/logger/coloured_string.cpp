@@ -64,8 +64,8 @@ namespace LSW {
 
 		coloured_string& coloured_string::operator+=(coloured_string & oth) {
 			str.clear();
-			while (oth.size()) {
-				str += oth.pop();
+			for(auto& i : oth) {
+				str += i;
 			}
 			return *this;
 		}
@@ -105,6 +105,8 @@ namespace LSW {
 				str.push_back({ i, curr_color });
 				last_added_color = curr_color;
 			}
+
+			//auto& cpyy = str.at(str.size() - 1);
 
 			return *this;
 		}

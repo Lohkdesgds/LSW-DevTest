@@ -23,6 +23,9 @@
 #include "..\shared\shared.h"
 #include "..\autocaster\autocaster.h"
 
+#include "..\superresource\superresource.h"
+#include "..\sprite\sprite.h"
+
 /*
 LATER: add a way to create threads to specific layers of collision
 - this way a thread is responsible to do the work in a layer
@@ -106,6 +109,8 @@ namespace LSW {
 			Core();
 
 			void init();
+			void pause();
+			void unpause();
 			void fEnd();
 
 			bool allEnded(); // all threads said they're not "initialized", so must be dead.

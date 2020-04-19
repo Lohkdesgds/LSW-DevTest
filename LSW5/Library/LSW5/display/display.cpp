@@ -324,7 +324,9 @@ namespace LSW {
 				while (al_get_time() - last_draw_tick < 1.0 / *ref_fps_limit) al_rest(0.1 / *ref_fps_limit);
 				last_draw_tick += 1.0 / *ref_fps_limit;
 			}
-			else al_flip_display();
+			else {
+				al_flip_display();
+			}
 
 
 			checkAcknowledge();

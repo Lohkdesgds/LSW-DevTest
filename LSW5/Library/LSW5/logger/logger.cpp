@@ -174,12 +174,16 @@ namespace LSW {
 		Logger& Logger::operator<<(coloured_string&& clstr)
 		{
 			lsw_print(clstr);
+			if (clstr.size()) g.last_c = clstr[clstr.size() - 1].cr;
 			g.memline[g.memlinecount] += clstr;
 			return *this;
 		}
 		Logger& Logger::operator<<(coloured_string& clstr)
 		{
 			lsw_print(clstr);
+			if (clstr.size()) {
+				g.last_c = clstr[clstr.size() - 1].cr;
+			}
 			g.memline[g.memlinecount] += clstr;
 			return *this;
 		}
@@ -223,10 +227,12 @@ namespace LSW {
 
 			return back_str;
 		}
-		Logger& Logger::operator<<(const std::string& o)
+		Logger& Logger::operator<<(const std::string& o) // don't forget template lmao
 		{
 			coloured_string cstr;
-			cstr = o.c_str();
+			char format[3];
+			sprintf_s(format, "&%x", Cast::s_cast<int>(g.last_c));
+			cstr = (format + o).c_str();
 			return (this->operator<<(cstr));
 		}
 		Logger& Logger::operator<<(const char& o)

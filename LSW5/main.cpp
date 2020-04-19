@@ -5,6 +5,8 @@
 #include "Library\LSW5\database\database.h"
 #include "Library\LSW5\core\core.h"
 #include "Library\LSW5\display\display.h"
+#include "Library\LSW5\superresource\superresource.h"
+#include "Library\LSW5\sprite\sprite.h"
 
 using namespace LSW::v5;
 
@@ -27,6 +29,8 @@ int main() {
 	logg.init(default_file_log_path);
 	Database db(config_default_file);
 
+	
+
 	db.set(database::e_string::PRINT_PATH, default_print_path);
 	db.set(database::e_string::DATA_PATH, start_zip_default_extract_path);
 
@@ -48,7 +52,8 @@ int main() {
 
 
 	Camera cam;
-	cam.set(camera::e_integer::ID, 10);
+	cam.set(camera::e_integer::ID, 0);
+	cam.apply();
 	int gut;
 	if (!cam.get(camera::e_integer::ID, gut)) {
 		logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&6Couldn't get CAMERA::ID? hmm..." << L::ELF;
@@ -58,7 +63,18 @@ int main() {
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Initializing CORE once - - -" << L::ELF;
 
+	core.pause(); // set to pause before doing anything
 	core.init();
+
+	SuperResource<Sprite_Base> sprites;
+	auto* ref = sprites.create("test");
+	ref->set("show_box", true);
+	ref->set("show_dot", true);
+
+
+	cam.apply();
+
+	core.unpause();
 
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Resting - - -" << L::ELF;
@@ -79,7 +95,7 @@ int main() {
 	for (short u = 0; u < 16; u++) {
 		char format[64];
 		sprintf_s(format, "&%xRAINBOW", u);
-		logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << format << L::ELF;
+		logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << format << " test" << L::ELF;
 	}
 	//}
 

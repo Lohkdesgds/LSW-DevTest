@@ -64,6 +64,9 @@
     <Filter Include="LSW5\Library\shared">
       <UniqueIdentifier>{2fd24662-6140-4e61-8d6a-169655cc7469}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW5\Library\sprite">
+      <UniqueIdentifier>{3b988ab4-6b5c-4509-95f9-05638a3dd447}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -118,6 +121,9 @@
     </ClCompile>
     <ClCompile Include="Library\LSW5\core\core.cpp">
       <Filter>LSW5\Library\core</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\sprite\sprite.cpp">
+      <Filter>LSW5\Library\sprite</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +192,9 @@
     </ClInclude>
     <ClInclude Include="Library\LSW5\shared\shared.h">
       <Filter>LSW5\Library\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\sprite\sprite.h">
+      <Filter>LSW5\Library\sprite</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

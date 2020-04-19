@@ -267,7 +267,7 @@ namespace LSW {
 		inline const auto lambda_sample_unload = [](ALLEGRO_SAMPLE*& b) -> void { if (al_is_system_installed() && b) { al_destroy_sample(b); b = nullptr; } };
 
 
-		template<typename T> SuperResource<T>::_i<T> SuperResource<T>::data = { Constants::lambda_default_load<T>, Constants::lambda_default_unload<T> };
+		template<typename T> SuperResource<T>::_i<T> SuperResource<T>::data = { lambda_default_load<T>, lambda_default_unload<T> };
 
 		// type specific
 		template <> SuperResource<ALLEGRO_BITMAP>::_i<ALLEGRO_BITMAP>	SuperResource<ALLEGRO_BITMAP>::data = { lambda_bitmap_load, lambda_bitmap_unload };

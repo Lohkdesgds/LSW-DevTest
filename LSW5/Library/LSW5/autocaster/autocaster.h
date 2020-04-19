@@ -16,7 +16,7 @@ namespace LSW {
 		namespace Cast {
 
 			// simple (static) cast
-			template<typename T, typename K>
+			template<typename K, typename T>
 			inline K s_cast(T val) noexcept { return static_cast<K>(val); }
 
 			// regress (go back to main) cast
@@ -24,7 +24,7 @@ namespace LSW {
 			inline Cust r_cast(Base b) noexcept { if (std::is_pointer_v<Base> || std::is_array_v<Base>) return s_cast<Cust*>(b); return s_cast<Cust>(b); }
 
 			// force cast
-			template<typename T, typename K>
+			template<typename K, typename T>
 			inline K f_cast(T val) noexcept { return (K)val; }
 
 			// auto cast

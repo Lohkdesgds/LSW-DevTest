@@ -206,6 +206,7 @@
     <ClCompile Include="Library\LSW5\logger\logger.cpp" />
     <ClCompile Include="Library\LSW5\logger\printer.cpp" />
     <ClCompile Include="Library\LSW5\socketsystem\socketsystem.cpp" />
+    <ClCompile Include="Library\LSW5\sprite\sprite.cpp" />
     <ClCompile Include="Library\LSW5\superresource\superresource.cpp" />
     <ClCompile Include="Library\LSW5\tools\tools.cpp" />
     <ClCompile Include="main.cpp" />
@@ -227,6 +228,7 @@
     <ClInclude Include="Library\LSW5\logger\printer.h" />
     <ClInclude Include="Library\LSW5\shared\shared.h" />
     <ClInclude Include="Library\LSW5\socketsystem\socketsystem.h" />
+    <ClInclude Include="Library\LSW5\sprite\sprite.h" />
     <ClInclude Include="Library\LSW5\supermap\supermap.h" />
     <ClInclude Include="Library\LSW5\supermap\superpair.h" />
     <ClInclude Include="Library\LSW5\superresource\superresource.h" />

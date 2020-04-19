@@ -77,6 +77,8 @@ namespace LSW {
 			Database db;
 			coloured_string clr_str;
 
+			SuperResource<Sprite_Base> sprites;
+
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 			Useful functions to quickly do stuff
@@ -168,9 +170,24 @@ namespace LSW {
 							}
 						}
 					}
+
+					// draw?
+					for(auto& i : sprites)
+					{
+						i->self->draw();
+					}
+
+					disp.flip();
+				}
+				catch (Abort::Abort err) {
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eFrom: " << err.getWhereFrom() << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.getDetails() << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << Cast::s_cast<int>(err.getLevel()) << L::ELF;
 				}
 				catch (...) {
-
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
 				}
 
 
@@ -315,6 +332,24 @@ namespace LSW {
 
 			data.gmute.unlock();
 		}
+
+		void Core::pause()
+		{
+			data.display_routine.pause = true;
+			data.collision_routine.pause = true;
+			data.events_routine.pause = true;
+			data.functional_routine.pause = true;
+		}
+
+		void Core::unpause()
+		{
+			data.display_routine.pause = false;
+			data.collision_routine.pause = false;
+			data.events_routine.pause = false;
+			data.functional_routine.pause = false;
+		}
+
+
 
 		void Core::fEnd()
 		{
