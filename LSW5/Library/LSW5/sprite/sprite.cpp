@@ -261,6 +261,7 @@ namespace LSW {
 					cam->get(camera::e_double::SCALE_G, camg);
 					cam->get(camera::e_double::SCALE_X, camx);
 					cam->get(camera::e_double::SCALE_Y, camy);
+					cam->apply();
 				}
 				else {
 					clean_camera.apply();
@@ -274,11 +275,13 @@ namespace LSW {
 					scale_y = *data.double_data[sprite::e_double::SCALE_G] * *data.double_data[sprite::e_double::SCALE_Y] * (camg * camy);
 
 					al_draw_filled_rectangle(
-						/* X1: */ *data.double_data[sprite::e_double::TARG_POSX] - scale_x,
-						/* Y1: */ *data.double_data[sprite::e_double::TARG_POSY] - scale_y,
-						/* X2: */ *data.double_data[sprite::e_double::TARG_POSX] + scale_x,
-						/* Y2: */ *data.double_data[sprite::e_double::TARG_POSY] + scale_y,
+						/* X1: */ *data.double_data[sprite::e_double::TARG_POSX] - scale_x * 0.5,
+						/* Y1: */ *data.double_data[sprite::e_double::TARG_POSY] - scale_y * 0.5,
+						/* X2: */ *data.double_data[sprite::e_double::TARG_POSX] + scale_x * 0.5,
+						/* Y2: */ *data.double_data[sprite::e_double::TARG_POSY] + scale_y * 0.5,
 						al_map_rgb(255, 255, 255));
+
+					//al_draw_filled_rectangle(0, 0, 900, 900, al_map_rgb(255, 0, 255));
 				}
 
 				if (isEq(sprite::e_boolean::SHOWDOT, true)) {

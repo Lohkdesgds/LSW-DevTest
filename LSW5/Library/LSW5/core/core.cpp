@@ -126,7 +126,7 @@ namespace LSW {
 				data.display_routine.tick();
 
 				try {
-					while (data.display_routine.pause) {
+					while (data.display_routine.isPaused()) {
 						Sleep(50); // 20 per sec
 						data.display_routine.tick(); // keep saying it's alive
 					}
@@ -135,13 +135,21 @@ namespace LSW {
 
 						// REGISTERED EVENT (here)
 
-						if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::LOOPTRACK))) {
+						if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::LOOP_TRACK))) {
 							db.set(database::e_sizet::FRAMESPERSECOND, data.display_routine.routines.getNumCallsDefault());
 						}
-						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::CHECKMEMORYBITMAP))) {
+						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::CHECK_MEMORY_BITMAP_AND_CAMERA))) {
 							al_convert_bitmaps();
+							Camera cam;
+							if (auto* ptr = cam.getLastCameraApply(); ptr) {
+								ptr->refresh();
+								ptr->apply();
+							}
+							else {
+								throw Abort::Abort(__FUNCSIG__, "No camera found. Please do a Camera.apply() somewhere and keep the Camera object alive to work.", Abort::abort_level::GIVEUP);
+							}
 						}
-						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::UPDATELOGONSCREEN))) {
+						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::UPDATE_LOG_ON_SCREEN))) {
 							// to be done
 						}
 
@@ -171,13 +179,17 @@ namespace LSW {
 						}
 					}
 
+
 					// draw?
 					for(auto& i : sprites)
 					{
 						i->self->draw();
 					}
 
+					//cam.getLastCameraApply()->matrix_debug();
+
 					disp.flip();
+					al_clear_to_color(al_map_rgb(0, 0, 0));
 				}
 				catch (Abort::Abort err) {
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
@@ -191,8 +203,8 @@ namespace LSW {
 				}
 
 
-				logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
-				al_rest(0.5);
+				//logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
+				//al_rest(0.5);
 			}
 
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -231,6 +243,12 @@ namespace LSW {
 			logg << L::SLF << fsr(__FUNCSIG__) << "Looping Thread COLLISION..." << L::ELF;
 			while (keep()) {
 				data.collision_routine.tick();
+
+				while (data.collision_routine.isPaused()) {
+					Sleep(50); // 20 per sec
+					data.collision_routine.tick(); // keep saying it's alive
+				}
+
 				logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
 				al_rest(0.5);
 			}
@@ -258,6 +276,12 @@ namespace LSW {
 			logg << L::SLF << fsr(__FUNCSIG__) << "Looping Thread EVENTS..." << L::ELF;
 			while (keep()) {
 				data.events_routine.tick();
+
+				while (data.events_routine.isPaused()) {
+					Sleep(50); // 20 per sec
+					data.events_routine.tick(); // keep saying it's alive
+				}
+
 				logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
 				al_rest(0.5);
 			}
@@ -285,6 +309,12 @@ namespace LSW {
 			logg << L::SLF << fsr(__FUNCSIG__) << "Looping Thread FUNCTIONAL..." << L::ELF;
 			while (keep()) {
 				data.functional_routine.tick();
+
+				while (data.functional_routine.isPaused()) {
+					Sleep(50); // 20 per sec
+					data.functional_routine.tick(); // keep saying it's alive
+				}
+
 				logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
 				al_rest(0.5);
 			}
@@ -384,6 +414,11 @@ namespace LSW {
 		bool Core::allAlive()
 		{
 			return data.display_routine.isAlive() && data.collision_routine.isAlive() && data.events_routine.isAlive() && data.functional_routine.isAlive();
+		}
+
+		bool Core::allPaused()
+		{
+			return data.display_routine.success_pause && data.collision_routine.success_pause && data.events_routine.success_pause && data.functional_routine.success_pause;
 		}
 
 	}

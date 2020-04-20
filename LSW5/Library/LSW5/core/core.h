@@ -39,13 +39,13 @@ namespace LSW {
 			const int collisions_per_second_calc = 20;
 
 			/*
-			LOOPTRACK is just to update stuff (database data)
+			LOOP_TRACK is just to update stuff (database data)
 			*/
 
-			enum class thr_display_routines		{ LOOPTRACK, CHECKMEMORYBITMAP, UPDATELOGONSCREEN };
-			enum class thr_collision_routines	{ LOOPTRACK, COLLISIONWORK };
-			enum class thr_events_routines		{ LOOPTRACK, UPDATEMOUSE };
-			enum class thr_functional_routines	{ LOOPTRACK };
+			enum class thr_display_routines		{ LOOP_TRACK, CHECK_MEMORY_BITMAP_AND_CAMERA, UPDATE_LOG_ON_SCREEN };
+			enum class thr_collision_routines	{ LOOP_TRACK, COLLISION_WORK };
+			enum class thr_events_routines		{ LOOP_TRACK, UPDATE_MOUSE };
+			enum class thr_functional_routines	{ LOOP_TRACK };
 
 			enum class thr_ids {
 				ALL = -1, DRAWING, COLLIDING, EVENTS, FUNCTIONAL,
@@ -53,7 +53,7 @@ namespace LSW {
 			};
 
 
-			typedef SuperTimer<1, 2, 5>								__display_routines;
+			typedef SuperTimer<1, 5, 5>								__display_routines;
 			typedef SuperTimer<1, collisions_per_second_calc>		__collision_routines;
 			typedef SuperTimer<1, 60>								__events_routines;
 			typedef SuperTimer<1>									__functional_routines;
@@ -71,13 +71,16 @@ namespace LSW {
 					double last_delta_loop = 0.0;
 					T routines{};
 					bool pause = false;
+					bool success_pause = false;
 					bool has_initialized_once = false;
 
 					void tick() { last_delta_loop = al_get_time() - last_loop; last_loop = al_get_time(); } // update time
+					bool isPaused() { return success_pause = pause; }
 					double lastDeltaT() { return last_delta_loop; }
 
 					bool isAlive() { return al_get_time() - last_loop < 1.0; } // had tick < 1 seg ago
 					bool isInitialized() { return has_initialized_once; } // true if on mid of the thread (via initialize() in first line and unitialize() in the end ON THREAD!)
+					bool hasPausedSuccessfully() { return success_pause; }
 
 					bool initialize() { bool k = has_initialized_once; has_initialized_once = true; return !k; } // return true if has to initialize, and also set that initialized
 					void deinitialize() { has_initialized_once = false; } // set as unitialized
@@ -116,6 +119,7 @@ namespace LSW {
 			bool allEnded(); // all threads said they're not "initialized", so must be dead.
 			bool oneAlive(); // at least one thread still running (1 sec max unload time)
 			bool allAlive(); // all threads are running?
+			bool allPaused();// have they paused successfully?
 		};
 	}
 }

@@ -51,13 +51,7 @@ int main() {
 	logg << L::SLF << fsr(__FUNCSIG__) << "&2Version: &a" << Shared::version_app << L::ELF;
 
 
-	Camera cam;
-	cam.set(camera::e_integer::ID, 0);
-	cam.apply();
-	int gut;
-	if (!cam.get(camera::e_integer::ID, gut)) {
-		logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&6Couldn't get CAMERA::ID? hmm..." << L::ELF;
-	}
+	
 
 	Core core;
 
@@ -66,20 +60,38 @@ int main() {
 	core.pause(); // set to pause before doing anything
 	core.init();
 
+	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Waiting CORE to start and then wait - - -" << L::ELF;
+	
+	while(!core.allPaused());
+
+	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Initializing resources - - -" << L::ELF;
+
 	SuperResource<Sprite_Base> sprites;
 	auto* ref = sprites.create("test");
 	ref->set("show_box", true);
 	ref->set("show_dot", true);
+	ref->set("scale_g", 0.3);
 
-
+	Camera cam;
+	cam.set(camera::e_integer::ID, 0);
 	cam.apply();
+	{
+		int gut;
+		if (!cam.get(camera::e_integer::ID, gut)) {
+			logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&6Couldn't get CAMERA::ID? hmm..." << L::ELF;
+		}
+	}
 
 	core.unpause();
+
+	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Unpaused CORE - - -" << L::ELF;
 
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Resting - - -" << L::ELF;
 
-	al_rest(6.0);
+	for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 10000;) {
+		ref->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time()));
+	}
 
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Ending CORE once - - -" << L::ELF;

@@ -202,6 +202,7 @@ namespace LSW {
 
 			if (!d) return;
 
+			// return is optional here
 			transf(d,
 				*Tools::assert_cast(data.double_data[camera::e_double::OFFSET_X]), *Tools::assert_cast(data.double_data[camera::e_double::OFFSET_Y]),
 				*Tools::assert_cast(data.double_data[camera::e_double::SCALE_X]) * *Tools::assert_cast(data.double_data[camera::e_double::SCALE_G]),
@@ -218,6 +219,73 @@ namespace LSW {
 		Camera* Camera::getLastCameraApply() const
 		{
 			return last_camera_applied;
+		}
+
+		void Camera::matrix_debug()
+		{
+			double m[2] = { 0.0 };
+			double limits[4] = { 0.0 };
+			//Database db;
+			Camera* psf = this->getLastCameraApply();
+			Camera  org;
+
+			//db.get(Constants::ro__db_mouse_double::RAW_MOUSE_X, m[0]);
+			//db.get(Constants::ro__db_mouse_double::RAW_MOUSE_Y, m[1]);
+
+			psf->get(camera::e_double::LIMIT_MIN_X, limits[0]);
+			psf->get(camera::e_double::LIMIT_MIN_Y, limits[1]);
+			psf->get(camera::e_double::LIMIT_MAX_X, limits[2]);
+			psf->get(camera::e_double::LIMIT_MAX_Y, limits[3]);
+
+			psf->refresh();
+
+			float mt[2];
+			for (short n = 0; n < 2; n++) mt[n] = +m[n];
+
+			ALLEGRO_TRANSFORM untransf = psf->copyRAW().transformation;
+			al_invert_transform(&untransf);
+			al_transform_coordinates(&untransf, &mt[0], &mt[1]);
+
+			m[0] = +mt[0];
+			m[1] = +mt[1];
+
+			ALLEGRO_COLOR co = al_map_rgba_f(0.5, 0.5, 0.5, 0.5);
+			ALLEGRO_COLOR cp = al_map_rgba_f(0.5, 0.25, 0.0, 0.5);
+			ALLEGRO_COLOR cp2 = al_map_rgba_f(0.3, 0.08, 0.0, 0.3);
+
+			org.apply();
+
+			// +
+			al_draw_line(-5, 0, 5, 0, co, 0.007);
+			al_draw_line(0, -5, 0, 5, co, 0.007);
+
+			// |---|
+			al_draw_line(-1, 0.1, -1, -0.1, co, 0.007);
+			al_draw_line(1, 0.1, 1, -0.1, co, 0.007);
+			al_draw_line(0.1, -1, -0.1, -1, co, 0.007);
+			al_draw_line(0.1, 1, -0.1, 1, co, 0.007);
+
+			// mouse
+			al_draw_filled_circle(m[0], m[1], 0.018, al_map_rgba_f(0.75, 0, 0, 0.75)); // mouse is different color
+
+			psf->apply();
+
+			// +
+			al_draw_line(-5, 0, 5, 0, cp, 0.01);
+			al_draw_line(0, -5, 0, 5, cp, 0.01);
+
+			// x
+			al_draw_line(-0.1, 0.1, 0.1, -0.1, cp, 0.008);
+			al_draw_line(-0.1, -0.1, 0.1, 0.1, cp, 0.008);
+
+			// |---|
+			al_draw_line(-1, 0.1, -1, -0.1, cp, 0.005);
+			al_draw_line(1, 0.1, 1, -0.1, cp, 0.005);
+			al_draw_line(0.1, -1, -0.1, -1, cp, 0.005);
+			al_draw_line(0.1, 1, -0.1, 1, cp, 0.005);
+
+			// limits
+			if (psf->isEq(camera::e_boolean::RESPECT_LIMITS, true)) al_draw_rectangle(limits[0], limits[1], limits[2], limits[3], cp2, 0.010);
 		}
 
 		Camera::camera_data& Camera::copyRAW()

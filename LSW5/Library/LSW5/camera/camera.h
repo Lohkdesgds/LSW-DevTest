@@ -101,6 +101,8 @@ namespace LSW {
 			void apply();
 			Camera* getLastCameraApply() const;
 
+			void matrix_debug();
+
 			Camera::camera_data& copyRAW();
 		};
 
