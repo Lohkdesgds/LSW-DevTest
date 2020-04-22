@@ -71,6 +71,12 @@ int main() {
 	ref->set("show_box", true);
 	ref->set("show_dot", true);
 	ref->set("scale_g", 0.3);
+	ref->set("target_pos_y", 0.5);
+	auto* ref2 = sprites.create("test2");
+	ref2->set("show_box", true);
+	ref2->set("show_dot", true);
+	ref2->set("scale_g", 0.2);
+	ref2->set("target_pos_y", -0.5);
 
 	Camera cam;
 	cam.set(camera::e_integer::ID, 0);
@@ -89,8 +95,9 @@ int main() {
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Resting - - -" << L::ELF;
 
-	for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 10000;) {
+	for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 5000;) {
 		ref->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time()));
+		ref2->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time() + 0.7));
 	}
 
 

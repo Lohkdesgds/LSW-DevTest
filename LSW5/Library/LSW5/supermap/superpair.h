@@ -229,7 +229,7 @@ namespace LSW {
 			bool set(K key) {
 				if (std::is_pointer<K>::value) return false;
 				if (std::is_array<K>::value) return false;
-				auto* copyin = (Cast::r_cast_t<K*>)(&key);
+				auto* copyin = (Cast::r_cast_t<K>*)(&key);
 				size_t actual_size_c = sizeof(*copyin);
 
 				// copyin is a value, not pointer
@@ -246,7 +246,7 @@ namespace LSW {
 			template<typename K, size_t size_o>
 			bool set(K(&key)[size_o]) {
 				size_t size = size_o;
-				auto* copyin = (Cast::r_cast_t<K*>)(key);
+				auto* copyin = (Cast::r_cast_t<K>*)(key);
 				if (typeid(copyin) == typeid(char*)) size = strnlen_s(key, size_o);
 				size_t actual_size_c = sizeof(*copyin) * size;
 
@@ -264,7 +264,7 @@ namespace LSW {
 			}
 			template<typename K>
 			bool set(K* key, size_t size) {
-				auto* copyin = (Cast::r_cast_t<K*>)(key);
+				auto* copyin = (Cast::r_cast_t<K>*)(key);
 				size_t actual_size_c = sizeof(*copyin) * size;
 
 				// copyin is a value, not pointer
@@ -292,7 +292,7 @@ namespace LSW {
 			T* operator[](K key) {
 				if (std::is_pointer<K>::value) return nullptr;
 				if (std::is_array<K>::value) return nullptr;
-				auto* copyin = (Cast::r_cast_t<K*>)(&key);
+				auto* copyin = (Cast::r_cast_t<K>*)(&key);
 				size_t actual_size_c = sizeof(*copyin);
 
 				for (auto& i : pairs) {
@@ -305,7 +305,7 @@ namespace LSW {
 			template<typename K, size_t size_o>
 			T* operator[](K(&key)[size_o]) {
 				size_t size = size_o;
-				auto* copyin = (Cast::r_cast_t<K*>)(key);
+				auto* copyin = (Cast::r_cast_t<K>*)(key);
 				if (typeid(copyin) == typeid(char*)) size = strnlen_s(key, size_o);
 				size_t actual_size_c = sizeof(*copyin) * size;
 
@@ -322,7 +322,7 @@ namespace LSW {
 			T* operator()(K key) {
 				if (std::is_pointer<K>::value) return nullptr;
 				if (std::is_array<K>::value) return nullptr;
-				auto* copyin = (Cast::r_cast_t<K*>)(&key);
+				auto* copyin = (Cast::r_cast_t<K>*)(&key);
 				size_t actual_size_c = sizeof(*copyin);
 
 				for (auto& i : pairs) {
@@ -335,7 +335,7 @@ namespace LSW {
 			template<typename K, size_t size_o>
 			T* operator()(K(&key)[size_o]) {
 				size_t size = size_o;
-				auto* copyin = (Cast::r_cast_t<K*>)(key);
+				auto* copyin = (Cast::r_cast_t<K>*)(key);
 				if (typeid(copyin) == typeid(char*)) size = strnlen_s(key, size_o);
 				size_t actual_size_c = sizeof(*copyin) * size;
 
@@ -349,7 +349,7 @@ namespace LSW {
 			template<typename K>
 			T* operator()(K* key, size_t size_o) {
 				size_t size = size_o;
-				auto* copyin = (Cast::r_cast_t<K*>)(key);
+				auto* copyin = (Cast::r_cast_t<K>*)(key);
 				if (typeid(copyin) == typeid(char*)) size = strnlen_s(key, size_o);
 				size_t actual_size_c = sizeof(*copyin) * size;
 
@@ -373,7 +373,7 @@ namespace LSW {
 			const T* operator[](K key) const {
 				if (std::is_pointer<K>::value) return nullptr;
 				if (std::is_array<K>::value) return nullptr;
-				auto* copyin = (Cast::r_cast_t<K*>)(&key);
+				auto* copyin = (Cast::r_cast_t<K>*)(&key);
 				size_t actual_size_c = sizeof(*copyin);
 
 				for (auto& i : pairs) {
@@ -386,7 +386,7 @@ namespace LSW {
 			template<typename K, size_t size_o>
 			const T* operator[](K(&key)[size_o]) const {
 				size_t size = size_o;
-				auto* copyin = (Cast::r_cast_t<K*>)(key);
+				auto* copyin = (Cast::r_cast_t<K>*)(key);
 				if (typeid(copyin) == typeid(char*)) size = strnlen_s(key, size_o);
 				size_t actual_size_c = sizeof(*copyin) * size;
 
@@ -403,7 +403,7 @@ namespace LSW {
 			const T* operator()(K key) const {
 				if (std::is_pointer<K>::value) return nullptr;
 				if (std::is_array<K>::value) return nullptr;
-				auto* copyin = (Cast::r_cast_t<K*>)(&key);
+				auto* copyin = (Cast::r_cast_t<K>*)(&key);
 				size_t actual_size_c = sizeof(*copyin);
 
 				for (auto& i : pairs) {
@@ -416,7 +416,7 @@ namespace LSW {
 			template<typename K, size_t size_o>
 			const T* operator()(K(&key)[size_o]) const {
 				size_t size = size_o;
-				auto* copyin = (Cast::r_cast_t<K*>)(key);
+				auto* copyin = (Cast::r_cast_t<K>*)(key);
 				if (typeid(copyin) == typeid(char*)) size = strnlen_s(key, size_o);
 				size_t actual_size_c = sizeof(*copyin) * size;
 
@@ -430,7 +430,7 @@ namespace LSW {
 			template<typename K>
 			const T* operator()(K* key, size_t size_o) const {
 				size_t size = size_o;
-				auto* copyin = (Cast::r_cast_t<K*>)(key);
+				auto* copyin = (Cast::r_cast_t<K>*)(key);
 				if (typeid(copyin) == typeid(char*)) size = strnlen_s(key, size_o);
 				size_t actual_size_c = sizeof(*copyin) * size;
 
@@ -454,7 +454,7 @@ namespace LSW {
 			void del(K key) {
 				if (std::is_pointer<K>::value) return;
 				if (std::is_array<K>::value) return;
-				auto* copyin = (Cast::r_cast_t<K*>)(&key);
+				auto* copyin = (Cast::r_cast_t<K>*)(&key);
 
 				for (size_t p = 0; p < pairs.size(); p++) {
 					auto& i = pairs[p];
@@ -466,7 +466,7 @@ namespace LSW {
 			}
 			template<typename K, size_t size>
 			void del(K(&key)[size]) {
-				auto* copyin = (Cast::r_cast_t<K*>)(&key);
+				auto* copyin = (Cast::r_cast_t<K>*)(&key);
 
 				for (size_t p = 0; p < pairs.size(); p++) {
 					auto& i = pairs[p];
@@ -478,7 +478,7 @@ namespace LSW {
 			}
 			template<typename K>
 			void del(K* key, size_t size) {
-				auto* copyin = (Cast::r_cast_t<K*>)(&key);
+				auto* copyin = (Cast::r_cast_t<K>*)(&key);
 
 				for (size_t p = 0; p < pairs.size(); p++) {
 					auto& i = pairs[p];
@@ -499,17 +499,17 @@ namespace LSW {
 
 			template<typename K>
 			bool hasType() const {
-				bool is_ptr = (std::is_pointer<K>::value || std::is_array<K>::value);
-				auto* copyin = (Cast::r_cast_t<K*>)(nullptr);
+				//bool is_ptr = (std::is_pointer<K>::value || std::is_array<K>::value);
+				auto* copyin = (Cast::r_cast_t<K>*)(nullptr);
 
 				for (size_t p = 0; p < pairs.size(); p++) {
 					auto& i = pairs[p];
-					if (is_ptr) {
-						if (i.first == typeid(copyin)) return true;
-					}
-					else {
+					//if (is_ptr) {
+					//	if (i.first == typeid(copyin)) return true;
+					//}
+					//else {
 						if (i.first == typeid(*copyin)) return true;
-					}
+					//}
 				}
 				return false;
 			}
@@ -525,14 +525,14 @@ namespace LSW {
 			template<typename K>
 			bool getType(K& val, size_t siz = 1) const {
 				bool is_ptr = (std::is_pointer<K>::value || std::is_array<K>::value);
-				auto* copyin = (Cast::r_cast_t<K*>)(nullptr);
+				auto* copyin = (Cast::r_cast_t<K>*)(nullptr);
 
 				for (size_t p = 0; p < pairs.size(); p++) {
 					auto& i = pairs[p];
 					if (is_ptr) {
-						if (i.first == typeid(copyin)) {
+						if (i.first == typeid(*copyin)) {
 							if (siz < i.second.size()) continue;
-							memcpy_s(i.second.c_data(), i.second.size(), (void*)val, i.second.size());
+							memcpy_s((void*)val, i.second.size(), i.second.c_data(), i.second.size());
 							return true;
 						}
 					}
@@ -548,7 +548,7 @@ namespace LSW {
 
 			template<typename K, size_t size>
 			bool getType(K(&val)[size]) const {
-				auto* copyin = (Cast::r_cast_t<K*>)(val);
+				auto* copyin = (Cast::r_cast_t<K>*)(val);
 				return getType(copyin, size);
 			}
 		};
