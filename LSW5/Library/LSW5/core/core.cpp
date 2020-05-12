@@ -126,12 +126,13 @@ namespace LSW {
 				data.display_routine.tick();
 
 				try {
+
 					while (data.display_routine.isPaused()) {
 						Sleep(50); // 20 per sec
 						data.display_routine.tick(); // keep saying it's alive
 					}
 
-					if (data.display_routine.routines.hasEvent()) {
+					if (data.display_routine.routines.hasEvent()) { // LOOP_TRACK, CHECK_MEMORY_BITMAP_AND_CAMERA, UPDATE_LOG_ON_SCREEN
 
 						// REGISTERED EVENT (here)
 
@@ -151,6 +152,7 @@ namespace LSW {
 						}
 						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::UPDATE_LOG_ON_SCREEN))) {
 							// to be done
+							// there's no such class to handle STRING yet (Text)
 						}
 
 						// OTHER EVENTS (Allegro and stuff)
@@ -181,6 +183,7 @@ namespace LSW {
 
 
 					// draw?
+
 					for(auto& i : sprites)
 					{
 						i->self->draw();
@@ -228,29 +231,89 @@ namespace LSW {
 
 		void Core::thr_1(Threads::boolThreadF& keep) // COLLIDING
 		{
+			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+			Variables used while thread is on:
+
+			* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 			const int thr_id = static_cast<int>(core::thr_ids::COLLIDING);
 			Logger logg;
+			Database db;
 
-			// variables used here:
+			SuperResource<Sprite_Base> sprites;
+
+
+			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+			> > > > INITIALIZE < < < <
+
+			* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 
 			if (data.collision_routine.initialize()) { // has to initialize (once)
 				logg << L::SLF << fsr(__FUNCSIG__) << "Initializing Thread COLLISION..." << L::ELF;
 
+				data.collision_routine.routines.start();
 			}
 
+
+			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+			> > > > LOOP < < < <
+
+			* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
 			logg << L::SLF << fsr(__FUNCSIG__) << "Looping Thread COLLISION..." << L::ELF;
 			while (keep()) {
 				data.collision_routine.tick();
 
-				while (data.collision_routine.isPaused()) {
-					Sleep(50); // 20 per sec
-					data.collision_routine.tick(); // keep saying it's alive
+				try {
+
+					while (data.collision_routine.isPaused()) {
+						Sleep(50); // 20 per sec
+						data.collision_routine.tick(); // keep saying it's alive
+					}
+
+					if (data.collision_routine.routines.hasEvent()) { // LOOP_TRACK, COLLISION_WORK
+
+						// REGISTERED EVENT (here)
+
+						if (data.collision_routine.routines.isThisThis(static_cast<size_t>(core::thr_collision_routines::LOOP_TRACK))) {
+							db.set(database::e_sizet::COLLISIONSPERSECOND, data.collision_routine.routines.getNumCallsDefault());
+						}
+						else if (data.collision_routine.routines.isThisThis(static_cast<size_t>(core::thr_collision_routines::COLLISION_WORK))) {
+
+							bool gottem = false;
+
+							for (size_t times = 0; !(gottem = sprites.tryLock()) && times < 10; Sleep(10));
+
+							if (gottem) {
+								for (auto& i : sprites) {
+									i->self->update();
+								}
+								sprites.unlock();
+							}
+							else {
+								throw Abort::Abort(__FUNCSIG__, "Couldn't get mutex for Sprites after 10 tries.", Abort::abort_level::GIVEUP);
+							}
+						}
+					}
+				}
+				catch (Abort::Abort err) {
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eFrom: " << err.getWhereFrom() << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.getDetails() << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << Cast::s_cast<int>(err.getLevel()) << L::ELF;
+				}
+				catch (...) {
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
 				}
 
-				logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
-				al_rest(0.5);
+				//logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
+				//al_rest(0.5);
 			}
 
 

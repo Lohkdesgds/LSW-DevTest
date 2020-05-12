@@ -12,11 +12,11 @@ namespace LSW {
 			while (data.keep_autosaving)
 			{
 				for (unsigned t = 0; t < database::delay_flush && data.keep_autosaving; t++) Sleep(100); // 5 sec with test
-				flush();
+				flush(!data.keep_autosaving);
 			}
 		}
 
-		void Database::flush()
+		void Database::flush(const bool print)
 		{
 			data.mute.lock();
 			Logger logg;
@@ -43,7 +43,7 @@ namespace LSW {
 					if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
 
 					al_set_config_value(data.config, "config", transformed_lmao, std::to_string(*Tools::assert_cast(data.double_data[transformed_lmao])).c_str());
-					logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << std::to_string(*Tools::assert_cast(data.double_data[transformed_lmao])) << "&2'" << L::EL;
+					if (print) logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << std::to_string(*Tools::assert_cast(data.double_data[transformed_lmao])) << "&2'" << L::EL;
 				}
 			}
 			// BOOL
@@ -66,7 +66,7 @@ namespace LSW {
 
 
 					al_set_config_value(data.config, "config", transformed_lmao, (*Tools::assert_cast(data.boolean_data[transformed_lmao]) ? "true" : "false"));
-					logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << (*Tools::assert_cast(data.boolean_data[transformed_lmao]) ? "true" : "false") << "&2'" << L::EL;
+					if (print) logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << (*Tools::assert_cast(data.boolean_data[transformed_lmao]) ? "true" : "false") << "&2'" << L::EL;
 				}
 			}
 			// INT
@@ -88,7 +88,7 @@ namespace LSW {
 					if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
 
 					al_set_config_value(data.config, "config", transformed_lmao, std::to_string(*Tools::assert_cast(data.integer_data[transformed_lmao])).c_str());
-					logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << std::to_string(*Tools::assert_cast(data.integer_data[transformed_lmao])) << "&2'" << L::EL;
+					if (print) logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << std::to_string(*Tools::assert_cast(data.integer_data[transformed_lmao])) << "&2'" << L::EL;
 				}
 			}
 			// SIZET
@@ -110,7 +110,7 @@ namespace LSW {
 					if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
 
 					al_set_config_value(data.config, "config", transformed_lmao, std::to_string(*Tools::assert_cast(data.sizet_data[transformed_lmao])).c_str());
-					logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << std::to_string(*Tools::assert_cast(data.sizet_data[transformed_lmao])) << "&2'" << L::EL;
+					if (print) logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << std::to_string(*Tools::assert_cast(data.sizet_data[transformed_lmao])) << "&2'" << L::EL;
 				}
 			}
 			// STD::STRING
@@ -132,7 +132,7 @@ namespace LSW {
 					if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
 
 					al_set_config_value(data.config, "config", transformed_lmao, (*Tools::assert_cast(data.string_data[transformed_lmao])).c_str());
-					logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << *Tools::assert_cast(data.string_data[transformed_lmao]) << "&2'" << L::EL;
+					if (print) logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << *Tools::assert_cast(data.string_data[transformed_lmao]) << "&2'" << L::EL;
 				}
 			}
 			// COLOR STUFF
@@ -157,7 +157,7 @@ namespace LSW {
 					char savin[512];
 					sprintf_s(savin, "{%.4f;%.4f;%.4f}", clr.r, clr.g, clr.b);
 					al_set_config_value(data.config, "config", transformed_lmao, savin);
-					logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << savin << "&2'" << L::EL;
+					if (print) logg << L::SL << fsr(__FUNCSIG__, E::DEBUG) << "&9Saved config entry &2'&a" << transformed_lmao << "&2' &9as &2'&a" << savin << "&2'" << L::EL;
 				}
 			}
 

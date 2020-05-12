@@ -17,6 +17,9 @@ namespace LSW {
 			// very useful stuff
 			constexpr size_t NoSolution = static_cast<size_t>(-1);
 
+			// game timing
+			const int game_timing_tps = 10;
+
 			// not actually template, but shared
 			struct super_char {
 				std::string ch;

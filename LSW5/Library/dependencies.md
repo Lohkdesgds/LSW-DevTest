@@ -18,6 +18,7 @@
 * Printer
 * Shared
 * SocketSystem
+* Sprite
 * SuperMap
 * SuperPair
 * SuperResource
@@ -28,106 +29,52 @@
 
 ### Dependency configuration
 
-* Abort
-
-* AllegroInitialization
-
-* Autocaster
- 
-* Camera
-  * SuperMap
-    * SuperPair
-      * Abort
-      * Autocaster
-  * Tools
-    * Abort
-  * AllegroInitialization
-
-* Core
-  * Abort
-  * SuperTimer
-    * AllegroInitialization
-  * SuperMap
-    * SuperPair
-      * Abort
-      * Autocaster
-  * Logger
-    * Printer
-      * ColouredString
-  * Display
-  * Shared
-  * Autocaster
-  
-* Database
-  * Abort
-  * SuperMap
-    * SuperPair
-      * Abort
-      * Autocaster
-  * Logger
-    * Printer
-      * ColouredString
-  * Tools
-    * Abort
-
-* Display
-  * Logger
-    * Printer
-      * ColouredString
-  * Database
-    * Abort
-    * SuperMap
-      * SuperPair
-        * Abort
-        * Autocaster
-    * Logger
-      * Printer
-        * ColouredString
-    * Tools
-      * Abort
-  * SuperThread
-    * AllegroInitialization
-  * Logger
-    * Printer
-      * ColouredString
-  
-* Downloader
-
-* FileSystem
-  * Tools
-  
-* Hash
-
-* Launcher
-
-* ColouredString
-
-* Logger
-  * Printer
-    * ColouredString
-    
-* Printer
-  * ColouredString
-
-* Shared
-
-* SocketSystem
-  * Abort
-
-* SuperMap
-  * SuperPair
-    * Abort
-    * Autocaster
-
-* SuperResource
-  * Abort
-  * AllegroInitialization
-  
-* SuperThread
-  * AllegroInitialization
-
-* SuperTimer
-  * AllegroInitialization
-  
-* Tools
-  * Abort
+Lib | #include
+--- | --------
+* Abort | none
+* AllegroInitialization | none
+* Autocaster | none
+* Camera | * SuperMap
+ | * Tools
+ | * AllegroInitialization
+* Core | * Abort
+ | * SuperTimer
+ | * SuperMap
+ | * Logger
+ | * Display
+ | * Shared
+ | * Autocaster
+ | * SuperResource
+ | * Sprite
+* Database | * Abort
+ | * SuperMap
+ | * Logger
+ | * Tools
+* Display | * Abort
+ | * Database
+ | * SuperThread
+ | * Logger  
+* Downloader | none
+* FileSystem | * Tools
+* Hash | none
+* Launcher | none
+* ColouredString | none
+* Logger | * Printer
+ | * ColouredString
+* Printer | * ColouredString
+* Shared | none
+* SocketSystem | * Abort
+* Sprite | * SuperMap
+ | * AllegroInitialization
+ | * Autocaster
+ | * Tools
+ | * Camera
+ | * Shared
+* SuperMap | * SuperPair
+* SuperPair | * Autocaster
+ | * Abort
+* SuperResource | * Abort
+ | * AllegroInitialization
+* SuperThread | * AllegroInitialization
+* SuperTimer | * AllegroInitialization
+* Tools | * Abort

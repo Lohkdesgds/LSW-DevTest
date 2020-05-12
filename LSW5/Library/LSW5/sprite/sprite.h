@@ -8,6 +8,7 @@
 #include "..\autocaster\autocaster.h"
 #include "..\tools\tools.h"
 #include "..\camera\camera.h"
+#include "..\shared\shared.h"
 
 
 namespace LSW {
@@ -17,7 +18,7 @@ namespace LSW {
 			/*
 			COL_MINDIST_... = the distance it has to move in ... (on a collision tick)			
 			*/
-			enum class e_double_readonly { SPEEDX, SPEEDY, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */, LAST_DRAW, POSX, POSY, ROTATION, COL_MINDIST_X, COL_MINDIST_Y };
+			enum class e_double_readonly { SPEED_X, SPEED_Y, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */, LAST_DRAW, POSX, POSY, ROTATION, COL_MINDIST_X, COL_MINDIST_Y };
 			enum class e_boolean_readonly { COLLISION_MOUSE_ON, COLLISION_MOUSE_CLICK, COLLISION_COLLIDED /* related to: LAST_COLLISION_TIME */ };
 
 
@@ -100,8 +101,8 @@ namespace LSW {
 			};*/
 
 			const SuperMap<double> e_double_readonly_defaults = {
-				{0.0,				(e_double_readonly::SPEEDX),						CHAR_INIT("speed_x")},
-				{0.0,				(e_double_readonly::SPEEDY),						CHAR_INIT("speed_y")},
+				{0.0,				(e_double_readonly::SPEED_X),						CHAR_INIT("speed_x")},
+				{0.0,				(e_double_readonly::SPEED_Y),						CHAR_INIT("speed_y")},
 				{0.0,				(e_double_readonly::LAST_COLLISION_TIME),			CHAR_INIT("last_collision_time")},
 				{0.0,				(e_double_readonly::LAST_DRAW),						CHAR_INIT("last_draw")},
 				{0.0,				(e_double_readonly::POSX),							CHAR_INIT("pos_x")}, // drawing POSX
@@ -135,7 +136,7 @@ namespace LSW {
 				{0.0,				(e_double::SPEED_ROTATION),							CHAR_INIT("speed_rotation")},
 				{0.3,				(e_double::SPEEDXY_LIMIT),							CHAR_INIT("speed_limit")},
 				{0.85,				(e_double::ELASTICITY_X),							CHAR_INIT("elasticity_x")},
-				{0.85,				(e_double::ELASTICITY_Y),							CHAR_INIT("elasticity_y")}
+				{0.85,				(e_double::ELASTICITY_Y),							CHAR_INIT("elasticity_y")} 
 			};
 
 			const SuperMap<bool> e_boolean_defaults = {
@@ -143,8 +144,8 @@ namespace LSW {
 				{true,				(e_boolean::DRAW),									CHAR_INIT("draw")},
 				{false,				(e_boolean::USE_COLOR),								CHAR_INIT("use_color")},
 				{true,				(e_boolean::AFFECTED_BY_CAM),						CHAR_INIT("affected_by_camera")},
-				{false,				(e_boolean::SHOWDOT),								CHAR_INIT("show_dot")},
-				{false,				(e_boolean::SHOWBOX),								CHAR_INIT("show_box")},
+				{false,				(e_boolean::SHOWDOT),								CHAR_INIT("show_dot")}, // shows dot where it will be drawn
+				{false,				(e_boolean::SHOWBOX),								CHAR_INIT("show_box")}, // shows rectangle where collision updated (latest update)
 				{true,				(e_boolean::RESPECT_CAMERA_LIMITS),					CHAR_INIT("respect_camera_limits")},
 				{false,				(e_boolean::FOLLOW_MOUSE),							CHAR_INIT("follow_mouse")},
 				{false,				(e_boolean::FOLLOW_KEYBOARD),						CHAR_INIT("follow_keyboard")}
@@ -224,6 +225,7 @@ namespace LSW {
 			void draw();
 			
 			void collide(Sprite_Base&);
+			void update();
 
 			Sprite_Base::sprite_base_data& copyRAW();
 		};

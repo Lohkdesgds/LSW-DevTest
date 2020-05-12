@@ -12,6 +12,9 @@
 namespace LSW {
 	namespace v5 {
 		namespace camera {
+
+			constexpr double roughness_default = 0.999;
+
 			enum class e_double { SCALE_X, SCALE_Y, SCALE_G, OFFSET_X, OFFSET_Y, ROTATION_RAD, LIMIT_MIN_X, LIMIT_MIN_Y, LIMIT_MAX_X, LIMIT_MAX_Y };
 			enum class e_boolean { RESPECT_LIMITS, READONLY_NOW };
 			enum class e_integer { ID };
@@ -39,26 +42,33 @@ namespace LSW {
 		}
 
 		class Camera {
+		public:
+			class layer_config {
+				int layer;
+				double elasticity = -1;
+				double roughness = camera::roughness_default;
+			public:
+				layer_config() = default;
+				// layer, elasticity, roughness
+				layer_config(const int, const double = -1, const double = camera::roughness_default);
+				layer_config(const layer_config&);
+				int getLayerID() const;
+				bool hasCollision() const;
+				double getElasticity() const;
+				double getRoughness() const;
+				void setLayerID(const int);
+				void setElasticity(const double);
+				void setRoughness(const double);
+			};
 			struct camera_data {
-				class layer_config {
-					int id;
-					double elasticity = -1;
-				public:
-					layer_config() = default;
-					layer_config(const int a, const double b) { id = a; elasticity = b; }
-					layer_config(const layer_config& o) { id = o.getID(); elasticity = o.getElasticity(); }
-					int getID() const { return id; }
-					bool hasCollision() const { return elasticity < 0.0; }
-					double getElasticity() const { return elasticity; }
-					void setID(const int a) { id = a; }
-					void setElasticity(const double a) { if (a < 0.0) elasticity = -1.0; else elasticity = a; }
-				};
-				SuperMap<double>	double_data  = camera::e_double_defaults;
+				SuperMap<double>	double_data = camera::e_double_defaults;
 				SuperMap<bool>		boolean_data = camera::e_boolean_defaults;
 				SuperMap<int>		integer_data = camera::e_integer_defaults;
 				ALLEGRO_TRANSFORM transformation{};
 				std::vector<layer_config> layers;
-			} data;
+			};
+		private:
+			camera_data data;
 
 			static Camera* last_camera_applied;
 
@@ -69,9 +79,9 @@ namespace LSW {
 
 			void reset();
 
-			void setLayer(const camera_data::layer_config);
-			void delLayer(const int);
-			camera_data::layer_config* getLayer(const int);
+			void addLayerConfig(const layer_config);
+			void delLayerConfig(const int);
+			layer_config* getLayerConfig(const int);
 
 			void set(const camera::e_double, double);
 			void set(const camera::e_boolean, bool);

@@ -132,11 +132,11 @@ namespace LSW {
 
 			void autosave_run();
 #ifndef LSW_NO_AUTOSAVE_DEBUG
-			void flush();
+			void flush(const bool); // print save
 #endif
 		public:
 #ifdef LSW_NO_AUTOSAVE_DEBUG
-			void flush();
+			void flush(const bool = false);
 #endif
 
 			Database();

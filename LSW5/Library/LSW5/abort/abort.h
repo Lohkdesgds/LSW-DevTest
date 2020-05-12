@@ -19,6 +19,7 @@ namespace LSW {
 				abort_level					abort_lvl = abort_level::FATAL_ERROR;
 				std::function<void(void)>	quick_exit = std::function<void(void)>();
 			public:
+				// from where, details, error level, function to call before real death 
 				Abort(std::string, std::string, abort_level = abort_level::FATAL_ERROR, std::function<void(void)> = std::function<void(void)>());
 
 				const std::string& getWhereFrom();

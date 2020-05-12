@@ -5,6 +5,46 @@ namespace LSW {
 
 		Camera* Camera::last_camera_applied = nullptr;
 
+
+
+		Camera::layer_config::layer_config(const int a, const double b, const double c) {
+			layer = a;
+			elasticity = b;
+			roughness = c;
+		}
+		Camera::layer_config::layer_config(const layer_config & o) {
+			layer = o.getLayerID();
+			elasticity = o.getElasticity();
+			roughness = o.getRoughness();
+		}
+		int Camera::layer_config::getLayerID() const {
+			return layer;
+		}
+		bool Camera::layer_config::hasCollision() const {
+			return elasticity < 0.0;
+		}
+		double Camera::layer_config::getElasticity() const {
+			return elasticity;
+		}
+		double Camera::layer_config::getRoughness() const {
+			return roughness;
+		}
+		void Camera::layer_config::setLayerID(const int a) {
+			layer = a;
+		}
+		void Camera::layer_config::setElasticity(const double a) {
+			if (a < 0.0) elasticity = -1.0;
+			else elasticity = a; 
+		}
+		void Camera::layer_config::setRoughness(const double a) { 
+			if (a < 0.0) roughness = 0.0; 
+			else if (a > 1.0) roughness = 1.0; 
+			else elasticity = a; 
+		}
+
+
+
+
 		ALLEGRO_TRANSFORM Camera::transf(ALLEGRO_BITMAP* d, const float x, const float y, const float sx, const float sy, const float r)
 		{
 			ALLEGRO_TRANSFORM& t = data.transformation;
@@ -52,10 +92,10 @@ namespace LSW {
 			refresh();
 		}
 
-		void Camera::setLayer(const Camera::camera_data::layer_config v)
+		void Camera::addLayerConfig(const Camera::layer_config v)
 		{
 			for (size_t p = 0; p < data.layers.size(); p++) {
-				if (data.layers[p].getID() == v.getID()) {
+				if (data.layers[p].getLayerID() == v.getLayerID()) {
 					data.layers[p].setElasticity(v.getElasticity());
 					return;
 				}
@@ -63,20 +103,20 @@ namespace LSW {
 			data.layers.push_back(v);
 		}
 
-		void Camera::delLayer(const int v)
+		void Camera::delLayerConfig(const int v)
 		{
 			for (size_t p = 0; p < data.layers.size(); p++) {
-				if (data.layers[p].getID() == v) {
+				if (data.layers[p].getLayerID() == v) {
 					data.layers.erase(data.layers.begin() + p);
 					return;
 				}
 			}
 		}
 
-		Camera::camera_data::layer_config* Camera::getLayer(const int v)
+		Camera::layer_config* Camera::getLayerConfig(const int v)
 		{
 			for (size_t p = 0; p < data.layers.size(); p++) {
-				if (data.layers[p].getID() == v) return &data.layers[p];
+				if (data.layers[p].getLayerID() == v) return &data.layers[p];
 			}
 			return nullptr;
 		}

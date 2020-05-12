@@ -36,8 +36,6 @@ namespace LSW {
 	namespace v5 {
 		namespace core {
 
-			const int collisions_per_second_calc = 20;
-
 			/*
 			LOOP_TRACK is just to update stuff (database data)
 			*/
@@ -54,7 +52,7 @@ namespace LSW {
 
 
 			typedef SuperTimer<1, 5, 5>								__display_routines;
-			typedef SuperTimer<1, collisions_per_second_calc>		__collision_routines;
+			typedef SuperTimer<1, Shared::game_timing_tps>			__collision_routines;
 			typedef SuperTimer<1, 60>								__events_routines;
 			typedef SuperTimer<1>									__functional_routines;
 		}
