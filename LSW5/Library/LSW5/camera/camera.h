@@ -8,6 +8,7 @@
 #include "..\supermap\supermap.h"
 #include "..\tools\tools.h"
 #include "..\allegroinitialization\allegroinitialization.h"
+#include "..\superresource\superresource.h"
 
 namespace LSW {
 	namespace v5 {
@@ -41,17 +42,21 @@ namespace LSW {
 			};
 		}
 
+
+
+		
+
 		class Camera {
 		public:
-			class layer_config {
+			class layer_each {
 				int layer;
 				double elasticity = -1;
 				double roughness = camera::roughness_default;
 			public:
-				layer_config() = default;
+				layer_each() = default;
 				// layer, elasticity, roughness
-				layer_config(const int, const double = -1, const double = camera::roughness_default);
-				layer_config(const layer_config&);
+				layer_each(const int, const double = -1, const double = camera::roughness_default);
+				layer_each(const layer_each&);
 				int getLayerID() const;
 				bool hasCollision() const;
 				double getElasticity() const;
@@ -60,16 +65,16 @@ namespace LSW {
 				void setElasticity(const double);
 				void setRoughness(const double);
 			};
-			struct camera_data {
+		private:
+			struct Camera_configuration {
 				SuperMap<double>	double_data = camera::e_double_defaults;
 				SuperMap<bool>		boolean_data = camera::e_boolean_defaults;
 				SuperMap<int>		integer_data = camera::e_integer_defaults;
 				ALLEGRO_TRANSFORM transformation{};
-				std::vector<layer_config> layers;
+				std::vector<layer_each> layers;
 			};
-		private:
-			camera_data data;
 
+			Camera_configuration data;
 			static Camera* last_camera_applied;
 
 			ALLEGRO_TRANSFORM transf(ALLEGRO_BITMAP*, const float, const float, const float, const float, const float);
@@ -79,9 +84,9 @@ namespace LSW {
 
 			void reset();
 
-			void addLayerConfig(const layer_config);
+			void addLayerConfig(const layer_each);
 			void delLayerConfig(const int);
-			layer_config* getLayerConfig(const int);
+			layer_each* getLayerConfig(const int);
 
 			void set(const camera::e_double, double);
 			void set(const camera::e_boolean, bool);
@@ -113,12 +118,10 @@ namespace LSW {
 
 			void matrix_debug();
 
-			Camera::camera_data& copyRAW();
+			Camera::Camera_configuration& copyRAW();
 		};
 
 
-		// ----------------------------------------------
-		// Camera does not need a template for ResourceOf
-		// ----------------------------------------------
+		template <> SuperResource<Camera>::_i<Camera>	SuperResource<Camera>::data = { lambda_default_load<Camera>, lambda_default_unload<Camera> };
 	}
 }

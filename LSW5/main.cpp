@@ -29,7 +29,8 @@ int main() {
 	logg.init(default_file_log_path);
 	Database db(config_default_file);
 
-	
+	SuperResource<Camera> cameras;
+	SuperResource<Sprite_Base> sprites;
 
 	db.set(database::e_string::PRINT_PATH, default_print_path);
 	db.set(database::e_string::DATA_PATH, start_zip_default_extract_path);
@@ -66,7 +67,6 @@ int main() {
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Initializing resources - - -" << L::ELF;
 
-	SuperResource<Sprite_Base> sprites;
 	auto* ref = sprites.create("test");
 	ref->set("show_box", true);
 	ref->set("show_dot", true);
@@ -82,13 +82,13 @@ int main() {
 	ref2->set("target_pos_y", 0.2);
 	ref2->set(sprite::e_double::ACCELERATION_X, -6e-4);
 
-	Camera cam;
-	cam.set(camera::e_integer::ID, 0);
-	cam.addLayerConfig(Camera::layer_config(0));
-	cam.apply();
+	Camera* cam = cameras.create("camera_0");
+	cam->set(camera::e_integer::ID, 0);
+	cam->addLayerConfig(Camera::layer_each(0));
+	cam->apply();
 	{
 		int gut;
-		if (!cam.get(camera::e_integer::ID, gut)) {
+		if (!cam->get(camera::e_integer::ID, gut)) {
 			logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&6Couldn't get CAMERA::ID? hmm..." << L::ELF;
 		}
 	}
@@ -106,7 +106,7 @@ int main() {
 	//}
 	ref->set(sprite::e_double::ACCELERATION_X, -5e-4);
 	ref2->set(sprite::e_double::ACCELERATION_X, 5e-4);
-	for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 9000;);
+	for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 15000;);
 
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Ending CORE once - - -" << L::ELF;
@@ -131,7 +131,7 @@ int main() {
 		Sleep(1000);
 	}
 
-	db.close();
 	logg.flush();
+	db.close();
 	return 0;
 }

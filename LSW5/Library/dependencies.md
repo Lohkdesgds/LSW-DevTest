@@ -101,7 +101,7 @@ Lib | #include
 Abort | *none*
 AllegroInitialization | *none*
 Autocaster | *none*
-Camera | SuperMap<br>Tools<br>AllegroInitialization
+Camera | SuperMap<br>Tools<br>AllegroInitialization<br>SuperResource
 Core | Abort<br>SuperTimer<br>SuperMap<br>Logger<br>Display<br>Shared<br>Autocaster<br>SuperResource<br>Sprite
 Database | Abort<br>SuperMap<br>Logger<br>Tools
 Display | Abort<br>Database<br>SuperThread<br>Logger

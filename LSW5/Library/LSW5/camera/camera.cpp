@@ -7,36 +7,36 @@ namespace LSW {
 
 
 
-		Camera::layer_config::layer_config(const int a, const double b, const double c) {
+		Camera::layer_each::layer_each(const int a, const double b, const double c) {
 			layer = a;
 			elasticity = b;
 			roughness = c;
 		}
-		Camera::layer_config::layer_config(const layer_config & o) {
+		Camera::layer_each::layer_each(const layer_each & o) {
 			layer = o.getLayerID();
 			elasticity = o.getElasticity();
 			roughness = o.getRoughness();
 		}
-		int Camera::layer_config::getLayerID() const {
+		int Camera::layer_each::getLayerID() const {
 			return layer;
 		}
-		bool Camera::layer_config::hasCollision() const {
+		bool Camera::layer_each::hasCollision() const {
 			return elasticity < 0.0;
 		}
-		double Camera::layer_config::getElasticity() const {
+		double Camera::layer_each::getElasticity() const {
 			return elasticity;
 		}
-		double Camera::layer_config::getRoughness() const {
+		double Camera::layer_each::getRoughness() const {
 			return roughness;
 		}
-		void Camera::layer_config::setLayerID(const int a) {
+		void Camera::layer_each::setLayerID(const int a) {
 			layer = a;
 		}
-		void Camera::layer_config::setElasticity(const double a) {
+		void Camera::layer_each::setElasticity(const double a) {
 			if (a < 0.0) elasticity = -1.0;
 			else elasticity = a; 
 		}
-		void Camera::layer_config::setRoughness(const double a) { 
+		void Camera::layer_each::setRoughness(const double a) {
 			if (a < 0.0) roughness = 0.0; 
 			else if (a > 1.0) roughness = 1.0; 
 			else elasticity = a; 
@@ -92,7 +92,7 @@ namespace LSW {
 			refresh();
 		}
 
-		void Camera::addLayerConfig(const Camera::layer_config v)
+		void Camera::addLayerConfig(const layer_each v)
 		{
 			for (size_t p = 0; p < data.layers.size(); p++) {
 				if (data.layers[p].getLayerID() == v.getLayerID()) {
@@ -113,7 +113,7 @@ namespace LSW {
 			}
 		}
 
-		Camera::layer_config* Camera::getLayerConfig(const int v)
+		Camera::layer_each* Camera::getLayerConfig(const int v)
 		{
 			for (size_t p = 0; p < data.layers.size(); p++) {
 				if (data.layers[p].getLayerID() == v) return &data.layers[p];
@@ -328,10 +328,10 @@ namespace LSW {
 			if (psf->isEq(camera::e_boolean::RESPECT_LIMITS, true)) al_draw_rectangle(limits[0], limits[1], limits[2], limits[3], cp2, 0.010);
 		}
 
-		Camera::camera_data& Camera::copyRAW()
+		Camera::Camera_configuration& Camera::copyRAW()
 		{
 			return data;
 		}
 
-	}
+}
 }

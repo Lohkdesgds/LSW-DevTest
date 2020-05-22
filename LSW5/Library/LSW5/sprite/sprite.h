@@ -179,7 +179,7 @@ namespace LSW {
 		protected:
 			std::function<void(void)> custom_draw_task; // set this as draw() for new children (so the draw() calls this if exists)
 
-			Camera* checkAndGetCamera() const;
+			//Camera* checkAndGetCamera() const;
 		public:
 			Sprite_Base() = default;
 			Sprite_Base(Sprite_Base&);
@@ -221,11 +221,13 @@ namespace LSW {
 			template<typename T, typename V> inline bool isEq(const T e, const V v) { V k; if (get(e, k)) return v == k; return false; }
 			template<typename T, typename V> inline bool ie(const T e, const V v) { return isEq(e, v); };
 
-			// ALWAYS CALL NATIVE DRAW FROM SPRITE_BASE!
-			void draw();
+			// ALWAYS CALL NATIVE DRAW FROM SPRITE_BASE! | Camera is useful to make it consistent
+			void draw(Camera*);
 			
-			void collide(Sprite_Base&);
-			void update();
+			// camera is useful for consistent run
+			void collide(Camera*, Sprite_Base&);
+			// camera is useful for consistent run
+			void update(Camera*);
 
 			Sprite_Base::sprite_base_data& copyRAW();
 		};

@@ -76,6 +76,7 @@ namespace LSW {
 			Display disp;
 			Database db;
 			coloured_string clr_str;
+			Camera gcam;
 
 			SuperResource<Sprite_Base> sprites;
 
@@ -183,10 +184,11 @@ namespace LSW {
 
 
 					// draw?
+					Camera* cam = gcam.getLastCameraApply();
 
 					for(auto& i : sprites)
 					{
-						i->self->draw();
+						i->self->draw(cam);
 					}
 
 					//cam.getLastCameraApply()->matrix_debug();
@@ -240,6 +242,7 @@ namespace LSW {
 			const int thr_id = static_cast<int>(core::thr_ids::COLLIDING);
 			Logger logg;
 			Database db;
+			const Camera gcam;
 
 			SuperResource<Sprite_Base> sprites;
 
@@ -290,9 +293,15 @@ namespace LSW {
 							for (size_t times = 0; !(gottem = sprites.tryLock()) && times < 10; Sleep(10));
 
 							if (gottem) {
+
+								Camera* cam = gcam.getLastCameraApply();
+								
 								for (auto& i : sprites) {
-									i->self->update();
+									i->self->update(cam);
 								}
+
+
+
 								sprites.unlock();
 							}
 							else {

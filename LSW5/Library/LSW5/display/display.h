@@ -16,7 +16,7 @@ namespace LSW {
 		namespace display {
 
 			//constexpr int display_default_mode = ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL; // exists on Database default value for FLAGS known as "d_mode"
-			constexpr int display_minimum_mode = ALLEGRO_RESIZABLE | ALLEGRO_OPENGL;
+			constexpr int display_minimum_mode = ALLEGRO_RESIZABLE | ALLEGRO_OPENGL | ALLEGRO_OPENGL_3_0 | ALLEGRO_FULLSCREEN_WINDOW;
 			constexpr int bitmap_default_mode = ALLEGRO_VIDEO_BITMAP | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_MIPMAP;
 			
 			constexpr int display_reference_size[] = { 1280,720 };

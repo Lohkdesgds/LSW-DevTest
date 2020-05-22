@@ -36,6 +36,17 @@ namespace LSW {
 		void lsw_print(const long long&);
 		void lsw_print(const size_t&);
 
+		void lsw_fprint(FILE*&, const coloured_string&);
+		void lsw_fprint(FILE*&, const std::string&);
+		void lsw_fprint(FILE*&, const char&);
+		void lsw_fprint(FILE*&, const int&);
+		void lsw_fprint(FILE*&, const float&);
+		void lsw_fprint(FILE*&, const double&);
+		void lsw_fprint(FILE*&, const unsigned&);
+		void lsw_fprint(FILE*&, const long&);
+		void lsw_fprint(FILE*&, const long long&);
+		void lsw_fprint(FILE*&, const size_t&);
+
 		template<size_t size> inline void lsw_print(const char(&str)[size]) {
 			for (auto& i : str) putchar(i);
 		}

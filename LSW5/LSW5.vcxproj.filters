@@ -67,6 +67,9 @@
     <Filter Include="LSW5\Library\sprite">
       <UniqueIdentifier>{3b988ab4-6b5c-4509-95f9-05638a3dd447}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW5\Library\supermutex">
+      <UniqueIdentifier>{1c2e96ff-a1c9-44db-8124-9de3809c4aef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -124,6 +127,9 @@
     </ClCompile>
     <ClCompile Include="Library\LSW5\sprite\sprite.cpp">
       <Filter>LSW5\Library\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\supermutex\supermutex.cpp">
+      <Filter>LSW5\Library\supermutex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +201,9 @@
     </ClInclude>
     <ClInclude Include="Library\LSW5\sprite\sprite.h">
       <Filter>LSW5\Library\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\supermutex\supermutex.h">
+      <Filter>LSW5\Library\supermutex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -174,6 +174,7 @@ namespace LSW {
 		Logger& Logger::operator<<(coloured_string&& clstr)
 		{
 			lsw_print(clstr);
+			lsw_fprint(g.fp, clstr);
 			if (clstr.size()) g.last_c = clstr[clstr.size() - 1].cr;
 			g.memline[g.memlinecount] += clstr;
 			return *this;
@@ -181,6 +182,7 @@ namespace LSW {
 		Logger& Logger::operator<<(coloured_string& clstr)
 		{
 			lsw_print(clstr);
+			lsw_fprint(g.fp, clstr);
 			if (clstr.size()) {
 				g.last_c = clstr[clstr.size() - 1].cr;
 			}

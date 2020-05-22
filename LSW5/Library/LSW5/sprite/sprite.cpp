@@ -2,14 +2,14 @@
 
 namespace LSW {
 	namespace v5 {
-		Camera* Sprite_Base::checkAndGetCamera() const
+		/*Camera* Sprite_Base::checkAndGetCamera() const
 		{
 			Camera l_cam, *cam;
 			if (!(cam = l_cam.getLastCameraApply())) {
 				throw Abort::Abort(__FUNCSIG__, "Camera not set! Please setup the camera before drawing.", Abort::abort_level::GIVEUP);
 			}
 			return cam;
-		}
+		}*/
 		Sprite_Base::Sprite_Base(Sprite_Base& other)
 		{
 			auto& oth = other.copyRAW();
@@ -250,10 +250,11 @@ namespace LSW {
 			return nullptr;
 		}
 
-		void Sprite_Base::draw()
+		void Sprite_Base::draw(Camera* cam)
 		{
+			if (!cam) throw Abort::Abort(__FUNCSIG__, "Invalid camera at Sprite's draw!", Abort::abort_level::GIVEUP);
+
 			if (isEq(sprite::e_boolean::SHOWBOX, true) || isEq(sprite::e_boolean::SHOWDOT, true)) {
-				Camera* cam = checkAndGetCamera();
 				Camera clean_camera;
 
 				double camx, camy, camg;
@@ -314,9 +315,9 @@ namespace LSW {
 			if (custom_draw_task) custom_draw_task();
 		}
 
-		void Sprite_Base::collide(Sprite_Base& oth) // if colliding, do not accept speed entry (keyboard player moving)
+		void Sprite_Base::collide(Camera* cam, Sprite_Base& oth) // if colliding, do not accept speed entry (keyboard player moving)
 		{
-			Camera* cam = checkAndGetCamera();
+			if (!cam) throw Abort::Abort(__FUNCSIG__, "Invalid camera at Sprite's collision!", Abort::abort_level::GIVEUP);
 
 			if (auto* ptr = cam->getLayerConfig(*getRef(sprite::e_integer::LAYER)); ptr) {
 				if (!ptr->hasCollision()) return;
@@ -327,9 +328,9 @@ namespace LSW {
 			}
 		}
 
-		void Sprite_Base::update()// needs to use ACCELERATION_X when collision, ELASTICITY_X to know how much of it goes backwards, TARG_POSX
+		void Sprite_Base::update(Camera* cam)// needs to use ACCELERATION_X when collision, ELASTICITY_X to know how much of it goes backwards, TARG_POSX
 		{
-			Camera* cam = checkAndGetCamera();
+			if (!cam) throw Abort::Abort(__FUNCSIG__, "Invalid camera at Sprite's update!", Abort::abort_level::GIVEUP);
 
 			if (auto* ptr = cam->getLayerConfig(*getRef(sprite::e_integer::LAYER)); ptr) {
 				double roughness = ptr->getRoughness();
