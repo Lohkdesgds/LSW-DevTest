@@ -9,6 +9,8 @@ namespace LSW {
 
             std::string block;
 
+            still_running = true;
+
             while (keep && (WaitForSingleObject(piProcInfo.hProcess, 1) == WAIT_TIMEOUT)) {
 
                 DWORD dwRead;
@@ -32,6 +34,9 @@ namespace LSW {
                 }
             }
             if (prunt) prunt("Process died or have been left alone.");
+
+            still_running = false;
+
             CloseHandle(piProcInfo.hProcess);
         }
         Launcher::~Launcher()
@@ -42,7 +47,7 @@ namespace LSW {
         {
             prunt = f;
         }
-        bool Launcher::launch(char* cmd)
+        bool Launcher::launch(std::string cmd)
         {
             saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
             saAttr.bInheritHandle = TRUE;
@@ -64,7 +69,7 @@ namespace LSW {
             siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
             bool good = CreateProcessA(NULL,
-                cmd,           // command line 
+                const_cast<char*>(cmd.c_str()),   // command line 
                 NULL,          // process security attributes 
                 NULL,          // primary thread security attributes 
                 TRUE,          // handles are inherited 
@@ -94,6 +99,11 @@ namespace LSW {
             keep = true;
             autosav = new std::thread([&]() { keep_reading(); });
             return true;
+        }
+
+        bool Launcher::stillRunning()
+        {
+            return still_running;
         }
 
         void Launcher::kill()
