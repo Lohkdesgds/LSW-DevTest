@@ -22,7 +22,7 @@ namespace LSW {
 				MOUSE_X, MOUSE_Y, RAW_MOUSE_X, RAW_MOUSE_Y, INSTANT_FRAMESPERSECOND, INSTANT_COLLISIONSPERSECOND, INSTANT_USEREVENTSPERSECOND, INSTANT_ADVANCEDFUNCSPERSECOND }; // not on file
 
 			enum class e_boolean { 
-				WAS_OSD_ON, ENABLE_SECOND_DEBUGGING_SCREEN, ULTRADEBUG, DOUBLEBUFFERING, HIDEMOUSE, // on file
+				WAS_OSD_ON, ENABLE_SECOND_DEBUGGING_SCREEN, ULTRADEBUG, DOUBLE_BUFFERING, HIDEMOUSE, // on file
 				SAVING_STRING_INPUT, MOUSE_0, MOUSE_1, MOUSE_2, MOUSE_3, MOUSE_4, MOUSE_5, MOUSE_6, MOUSE_7 }; // not on file
 
 			enum class e_integer {
@@ -68,7 +68,7 @@ namespace LSW {
 				{false, 														(e_boolean::WAS_OSD_ON),											CHAR_INIT("was_osd_on"),						customtriggers::SAVE_ON_FILE},
 				{false, 														(e_boolean::ENABLE_SECOND_DEBUGGING_SCREEN),						CHAR_INIT("second_screen_debug"),				customtriggers::SAVE_ON_FILE},
 				{false,  														(e_boolean::ULTRADEBUG),											CHAR_INIT("ultradebug"),						customtriggers::SAVE_ON_FILE},
-				{false,  														(e_boolean::DOUBLEBUFFERING),										CHAR_INIT("double_buffering_screen"),			customtriggers::SAVE_ON_FILE},
+				{false,  														(e_boolean::DOUBLE_BUFFERING),										CHAR_INIT("double_buffering_screen"),			customtriggers::SAVE_ON_FILE},
 				{true,   														(e_boolean::HIDEMOUSE),												CHAR_INIT("hidemouse"),							customtriggers::SAVE_ON_FILE},
 				{false,  														(e_boolean::SAVING_STRING_INPUT),									CHAR_INIT("saving_string_input")},
 				{false,  														(e_boolean::MOUSE_0),												CHAR_INIT("mouse_button_0")},

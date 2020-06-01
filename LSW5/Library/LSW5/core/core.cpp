@@ -104,7 +104,39 @@ namespace LSW {
 			if (data.display_routine.initialize()) { // has to initialize (once)
 				logg << L::SLF << fsr(__FUNCSIG__) << "Initializing Thread DRAWING..." << L::ELF;
 
-				disp.init();
+				/*				
+				// initializing references later:
+				ref_fx_amount		= (db.getRef(database::e_double::FX_AMOUNT));
+				ref_buffer_prop		= (db.getRef(database::e_double::RESOLUTION_BUFFER_PROPORTION));
+				ref_fps_limit		= (db.getRef(database::e_integer::LIMIT_FPS));
+				ref_print_path		= (db.getRef(database::e_string::PRINT_PATH));
+				ref_doublebuffer	= (db.getRef(database::e_boolean::DOUBLE_BUFFERING));
+
+				ALLEGRO_DISPLAY_MODE dm{};
+
+				db.get(database::e_integer::SCREEN_X, dm.width);
+				db.get(database::e_integer::SCREEN_Y, dm.height);
+				db.get(database::e_integer::SCREEN_PREF_HZ, dm.refresh_rate);
+				db.get(database::e_integer::SCREEN_FLAGS, dm.format);
+				*/
+
+				disp.set(display::e_double::FX_AMOUNT,						[&] {double d; db.get(database::e_double::FX_AMOUNT, d); return d; });
+				disp.set(display::e_double::RESOLUTION_BUFFER_PROPORTION,	[&] {double d; db.get(database::e_double::RESOLUTION_BUFFER_PROPORTION, d); return d; });
+				disp.set(display::e_integer::LIMIT_FPS,						[&] {int d; db.get(database::e_integer::LIMIT_FPS, d); return d; });
+				disp.set(display::e_string::PRINT_PATH,						[&] {std::string d; db.get(database::e_string::PRINT_PATH, d); return d; });
+				disp.set(display::e_boolean::DOUBLE_BUFFERING,				[&] {bool d; db.get(database::e_boolean::DOUBLE_BUFFERING, d); return d; });
+
+				int d_width, d_height, d_refresh_rate, d_flags;
+				db.get(database::e_integer::SCREEN_X, d_width);
+				db.get(database::e_integer::SCREEN_Y, d_height);
+				db.get(database::e_integer::SCREEN_PREF_HZ, d_refresh_rate);
+				db.get(database::e_integer::SCREEN_FLAGS, d_flags);
+
+				disp.reFlags(d_flags);
+				if (d_flags & ALLEGRO_WINDOWED) disp.launchWindow(d_width ? d_width : display::display_reference_size[0], d_height ? d_height : display::display_reference_size[1], d_refresh_rate);
+				else disp.launch((d_width != 0 && d_height != 0) ? disp.getNearestConfiguration(d_width, d_height, d_refresh_rate) : disp.getHighestConfiguration());
+
+				if (db.isEq(database::e_boolean::HIDEMOUSE, true)) al_hide_mouse_cursor(disp.getRawDisplay());
 
 				data.display_routine.routines.insert(&data.evsrc);
 				data.display_routine.routines.insert(disp.getEvent());
@@ -226,7 +258,7 @@ namespace LSW {
 				data.display_routine.routines.remove(disp.getEvent());
 				data.display_routine.routines.remove(logg.getEvent());
 
-				disp.deinit();
+				disp.close();
 				data.display_routine.deinitialize(); // set as unitialized once ended the thread stuff
 			}
 		}

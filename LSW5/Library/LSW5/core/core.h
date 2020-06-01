@@ -22,6 +22,7 @@
 #include "..\display\display.h"
 #include "..\shared\shared.h"
 #include "..\autocaster\autocaster.h"
+#include "..\database\database.h"
 
 #include "..\superresource\superresource.h"
 #include "..\sprite\sprite.h"
