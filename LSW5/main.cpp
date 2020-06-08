@@ -81,6 +81,20 @@ int main() {
 	ref2->set("target_pos_x", 0.5);
 	ref2->set("target_pos_y", 0.2);
 	ref2->set(sprite::e_double::ACCELERATION_X, -6e-4);
+	auto* ref3 = sprites.create("test3");
+	ref3->set("show_box", true);
+	ref3->set("show_dot", true);
+	ref3->set("scale_g", 0.4);
+	ref3->set("target_pos_x", 0.0);
+	ref3->set("target_pos_y", 0.6);
+	ref3->set(sprite::e_double::ACCELERATION_Y, -6e-4);
+	auto* ref4 = sprites.create("test4");
+	ref4->set("show_box", true);
+	ref4->set("show_dot", true);
+	ref4->set("scale_g", 0.32);
+	ref4->set("target_pos_x", 0.0);
+	ref4->set("target_pos_y", -0.6);
+	ref4->set(sprite::e_double::ACCELERATION_Y, 6e-4);
 
 	Camera* cam = cameras.create("camera_0");
 	cam->set(camera::e_integer::ID, 0);
@@ -100,13 +114,13 @@ int main() {
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Resting - - -" << L::ELF;
 
-	for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 4000;);// {
+	for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 25000 && core.allAlive(););// {
 		//ref->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time()));
 		//ref2->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time() + 0.7));
 	//}
-	ref->set(sprite::e_double::ACCELERATION_X, -5e-4);
-	ref2->set(sprite::e_double::ACCELERATION_X, 5e-4);
-	for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 15000;);
+	//ref->set(sprite::e_double::ACCELERATION_X, -5e-4);
+	//ref2->set(sprite::e_double::ACCELERATION_X, 5e-4);
+	//for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 15000 && core.allAlive(););
 
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Ending CORE once - - -" << L::ELF;

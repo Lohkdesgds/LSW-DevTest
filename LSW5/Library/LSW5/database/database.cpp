@@ -196,11 +196,11 @@ namespace LSW {
 						if (!i.hasType<char*>()) continue; // no string aka no config save
 
 						size_t len_ = 0;
-						char transformed_lmao[512];
+						char transformed_lmao[512] = { 0 };
 
 						i.getType<>(transformed_lmao);
 
-						if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
+						if ((len_ = Tools::strlen_s(transformed_lmao)) == 0) continue; // no string aka no config save
 
 						auto result = al_get_config_value(data.config, "config", transformed_lmao);
 						if (!result) continue;
@@ -229,11 +229,11 @@ namespace LSW {
 						if (!i.hasType<char*>()) continue; // no string aka no config save
 
 						size_t len_ = 0;
-						char transformed_lmao[512];
+						char transformed_lmao[512] = { 0 };
 
 						i.getType<>(transformed_lmao);
 
-						if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
+						if ((len_ = Tools::strlen_s(transformed_lmao)) == 0) continue; // no string aka no config save
 
 						auto result = al_get_config_value(data.config, "config", transformed_lmao);
 						if (!result) continue;
@@ -247,11 +247,11 @@ namespace LSW {
 						if (!i.hasType<char*>()) continue; // no string aka no config save
 
 						size_t len_ = 0;
-						char transformed_lmao[512];
+						char transformed_lmao[512] = { 0 };
 
 						i.getType<>(transformed_lmao);
 
-						if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
+						if ((len_ = Tools::strlen_s(transformed_lmao)) == 0) continue; // no string aka no config save
 
 						auto result = al_get_config_value(data.config, "config", transformed_lmao);
 						if (!result) continue;
@@ -268,11 +268,11 @@ namespace LSW {
 						if (!i.hasType<char*>()) continue; // no string aka no config save
 
 						size_t len_ = 0;
-						char transformed_lmao[512];
+						char transformed_lmao[512] = { 0 };
 
 						i.getType<>(transformed_lmao);
 
-						if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
+						if ((len_ = Tools::strlen_s(transformed_lmao)) == 0) continue; // no string aka no config save
 
 						auto result = al_get_config_value(data.config, "config", transformed_lmao);
 						if (!result) continue;
@@ -289,11 +289,11 @@ namespace LSW {
 						if (!i.hasType<char*>()) continue; // no string aka no config save
 
 						size_t len_ = 0;
-						char transformed_lmao[512];
+						char transformed_lmao[512] = { 0 };
 
 						i.getType<>(transformed_lmao);
 
-						if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
+						if ((len_ = Tools::strlen_s(transformed_lmao)) == 0) continue; // no string aka no config save
 
 						auto result = al_get_config_value(data.config, "config", transformed_lmao);
 						if (!result) continue;
@@ -308,11 +308,11 @@ namespace LSW {
 						if (!i.hasType<char*>()) continue; // no string aka no config save
 
 						size_t len_ = 0;
-						char transformed_lmao[512];
+						char transformed_lmao[512] = { 0 };
 
 						i.getType<>(transformed_lmao);
 
-						if (Tools::strlen_s(transformed_lmao) == 0) continue; // no string aka no config save
+						if ((len_ = Tools::strlen_s(transformed_lmao)) == 0) continue; // no string aka no config save
 
 						auto result = al_get_config_value(data.config, "config", transformed_lmao);
 						if (!result) continue;

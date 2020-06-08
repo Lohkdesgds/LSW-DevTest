@@ -29,7 +29,7 @@ Logger header:
 #include "..\allegroinitialization\allegroinitialization.h"
 #include "..\tools\tools.h"
 #include "..\shared\shared.h"
-#include "..\autocaster\autocaster.h"
+//#include "..\autocaster\autocaster.h"
 
 
 namespace LSW {
@@ -80,7 +80,7 @@ namespace LSW {
 			template<size_t siz> Logger& operator<<(const char(&oth)[siz]) {
 				coloured_string cstr;
 				char format[3];
-				sprintf_s(format, "&%x", Cast::s_cast<int>(g.last_c));
+				sprintf_s(format, "&%x", static_cast<int>(g.last_c));
 				cstr = (format + std::string(oth)).c_str();
 				return (this->operator<<(cstr));
 			}

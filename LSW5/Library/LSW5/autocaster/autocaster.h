@@ -16,8 +16,8 @@ namespace LSW {
 		namespace Cast {
 
 			// simple (static) cast
-			template<typename K, typename T>
-			inline K s_cast(T val) noexcept { return static_cast<K>(val); }
+			//template<typename K, typename T>
+			//inline K s_cast(T val) noexcept { return static_cast<K>(val); } // not hard, static_cast<> is easy
 
 			// regress (go back to main) cast
 			template<typename Base, typename Cust = std::remove_all_extents_t<std::remove_const_t<Base>>>

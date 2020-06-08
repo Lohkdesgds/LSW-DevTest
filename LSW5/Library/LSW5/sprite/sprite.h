@@ -24,9 +24,20 @@ namespace LSW {
 
 			enum class e_string { ID };
 			enum class e_double { TARG_POSX, TARG_POSY, SCALE_X, SCALE_Y, SCALE_G, CENTER_X, CENTER_Y, TARG_ROTATION, ACCELERATION_X, ACCELERATION_Y, SPEED_ROTATION, SPEEDXY_LIMIT, ELASTICITY_X, ELASTICITY_Y };
-			enum class e_boolean { COLLISION_IGNORE, DRAW, USE_COLOR, AFFECTED_BY_CAM, SHOWDOT, SHOWBOX, RESPECT_CAMERA_LIMITS, FOLLOW_MOUSE, FOLLOW_KEYBOARD };
-			enum class e_integer { LAYER };
+			enum class e_boolean { DRAW, USE_COLOR, AFFECTED_BY_CAM, SHOWDOT, SHOWBOX, RESPECT_CAMERA_LIMITS, FOLLOW_MOUSE, FOLLOW_KEYBOARD };
+			enum class e_integer { LAYER, COLLISION_MODE };
 			enum class e_color { COLOR };
+
+			enum class e_collision_mode_cast {
+				COLLISION_BOTH, // collide and move if colliding
+				COLLISION_STATIC, // collide with others and stay static
+				COLLISION_INVERSE, // doesn't cause collision on others, but move if someone is colliding with it
+				COLLISION_NONE // no collision behaviour at all
+			};
+
+			enum class e_direction { NORTH, SOUTH, EAST, WEST, NONE };
+
+
 
 			/*
 			class __slice {
@@ -100,6 +111,9 @@ namespace LSW {
 				__slice("%fps_cap%", Cast::a_cast(tags_e::T_FPS_CAP))
 			};*/
 
+
+			constexpr double minimum_sprite_accel_collision = 1e-6;
+
 			const SuperMap<double> e_double_readonly_defaults = {
 				{0.0,				(e_double_readonly::SPEED_X),						CHAR_INIT("speed_x")},
 				{0.0,				(e_double_readonly::SPEED_Y),						CHAR_INIT("speed_y")},
@@ -140,7 +154,6 @@ namespace LSW {
 			};
 
 			const SuperMap<bool> e_boolean_defaults = {
-				{false,				(e_boolean::COLLISION_IGNORE),						CHAR_INIT("collision_ignore")},
 				{true,				(e_boolean::DRAW),									CHAR_INIT("draw")},
 				{false,				(e_boolean::USE_COLOR),								CHAR_INIT("use_color")},
 				{true,				(e_boolean::AFFECTED_BY_CAM),						CHAR_INIT("affected_by_camera")},
@@ -152,7 +165,8 @@ namespace LSW {
 			};
 
 			const SuperMap<int> e_integer_defaults = {
-				{0,					(e_integer::LAYER),									CHAR_INIT("layer")}
+				{0,															(e_integer::LAYER),					CHAR_INIT("layer")},
+				{static_cast<int>(e_collision_mode_cast::COLLISION_BOTH),	(e_integer::COLLISION_MODE),		CHAR_INIT("collision_mode")}
 			};
 
 			const SuperMap<ALLEGRO_COLOR> e_color_defaults = {
@@ -176,8 +190,29 @@ namespace LSW {
 				SuperMap<int>			integer_data			= sprite::e_integer_defaults;
 				SuperMap<ALLEGRO_COLOR> color_data				= sprite::e_color_defaults;
 			} data;
+			struct easier_collision_handle {
+				double	posx = 0.0,
+						posy = 0.0,
+						sizx = 0.0, // full size
+						sizy = 0.0; // full size
+
+				int directions_cases[4] = { 0 };
+				bool was_col = false;
+
+				easier_collision_handle() = default;
+				easier_collision_handle(const easier_collision_handle&);
+
+				// test overlap between this and someone else
+				bool overlap(easier_collision_handle&);
+				// Where should I go?
+				sprite::e_direction processResult();
+				// Resets directions history
+				void resetDirections();
+				// X, Y, SX, SY
+				void setup(const double, const double, const double, const double);
+			} easy_collision;
 		protected:
-			std::function<void(void)> custom_draw_task; // set this as draw() for new children (so the draw() calls this if exists)
+			std::function<void(void)> custom_draw_task; // set this as draw() of new children (so the draw() calls this if exists for further drawing scheme)
 
 			//Camera* checkAndGetCamera() const;
 		public:
@@ -226,10 +261,12 @@ namespace LSW {
 			
 			// camera is useful for consistent run
 			void collide(Camera*, Sprite_Base&);
-			// camera is useful for consistent run
+			// camera is useful for consistent run, also updates easier_collision_handle for further collide()
 			void update(Camera*);
 
 			Sprite_Base::sprite_base_data& copyRAW();
+			// YOU SHALL update() BEFORE TESTING COLLISION!
+			easier_collision_handle& getCollision();
 		};
 
 	}

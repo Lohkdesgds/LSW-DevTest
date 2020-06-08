@@ -20,11 +20,11 @@ namespace LSW {
 	namespace v5 {
 
 		namespace display {
-			constexpr int display_default_mode = ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL;
-			constexpr int display_minimum_mode = ALLEGRO_OPENGL;
+			constexpr int display_default_flags = ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL;
+			constexpr int display_minimum_flags = ALLEGRO_OPENGL;
 			constexpr int bitmap_default_mode = ALLEGRO_VIDEO_BITMAP | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_MIPMAP;
 			constexpr size_t end_timeout_max_time = 5; // seconds
-			constexpr auto acknowledge_timeout_time = std::chrono::seconds(2);
+			constexpr auto acknowledge_timeout_time = std::chrono::milliseconds(100);
 			constexpr int display_reference_size[] = { 1280,720 };
 
 			/*
@@ -41,17 +41,17 @@ namespace LSW {
 			enum class e_boolean { DOUBLE_BUFFERING };
 
 			const SuperMap<std::function<double(void)>> e_double_defaults = {
-				{[] {return 0.0; },								(e_double::FX_AMOUNT),						CHAR_INIT("fx_amount")},
-				{[] {return 1.0; },								(e_double::RESOLUTION_BUFFER_PROPORTION),					CHAR_INIT("buffer_proportion")}
+				{[] {return 0.0; },								(e_double::FX_AMOUNT),									CHAR_INIT("fx_amount")},
+				{[] {return 1.0; },								(e_double::RESOLUTION_BUFFER_PROPORTION),				CHAR_INIT("buffer_proportion")}
 			};
 			const SuperMap<std::function<int(void)>> e_integer_defaults = {
-				{[] {return 0; },								(e_integer::LIMIT_FPS),						CHAR_INIT("fps_limit")}
+				{[] {return 0; },								(e_integer::LIMIT_FPS),									CHAR_INIT("fps_limit")}
 			};
 			const SuperMap<std::function<std::string(void)>> e_string_defaults = {
-				{[] {return std::string(""); },					(e_string::PRINT_PATH),						CHAR_INIT("print_path")}
+				{[] {return std::string(""); },					(e_string::PRINT_PATH),									CHAR_INIT("print_path")}
 			};
 			const SuperMap<std::function<bool(void)>> e_boolean_defaults = {
-				{[] {return false; },							(e_boolean::DOUBLE_BUFFERING),					CHAR_INIT("double_buffer")}
+				{[] {return false; },							(e_boolean::DOUBLE_BUFFERING),							CHAR_INIT("double_buffer")}
 			};
 
 
@@ -62,10 +62,14 @@ namespace LSW {
 				std::vector<ALLEGRO_DISPLAY_MODE> display_modes;
 				size_t last_display_mode = 0;
 			} fullscreen;
-			struct display_windowed {
+			struct display_info {
+				ALLEGRO_DISPLAY_MODE chosen_mode{};
+				int latest_display_flags = display::display_minimum_flags;
+			} display_now_config;
+			/*struct display_windowed {
 				size_t refresh_rate = 0;
 				int display_size[2] = { 0, 0 };
-			} window;
+			} window;*/
 
 			bool was_window = false;
 
@@ -77,6 +81,9 @@ namespace LSW {
 				SuperMap<std::function<std::string(void)>>		string_data = display::e_string_defaults;
 				SuperMap<std::function<bool(void)>>				boolean_data = display::e_boolean_defaults;
 			} data;
+
+			//ALLEGRO_DISPLAY_MODE chosen_mode{}; // DO NOT USE .FORMAT AS MODE! NOT THE SAME! .FORMAT IS PIXEL FORMAT AKA RGB STUFF
+			//int latest_display_flags = display::display_minimum_flags;
 
 			ALLEGRO_DISPLAY* display_itself = nullptr;
 			ALLEGRO_BITMAP* display_buffer = nullptr;
@@ -117,10 +124,20 @@ namespace LSW {
 			void refreshMemoryBitmaps();
 			void acknowledgeDisplay();
 
+			void set(const display::e_double, double);
+			void set(const display::e_integer, int);
+			void set(const display::e_string, std::string);
+			void set(const display::e_boolean, bool);
+
 			void set(const display::e_double,  std::function<double(void)>);
 			void set(const display::e_integer, std::function<int(void)>);
 			void set(const display::e_string,  std::function<std::string(void)>);
 			void set(const display::e_boolean, std::function<bool(void)>);
+
+			void set(const std::string, double);
+			void set(const std::string, int);
+			void set(const std::string, std::string);
+			void set(const std::string, bool);
 
 			void set(const std::string, std::function<double(void)>);
 			void set(const std::string, std::function<int(void)>);
@@ -128,10 +145,20 @@ namespace LSW {
 			void set(const std::string, std::function<bool(void)>);
 
 
+			bool get(const display::e_double, double&);
+			bool get(const display::e_integer, int&);
+			bool get(const display::e_string, std::string&);
+			bool get(const display::e_boolean, bool&);
+
 			bool get(const display::e_double, std::function<double(void)>&);
 			bool get(const display::e_integer, std::function<int(void)>&);
 			bool get(const display::e_string, std::function<std::string(void)>&);
 			bool get(const display::e_boolean, std::function<bool(void)>&);
+
+			bool get(const std::string, double&);
+			bool get(const std::string, int&);
+			bool get(const std::string, std::string&);
+			bool get(const std::string, bool&);
 
 			bool get(const std::string, std::function<double(void)>&);
 			bool get(const std::string, std::function<int(void)>&);
@@ -148,6 +175,7 @@ namespace LSW {
 			const size_t getNearestConfiguration(const int, const int, const size_t = static_cast<size_t>(-1));
 			const size_t getHighestConfiguration();
 			const size_t getHighestMonitorRefreshRate();
+			const display_info getLatest();
 
 			ALLEGRO_DISPLAY* getRawDisplay();
 			ALLEGRO_EVENT_SOURCE* getEvent();
@@ -163,8 +191,8 @@ namespace LSW {
 		/*
 		namespace display {
 
-			//constexpr int display_default_mode = ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL; // exists on Database default value for FLAGS known as "d_mode"
-			constexpr int display_minimum_mode = ALLEGRO_RESIZABLE | ALLEGRO_OPENGL | ALLEGRO_OPENGL_3_0 | ALLEGRO_FULLSCREEN_WINDOW;
+			//constexpr int display_default_flags = ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL; // exists on Database default value for FLAGS known as "d_mode"
+			constexpr int display_minimum_flags = ALLEGRO_RESIZABLE | ALLEGRO_OPENGL | ALLEGRO_OPENGL_3_0 | ALLEGRO_FULLSCREEN_WINDOW;
 			constexpr int bitmap_default_mode = ALLEGRO_VIDEO_BITMAP | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_MIPMAP;
 			
 			constexpr int display_reference_size[] = { 1280,720 };

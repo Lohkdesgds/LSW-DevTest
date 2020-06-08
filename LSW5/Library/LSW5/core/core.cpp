@@ -120,11 +120,11 @@ namespace LSW {
 				db.get(database::e_integer::SCREEN_FLAGS, dm.format);
 				*/
 
-				disp.set(display::e_double::FX_AMOUNT,						[&] {double d; db.get(database::e_double::FX_AMOUNT, d); return d; });
-				disp.set(display::e_double::RESOLUTION_BUFFER_PROPORTION,	[&] {double d; db.get(database::e_double::RESOLUTION_BUFFER_PROPORTION, d); return d; });
-				disp.set(display::e_integer::LIMIT_FPS,						[&] {int d; db.get(database::e_integer::LIMIT_FPS, d); return d; });
-				disp.set(display::e_string::PRINT_PATH,						[&] {std::string d; db.get(database::e_string::PRINT_PATH, d); return d; });
-				disp.set(display::e_boolean::DOUBLE_BUFFERING,				[&] {bool d; db.get(database::e_boolean::DOUBLE_BUFFERING, d); return d; });
+				disp.set(display::e_double::FX_AMOUNT,						[&] {double d;		db.get(database::e_double::FX_AMOUNT, d);						return d; });
+				disp.set(display::e_double::RESOLUTION_BUFFER_PROPORTION,	[&] {double d;		db.get(database::e_double::RESOLUTION_BUFFER_PROPORTION, d);	return d; });
+				disp.set(display::e_integer::LIMIT_FPS,						[&] {int d;			db.get(database::e_integer::LIMIT_FPS, d);						return d; });
+				disp.set(display::e_string::PRINT_PATH,						[&] {std::string d; db.get(database::e_string::PRINT_PATH, d);						return d; });
+				disp.set(display::e_boolean::DOUBLE_BUFFERING,				[&] {bool d;		db.get(database::e_boolean::DOUBLE_BUFFERING, d);				return d; });
 
 				int d_width, d_height, d_refresh_rate, d_flags;
 				db.get(database::e_integer::SCREEN_X, d_width);
@@ -200,6 +200,11 @@ namespace LSW {
 									logg << L::SLF << fsr(__FUNCSIG__) << "&5Got EVENT_DISPLAY_CLOSE event on main window, setting to close the game..." << L::ELF;
 								}
 								break;
+							case ALLEGRO_EVENT_DISPLAY_RESIZE:
+								if (ev.display.source == disp.getRawDisplay()) {
+									disp.acknowledgeDisplay();
+								}
+								break;
 							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_LOG_STRING):
 									clr_str = *(coloured_string*)ev.user.data1;
 									// set later the string on screen
@@ -233,7 +238,7 @@ namespace LSW {
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eFrom: " << err.getWhereFrom() << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.getDetails() << L::ELF;
-					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << Cast::s_cast<int>(err.getLevel()) << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << static_cast<int>(err.getLevel()) << L::ELF;
 				}
 				catch (...) {
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
@@ -257,6 +262,19 @@ namespace LSW {
 				data.display_routine.routines.remove(&data.evsrc);
 				data.display_routine.routines.remove(disp.getEvent());
 				data.display_routine.routines.remove(logg.getEvent());
+
+				db.set(database::e_double::FX_AMOUNT,						(*disp.getRef(display::e_double::FX_AMOUNT))());
+				db.set(database::e_double::RESOLUTION_BUFFER_PROPORTION,	(*disp.getRef(display::e_double::RESOLUTION_BUFFER_PROPORTION))());
+				db.set(database::e_integer::LIMIT_FPS,						(*disp.getRef(display::e_integer::LIMIT_FPS))());
+				db.set(database::e_string::PRINT_PATH,						(*disp.getRef(display::e_string::PRINT_PATH))());
+				db.set(database::e_boolean::DOUBLE_BUFFERING,				(*disp.getRef(display::e_boolean::DOUBLE_BUFFERING))());
+
+				auto d_info = disp.getLatest();
+				db.set(database::e_integer::SCREEN_X, d_info.chosen_mode.width);
+				db.set(database::e_integer::SCREEN_Y, d_info.chosen_mode.height);
+				db.set(database::e_integer::SCREEN_PREF_HZ, d_info.chosen_mode.refresh_rate);
+				db.set(database::e_integer::SCREEN_FLAGS, d_info.latest_display_flags);
+
 
 				disp.close();
 				data.display_routine.deinitialize(); // set as unitialized once ended the thread stuff
@@ -329,8 +347,13 @@ namespace LSW {
 								Camera* cam = gcam.getLastCameraApply();
 								
 								for (auto& i : sprites) {
-									i->self->update(cam);
+									i->self->update(cam); // process positioning
+
+									for (auto& j : sprites) {
+										if (i->self != j->self) i->self->collide(cam, *j->self);
+									}
 								}
+
 
 
 
@@ -347,7 +370,7 @@ namespace LSW {
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eFrom: " << err.getWhereFrom() << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.getDetails() << L::ELF;
-					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << Cast::s_cast<int>(err.getLevel()) << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << static_cast<int>(err.getLevel()) << L::ELF;
 				}
 				catch (...) {
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
@@ -367,12 +390,16 @@ namespace LSW {
 		{
 			const int thr_id = static_cast<int>(core::thr_ids::EVENTS);
 			Logger logg;
+			Database db;
 
 			// variables used here:
 
 			if (data.events_routine.initialize()) { // has to initialize (once)
 				logg << L::SLF << fsr(__FUNCSIG__) << "Initializing Thread EVENTS..." << L::ELF;
 
+				data.events_routine.routines.insert(&data.evsrc);
+
+				data.events_routine.routines.start();
 			}
 
 
@@ -381,13 +408,41 @@ namespace LSW {
 			while (keep()) {
 				data.events_routine.tick();
 
-				while (data.events_routine.isPaused()) {
-					Sleep(50); // 20 per sec
-					data.events_routine.tick(); // keep saying it's alive
+				try {
+					while (data.events_routine.isPaused()) {
+						Sleep(50); // 20 per sec
+						data.events_routine.tick(); // keep saying it's alive
+					}
+
+					if (data.events_routine.routines.hasEvent()) { // LOOP_TRACK, UPDATE_MOUSE
+						if (data.events_routine.routines.isThisThis(static_cast<size_t>(core::thr_events_routines::LOOP_TRACK))) {
+							db.set(database::e_sizet::USEREVENTSPERSECOND, data.events_routine.routines.getNumCallsDefault());
+						}
+						else if (data.events_routine.routines.isThisThis(static_cast<size_t>(core::thr_events_routines::UPDATE_MOUSE))) {
+							// get mouse and set position
+						}
+
+						// OTHER EVENTS (Allegro and stuff)
+
+						//else {
+							//auto ev = data.display_routine.routines.getEventRaw();
+
+						//}
+					}
+				}
+				catch (Abort::Abort err) {
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eFrom: " << err.getWhereFrom() << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.getDetails() << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << static_cast<int>(err.getLevel()) << L::ELF;
+				}
+				catch (...) {
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
 				}
 
-				logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
-				al_rest(0.5);
+				//logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
+				//al_rest(0.5);
 			}
 
 

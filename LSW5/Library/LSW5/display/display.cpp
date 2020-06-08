@@ -3,7 +3,7 @@
 
 namespace LSW {
 	namespace v5 {
-		void Display::__init(const int mode)
+		void Display::__init(const int flags)
 		{
 			__print("Initializing display...");
 
@@ -11,7 +11,8 @@ namespace LSW {
 			lsw_al_init();
 
 			// guaranteed list of possible configurations
-			al_set_new_display_flags(mode);
+			al_set_new_display_flags(flags);
+			display_now_config.latest_display_flags = flags;
 			fullscreen.display_modes.clear();
 
 			auto isSame = [](ALLEGRO_DISPLAY_MODE& a, ALLEGRO_DISPLAY_MODE& b) { return (a.format == b.format && a.height == b.height && a.refresh_rate == b.refresh_rate && a.width == b.width); };
@@ -53,7 +54,7 @@ namespace LSW {
 		void Display::__setacknowledge()
 		{
 			should_acknowledge = true;
-			time_last_acknowledge = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + std::chrono::milliseconds(500));
+			time_last_acknowledge = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
 		}
 
 		void Display::__checkacknowledge()
@@ -61,7 +62,11 @@ namespace LSW {
 			if (should_acknowledge && std::chrono::system_clock::now().time_since_epoch() - time_last_acknowledge > display::acknowledge_timeout_time) {
 
 				al_acknowledge_resize(display_itself);
+
 				should_acknowledge = false;
+
+				display_now_config.chosen_mode.width = al_get_display_width(display_itself);
+				display_now_config.chosen_mode.height = al_get_display_height(display_itself);
 
 				if (use_doublebuffer) {
 
@@ -157,12 +162,12 @@ namespace LSW {
 
 		Display::Display()
 		{
-			__init(display::display_default_mode);
+			__init(display::display_default_flags);
 		}
 
-		Display::Display(const int mode)
+		Display::Display(const int flags)
 		{
-			__init(mode | display::display_minimum_mode);
+			__init(flags | display::display_minimum_flags);
 		}
 
 		Display::~Display()
@@ -170,9 +175,9 @@ namespace LSW {
 			__deinit();
 		}
 
-		void Display::reFlags(const int mode)
+		void Display::reFlags(const int flags)
 		{
-			__init(mode | display::display_minimum_mode);
+			__init(flags | display::display_minimum_flags);
 		}
 
 		bool Display::launch(const size_t option)
@@ -181,9 +186,8 @@ namespace LSW {
 			was_window = false;
 
 			fullscreen.last_display_mode = option;
-			ALLEGRO_DISPLAY_MODE chosen_mode{};
 			if (option < fullscreen.display_modes.size()) {
-				chosen_mode = fullscreen.display_modes[option];
+				display_now_config.chosen_mode = fullscreen.display_modes[option];
 			}
 			else if (option == static_cast<size_t>(-1)) {
 				fullscreen.last_display_mode = getHighestConfiguration();
@@ -191,15 +195,15 @@ namespace LSW {
 					throw Abort::Abort(__FUNCSIG__, "Display couldn't get a valid configuration to launch.");
 					return false;
 				}
-				chosen_mode = fullscreen.display_modes[fullscreen.last_display_mode];
+				display_now_config.chosen_mode = fullscreen.display_modes[fullscreen.last_display_mode];
 			}
 
-			al_set_new_display_refresh_rate(static_cast<int>(chosen_mode.refresh_rate));
+			al_set_new_display_refresh_rate(static_cast<int>(display_now_config.chosen_mode.refresh_rate));
 			// already did al_set_new_display_flags on __init();
 			al_set_new_bitmap_flags(display::bitmap_default_mode); // forced
 			al_set_new_display_option(ALLEGRO_VSYNC, 2, ALLEGRO_SUGGEST);
 
-			if (display_itself = al_create_display(window.display_size[0], window.display_size[1])) {
+			if (display_itself = al_create_display(display_now_config.chosen_mode.width, display_now_config.chosen_mode.height)) {
 				__print("Created display successfully.");
 			}
 			else {
@@ -220,16 +224,16 @@ namespace LSW {
 			if (refresh_rate == 0) refresh_rate = max_refresh_rate;
 			else if (!(refresh_rate > 0 && refresh_rate <= max_refresh_rate)) throw Abort::Abort(__FUNCSIG__, "Invalid refresh rate to launch as window.");
 
-			window.display_size[0] = x;
-			window.display_size[1] = y;
-			window.refresh_rate = refresh_rate;
+			display_now_config.chosen_mode.width = x;
+			display_now_config.chosen_mode.height = y;
+			display_now_config.chosen_mode.refresh_rate = static_cast<int>(refresh_rate > 1e9 ? 1e9 : refresh_rate); // 1e9 frames per second? ARE YOU INSANE? :haha:
 
-			al_set_new_display_refresh_rate(static_cast<int>(window.refresh_rate));
+			al_set_new_display_refresh_rate(static_cast<int>(display_now_config.chosen_mode.refresh_rate));
 			// already did al_set_new_display_flags on __init();
 			al_set_new_bitmap_flags(display::bitmap_default_mode); // forced
 			al_set_new_display_option(ALLEGRO_VSYNC, 2, ALLEGRO_SUGGEST);
 
-			if (display_itself = al_create_display(window.display_size[0], window.display_size[1])) {
+			if (display_itself = al_create_display(display_now_config.chosen_mode.width, display_now_config.chosen_mode.height)) {
 				__print("Created display successfully.");
 			}
 			else {
@@ -244,7 +248,7 @@ namespace LSW {
 		bool Display::relaunch()
 		{
 			// close() is automatic
-			if (__lastWasWindow()) return launchWindow(window.display_size[0], window.display_size[1], window.refresh_rate);
+			if (__lastWasWindow()) return launchWindow(display_now_config.chosen_mode.width, display_now_config.chosen_mode.height, display_now_config.chosen_mode.refresh_rate);
 			return launch(fullscreen.last_display_mode);
 		}
 
@@ -355,6 +359,26 @@ namespace LSW {
 			__setacknowledge();
 		}
 
+		void Display::set(const display::e_double e, double v)
+		{
+			set(e, [=] {return v; });
+		}
+
+		void Display::set(const display::e_integer e, int v)
+		{
+			set(e, [=] {return v; });
+		}
+
+		void Display::set(const display::e_string e, std::string v)
+		{
+			set(e, [=] {return v; });
+		}
+
+		void Display::set(const display::e_boolean e, bool v)
+		{
+			set(e, [=] {return v; });
+		}
+
 		void Display::set(const display::e_double e, std::function<double(void)> v)
 		{
 			if (auto* ptr = data.double_data(e); ptr)
@@ -377,6 +401,26 @@ namespace LSW {
 		{
 			if (auto* ptr = data.boolean_data(e); ptr)
 				*ptr = v;
+		}
+
+		void Display::set(const std::string e, double v)
+		{
+			set(e, std::function<double(void)>([=] {return v; }));
+		}
+
+		void Display::set(const std::string e, int v)
+		{
+			set(e, std::function<int(void)>([=] {return v; }));
+		}
+
+		void Display::set(const std::string e, std::string v)
+		{
+			set(e, std::function<std::string(void)>([=] {return v; }));
+		}
+
+		void Display::set(const std::string e, bool v)
+		{
+			set(e, std::function<bool(void)>([=] {return v; }));
 		}
 
 		void Display::set(const std::string e, std::function<double(void)> v)
@@ -405,6 +449,46 @@ namespace LSW {
 			auto* ptr = data.boolean_data(e.c_str(), e.length());
 			if (!ptr) data.boolean_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
+		}
+
+		bool Display::get(const display::e_double e, double& v)
+		{
+			if (auto* ptr = data.double_data[e]; ptr)
+			{
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Display::get(const display::e_integer e, int& v)
+		{
+			if (auto* ptr = data.integer_data[e]; ptr)
+			{
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Display::get(const display::e_string e, std::string& v)
+		{
+			if (auto* ptr = data.string_data[e]; ptr)
+			{
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Display::get(const display::e_boolean e, bool& v)
+		{
+			if (auto* ptr = data.boolean_data[e]; ptr)
+			{
+				v = (*ptr)();
+				return true;
+			}
+			return false;
 		}
 
 		bool Display::get(const display::e_double e, std::function<double(void)>& v)
@@ -442,6 +526,42 @@ namespace LSW {
 			if (auto* ptr = data.boolean_data[e]; ptr)
 			{
 				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool Display::get(const std::string e, double& v)
+		{
+			if (auto* ptr = data.double_data(e.c_str(), e.length()); ptr) {
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Display::get(const std::string e, int& v)
+		{
+			if (auto* ptr = data.integer_data(e.c_str(), e.length()); ptr) {
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Display::get(const std::string e, std::string& v)
+		{
+			if (auto* ptr = data.string_data(e.c_str(), e.length()); ptr) {
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Display::get(const std::string e, bool& v)
+		{
+			if (auto* ptr = data.boolean_data(e.c_str(), e.length()); ptr) {
+				v = (*ptr)();
 				return true;
 			}
 			return false;
@@ -581,6 +701,11 @@ namespace LSW {
 			size_t refresh_rate = 0;
 			for (auto& i : fullscreen.display_modes) refresh_rate = (i.refresh_rate > refresh_rate ? i.refresh_rate : refresh_rate);
 			return refresh_rate ? refresh_rate : static_cast<size_t>(-1);
+		}
+
+		const Display::display_info Display::getLatest()
+		{
+			return display_now_config;
 		}
 
 		ALLEGRO_DISPLAY* Display::getRawDisplay()
@@ -788,7 +913,7 @@ namespace LSW {
 			db.get(database::e_integer::SCREEN_PREF_HZ, dm.refresh_rate);
 			db.get(database::e_integer::SCREEN_FLAGS, dm.format);
 
-			dm.format |= display::display_minimum_mode;
+			dm.format |= display::display_minimum_flags;
 
 			db.set(database::e_integer::SCREEN_FLAGS, dm.format);
 
