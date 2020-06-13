@@ -1,18 +1,5 @@
 #pragma once
 
-
-/*
-= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =
-ColouredString header:
-
-- Coloured string is a string with color
-# WORKING since 20200410
-
-= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =
-*/
-
-
-
 // C++
 #include <string>
 

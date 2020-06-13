@@ -2,6 +2,9 @@
 
 namespace LSW {
 	namespace v5 {
+
+		bool PhysFS::physfs_initialized_once = false;
+
 		std::string SmartFILE::convert(const file_modes m)
 		{
 			switch (m) {
@@ -76,35 +79,103 @@ namespace LSW {
 			return fwrite(buf.data(), sizeof(char), s ? s : buf.size(), fp);
 		}
 
-
-
-		/*
-		errno_t lsw_fopen(FILE*& fp, const char* path, const char* mode)
+		std::string PhysFS::readDir(const char* path)
 		{
-			std::string npath = path;
-			Tools::interpretPath(npath);
-			return fopen_s(&fp, npath.c_str(), mode);
-		}
-		errno_t lsw_fopen_f(FILE*& fp, const char* path, const char* mode)
-		{
-			std::string npath = path;
-			Tools::handlePath(npath);
-			return fopen_s(&fp, npath.c_str(), mode);
-		}
-		size_t lsw_fread(FILE*& fp, string_sized& buf, bool& end, size_t siz) {
-			if (!fp) return 0;
-			end = false;
+			std::string files;
+			char** rc = PHYSFS_enumerateFiles(path ? path : "");
+			for (auto j = rc; *j != NULL; j++) {
+				PHYSFS_Stat fprop;
+				std::string cpath = (path ? (std::string(path) + "/") : "") + *j;
+				PHYSFS_stat(cpath.c_str(), &fprop);
 
-			buf.reserve(siz);
-			auto read = fread_s(buf.data(), siz, sizeof(char), siz, fp);
-			end = (read != siz) || feof(fp);
-			buf._set_size(read);
-			return read;
+				switch (fprop.filetype) {
+				case PHYSFS_FILETYPE_REGULAR: // file
+					files += cpath + " [" + Tools::byteAutoString(fprop.filesize, 1, true) + "B], ";
+					break;
+				case PHYSFS_FILETYPE_DIRECTORY: // path
+					files += readDir(cpath.c_str()) + ", ";
+					break;
+				}
+			}
+			PHYSFS_freeList(rc);
+			if (files.length() > 1) for (short u = 0; u < 2; u++) files.pop_back();
+
+			return files;
 		}
-		size_t lsw_fwrite(FILE*& fp, const string_sized& buf) {
-			if (!fp) return 0;
-			return fwrite(buf.data(), sizeof(char), buf.size(), fp);
+
+		PhysFS::PhysFS()
+		{
+			lsw_al_init();
+			
+			if (!physfs_initialized_once) {
+				char myself[1024];
+				GetModuleFileNameA(NULL, myself, 1024);
+
+				if (!PHYSFS_init(myself)) throw Abort::Abort(__FUNCSIG__, "Failed to setup physfs!");
+				al_set_physfs_file_interface();
+
+				physfs_initialized_once = true;
+			}
 		}
-		*/
+		void PhysFS::disableALL()
+		{
+			PHYSFS_deinit();
+			physfs_initialized_once = false;
+		}
+
+		void PhysFS::addPath(std::string s)
+		{
+			Tools::interpretPath(s);
+			if (PHYSFS_mount(s.c_str(), nullptr, 1) == 0) throw Abort::Abort(__FUNCSIG__, "Couldn't add " + s + " to search paths.", Abort::abort_level::GIVEUP);
+			if (prunt) prunt(std::string("Added path '") + s.c_str() + "' successfully.");
+		}
+
+		void PhysFS::delPath(const std::string s)
+		{
+			if (PHYSFS_unmount(s.c_str()) == 0) throw Abort::Abort(__FUNCSIG__, "Couldn't remove " + s + " from search paths.", Abort::abort_level::GIVEUP);
+			if (prunt) prunt("Removed path '" + s + "' successfully.");
+		}
+
+		void PhysFS::hookPrint(const std::function<void(std::string)> f)
+		{
+			prunt = f;
+		}
+
+		void PhysFS::apply()
+		{
+			al_set_physfs_file_interface();
+			if (prunt) prunt("Applied PhysFS on current thread #" + std::to_string(Tools::getThreadID()));
+		}
+
+		void PhysFS::cancel()
+		{
+			al_set_standard_file_interface();
+			if (prunt) prunt("Removed PhysFS on current thread #" + std::to_string(Tools::getThreadID()));
+		}
+
+		void PhysFS::dir()
+		{
+			std::string raw_paths;
+			std::string files;
+
+			auto listpath = PHYSFS_getSearchPath();
+			for (auto i = listpath; *i != NULL; i++) {
+				raw_paths += std::string(*i) + ", ";
+			}
+			if (raw_paths.length() > 1) for (short u = 0; u < 2; u++) raw_paths.pop_back();
+			PHYSFS_freeList(listpath);
+
+
+			files = readDir();
+
+			if (files.length() > 1) for (short u = 0; u < 2; u++) { files.pop_back(); } // last ", "
+			//Tools::_clearPath(files);
+
+			if (prunt) {
+				prunt("Paths added: " + raw_paths);
+				prunt("Files found: " + files);
+			}
+		}
+
 	}
 }

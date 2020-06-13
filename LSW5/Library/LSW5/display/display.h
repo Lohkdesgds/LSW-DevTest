@@ -1,20 +1,19 @@
 #pragma once
 
+// C
 #include <allegro5/allegro.h>
-
+// C++
 #include <string>
 #include <vector>
 #include <chrono>
 #include <thread>
-
+// Others
 #include "..\Abort\abort.h"
-//#include "..\Database\database.h"
 #include "..\superthread\superthread.h"
 #include "..\allegroinitialization\allegroinitialization.h"
 #include "..\supermutex\supermutex.h"
 #include "..\tools\tools.h"
 #include "..\supermap\supermap.h"
-//#include "..\logger\logger.h"
 
 namespace LSW {
 	namespace v5 {

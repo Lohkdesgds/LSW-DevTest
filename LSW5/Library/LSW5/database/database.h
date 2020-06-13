@@ -2,12 +2,14 @@
 
 //#define LSW_NO_AUTOSAVE_DEBUG
 
+// C++
 #include <string>
-
+// Others
 #include "..\Abort\abort.h"
 #include "..\supermap\supermap.h"
 #include "..\Logger\logger.h"
 #include "..\tools\tools.h"
+#include "..\supermutex\supermutex.h"
 
 namespace LSW {
 	namespace v5 {
@@ -15,7 +17,7 @@ namespace LSW {
 
 			// new
 			constexpr int d_mode = ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL;
-			constexpr int delay_flush = 200; // 20 sec (this val / 10)
+			constexpr int delay_flush = 3000; // 5 min (this val / 10)
 
 			enum class e_double {
 				LAST_VOLUME, RESOLUTION_BUFFER_PROPORTION, FX_AMOUNT, // on file
@@ -122,7 +124,7 @@ namespace LSW {
 				std::string				config_path;
 
 				// secure access
-				std::mutex mute;
+				SuperMutex mute;
 
 				// additional data
 				std::thread* autosave_thread = nullptr;

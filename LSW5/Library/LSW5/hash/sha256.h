@@ -1,7 +1,9 @@
 #pragma once
 
-#include <string>
+// C
 #include <stdio.h>
+// C++
+#include <string>
 
 namespace LSW {
     namespace v5 {

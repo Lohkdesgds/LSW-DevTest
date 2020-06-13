@@ -1,5 +1,6 @@
 #pragma once
 
+// C++
 #include <string>
 
 namespace LSW {

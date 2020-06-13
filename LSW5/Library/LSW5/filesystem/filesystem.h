@@ -3,11 +3,13 @@
 // C
 #include <stdio.h>
 #include <stdlib.h>
+#include <physfs.h>
 // C++
 #include <string>
-
-// import
+#include <functional>
+// Others
 #include "..\tools\tools.h"
+#include "..\allegroinitialization\allegroinitialization.h"
 
 
 namespace LSW {
@@ -32,6 +34,33 @@ namespace LSW {
 
 			size_t read(std::string&, const size_t);
 			size_t write(std::string&, const size_t = 0);
+		};
+
+		class PhysFS {
+			static bool physfs_initialized_once;
+			std::function<void(std::string)> prunt;
+
+			std::string readDir(const char* = nullptr); // can call itself if folders in
+		public:
+			PhysFS();
+
+			// disable PhysFS everywhere
+			void disableALL();
+
+			// add new path
+			void addPath(std::string);
+			// remove this path
+			void delPath(const std::string);
+
+			void hookPrint(const std::function<void(std::string)>);
+
+			// apply the paths
+			void apply();
+			// cancel apply
+			void cancel();
+
+			// dir like cmd dir
+			void dir();
 		};
 	}
 }

@@ -20,8 +20,7 @@ SuperPair header:
 #include <vector>
 #include <typeinfo>
 #include <typeindex>
-
-// import
+// Others
 #include "..\autocaster\autocaster.h"
 #include "..\abort\abort.h"
 

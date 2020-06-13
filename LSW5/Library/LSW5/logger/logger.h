@@ -21,15 +21,13 @@ Logger header:
 // C++
 #include <string>
 #include <mutex>
-
-// import
+// Others
 #include "..\Abort\abort.h"
 #include "coloured_string.h"
 #include "printer.h"
 #include "..\allegroinitialization\allegroinitialization.h"
 #include "..\tools\tools.h"
 #include "..\shared\shared.h"
-//#include "..\autocaster\autocaster.h"
 
 
 namespace LSW {

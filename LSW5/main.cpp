@@ -7,6 +7,9 @@
 #include "Library\LSW5\display\display.h"
 #include "Library\LSW5\superresource\superresource.h"
 #include "Library\LSW5\sprite\sprite.h"
+#include "Library\LSW5\entity\entity.h"
+#include "Library\LSW5\autocaster\autocaster.h"
+#include "Library\LSW5\filesystem\filesystem.h"
 
 using namespace LSW::v5;
 
@@ -18,16 +21,21 @@ const char project_company[] = "Lohk's Studios";	// manually put
 const std::string discord_api_extract = std::string("%appdata%/") + project_company + "/" + project_name + "/data/discordapi.exe";
 const std::string discord_api_extract_dll = std::string("%appdata%/") + project_company + "/" + project_name + "/data/discord_game_sdk.dll";
 const std::string start_zip_default_extract_path = std::string("%appdata%/") + project_company + "/" + project_name + "/data/data.zip";
+const std::string start_zip_default_path = std::string("%appdata%/") + project_company + "/" + project_name + "/data";
 const std::string config_default_file = std::string("%appdata%/") + project_company + "/" + project_name + "/config/config.lohk";
 const std::string default_file_log_path = std::string("%appdata%/") + project_company + "/" + project_name + "/logs/latest.log";
 const std::string default_print_path = std::string("%win_photos_path%/Lohk's Studios Screenshots/");
 
+const std::string datapack_insertion_automatic = "NOT_READY_DATAPACK";
 
 
-int main() {
+int main(int argc, char* argv[]) {
 	Logger logg;
 	logg.init(default_file_log_path);
 	Database db(config_default_file);
+	PhysFS fs;
+	fs.hookPrint([&](std::string s) { logg << L::SLF << fsr(__FUNCSIG__, E::INFO) << "&5[PhysFS]&8 " << s << L::ELF; });
+
 
 	SuperResource<Camera> cameras;
 	SuperResource<Sprite_Base> sprites;
@@ -35,8 +43,12 @@ int main() {
 	db.set(database::e_string::PRINT_PATH, default_print_path);
 	db.set(database::e_string::DATA_PATH, start_zip_default_extract_path);
 
+	fs.addPath(start_zip_default_extract_path);
+	fs.apply();
+	fs.dir();
+
 	// custom entries (if no reset, they will be there forever lmao)
-	db.set("discord_api_extract", discord_api_extract);
+	db.set("discord_api_extract", discord_api_extract);	
 	db.set("discord_api_extract_dll", discord_api_extract_dll);
 
 	{
@@ -88,13 +100,16 @@ int main() {
 	ref3->set("target_pos_x", 0.0);
 	ref3->set("target_pos_y", 0.6);
 	ref3->set(sprite::e_double::ACCELERATION_Y, -6e-4);
-	auto* ref4 = sprites.create("test4");
+	auto* ref4 = sprites.customLoad("test4", [](Sprite_Base*& b) {return (b = new Entity()); });
 	ref4->set("show_box", true);
 	ref4->set("show_dot", true);
+	ref4->set("draw", true);
 	ref4->set("scale_g", 0.32);
 	ref4->set("target_pos_x", 0.0);
 	ref4->set("target_pos_y", -0.6);
 	ref4->set(sprite::e_double::ACCELERATION_Y, 6e-4);
+	Entity* ref4_alt = (Entity*)ref4;
+	ref4_alt->load("atlas0.png");
 
 	Camera* cam = cameras.create("camera_0");
 	cam->set(camera::e_integer::ID, 0);

@@ -7,8 +7,7 @@
 #include <functional>
 #include <vector>
 #include <mutex>
-
-// import
+// Others
 #include "..\abort\abort.h"
 #include "..\allegroinitialization\allegroinitialization.h"
 

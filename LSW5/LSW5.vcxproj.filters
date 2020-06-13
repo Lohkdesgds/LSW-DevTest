@@ -70,6 +70,9 @@
     <Filter Include="LSW5\Library\supermutex">
       <UniqueIdentifier>{1c2e96ff-a1c9-44db-8124-9de3809c4aef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW5\Library\entity">
+      <UniqueIdentifier>{405588bd-d0ce-482b-9563-bc986de37594}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -130,6 +133,9 @@
     </ClCompile>
     <ClCompile Include="Library\LSW5\supermutex\supermutex.cpp">
       <Filter>LSW5\Library\supermutex</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\entity\entity.cpp">
+      <Filter>LSW5\Library\entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +210,9 @@
     </ClInclude>
     <ClInclude Include="Library\LSW5\supermutex\supermutex.h">
       <Filter>LSW5\Library\supermutex</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\entity\entity.h">
+      <Filter>LSW5\Library\entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

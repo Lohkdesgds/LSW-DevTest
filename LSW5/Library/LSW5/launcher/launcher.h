@@ -1,12 +1,14 @@
 #pragma once
 
+// C
 #include <stdio.h>
 #include <stdlib.h>
+#include <Windows.h>
+// C++
 #include <functional>
 #include <thread>
 #include <string>
 #include <sstream>
-#include <Windows.h>
 #include <algorithm>
 
 namespace LSW {

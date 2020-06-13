@@ -1,10 +1,11 @@
 #pragma once
 
+// C
 #include <allegro5/allegro.h>
-
+// C++
 #include <map>
 #include <vector>
-
+// Others
 #include "..\supermap\supermap.h"
 #include "..\tools\tools.h"
 #include "..\allegroinitialization\allegroinitialization.h"

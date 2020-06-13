@@ -8,10 +8,12 @@ namespace LSW {
 			if (locked) return false;
 			m.lock();
 			locked = true;
+			m.unlock();
 			return true;
 		}
 		void SuperMutex::weird_mtx::unlock()
 		{
+			m.lock();
 			locked = false;
 			m.unlock();
 		}

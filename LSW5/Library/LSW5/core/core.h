@@ -1,20 +1,9 @@
 #pragma once
 
+// C++
 #include <thread>
 #include <mutex>
-
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_acodec.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_color.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_physfs.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_native_dialog.h>
-#include <allegro5/allegro_ttf.h>
-#include <physfs.h>
-
+// Others
 #include "..\abort\abort.h"
 #include "..\supertimer\supertimer.h"
 #include "..\supermap\supermap.h"
@@ -23,12 +12,11 @@
 #include "..\shared\shared.h"
 #include "..\autocaster\autocaster.h"
 #include "..\database\database.h"
-
 #include "..\superresource\superresource.h"
 #include "..\sprite\sprite.h"
 
 /*
-LATER: add a way to create threads to specific layers of collision
+LATER: (maybe) add a way to create threads to specific layers of collision
 - this way a thread is responsible to do the work in a layer
 */
 

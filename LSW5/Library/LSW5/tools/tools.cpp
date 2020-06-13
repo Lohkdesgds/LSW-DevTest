@@ -187,6 +187,12 @@ namespace LSW {
 
 				return rett;
 			}
+			uint64_t getThreadID()
+			{
+				std::stringstream ss;
+				ss << std::this_thread::get_id();
+				return std::stoull(ss.str());
+			}
 			std::vector<bool> translBinary(const int v, const size_t lim)
 			{
 				std::vector<bool> b;

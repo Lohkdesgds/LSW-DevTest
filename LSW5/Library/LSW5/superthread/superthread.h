@@ -1,11 +1,11 @@
 #pragma once
 
-
-#include <thread>
+// C
 #include <assert.h>
+// C++
+#include <thread>
 #include <functional>
-
-
+// Others
 #include "..\allegroinitialization\allegroinitialization.h"
 
 //#define LSW_THREAD_ALLEGRO

@@ -161,7 +161,8 @@ namespace LSW {
 				try {
 
 					while (data.display_routine.isPaused()) {
-						Sleep(50); // 20 per sec
+						std::this_thread::sleep_for(std::chrono::milliseconds(200));
+						//Sleep(50); // 20 per sec
 						data.display_routine.tick(); // keep saying it's alive
 					}
 
@@ -325,7 +326,8 @@ namespace LSW {
 				try {
 
 					while (data.collision_routine.isPaused()) {
-						Sleep(50); // 20 per sec
+						std::this_thread::sleep_for(std::chrono::milliseconds(200));
+						//Sleep(50); // 20 per sec
 						data.collision_routine.tick(); // keep saying it's alive
 					}
 
@@ -410,7 +412,8 @@ namespace LSW {
 
 				try {
 					while (data.events_routine.isPaused()) {
-						Sleep(50); // 20 per sec
+						std::this_thread::sleep_for(std::chrono::milliseconds(200));
+						//Sleep(50); // 20 per sec
 						data.events_routine.tick(); // keep saying it's alive
 					}
 
@@ -470,7 +473,8 @@ namespace LSW {
 				data.functional_routine.tick();
 
 				while (data.functional_routine.isPaused()) {
-					Sleep(50); // 20 per sec
+					std::this_thread::sleep_for(std::chrono::milliseconds(200));
+					//Sleep(50); // 20 per sec
 					data.functional_routine.tick(); // keep saying it's alive
 				}
 
@@ -496,7 +500,7 @@ namespace LSW {
 		{
 			data.gmute.lock();
 			if (!data.has_init_once) {
-				lsw_al_init();
+				lsw_al_init_all();
 
 				al_init_user_event_source(&data.evsrc);
 

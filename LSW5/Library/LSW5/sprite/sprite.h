@@ -1,8 +1,8 @@
 #pragma once
 
-
+// C++
 #include <string>
-
+// Others
 #include "..\supermap\supermap.h"
 #include "..\allegroinitialization\allegroinitialization.h"
 #include "..\autocaster\autocaster.h"

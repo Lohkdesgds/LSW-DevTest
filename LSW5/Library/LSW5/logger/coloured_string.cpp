@@ -74,8 +74,10 @@ namespace LSW {
 			C curr_color = C::WHITE, last_added_color = C::WHITE;
 			bool ignore_once = false;
 			bool percentage_c = false;
+			bool has_backslash_to_add = false;
 
 			for (auto& i : rstr) {
+				has_backslash_to_add = false;
 				if (i == '&' && !ignore_once) {
 					percentage_c = true;
 					continue;
@@ -85,7 +87,10 @@ namespace LSW {
 					ignore_once = true;
 					continue;
 				}
-				else ignore_once = false;
+				else {
+					if (ignore_once && (i != '&' && i != '\\')) has_backslash_to_add = true;
+					ignore_once = false;
+				}
 
 				if (percentage_c) { // &color (0-9,a-f)
 					percentage_c = false;
@@ -102,6 +107,8 @@ namespace LSW {
 					}
 					continue;
 				}
+
+				if (has_backslash_to_add) str.push_back({ '\\', curr_color });
 				str.push_back({ i, curr_color });
 				last_added_color = curr_color;
 			}

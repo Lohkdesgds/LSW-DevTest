@@ -1,6 +1,6 @@
 #pragma once
 
-// import
+// Others
 #include "..\allegroinitialization\allegroinitialization.h"
 
 

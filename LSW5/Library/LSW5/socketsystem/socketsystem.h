@@ -15,8 +15,6 @@ SocketSystem header:
 #undef UNICODE
 #define WIN32_LEAN_AND_MEAN
 
-//#define LSW_EXPERIMENTAL_BOOST
-
 // C
 #include <windows.h>
 #include <winsock2.h>
@@ -30,14 +28,12 @@ SocketSystem header:
 #include <mutex>
 #include <functional>
 #include <memory>
-
-// import
+// Others
 #include "..\abort\abort.h"
 #include "..\tools\tools.h"
 #include "..\filesystem\filesystem.h"
 #include "..\supermutex\supermutex.h"
 
-// ALT
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")

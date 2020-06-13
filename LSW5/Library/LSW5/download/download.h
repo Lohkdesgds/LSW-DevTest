@@ -1,8 +1,10 @@
 #pragma once
 
+// C
 #include <windows.h>
 #include <wininet.h>
 #include <ShlObj.h>
+// C++
 #include <string>
 
 #pragma comment (lib, "wininet.lib")

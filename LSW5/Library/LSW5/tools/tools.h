@@ -8,8 +8,7 @@
 #include <vector>
 #include <sstream>
 #include <chrono>
-
-// import
+// Others
 #include "..\abort\abort.h"
 
 #define CHAR_INIT_LIMIT 512
@@ -38,6 +37,8 @@ namespace LSW {
 
 			// FORMAT = "STARTSTUFF######ENDSTUFF" (# = number space)
 			std::vector<std::string> genStrFormat(const std::string, const size_t, const size_t = 0);
+
+			uint64_t getThreadID();
 
 			// value, how many bytes to test?
 			std::vector<bool> translBinary(const int, const size_t);

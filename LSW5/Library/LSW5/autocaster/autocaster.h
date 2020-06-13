@@ -1,14 +1,6 @@
 #pragma once
 
-/*
-= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =
-Autocaster header:
-
-- Autocaster is a useful default cast method to cast stuff around.
-
-= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =
-*/
-
+// C++
 #include <type_traits>
 
 namespace LSW {

@@ -1,25 +1,12 @@
 #pragma once
 
 
-/*
-= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =
-Printer header:
-
-- Printer can print almost everything
-# WORKING since 20200410
-
-= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =
-*/
-
-
-
 // C
 #include <Windows.h>
 #include <stdio.h>
 // C++
 #include <string>
-
-// import
+// Others
 #include "coloured_string.h"
 
 namespace LSW {
