@@ -7,7 +7,7 @@
 #include "Library\LSW5\display\display.h"
 #include "Library\LSW5\superresource\superresource.h"
 #include "Library\LSW5\sprite\sprite.h"
-#include "Library\LSW5\entity\entity.h"
+#include "Library\LSW5\entities\entities.h"
 #include "Library\LSW5\autocaster\autocaster.h"
 #include "Library\LSW5\filesystem\filesystem.h"
 
@@ -39,13 +39,14 @@ int main(int argc, char* argv[]) {
 
 	SuperResource<Camera> cameras;
 	SuperResource<Sprite_Base> sprites;
+	SuperResource<ALLEGRO_BITMAP> bitmaps;
 
 	db.set(database::e_string::PRINT_PATH, default_print_path);
 	db.set(database::e_string::DATA_PATH, start_zip_default_extract_path);
 
 	fs.addPath(start_zip_default_extract_path);
 	fs.apply();
-	fs.dir();
+	fs.dir(); // just register what's inside lmao
 
 	// custom entries (if no reset, they will be there forever lmao)
 	db.set("discord_api_extract", discord_api_extract);	
@@ -79,6 +80,9 @@ int main(int argc, char* argv[]) {
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Initializing resources - - -" << L::ELF;
 
+
+	bitmaps.create("_ATLAS0", "atlas0.png"); // load big atlas
+
 	auto* ref = sprites.create("test");
 	ref->set("show_box", true);
 	ref->set("show_dot", true);
@@ -109,7 +113,9 @@ int main(int argc, char* argv[]) {
 	ref4->set("target_pos_y", -0.6);
 	ref4->set(sprite::e_double::ACCELERATION_Y, 6e-4);
 	Entity* ref4_alt = (Entity*)ref4;
-	ref4_alt->load("atlas0.png");
+	ref4_alt->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
+	ref4_alt->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
+	ref4_alt->set(entity::e_double::FRAMES_PER_SECOND, 4.0);
 
 	Camera* cam = cameras.create("camera_0");
 	cam->set(camera::e_integer::ID, 0);

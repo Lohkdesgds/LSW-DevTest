@@ -205,7 +205,7 @@
     <ClCompile Include="Library\LSW5\database\database.cpp" />
     <ClCompile Include="Library\LSW5\display\display.cpp" />
     <ClCompile Include="Library\LSW5\download\download.cpp" />
-    <ClCompile Include="Library\LSW5\entity\entity.cpp" />
+    <ClCompile Include="Library\LSW5\entities\entities.cpp" />
     <ClCompile Include="Library\LSW5\filesystem\filesystem.cpp" />
     <ClCompile Include="Library\LSW5\hash\sha256.cpp" />
     <ClCompile Include="Library\LSW5\launcher\launcher.cpp" />
@@ -228,7 +228,7 @@
     <ClInclude Include="Library\LSW5\database\database.h" />
     <ClInclude Include="Library\LSW5\display\display.h" />
     <ClInclude Include="Library\LSW5\download\download.h" />
-    <ClInclude Include="Library\LSW5\entity\entity.h" />
+    <ClInclude Include="Library\LSW5\entities\entities.h" />
     <ClInclude Include="Library\LSW5\filesystem\filesystem.h" />
     <ClInclude Include="Library\LSW5\hash\sha256.h" />
     <ClInclude Include="Library\LSW5\launcher\launcher.h" />
