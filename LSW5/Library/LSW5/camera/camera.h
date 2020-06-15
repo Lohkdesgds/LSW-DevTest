@@ -67,12 +67,12 @@ namespace LSW {
 				void setRoughness(const double);
 			};
 		private:
-			struct Camera_configuration {
-				SuperMap<double>	double_data = camera::e_double_defaults;
-				SuperMap<bool>		boolean_data = camera::e_boolean_defaults;
-				SuperMap<int>		integer_data = camera::e_integer_defaults;
-				ALLEGRO_TRANSFORM transformation{};
-				std::vector<layer_each> layers;
+			struct Camera_configuration { // THE configuration of a Camera
+				SuperMap<double>	double_data = camera::e_double_defaults;	// its double values
+				SuperMap<bool>		boolean_data = camera::e_boolean_defaults;	// its boolean values
+				SuperMap<int>		integer_data = camera::e_integer_defaults;	// its integer values
+				ALLEGRO_TRANSFORM transformation{};								// its transformation (can refresh() based on ^^)
+				std::vector<layer_each> layers;									// its way to handle different layers
 			};
 
 			Camera_configuration data;

@@ -3,6 +3,7 @@
 // C++
 #include <string>
 // Others
+#include "..\abort\abort.h"
 #include "..\supermap\supermap.h"
 #include "..\allegroinitialization\allegroinitialization.h"
 #include "..\autocaster\autocaster.h"
@@ -243,13 +244,13 @@ namespace LSW {
 			bool get(const std::string, int&);
 			bool get(const std::string, ALLEGRO_COLOR&);
 
-			double*			getRef(const sprite::e_double_readonly);
-			bool*			getRef(const sprite::e_boolean_readonly);
-			std::string*	getRef(const sprite::e_string);
-			double*			getRef(const sprite::e_double);
-			bool*			getRef(const sprite::e_boolean);
-			int*			getRef(const sprite::e_integer);
-			ALLEGRO_COLOR*	getRef(const sprite::e_color);
+			const double*			getRef(const sprite::e_double_readonly) const;
+			const bool*				getRef(const sprite::e_boolean_readonly) const;
+			std::string*			getRef(const sprite::e_string);
+			double*					getRef(const sprite::e_double);
+			bool*					getRef(const sprite::e_boolean);
+			int*					getRef(const sprite::e_integer);
+			ALLEGRO_COLOR*			getRef(const sprite::e_color);
 
 			template<typename T, typename V> inline bool g(const T a, V& b) { return get(a, b); };
 			template<typename T, typename V> inline bool s(const T a, V& b) { return set(a, b); };
@@ -264,7 +265,7 @@ namespace LSW {
 			// camera is useful for consistent run, also updates easier_collision_handle for further collide()
 			void update(Camera*);
 
-			Sprite_Base::sprite_base_data& copyRAW();
+			sprite_base_data& copyRAW();
 			// YOU SHALL update() BEFORE TESTING COLLISION!
 			easier_collision_handle& getCollision();
 		};

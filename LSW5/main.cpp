@@ -13,6 +13,12 @@
 
 using namespace LSW::v5;
 
+// nvidia stuff
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
+
+
 
 // game specific here stuff
 const char project_name[] = PROJECTNAME;			// properties, c++, preprocessor definitions. Default autogen: 'PROJECTNAME="$(ProjectName)";%(PreprocessorDefinitions)'
@@ -40,6 +46,7 @@ int main(int argc, char* argv[]) {
 	SuperResource<Camera> cameras;
 	SuperResource<Sprite_Base> sprites;
 	SuperResource<ALLEGRO_BITMAP> bitmaps;
+	SuperResource<ALLEGRO_FONT> fonts;
 
 	db.set(database::e_string::PRINT_PATH, default_print_path);
 	db.set(database::e_string::DATA_PATH, start_zip_default_extract_path);
@@ -82,6 +89,7 @@ int main(int argc, char* argv[]) {
 
 
 	bitmaps.create("_ATLAS0", "atlas0.png"); // load big atlas
+	fonts.create("_FONT", "font.ttf"); // load main font
 
 	auto ref = sprites.create("test");
 	ref->set("show_box", true);
@@ -104,7 +112,7 @@ int main(int argc, char* argv[]) {
 	ref3->set("target_pos_x", 0.0);
 	ref3->set("target_pos_y", 0.6);
 	ref3->set(sprite::e_double::ACCELERATION_Y, -6e-4);
-	auto ref4 = sprites.customLoad("test4", [](Sprite_Base*& b) {return (b = new Entity()); });
+	auto ref4 = sprites.customLoad("test4", [](Sprite_Base*& b) {return (b = new Block()); });
 	ref4->set("show_box", true);
 	ref4->set("show_dot", true);
 	ref4->set("draw", true);
@@ -112,10 +120,25 @@ int main(int argc, char* argv[]) {
 	ref4->set("target_pos_x", 0.0);
 	ref4->set("target_pos_y", -0.6);
 	ref4->set(sprite::e_double::ACCELERATION_Y, 6e-4);
-	Entity* ref4_alt = (Entity*)&(*ref4);
+	Block* ref4_alt = (Block*)&(*ref4);
 	ref4_alt->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
 	ref4_alt->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
 	ref4_alt->set(entity::e_double::FRAMES_PER_SECOND, 4.0);
+	auto ref5 = sprites.customLoad("test5", [](Sprite_Base*& b) {return (b = new Text()); });
+	//ref5->set("show_box", true);
+	ref5->set("show_dot", true);
+	ref5->set("draw", true);
+	ref5->set("scale_g", 0.32);
+	ref5->set("target_pos_x", 0.0);
+	ref5->set("target_pos_y", -0.7);
+	ref5->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
+	ref5->set(sprite::e_double::SCALE_G, 0.1);
+	ref5->set(sprite::e_double::SCALE_X, 0.6);
+	//ref5->set(sprite::e_double::ACCELERATION_Y, 6e-4);
+	Text* ref5_alt = (Text*)&(*ref5);
+	ref5_alt->load("_FONT");
+	ref5_alt->set(text::e_string::STRING, "HELLO WORLD DAMN IT");
+	ref5_alt->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
 
 	auto cam = cameras.create("camera_0");
 	cam->set(camera::e_integer::ID, 0);

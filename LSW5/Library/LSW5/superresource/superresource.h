@@ -323,7 +323,7 @@ namespace LSW {
 		inline const auto lambda_bitmap_load = [](std::string& p, ALLEGRO_BITMAP*& b) -> bool { return ((b = al_load_bitmap(p.c_str()))); };
 		inline const auto lambda_bitmap_unload = [](ALLEGRO_BITMAP*& b) -> void {if (al_is_system_installed() && b) { al_destroy_bitmap(b); b = nullptr; } };
 
-		inline const auto lambda_font_load = [](std::string& p, ALLEGRO_FONT*& b) -> bool { return ((b = al_load_ttf_font(p.c_str(), 25e2, 0))); };
+		inline const auto lambda_font_load = [](std::string& p, ALLEGRO_FONT*& b) -> bool { return ((b = al_load_ttf_font(p.c_str(), 75.0, 0))); };
 		inline const auto lambda_font_unload = [](ALLEGRO_FONT*& b) -> void { if (al_is_system_installed() && b) { al_destroy_font(b); b = nullptr; } };
 
 		inline const auto lambda_sample_load = [](std::string& p, ALLEGRO_SAMPLE*& b) -> bool { return ((b = al_load_sample(p.c_str()))); };

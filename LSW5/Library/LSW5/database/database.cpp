@@ -428,6 +428,12 @@ namespace LSW {
 			else *ptr = v;
 		}
 
+		bool Database::get(const database::e_chronomillis_readonly e, std::chrono::milliseconds& v)
+		{
+			if (auto* ptr = data.chronomillis_readonly_data[e]; ptr) { v = *ptr; return true; }
+			return false;
+		}
+
 		bool Database::get(const database::e_double e, double& v)
 		{
 			if (auto* ptr = data.double_data[e]; ptr) { v = *ptr; return true; }
@@ -461,6 +467,12 @@ namespace LSW {
 		bool Database::get(const database::e_color e, ALLEGRO_COLOR& v)
 		{
 			if (auto* ptr = data.color_data[e]; ptr) { v = *ptr; return true; }
+			return false;
+		}
+
+		bool Database::get(const std::string e, std::chrono::milliseconds& v)
+		{
+			if (auto* ptr = data.chronomillis_readonly_data(e.c_str(), e.length()); ptr) { v = *ptr; return true; }
 			return false;
 		}
 
@@ -498,6 +510,12 @@ namespace LSW {
 		{
 			if (auto* ptr = data.color_data(e.c_str(), e.length()); ptr) { v = *ptr; return true; }
 			return false;
+		}
+
+		const std::chrono::milliseconds* Database::getRef(const database::e_chronomillis_readonly e) const
+		{
+			if (auto* ptr = data.chronomillis_readonly_data(e); ptr) return ptr;
+			return nullptr;
 		}
 
 		double* Database::getRef(const database::e_double e)

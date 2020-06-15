@@ -19,6 +19,9 @@ namespace LSW {
 			constexpr int d_mode = ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL;
 			constexpr int delay_flush = 3000; // 5 min (this val / 10)
 
+			enum class e_chronomillis_readonly {
+				STARTED_APP_TIME
+			};
 			enum class e_double {
 				LAST_VOLUME, RESOLUTION_BUFFER_PROPORTION, FX_AMOUNT, // on file
 				MOUSE_X, MOUSE_Y, RAW_MOUSE_X, RAW_MOUSE_Y, INSTANT_FRAMESPERSECOND, INSTANT_COLLISIONSPERSECOND, INSTANT_USEREVENTSPERSECOND, INSTANT_ADVANCEDFUNCSPERSECOND }; // not on file
@@ -53,6 +56,9 @@ namespace LSW {
 			const std::string e_true = "true"; // if not 'true', false.
 			enum class customtriggers { SAVE_ON_FILE };
 
+			const SuperMap<std::chrono::milliseconds> e_chronomillis_readonly_defaults = {
+				{std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()),		(e_chronomillis_readonly::STARTED_APP_TIME),			CHAR_INIT("started_app_time")}
+			};
 			const SuperMap<double>			e_double_defaults   = {
 				{0.5,															(e_double::LAST_VOLUME),											CHAR_INIT("last_volume"),						customtriggers::SAVE_ON_FILE},
 				{1.0, 															(e_double::RESOLUTION_BUFFER_PROPORTION),							CHAR_INIT("resolution_proportion"),				customtriggers::SAVE_ON_FILE},
@@ -114,14 +120,15 @@ namespace LSW {
 		class Database {
 			struct database_data {
 				// actual data
-				SuperMap<double>		double_data	 = database::e_double_defaults;
-				SuperMap<bool>			boolean_data = database::e_boolean_defaults;
-				SuperMap<int>			integer_data = database::e_integer_defaults;
-				SuperMap<size_t>		sizet_data	 = database::e_sizet_defaults;
-				SuperMap<std::string>	string_data	 = database::e_string_defaults;
-				SuperMap<ALLEGRO_COLOR>	color_data	 = database::e_color_defaults;
-				ALLEGRO_CONFIG*			config = nullptr;
-				std::string				config_path;
+				SuperMap<std::chrono::milliseconds> chronomillis_readonly_data	= database::e_chronomillis_readonly_defaults;
+				SuperMap<double>					double_data	 				= database::e_double_defaults;
+				SuperMap<bool>						boolean_data 				= database::e_boolean_defaults;
+				SuperMap<int>						integer_data 				= database::e_integer_defaults;
+				SuperMap<size_t>					sizet_data	 				= database::e_sizet_defaults;
+				SuperMap<std::string>				string_data	 				= database::e_string_defaults;
+				SuperMap<ALLEGRO_COLOR>				color_data	 				= database::e_color_defaults;
+				ALLEGRO_CONFIG*						config 						= nullptr;
+				std::string							config_path;
 
 				// secure access
 				SuperMutex mute;
@@ -159,12 +166,14 @@ namespace LSW {
 			void set(const std::string, const std::string);
 			void set(const std::string, const ALLEGRO_COLOR);
 
+			bool get(const database::e_chronomillis_readonly, std::chrono::milliseconds&);
 			bool get(const database::e_double, double&);
 			bool get(const database::e_boolean, bool&);
 			bool get(const database::e_integer, int&);
 			bool get(const database::e_sizet, size_t&);
 			bool get(const database::e_string, std::string&);
 			bool get(const database::e_color, ALLEGRO_COLOR&);
+			bool get(const std::string, std::chrono::milliseconds&);
 			bool get(const std::string, double&);
 			bool get(const std::string, bool&);
 			bool get(const std::string, int&);
@@ -172,12 +181,13 @@ namespace LSW {
 			bool get(const std::string, std::string&);
 			bool get(const std::string, ALLEGRO_COLOR&);
 
-			double*			getRef(const database::e_double);	// Direct reference to the value
-			bool*			getRef(const database::e_boolean);	// Direct reference to the value
-			int*			getRef(const database::e_integer);	// Direct reference to the value
-			size_t*			getRef(const database::e_sizet);	// Direct reference to the value
-			std::string*	getRef(const database::e_string);	// Direct reference to the value
-			ALLEGRO_COLOR* 	getRef(const database::e_color);	// Direct reference to the value
+			const std::chrono::milliseconds*			getRef(const database::e_chronomillis_readonly) const;	// Direct reference to the value
+			double*										getRef(const database::e_double);	// Direct reference to the value
+			bool*										getRef(const database::e_boolean);	// Direct reference to the value
+			int*										getRef(const database::e_integer);	// Direct reference to the value
+			size_t*										getRef(const database::e_sizet);	// Direct reference to the value
+			std::string*								getRef(const database::e_string);	// Direct reference to the value
+			ALLEGRO_COLOR* 								getRef(const database::e_color);	// Direct reference to the value
 			
 			template<typename T, typename V> inline bool g(const T a, V& b) { return get(a, b); };
 			template<typename T, typename V> inline bool isEq(const T e, const V v) { V k; if (get(e, k)) return v == k; return false; }

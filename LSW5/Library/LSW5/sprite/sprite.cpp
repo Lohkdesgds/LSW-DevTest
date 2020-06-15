@@ -319,14 +319,14 @@ namespace LSW {
 			return false;
 		}
 
-		double* Sprite_Base::getRef(const sprite::e_double_readonly e)
+		const double* Sprite_Base::getRef(const sprite::e_double_readonly e) const
 		{
 			if (auto* ptr = data.double_readonly_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		bool* Sprite_Base::getRef(const sprite::e_boolean_readonly e)
+		const bool* Sprite_Base::getRef(const sprite::e_boolean_readonly e) const
 		{
 			if (auto* ptr = data.boolean_readonly_data(e); ptr)
 				return ptr;
@@ -375,16 +375,16 @@ namespace LSW {
 			if (isEq(sprite::e_boolean::SHOWBOX, true) || isEq(sprite::e_boolean::SHOWDOT, true)) {
 				Camera clean_camera;
 
-				double camx, camy, camg;
+				//double camx, camy, camg;
 				if (*data.boolean_data[sprite::e_boolean::AFFECTED_BY_CAM]) {
-					cam->get(camera::e_double::SCALE_G, camg);
-					cam->get(camera::e_double::SCALE_X, camx);
-					cam->get(camera::e_double::SCALE_Y, camy);
+					//cam->get(camera::e_double::SCALE_G, camg);
+					//cam->get(camera::e_double::SCALE_X, camx);
+					//cam->get(camera::e_double::SCALE_Y, camy);
 					cam->apply();
 				}
 				else {
 					clean_camera.apply();
-					camx = camy = camg = 1.0;
+					//camx = camy = camg = 1.0;
 				}
 
 				// delta T calculation
@@ -408,8 +408,8 @@ namespace LSW {
 				if (isEq(sprite::e_boolean::SHOWBOX, true)) {
 					double scale_x, scale_y;
 
-					scale_x = *data.double_data[sprite::e_double::SCALE_G] * *data.double_data[sprite::e_double::SCALE_X] * (camg * camx);
-					scale_y = *data.double_data[sprite::e_double::SCALE_G] * *data.double_data[sprite::e_double::SCALE_Y] * (camg * camy);
+					scale_x = *data.double_data[sprite::e_double::SCALE_G] * *data.double_data[sprite::e_double::SCALE_X]/* * (camg * camx)*/;
+					scale_y = *data.double_data[sprite::e_double::SCALE_G] * *data.double_data[sprite::e_double::SCALE_Y]/* * (camg * camy)*/;
 
 					al_draw_filled_rectangle(
 						/* X1: */ *data.double_data[sprite::e_double::TARG_POSX] - scale_x * 0.5,
@@ -425,7 +425,7 @@ namespace LSW {
 					al_draw_filled_circle(
 						/* X1: */ *data.double_readonly_data[sprite::e_double_readonly::POSX],
 						/* X1: */ *data.double_readonly_data[sprite::e_double_readonly::POSY],
-						/* SCL */ 0.1f * (fabs(camg * sqrt(camx * camy) * 0.30f) + 0.12f),
+						/* SCL */ 0.1f * (fabs(/*camg * sqrt(camx * camy) * */0.30f) + 0.12f),
 						al_map_rgb(127, easy_collision.was_col ? 76 : 127, easy_collision.was_col ? 76 : 127));
 				}
 			}

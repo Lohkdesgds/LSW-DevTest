@@ -130,29 +130,29 @@ namespace LSW {
 
 			template<typename K>
 			const T* operator[](K key) const {
-				for (auto& i : sps) if (T* ptr; ptr = i(key)) return ptr;
+				for (auto& i : sps) if (const T* ptr = i(key); ptr) return ptr;
 				return nullptr;
 			}
 			template<typename K, size_t size_o>
 			const T* operator[](K(&key)[size_o]) const {
-				for (auto& i : sps) if (T* ptr; ptr = i(key, size_o)) return ptr;
+				for (auto& i : sps) if (const T* ptr = i(key, size_o); ptr) return ptr;
 				return nullptr;
 			}
 
 
 			template<typename K>
 			const T* operator()(K key) const {
-				for (auto& i : sps) if (T* ptr; ptr = i[key]) return ptr;
+				for (auto& i : sps) if (const T* ptr = i[key]; ptr) return ptr;
 				return nullptr;
 			}
 			template<typename K, size_t size_o>
 			const T* operator()(K(&key)[size_o]) const {
-				for (auto& i : sps) if (T* ptr; ptr = i(key, size_o)) return ptr;
+				for (auto& i : sps) if (const T* ptr = i(key, size_o); ptr) return ptr;
 				return nullptr;
 			}
 			template<typename K>
 			const T* operator()(K* key, size_t size) const {
-				for (auto& i : sps) if (T* ptr; ptr = i(key, size)) return ptr;
+				for (auto& i : sps) if (const T* ptr = i(key, size); ptr) return ptr;
 				return nullptr;
 			}
 		};

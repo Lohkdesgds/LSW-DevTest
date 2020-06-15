@@ -96,7 +96,8 @@ namespace LSW {
 		{
 			for (size_t p = 0; p < data.layers.size(); p++) {
 				if (data.layers[p].getLayerID() == v.getLayerID()) {
-					data.layers[p].setElasticity(v.getElasticity());
+					//data.layers[p].setElasticity(v.getElasticity());
+					data.layers[p] = v;
 					return;
 				}
 			}

@@ -1,4 +1,5 @@
 # Dependencies in LSW 5
+*Updated 2020/06/15 approx 07:42 GMT*
 
 <hr>
 
@@ -32,6 +33,10 @@
 
 #### Downloader
 *Quick download from a link? This can download from many places many stuff. Put the link and wait!*
+<hr>
+
+#### Entities
+*Blocks, Texts, stuff shown on screen mostly based on Sprite_Base*
 <hr>
 
 #### Filesystem
@@ -78,6 +83,10 @@
 *An extended version of std::pair used in SuperMaps!*
 <hr>
 
+#### SuperMutex
+*An extended version of std::mutex more like a semaphore!*
+<hr>
+
 #### SuperResource
 *Want some resource around your app no brainer? Just create your data and you're good to go!*
 <hr>
@@ -95,6 +104,8 @@
 <hr>
 
 ## Dependency configuration
+*Some dependencies may be chained from other headers.*
+
 
 Lib | #include
 --- | --------
@@ -102,22 +113,23 @@ Abort | *none*
 AllegroInitialization | *none*
 Autocaster | *none*
 Camera | SuperMap<br>Tools<br>AllegroInitialization<br>SuperResource
-Core | Abort<br>SuperTimer<br>SuperMap<br>Logger<br>Display<br>Shared<br>Autocaster<br>SuperResource<br>Sprite
-Database | Abort<br>SuperMap<br>Logger<br>Tools
-Display | Abort<br>Database<br>SuperThread<br>Logger
+Core | Abort<br>SuperTimer<br>SuperMap<br>Logger<br>Display<br>Shared<br>Autocaster<br>Database<br>SuperResource<br>Sprite
+Database | Abort<br>SuperMap<br>Logger<br>Tools<br>SuperMutex
+Display | Abort<br>SuperThread<br>AllegroInitialization<br>SuperMutex<br>Tools<br>SuperMap
 Downloader | *none*
-FileSystem | Tools
+Entities | Sprite<br>SuperResource<br>Database<br>Tools
+FileSystem | Tools<br>AllegroInitialization
 Hash | *none*
 Launcher | *none*
 ColouredString | *none*
-Logger | Printer<br>ColouredString
+Logger | Printer<br>ColouredString<br>Abort<br>AllegroInitialization<br>Tools<br>Shared
 Printer | ColouredString
 Shared | *none*
-SocketSystem | Abort
-Sprite | SuperMap<br>AllegroInitialization<br>Autocaster<br>Tools<br>Camera<br>Shared
+SocketSystem | Abort<br>Tools<br>FileSystem<br>SuperMutex
+Sprite | Abort<br>SuperMap<br>AllegroInitialization<br>Autocaster<br>Tools<br>Camera<br>Shared
 SuperMap | SuperPair
 SuperPair | Autocaster<br>Abort
-SuperResource | Abort<br>AllegroInitialization
+SuperResource | Abort<br>AllegroInitialization<br>SuperMutex
 SuperThread | AllegroInitialization
 SuperTimer | AllegroInitialization
 Tools | Abort
