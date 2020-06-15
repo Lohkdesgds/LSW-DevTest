@@ -33,7 +33,7 @@ namespace LSW {
 
 		class Entity : public Sprite_Base {
 			struct _bitmap {
-				ALLEGRO_BITMAP* ref = nullptr;
+				std::shared_ptr<ALLEGRO_BITMAP> ref;
 				std::string source, id;
 				bool is_sub_bitmap = false; // if true, source is source's id, else source is path
 			};

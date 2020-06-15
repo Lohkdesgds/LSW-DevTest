@@ -226,7 +226,7 @@ namespace LSW {
 
 					for(auto& i : sprites)
 					{
-						i->self->draw(cam);
+						i->draw(cam);
 					}
 
 					//cam.getLastCameraApply()->matrix_debug();
@@ -340,30 +340,31 @@ namespace LSW {
 						}
 						else if (data.collision_routine.routines.isThisThis(static_cast<size_t>(core::thr_collision_routines::COLLISION_WORK))) {
 
-							bool gottem = false;
+							//bool gottem = false;
 
-							for (size_t times = 0; !(gottem = sprites.tryLock()) && times < 10; Sleep(10));
+							//for (size_t times = 0; !(gottem = sprites.lock()) && times < 10; Sleep(10));
+							sprites.lock();
 
-							if (gottem) {
+							//if (gottem) {
 
-								Camera* cam = gcam.getLastCameraApply();
+							Camera* cam = gcam.getLastCameraApply();
 								
-								for (auto& i : sprites) {
-									i->self->update(cam); // process positioning
+							for (auto& i : sprites) {
+								i->update(cam); // process positioning
 
-									for (auto& j : sprites) {
-										if (i->self != j->self) i->self->collide(cam, *j->self);
-									}
+								for (auto& j : sprites) {
+									if (i != j) i->collide(cam, *j.data());
 								}
-
-
-
-
-								sprites.unlock();
 							}
+
+
+
+
+							sprites.unlock();
+							/*}
 							else {
 								throw Abort::Abort(__FUNCSIG__, "Couldn't get mutex for Sprites after 10 tries.", Abort::abort_level::GIVEUP);
-							}
+							}*/
 						}
 					}
 				}

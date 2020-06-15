@@ -123,6 +123,6 @@ namespace LSW {
 		};
 
 
-		template <> SuperResource<Camera>::_i<Camera>	SuperResource<Camera>::data = { lambda_default_load<Camera>, lambda_default_unload<Camera> };
+		template <> SuperResource<Camera>::_data<Camera>	SuperResource<Camera>::data = { lambda_default_load<Camera>, lambda_default_unload<Camera> };
 	}
 }

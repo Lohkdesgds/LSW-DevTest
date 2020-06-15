@@ -85,9 +85,6 @@
     <ClCompile Include="Library\LSW5\filesystem\filesystem.cpp">
       <Filter>LSW5\Library\filesystem</Filter>
     </ClCompile>
-    <ClCompile Include="Library\LSW5\superresource\superresource.cpp">
-      <Filter>LSW5\Library\superresource</Filter>
-    </ClCompile>
     <ClCompile Include="Library\LSW5\socketsystem\socketsystem.cpp">
       <Filter>LSW5\Library\socketsystem</Filter>
     </ClCompile>

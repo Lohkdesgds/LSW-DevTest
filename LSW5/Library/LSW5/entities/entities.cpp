@@ -26,7 +26,7 @@ namespace LSW {
 				if (frame >= bitmaps.size()) frame = bitmaps.size() - 1;
 			}
 
-			ALLEGRO_BITMAP* rn = bitmaps[frame].ref;
+			ALLEGRO_BITMAP* rn = &(*bitmaps[frame].ref);
 			if (!rn) throw Abort::Abort(__FUNCSIG__, "Unexpected NULL on draw!");
 
 
@@ -86,7 +86,7 @@ namespace LSW {
 		void Entity::loadCut(const std::string id, const std::string parent_id, const int x, const int y, const int w, const int h)
 		{
 			SuperResource<ALLEGRO_BITMAP> bmps;
-			ALLEGRO_BITMAP* parent = nullptr;
+			std::shared_ptr<ALLEGRO_BITMAP> parent;
 			if (bmps.get(parent_id, parent))
 			{
 				_bitmap binfo;
@@ -94,7 +94,7 @@ namespace LSW {
 				binfo.source = parent_id;
 				binfo.is_sub_bitmap = true;
 				binfo.id = id;
-				binfo.ref = bmps.customLoad(id, [=](ALLEGRO_BITMAP*& ret) {return ret = al_create_sub_bitmap(parent, x, y, w, h); });
+				binfo.ref = bmps.customLoad(id, [=](ALLEGRO_BITMAP*& ret) {return ret = al_create_sub_bitmap(&(*parent), x, y, w, h); });
 
 				if (binfo.ref)
 				{

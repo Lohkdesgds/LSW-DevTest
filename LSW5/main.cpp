@@ -83,28 +83,28 @@ int main(int argc, char* argv[]) {
 
 	bitmaps.create("_ATLAS0", "atlas0.png"); // load big atlas
 
-	auto* ref = sprites.create("test");
+	auto ref = sprites.create("test");
 	ref->set("show_box", true);
 	ref->set("show_dot", true);
 	ref->set("scale_g", 0.3);
 	ref->set("target_pos_x", -0.5);
 	ref->set("target_pos_y", 0.2);
 	ref->set(sprite::e_double::ACCELERATION_X, 6e-4);
-	auto* ref2 = sprites.create("test2");
+	auto ref2 = sprites.create("test2");
 	ref2->set("show_box", true);
 	ref2->set("show_dot", true);
 	ref2->set("scale_g", 0.2);
 	ref2->set("target_pos_x", 0.5);
 	ref2->set("target_pos_y", 0.2);
 	ref2->set(sprite::e_double::ACCELERATION_X, -6e-4);
-	auto* ref3 = sprites.create("test3");
+	auto ref3 = sprites.create("test3");
 	ref3->set("show_box", true);
 	ref3->set("show_dot", true);
 	ref3->set("scale_g", 0.4);
 	ref3->set("target_pos_x", 0.0);
 	ref3->set("target_pos_y", 0.6);
 	ref3->set(sprite::e_double::ACCELERATION_Y, -6e-4);
-	auto* ref4 = sprites.customLoad("test4", [](Sprite_Base*& b) {return (b = new Entity()); });
+	auto ref4 = sprites.customLoad("test4", [](Sprite_Base*& b) {return (b = new Entity()); });
 	ref4->set("show_box", true);
 	ref4->set("show_dot", true);
 	ref4->set("draw", true);
@@ -112,12 +112,12 @@ int main(int argc, char* argv[]) {
 	ref4->set("target_pos_x", 0.0);
 	ref4->set("target_pos_y", -0.6);
 	ref4->set(sprite::e_double::ACCELERATION_Y, 6e-4);
-	Entity* ref4_alt = (Entity*)ref4;
+	Entity* ref4_alt = (Entity*)&(*ref4);
 	ref4_alt->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
 	ref4_alt->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
 	ref4_alt->set(entity::e_double::FRAMES_PER_SECOND, 4.0);
 
-	Camera* cam = cameras.create("camera_0");
+	auto cam = cameras.create("camera_0");
 	cam->set(camera::e_integer::ID, 0);
 	cam->addLayerConfig(Camera::layer_each(0));
 	cam->apply();
