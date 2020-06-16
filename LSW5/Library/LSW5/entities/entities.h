@@ -160,6 +160,7 @@ __slice("%version%", tags_e::T_VERSION),__slice("%screen_buf_proportion%", tags_
 
 			constexpr auto timeout_interpret = std::chrono::milliseconds(500);
 			constexpr auto default_sharpness_font = 75.0;
+			constexpr auto default_delta_t_text_update_delay = std::chrono::seconds(1); // don't need to be fast
 		}
 
 

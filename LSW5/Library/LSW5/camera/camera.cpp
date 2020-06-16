@@ -3,10 +3,6 @@
 namespace LSW {
 	namespace v5 {
 
-		Camera* Camera::last_camera_applied = nullptr;
-
-
-
 		Camera::layer_each::layer_each(const int a, const double b, const double c) {
 			layer = a;
 			elasticity = b;
@@ -254,12 +250,6 @@ namespace LSW {
 		void Camera::apply()
 		{
 			al_use_transform(&data.transformation);
-			last_camera_applied = this;
-		}
-
-		Camera* Camera::getLastCameraApply() const
-		{
-			return last_camera_applied;
 		}
 
 		void Camera::matrix_debug()
@@ -267,7 +257,7 @@ namespace LSW {
 			double m[2] = { 0.0 };
 			double limits[4] = { 0.0 };
 			//Database db;
-			Camera* psf = this->getLastCameraApply();
+			Camera* psf = this;
 			Camera  org;
 
 			//db.get(Constants::ro__db_mouse_double::RAW_MOUSE_X, m[0]);

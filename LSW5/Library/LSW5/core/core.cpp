@@ -76,7 +76,11 @@ namespace LSW {
 			Display disp;
 			Database db;
 			coloured_string clr_str;
-			Camera gcam;
+			SuperResource<Camera> cameras;
+			if (cameras.size() == 0) {
+				throw Abort::Abort(__FUNCSIG__, "NO CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource)");
+			}
+			std::shared_ptr<Camera> main_cam = cameras.begin()->data(); // get first cam as main camera
 
 			SuperResource<Sprite_Base> sprites;
 
@@ -175,14 +179,8 @@ namespace LSW {
 						}
 						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::CHECK_MEMORY_BITMAP_AND_CAMERA))) {
 							al_convert_bitmaps();
-							Camera cam;
-							if (auto* ptr = cam.getLastCameraApply(); ptr) {
-								ptr->refresh();
-								ptr->apply();
-							}
-							else {
-								throw Abort::Abort(__FUNCSIG__, "No camera found. Please do a Camera.apply() somewhere and keep the Camera object alive to work.", Abort::abort_level::GIVEUP);
-							}
+							main_cam->refresh();
+							main_cam->apply();
 						}
 						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::UPDATE_LOG_ON_SCREEN))) {
 							// to be done
@@ -222,11 +220,10 @@ namespace LSW {
 
 
 					// draw?
-					Camera* cam = gcam.getLastCameraApply();
 
 					for(auto& i : sprites)
 					{
-						i->draw(cam);
+						i->draw(&(*main_cam));
 					}
 
 					//cam.getLastCameraApply()->matrix_debug();
@@ -347,13 +344,17 @@ namespace LSW {
 
 							//if (gottem) {
 
-							Camera* cam = gcam.getLastCameraApply();
+							SuperResource<Camera> cameras;
+							if (cameras.size() == 0) {
+								throw Abort::Abort(__FUNCSIG__, "NO CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource)");
+							}
+							std::shared_ptr<Camera> main_cam = cameras.begin()->data(); // get first cam as main camera
 								
 							for (auto& i : sprites) {
-								i->update(cam); // process positioning
+								i->update(&(*main_cam)); // process positioning
 
 								for (auto& j : sprites) {
-									if (i != j) i->collide(cam, *j.data());
+									if (i != j) i->collide(&(*main_cam), *j.data());
 								}
 							}
 

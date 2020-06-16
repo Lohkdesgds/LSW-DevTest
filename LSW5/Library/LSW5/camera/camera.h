@@ -76,7 +76,6 @@ namespace LSW {
 			};
 
 			Camera_configuration data;
-			static Camera* last_camera_applied;
 
 			ALLEGRO_TRANSFORM transf(ALLEGRO_BITMAP*, const float, const float, const float, const float, const float);
 		public:
@@ -115,7 +114,6 @@ namespace LSW {
 
 			void refresh();
 			void apply();
-			Camera* getLastCameraApply() const;
 
 			void matrix_debug();
 

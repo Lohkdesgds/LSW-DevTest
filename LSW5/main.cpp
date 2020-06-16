@@ -72,7 +72,8 @@ int main(int argc, char* argv[]) {
 	logg << L::SLF << fsr(__FUNCSIG__) << "&2Version: &a" << Shared::version_app << L::ELF;
 
 
-	
+
+	auto cam = cameras.create("MAIN_CAMERA");
 
 	Core core;
 
@@ -137,12 +138,11 @@ int main(int argc, char* argv[]) {
 	//ref5->set(sprite::e_double::ACCELERATION_Y, 6e-4);
 	Text* ref5_alt = (Text*)&(*ref5);
 	ref5_alt->load("_FONT");
-	ref5_alt->set(text::e_string::STRING, "HELLO WORLD DAMN IT");
+	ref5_alt->set(text::e_string::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
 	ref5_alt->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
-
-	auto cam = cameras.create("camera_0");
 	cam->set(camera::e_integer::ID, 0);
 	cam->addLayerConfig(Camera::layer_each(0));
+	cam->refresh();
 	cam->apply();
 	{
 		int gut;

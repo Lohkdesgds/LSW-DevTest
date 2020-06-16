@@ -46,7 +46,7 @@ namespace LSW {
 				}
 				else {
 					frame = frame > 0 ? frame : -frame;
-					if (frame >= bitmaps.size()) frame = bitmaps.size() - 1;
+					if (frame >= bitmaps.size()) frame = static_cast<int>(bitmaps.size() - 1);
 				}
 			}
 
@@ -247,8 +247,9 @@ namespace LSW {
 					if ((poss = fina.find(text::tags[q].s())) != std::string::npos)
 					{
 						b = true;
-						Camera gcam;
-						Camera* cam = gcam.getLastCameraApply();
+						SuperResource<Camera> cameras;
+						if (cameras.size() == 0) return; // cannot proceed
+						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
 						Sprite_Base* follow = *data.sprite_ptr_data[text::e_sprite_ptr::FOLLOWING];
 						Database conf;
 						ALLEGRO_DISPLAY* d = al_get_current_display();
@@ -649,7 +650,7 @@ namespace LSW {
 			// STRING
 			if (std::chrono::system_clock::now().time_since_epoch() > delta_t) // do update string
 			{
-				delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + entity::default_delta_t_frame_delay);
+				delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + text::default_delta_t_text_update_delay);
 
 				p_str = *data.string_data[text::e_string::STRING];
 				interpretTags(p_str);
@@ -705,8 +706,12 @@ namespace LSW {
 				targ_draw_xy_shadow[1] /= scale_y;
 			}
 
+			SuperResource<Camera> cameras;
+			if (cameras.size() == 0) {
+				throw Abort::Abort(__FUNCSIG__, "NO CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource)", Abort::abort_level::GIVEUP);
+			}
+			std::shared_ptr<Camera> ruler = cameras.begin()->data(); // get first cam as main camera
 			Camera preset;
-			Camera* ruler = preset.getLastCameraApply();
 
 			//double camx, camy, camg;
 			if (*getRef(sprite::e_boolean::AFFECTED_BY_CAM)) preset = *ruler; // copy
