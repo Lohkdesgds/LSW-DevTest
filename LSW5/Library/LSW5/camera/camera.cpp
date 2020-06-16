@@ -252,6 +252,11 @@ namespace LSW {
 			al_use_transform(&data.transformation);
 		}
 
+		ALLEGRO_TRANSFORM Camera::getTransform()
+		{
+			return data.transformation;
+		}
+
 		void Camera::matrix_debug()
 		{
 			double m[2] = { 0.0 };
@@ -273,7 +278,7 @@ namespace LSW {
 			float mt[2];
 			for (short n = 0; n < 2; n++) mt[n] = +m[n];
 
-			ALLEGRO_TRANSFORM untransf = psf->copyRAW().transformation;
+			ALLEGRO_TRANSFORM untransf = psf->getTransform();
 			al_invert_transform(&untransf);
 			al_transform_coordinates(&untransf, &mt[0], &mt[1]);
 

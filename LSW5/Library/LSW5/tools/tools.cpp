@@ -1,6 +1,5 @@
 #include "tools.h"
 
-
 namespace LSW {
 	namespace v5 {
 
@@ -219,6 +218,25 @@ namespace LSW {
 				sprintf_s(buf, format, end, prefix >= 0 ? known_size_ends[prefix] : "");
 
 				return buf;
+			}
+			std::wstring wideUp(const std::string& str) {
+				// Deprecated ;-;
+				/*std::wstring_convert<std::codecvt_utf8 <wchar_t>, wchar_t> convert;
+				return convert.from_bytes(s);*/
+
+				if (str.empty())
+					return std::wstring();
+
+				size_t charsNeeded = ::MultiByteToWideChar(CP_UTF8, 0,
+					str.data(), (int)str.size(), NULL, 0);
+				if (charsNeeded == 0) throw Abort::Abort(__FUNCSIG__, "Failed to convert to wstring!", Abort::abort_level::GIVEUP);
+
+				std::vector<wchar_t> buffer(charsNeeded + 1);
+				int charsConverted = ::MultiByteToWideChar(CP_UTF8, 0,
+					str.data(), (int)str.size(), &buffer[0], static_cast<int>(buffer.size()));
+				if (charsConverted == 0) throw Abort::Abort(__FUNCSIG__, "Failed to convert to wstring!", Abort::abort_level::GIVEUP);
+
+				return std::wstring(&buffer[0], charsConverted);
 			}
 			std::vector<std::pair<std::string, std::string>> breakLines(const std::string a, const std::string spr, const std::string comment, const std::string endline)
 			{

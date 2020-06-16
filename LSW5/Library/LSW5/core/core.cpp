@@ -90,13 +90,13 @@ namespace LSW {
 
 			* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-			const auto throw_event_update_display_size = [&]() {
+			/*const auto throw_event_update_display_size = [&]() {
 				ALLEGRO_EVENT evv;
 				evv.type = Cast::a_cast(Shared::my_events::CUSTOM_EVENT_SHARING_NEW_DISPLAY_SIZE);
 				evv.user.data1 = al_get_display_width(disp.getRawDisplay());
 				evv.user.data2 = al_get_display_height(disp.getRawDisplay());
 				al_emit_user_event(&data.evsrc, &evv, NULL);
-			};
+			};*/
 			
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -148,7 +148,7 @@ namespace LSW {
 
 				data.display_routine.routines.start();
 
-				throw_event_update_display_size();
+				//throw_event_update_display_size();
 			}
 			
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -199,9 +199,14 @@ namespace LSW {
 									logg << L::SLF << fsr(__FUNCSIG__) << "&5Got EVENT_DISPLAY_CLOSE event on main window, setting to close the game..." << L::ELF;
 								}
 								break;
+							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_CALL_FULLSCREEN):
+								al_set_display_flag(disp.getRawDisplay(), ALLEGRO_FULLSCREEN_WINDOW, (bool)ev.user.data1);
+								ev.display.source = disp.getRawDisplay();
+								// yes, no break
 							case ALLEGRO_EVENT_DISPLAY_RESIZE:
 								if (ev.display.source == disp.getRawDisplay()) {
 									disp.acknowledgeDisplay();
+									//throw_event_update_display_size();
 								}
 								break;
 							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_LOG_STRING):
@@ -211,6 +216,25 @@ namespace LSW {
 							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_EXTERNAL_EXIT_CALL):
 								internalEnd();
 								logg << L::SLF << fsr(__FUNCSIG__) << "&5Got EVENT_EXTERNAL_EXIT_CALL event on main window, setting to close the game..." << L::ELF;
+								break;
+							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_DISPLAY_UPDATE_RESOLUTION_SCALE):
+								{
+									double scale = ev.user.data1 * 1.0 / 100;
+									bool is_enabled = ev.user.data2;
+
+									db.set(database::e_double::RESOLUTION_BUFFER_PROPORTION, scale);
+									db.set(database::e_boolean::DOUBLE_BUFFERING, is_enabled);
+
+									disp.acknowledgeDisplay();
+								}
+								break;
+							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_DISPLAY_CHROMA_FX):
+								{
+									double fx_amount = ev.user.data1 * 1.0 / 1000;
+									db.set(database::e_double::FX_AMOUNT, fx_amount);
+
+									disp.acknowledgeDisplay();
+								}
 								break;
 
 								// BEING DONE
@@ -328,45 +352,44 @@ namespace LSW {
 						data.collision_routine.tick(); // keep saying it's alive
 					}
 
-					if (data.collision_routine.routines.hasEvent()) { // LOOP_TRACK, COLLISION_WORK
+					data.collision_routine.routines.hasEventWait();// LOOP_TRACK, COLLISION_WORK
 
-						// REGISTERED EVENT (here)
+					// REGISTERED EVENT (here)
 
-						if (data.collision_routine.routines.isThisThis(static_cast<size_t>(core::thr_collision_routines::LOOP_TRACK))) {
-							db.set(database::e_sizet::COLLISIONSPERSECOND, data.collision_routine.routines.getNumCallsDefault());
+					if (data.collision_routine.routines.isThisThis(static_cast<size_t>(core::thr_collision_routines::LOOP_TRACK))) {
+						db.set(database::e_sizet::COLLISIONSPERSECOND, data.collision_routine.routines.getNumCallsDefault());
+					}
+					else if (data.collision_routine.routines.isThisThis(static_cast<size_t>(core::thr_collision_routines::COLLISION_WORK))) {
+
+						//bool gottem = false;
+
+						//for (size_t times = 0; !(gottem = sprites.lock()) && times < 10; Sleep(10));
+						sprites.lock();
+
+						//if (gottem) {
+
+						SuperResource<Camera> cameras;
+						if (cameras.size() == 0) {
+							throw Abort::Abort(__FUNCSIG__, "NO CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource)");
 						}
-						else if (data.collision_routine.routines.isThisThis(static_cast<size_t>(core::thr_collision_routines::COLLISION_WORK))) {
-
-							//bool gottem = false;
-
-							//for (size_t times = 0; !(gottem = sprites.lock()) && times < 10; Sleep(10));
-							sprites.lock();
-
-							//if (gottem) {
-
-							SuperResource<Camera> cameras;
-							if (cameras.size() == 0) {
-								throw Abort::Abort(__FUNCSIG__, "NO CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource)");
-							}
-							std::shared_ptr<Camera> main_cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> main_cam = cameras.begin()->data(); // get first cam as main camera
 								
-							for (auto& i : sprites) {
-								i->update(&(*main_cam)); // process positioning
+						for (auto& i : sprites) {
+							i->update(&(*main_cam)); // process positioning
 
-								for (auto& j : sprites) {
-									if (i != j) i->collide(&(*main_cam), *j.data());
-								}
+							for (auto& j : sprites) {
+								if (i != j) i->collide(&(*main_cam), *j.data());
 							}
-
-
-
-
-							sprites.unlock();
-							/*}
-							else {
-								throw Abort::Abort(__FUNCSIG__, "Couldn't get mutex for Sprites after 10 tries.", Abort::abort_level::GIVEUP);
-							}*/
 						}
+
+
+
+
+						sprites.unlock();
+						/*}
+						else {
+							throw Abort::Abort(__FUNCSIG__, "Couldn't get mutex for Sprites after 10 tries.", Abort::abort_level::GIVEUP);
+						}*/
 					}
 				}
 				catch (Abort::Abort err) {
@@ -396,12 +419,16 @@ namespace LSW {
 			Logger logg;
 			Database db;
 
+			SuperResource<Sprite_Base> sprites;
+
 			// variables used here:
 
 			if (data.events_routine.initialize()) { // has to initialize (once)
 				logg << L::SLF << fsr(__FUNCSIG__) << "Initializing Thread EVENTS..." << L::ELF;
 
 				data.events_routine.routines.insert(&data.evsrc);
+				data.events_routine.routines.insert(al_get_keyboard_event_source());
+				data.events_routine.routines.insert(al_get_mouse_event_source());
 
 				data.events_routine.routines.start();
 			}
@@ -419,20 +446,115 @@ namespace LSW {
 						data.events_routine.tick(); // keep saying it's alive
 					}
 
-					if (data.events_routine.routines.hasEvent()) { // LOOP_TRACK, UPDATE_MOUSE
-						if (data.events_routine.routines.isThisThis(static_cast<size_t>(core::thr_events_routines::LOOP_TRACK))) {
-							db.set(database::e_sizet::USEREVENTSPERSECOND, data.events_routine.routines.getNumCallsDefault());
+					data.events_routine.routines.hasEventWait();// LOOP_TRACK, UPDATE_MOUSE
+					if (data.events_routine.routines.isThisThis(static_cast<size_t>(core::thr_events_routines::LOOP_TRACK))) {
+						db.set(database::e_sizet::USEREVENTSPERSECOND, data.events_routine.routines.getNumCallsDefault());
+					}
+					else if (data.events_routine.routines.isThisThis(static_cast<size_t>(core::thr_events_routines::UPDATE_MOUSE))) {
+						SuperResource<Camera> cameras;
+						if (cameras.size() == 0) throw Abort::Abort(__FUNCSIG__, "Cannot work with mouse positioning without a camera set at pos 0!", Abort::abort_level::GIVEUP);
+
+						double md[2];
+						db.get(database::e_double::RAW_MOUSE_X, md[0]);
+						db.get(database::e_double::RAW_MOUSE_Y, md[1]);
+
+						float m[2];
+						for (short p = 0; p < 2; p++) m[p] = +md[p];
+
+						// transform based on cam
+						auto psf = cameras.begin()->data();
+
+						ALLEGRO_TRANSFORM untransf = psf->getTransform();
+						al_invert_transform(&untransf);
+						al_transform_coordinates(&untransf, &m[0], &m[1]);
+
+						for (short p = 0; p < 2; p++) {
+							md[p] = static_cast<double>(m[p]);
 						}
-						else if (data.events_routine.routines.isThisThis(static_cast<size_t>(core::thr_events_routines::UPDATE_MOUSE))) {
-							// get mouse and set position
+
+						db.set(database::e_double::MOUSE_X, md[0]);
+						db.set(database::e_double::MOUSE_Y, md[1]);
+
+
+						for (auto& i : sprites) {
+							if (!i.getEnabled()) continue;
+							if (i->isEq(sprite::e_boolean::FOLLOW_MOUSE, true)) {
+								i->set(sprite::e_double::TARG_POSX, md[0]);
+								i->set(sprite::e_double::TARG_POSY, md[1]);
+							}
+						}
+					}
+
+					// OTHER EVENTS (Allegro and stuff)
+
+					else {
+						auto ev = data.events_routine.routines.getEventRaw();
+
+						switch (ev.type) {
+						case ALLEGRO_EVENT_KEY_DOWN: // IN GAME
+							db.key(ev.keyboard.keycode) = true;
+							break;
+						case ALLEGRO_EVENT_KEY_UP: // IN GAME
+							db.key(ev.keyboard.keycode) = false;
+							break;
+						case ALLEGRO_EVENT_KEY_CHAR: // User input
+							if (db.isEq(database::e_boolean::SAVING_STRING_INPUT, true)) { // LAST_STRING CURRENT_STRING
+								if (ev.keyboard.unichar >= 32)
+								{
+									char multibyte[5] = { 0, 0, 0, 0, 0 };
+
+									al_utf8_encode(multibyte, ev.keyboard.unichar <= 32 ? ' ' : ev.keyboard.unichar);
+									char v = (char)strlen(multibyte);
+									if (v > 4) throw Abort::Abort(__FUNCSIG__, "Got an exception on user input: invalid key code, couldn't translate to a valid string", Abort::abort_level::GIVEUP);
+
+									auto& max_str_len = *db.getRef(database::e_sizet::MAXIMUM_STRING_INPUT_LEN);
+									auto& strr = *db.getRef(database::e_string::CURRENT_STRING);
+
+									for (auto& i : multibyte) {
+										if (i) {
+											if (strr.length() < max_str_len ? max_str_len : std::string::npos) strr += i; // limit
+										}
+									}
+								}
+								else if (ev.keyboard.keycode == ALLEGRO_KEY_BACKSPACE)
+								{
+									auto& strr = *db.getRef(database::e_string::CURRENT_STRING);
+									auto str_c = Tools::wideUp(strr);
+
+									if (str_c.length() > 1) {
+										str_c.pop_back();
+										while (Tools::wideUp(strr) != str_c && strr.length() > 0) strr.pop_back();
+									}
+									else {
+										strr.clear();
+									}
+								}
+								else if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER || ev.keyboard.keycode == ALLEGRO_KEY_PAD_ENTER)
+								{
+									auto& strr = *db.getRef(database::e_string::CURRENT_STRING);
+									auto& lstr = *db.getRef(database::e_string::LAST_STRING);
+									lstr = strr;
+									strr.clear();
+								}
+							}
+							break;
+						case ALLEGRO_EVENT_MOUSE_AXES:
+							{
+								double prop = 1.0;
+								db.get(database::e_double::RESOLUTION_BUFFER_PROPORTION, prop);
+
+								db.set(database::e_double::RAW_MOUSE_X, ev.mouse.x * prop);
+								db.set(database::e_double::RAW_MOUSE_Y, ev.mouse.y * prop);
+							}
+							break;
+						case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+							db.set(static_cast<database::e_boolean>(static_cast<int>(database::e_boolean::MOUSE_0) + ev.mouse.button > 7 ? 7 : ev.mouse.button), true);
+							break;
+						case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+							db.set(static_cast<database::e_boolean>(static_cast<int>(database::e_boolean::MOUSE_0) + ev.mouse.button > 7 ? 7 : ev.mouse.button), false);
+							break;
 						}
 
-						// OTHER EVENTS (Allegro and stuff)
-
-						//else {
-							//auto ev = data.display_routine.routines.getEventRaw();
-
-						//}
 					}
 				}
 				catch (Abort::Abort err) {
@@ -480,7 +602,7 @@ namespace LSW {
 					data.functional_routine.tick(); // keep saying it's alive
 				}
 
-				logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
+				//logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF; // stop haha
 				al_rest(0.5);
 			}
 

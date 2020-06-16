@@ -55,6 +55,9 @@ int main(int argc, char* argv[]) {
 	fs.apply();
 	fs.dir(); // just register what's inside lmao
 
+	// test keyboard input
+	db.set(database::e_boolean::SAVING_STRING_INPUT, true);
+
 	// custom entries (if no reset, they will be there forever lmao)
 	db.set("discord_api_extract", discord_api_extract);	
 	db.set("discord_api_extract_dll", discord_api_extract_dll);
@@ -99,6 +102,7 @@ int main(int argc, char* argv[]) {
 	ref->set("target_pos_x", -0.5);
 	ref->set("target_pos_y", 0.2);
 	ref->set(sprite::e_double::ACCELERATION_X, 6e-4);
+
 	auto ref2 = sprites.create("test2");
 	ref2->set("show_box", true);
 	ref2->set("show_dot", true);
@@ -106,6 +110,7 @@ int main(int argc, char* argv[]) {
 	ref2->set("target_pos_x", 0.5);
 	ref2->set("target_pos_y", 0.2);
 	ref2->set(sprite::e_double::ACCELERATION_X, -6e-4);
+
 	auto ref3 = sprites.create("test3");
 	ref3->set("show_box", true);
 	ref3->set("show_dot", true);
@@ -113,33 +118,48 @@ int main(int argc, char* argv[]) {
 	ref3->set("target_pos_x", 0.0);
 	ref3->set("target_pos_y", 0.6);
 	ref3->set(sprite::e_double::ACCELERATION_Y, -6e-4);
-	auto ref4 = sprites.customLoad("test4", [](Sprite_Base*& b) {return (b = new Block()); });
-	ref4->set("show_box", true);
-	ref4->set("show_dot", true);
-	ref4->set("draw", true);
-	ref4->set("scale_g", 0.32);
-	ref4->set("target_pos_x", 0.0);
-	ref4->set("target_pos_y", -0.6);
+
+	auto ref4_orig = sprites.customLoad("test4", [](Sprite_Base*& b) {return (b = new Block()); });
+	Block* ref4 = (Block*)&(*ref4_orig);
+	ref4->set(sprite::e_boolean::SHOWBOX, true);
+	ref4->set(sprite::e_boolean::SHOWDOT, true);
+	ref4->set(sprite::e_boolean::DRAW, true);
+	ref4->set(sprite::e_double::SCALE_G, 0.32);
+	ref4->set(sprite::e_double::TARG_POSX, 0.0);
+	ref4->set(sprite::e_double::TARG_POSY, -0.6);
 	ref4->set(sprite::e_double::ACCELERATION_Y, 6e-4);
-	Block* ref4_alt = (Block*)&(*ref4);
-	ref4_alt->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
-	ref4_alt->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
-	ref4_alt->set(entity::e_double::FRAMES_PER_SECOND, 4.0);
-	auto ref5 = sprites.customLoad("test5", [](Sprite_Base*& b) {return (b = new Text()); });
-	//ref5->set("show_box", true);
-	ref5->set("show_dot", true);
-	ref5->set("draw", true);
-	ref5->set("scale_g", 0.32);
-	ref5->set("target_pos_x", 0.0);
-	ref5->set("target_pos_y", -0.7);
+	ref4->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
+	ref4->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
+	ref4->set(entity::e_double::FRAMES_PER_SECOND, 4.0);
+
+	auto ref5_orig = sprites.customLoad("test5", [](Sprite_Base*& b) {return (b = new Text()); });
+	Text* ref5 = (Text*)&(*ref5_orig);
+	//ref5->set(sprite::e_boolean::SHOWBOX, true);
+	ref5->set(sprite::e_boolean::SHOWDOT, true);
+	ref5->set(sprite::e_boolean::DRAW, true);
+	ref5->set(sprite::e_double::TARG_POSX, 0.0);
+	ref5->set(sprite::e_double::TARG_POSY, -0.7);
 	ref5->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
 	ref5->set(sprite::e_double::SCALE_G, 0.1);
 	ref5->set(sprite::e_double::SCALE_X, 0.6);
-	//ref5->set(sprite::e_double::ACCELERATION_Y, 6e-4);
-	Text* ref5_alt = (Text*)&(*ref5);
-	ref5_alt->load("_FONT");
-	ref5_alt->set(text::e_string::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
-	ref5_alt->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
+	ref5->load("_FONT");
+	ref5->set(text::e_string::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
+	ref5->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
+
+	auto ref6_orig = sprites.customLoad("test6", [](Sprite_Base*& b) {return (b = new Text()); });
+	Text* ref6 = (Text*)&(*ref6_orig);
+	//ref6->set(sprite::e_boolean::SHOWBOX, true);
+	ref6->set(sprite::e_boolean::SHOWDOT, true);
+	ref6->set(sprite::e_boolean::DRAW, true);
+	ref6->set(sprite::e_double::TARG_POSX, -1.0);
+	ref6->set(sprite::e_double::TARG_POSY, -0.95);
+	ref6->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
+	ref6->set(sprite::e_double::SCALE_G, 0.07);
+	ref6->set(sprite::e_double::SCALE_X, 0.4);
+	ref6->load("_FONT");
+	ref6->set(text::e_string::STRING, "%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string%");
+	ref6->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
+
 	cam->set(camera::e_integer::ID, 0);
 	cam->addLayerConfig(Camera::layer_each(0));
 	cam->refresh();
@@ -158,7 +178,9 @@ int main(int argc, char* argv[]) {
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Resting - - -" << L::ELF;
 
-	for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 25000 && core.allAlive(););// {
+
+	while (core.allAlive()); // wait user do smth
+	//for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 25000 && core.allAlive(););// {
 		//ref->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time()));
 		//ref2->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time() + 0.7));
 	//}

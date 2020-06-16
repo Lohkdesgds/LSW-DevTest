@@ -10,6 +10,7 @@
 #include "..\tools\tools.h"
 #include "..\camera\camera.h"
 #include "..\shared\shared.h"
+#include "..\database\database.h"
 
 
 namespace LSW {
@@ -37,6 +38,9 @@ namespace LSW {
 			};
 
 			enum class e_direction { NORTH, SOUTH, EAST, WEST, NONE };
+
+			enum class e_tie_functional { COLLISION_MOUSE_ON, COLLISION_MOUSE_CLICK, COLLISION_MOUSE_UNCLICK, COLLISION_COLLIDED_OTHER, COLLISION_NONE };
+			constexpr auto tie_functional_size = static_cast<size_t>(e_tie_functional::COLLISION_NONE) + 1;
 
 
 
@@ -182,15 +186,6 @@ namespace LSW {
 		*/
 
 		class Sprite_Base {
-			struct sprite_base_data {
-				SuperMap<double>		double_readonly_data	= sprite::e_double_readonly_defaults;
-				SuperMap<bool>			boolean_readonly_data	= sprite::e_boolean_readonly_defaults;
-				SuperMap<std::string>	string_data				= sprite::e_string_defaults;
-				SuperMap<double>		double_data				= sprite::e_double_defaults;
-				SuperMap<bool>			boolean_data			= sprite::e_boolean_defaults;
-				SuperMap<int>			integer_data			= sprite::e_integer_defaults;
-				SuperMap<ALLEGRO_COLOR> color_data				= sprite::e_color_defaults;
-			} data;
 			struct easier_collision_handle {
 				double	posx = 0.0,
 						posy = 0.0,
@@ -212,13 +207,29 @@ namespace LSW {
 				// X, Y, SX, SY
 				void setup(const double, const double, const double, const double);
 			} easy_collision;
+
+			struct sprite_base_data {
+				SuperMap<double>		double_readonly_data = sprite::e_double_readonly_defaults;
+				SuperMap<bool>			boolean_readonly_data = sprite::e_boolean_readonly_defaults;
+				SuperMap<std::string>	string_data = sprite::e_string_defaults;
+				SuperMap<double>		double_data = sprite::e_double_defaults;
+				SuperMap<bool>			boolean_data = sprite::e_boolean_defaults;
+				SuperMap<int>			integer_data = sprite::e_integer_defaults;
+				SuperMap<ALLEGRO_COLOR> color_data = sprite::e_color_defaults;
+			} sprite_data;
+
+			std::function<void(void)> pair_tied[sprite::tie_functional_size];
+			sprite::e_tie_functional new_state = sprite::e_tie_functional::COLLISION_NONE;
+			sprite::e_tie_functional last_state = sprite::e_tie_functional::COLLISION_NONE;
+
 		protected:
 			std::function<void(void)> custom_draw_task; // set this as draw() of new children (so the draw() calls this if exists for further drawing scheme)
-
-			//Camera* checkAndGetCamera() const;
 		public:
 			Sprite_Base() = default;
 			Sprite_Base(Sprite_Base&);
+
+			void hook(const sprite::e_tie_functional, const std::function<void(void)>);
+			void unhook(const sprite::e_tie_functional);
 
 			void set(const sprite::e_string, std::string);
 			void set(const sprite::e_double, double);

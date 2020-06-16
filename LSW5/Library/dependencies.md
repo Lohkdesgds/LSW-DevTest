@@ -126,7 +126,7 @@ Logger | Printer<br>ColouredString<br>Abort<br>AllegroInitialization<br>Tools<br
 Printer | ColouredString
 Shared | *none*
 SocketSystem | Abort<br>Tools<br>FileSystem<br>SuperMutex
-Sprite | Abort<br>SuperMap<br>AllegroInitialization<br>Autocaster<br>Tools<br>Camera<br>Shared
+Sprite | Abort<br>SuperMap<br>AllegroInitialization<br>Autocaster<br>Tools<br>Camera<br>Shared<br>Database
 SuperMap | SuperPair
 SuperPair | Autocaster<br>Abort
 SuperResource | Abort<br>AllegroInitialization<br>SuperMutex

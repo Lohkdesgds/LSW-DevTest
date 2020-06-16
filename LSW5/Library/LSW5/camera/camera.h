@@ -115,6 +115,8 @@ namespace LSW {
 			void refresh();
 			void apply();
 
+			ALLEGRO_TRANSFORM getTransform();
+
 			void matrix_debug();
 
 			Camera::Camera_configuration& copyRAW();

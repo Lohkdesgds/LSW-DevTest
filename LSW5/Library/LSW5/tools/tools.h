@@ -8,6 +8,7 @@
 #include <vector>
 #include <sstream>
 #include <chrono>
+#include <codecvt>
 // Others
 #include "..\abort\abort.h"
 
@@ -45,6 +46,9 @@ namespace LSW {
 
 			// BASE10! auto conv bytes to string like 1000 -> 1 kB, with size itself and how many .numbers kB, bool is if you want "1.0 k" instead of "1.0k"
 			std::string byteAutoString(double, const size_t = 1, const bool = false);
+
+			// gets std::string UTF8 and converts to wchar_t (UTF16) // https://stackoverflow.com/a/26914562
+			std::wstring wideUp(const std::string&);
 
 			// the string, the separator (like :, =, ...), comment characters and characters in the end aka endline // setting: value#comment
 			std::vector<std::pair<std::string, std::string>> breakLines(const std::string, const std::string = ":= ", const std::string = "#", const std::string = "\r\n");

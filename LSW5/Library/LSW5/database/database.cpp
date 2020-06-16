@@ -554,5 +554,11 @@ namespace LSW {
 			return nullptr;
 		}
 
+		bool& Database::key(const int u)
+		{
+			if (u < 0 || u >= ALLEGRO_KEY_MAX) throw Abort::Abort(__FUNCSIG__, "Out of range key!");
+			return data.keys[u];
+		}
+
 }
 }

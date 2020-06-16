@@ -168,7 +168,7 @@ namespace LSW {
 
 			files = readDir();
 
-			if (files.length() > 1) for (short u = 0; u < 2; u++) { files.pop_back(); } // last ", "
+			//if (files.length() > 1) for (short u = 0; u < 2; u++) { files.pop_back(); } // last ", "
 			//Tools::_clearPath(files);
 
 			if (prunt) {

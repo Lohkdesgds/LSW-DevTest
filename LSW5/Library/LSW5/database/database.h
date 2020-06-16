@@ -136,6 +136,8 @@ namespace LSW {
 				// additional data
 				std::thread* autosave_thread = nullptr;
 				bool keep_autosaving = false;
+
+				bool keys[ALLEGRO_KEY_MAX] = { false };
 			};
 			static database_data data;
 
@@ -192,6 +194,8 @@ namespace LSW {
 			template<typename T, typename V> inline bool g(const T a, V& b) { return get(a, b); };
 			template<typename T, typename V> inline bool isEq(const T e, const V v) { V k; if (get(e, k)) return v == k; return false; }
 			template<typename T, typename V> inline bool ie(const T e, const V v) { return isEq(e, v); };
+
+			bool& key(const int);
 		};
 	}
 }
