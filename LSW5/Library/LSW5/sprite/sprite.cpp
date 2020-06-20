@@ -139,39 +139,72 @@ namespace LSW {
 			sprite_data.integer_data			= oth.integer_data;
 			sprite_data.color_data				= oth.color_data;
 		}
+
 		void Sprite_Base::hook(const sprite::e_tie_functional e, const std::function<void(void)> f)
 		{
 			pair_tied[static_cast<size_t>(e)] = f;
 		}
+
 		void Sprite_Base::unhook(const sprite::e_tie_functional e)
 		{
 			hook(e, std::function<void(void)>());
 		}
+
 		void Sprite_Base::set(const sprite::e_string e, std::string v)
 		{
 			if (auto* ptr = sprite_data.string_data(e); ptr)
-				*ptr = v;
+				*ptr = [=] {return v; };
 		}
 
 		void Sprite_Base::set(const sprite::e_double e, double v)
 		{
 			if (auto* ptr = sprite_data.double_data(e); ptr)
-				*ptr = v;
+				*ptr = [=] {return v; };
 		}
 
 		void Sprite_Base::set(const sprite::e_boolean e, bool v)
 		{
 			if (auto* ptr = sprite_data.boolean_data(e); ptr)
-				*ptr = v;
+				*ptr = [=] {return v; };
 		}
 
 		void Sprite_Base::set(const sprite::e_integer e, int v)
 		{
 			if (auto* ptr = sprite_data.integer_data(e); ptr)
-				*ptr = v;
+				*ptr = [=] {return v; };
 		}
 
 		void Sprite_Base::set(const sprite::e_color e, ALLEGRO_COLOR v)
+		{
+			if (auto* ptr = sprite_data.color_data(e); ptr)
+				*ptr = [=] {return v; };
+		}
+
+		void Sprite_Base::set(const sprite::e_string e, std::function<std::string(void)> v)
+		{
+			if (auto* ptr = sprite_data.string_data(e); ptr)
+				*ptr = v;
+		}
+
+		void Sprite_Base::set(const sprite::e_double e, std::function<double(void)> v)
+		{
+			if (auto* ptr = sprite_data.double_data(e); ptr)
+				*ptr = v;
+		}
+
+		void Sprite_Base::set(const sprite::e_boolean e, std::function<bool(void)> v)
+		{
+			if (auto* ptr = sprite_data.boolean_data(e); ptr)
+				*ptr = v;
+		}
+
+		void Sprite_Base::set(const sprite::e_integer e, std::function<int(void)> v)
+		{
+			if (auto* ptr = sprite_data.integer_data(e); ptr)
+				*ptr = v;
+		}
+
+		void Sprite_Base::set(const sprite::e_color e, std::function<ALLEGRO_COLOR(void)> v)
 		{
 			if (auto* ptr = sprite_data.color_data(e); ptr)
 				*ptr = v;
@@ -180,32 +213,67 @@ namespace LSW {
 		void Sprite_Base::set(const std::string e, std::string v)
 		{
 			auto* ptr = sprite_data.string_data(e.c_str(), e.length());
+			if (!ptr) sprite_data.string_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			else *ptr = [=] {return v; };
+		}
+
+		void Sprite_Base::set(const std::string e, double v)
+		{
+			auto* ptr = sprite_data.double_data(e.c_str(), e.length());
+			if (!ptr) sprite_data.double_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			else *ptr = [=] {return v; };
+		}
+
+		void Sprite_Base::set(const std::string e, bool v)
+		{
+			auto* ptr = sprite_data.boolean_data(e.c_str(), e.length());
+			if (!ptr) sprite_data.boolean_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			else *ptr = [=] {return v; };
+		}
+
+		void Sprite_Base::set(const std::string e, int v)
+		{
+			auto* ptr = sprite_data.integer_data(e.c_str(), e.length());
+			if (!ptr) sprite_data.integer_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			else *ptr = [=] {return v; };
+		}
+
+		void Sprite_Base::set(const std::string e, ALLEGRO_COLOR v)
+		{
+			auto* ptr = sprite_data.color_data(e.c_str(), e.length());
+			if (!ptr) sprite_data.color_data.add({ [=] {return v; } , e.c_str(), e.length() });
+			else *ptr = [=] {return v; };
+		}
+
+		void Sprite_Base::set(const std::string e, std::function<std::string(void)> v)
+		{
+			auto* ptr = sprite_data.string_data(e.c_str(), e.length());
 			if (!ptr) sprite_data.string_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
-		void Sprite_Base::set(const std::string e, double v)
+		void Sprite_Base::set(const std::string e, std::function<double(void)> v)
 		{
 			auto* ptr = sprite_data.double_data(e.c_str(), e.length());
 			if (!ptr) sprite_data.double_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
-		void Sprite_Base::set(const std::string e, bool v)
+		void Sprite_Base::set(const std::string e, std::function<bool(void)> v)
 		{
 			auto* ptr = sprite_data.boolean_data(e.c_str(), e.length());
 			if (!ptr) sprite_data.boolean_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
-		void Sprite_Base::set(const std::string e, int v)
+		void Sprite_Base::set(const std::string e, std::function<int(void)> v)
 		{
 			auto* ptr = sprite_data.integer_data(e.c_str(), e.length());
 			if (!ptr) sprite_data.integer_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
-		void Sprite_Base::set(const std::string e, ALLEGRO_COLOR v)
+		void Sprite_Base::set(const std::string e, std::function<ALLEGRO_COLOR(void)> v)
 		{
 			auto* ptr = sprite_data.color_data(e.c_str(), e.length());
 			if (!ptr) sprite_data.color_data.add({ v, e.c_str(), e.length() });
@@ -236,7 +304,7 @@ namespace LSW {
 		{
 			if (auto* ptr = sprite_data.string_data[e]; ptr)
 			{
-				v = *ptr;
+				v = (*ptr)();
 				return true;
 			}
 			return false;
@@ -246,7 +314,7 @@ namespace LSW {
 		{
 			if (auto* ptr = sprite_data.double_data[e]; ptr)
 			{
-				v = *ptr;
+				v = (*ptr)();
 				return true;
 			}
 			return false;
@@ -256,7 +324,7 @@ namespace LSW {
 		{
 			if (auto* ptr = sprite_data.boolean_data[e]; ptr)
 			{
-				v = *ptr;
+				v = (*ptr)();
 				return true;
 			}
 			return false;
@@ -266,7 +334,7 @@ namespace LSW {
 		{
 			if (auto* ptr = sprite_data.integer_data[e]; ptr)
 			{
-				v = *ptr;
+				v = (*ptr)();
 				return true;
 			}
 			return false;
@@ -276,24 +344,56 @@ namespace LSW {
 		{
 			if (auto* ptr = sprite_data.color_data[e]; ptr)
 			{
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const sprite::e_string e, std::function<std::string(void)>& v)
+		{
+			if (auto* ptr = sprite_data.string_data[e]; ptr)
+			{
 				v = *ptr;
 				return true;
 			}
 			return false;
 		}
 
-		bool Sprite_Base::get(const std::string e, double& v)
+		bool Sprite_Base::get(const sprite::e_double e, std::function<double(void)>& v)
 		{
-			if (auto* ptr = sprite_data.double_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = sprite_data.double_data[e]; ptr)
+			{
 				v = *ptr;
 				return true;
 			}
 			return false;
 		}
 
-		bool Sprite_Base::get(const std::string e, bool& v)
+		bool Sprite_Base::get(const sprite::e_boolean e, std::function<bool(void)>& v)
 		{
-			if (auto* ptr = sprite_data.boolean_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = sprite_data.boolean_data[e]; ptr)
+			{
+				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const sprite::e_integer e, std::function<int(void)>& v)
+		{
+			if (auto* ptr = sprite_data.integer_data[e]; ptr)
+			{
+				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const sprite::e_color e, std::function<ALLEGRO_COLOR(void)>& v)
+		{
+			if (auto* ptr = sprite_data.color_data[e]; ptr)
+			{
 				v = *ptr;
 				return true;
 			}
@@ -303,7 +403,25 @@ namespace LSW {
 		bool Sprite_Base::get(const std::string e, std::string& v)
 		{
 			if (auto* ptr = sprite_data.string_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const std::string e, double& v)
+		{
+			if (auto* ptr = sprite_data.double_data(e.c_str(), e.length()); ptr) {
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const std::string e, bool& v)
+		{
+			if (auto* ptr = sprite_data.boolean_data(e.c_str(), e.length()); ptr) {
+				v = (*ptr)();
 				return true;
 			}
 			return false;
@@ -312,13 +430,58 @@ namespace LSW {
 		bool Sprite_Base::get(const std::string e, int& v)
 		{
 			if (auto* ptr = sprite_data.integer_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
+				v = (*ptr)();
 				return true;
 			}
 			return false;
 		}
 
 		bool Sprite_Base::get(const std::string e, ALLEGRO_COLOR& v)
+		{
+			if (auto* ptr = sprite_data.color_data(e.c_str(), e.length()); ptr) {
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const std::string e, std::function<std::string(void)>& v)
+		{
+			if (auto* ptr = sprite_data.string_data(e.c_str(), e.length()); ptr) {
+				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const std::string e, std::function<double(void)>& v)
+		{
+			if (auto* ptr = sprite_data.double_data(e.c_str(), e.length()); ptr) {
+				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const std::string e, std::function<bool(void)>& v)
+		{
+			if (auto* ptr = sprite_data.boolean_data(e.c_str(), e.length()); ptr) {
+				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const std::string e, std::function<int(void)>& v)
+		{
+			if (auto* ptr = sprite_data.integer_data(e.c_str(), e.length()); ptr) {
+				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool Sprite_Base::get(const std::string e, std::function<ALLEGRO_COLOR(void)>& v)
 		{
 			if (auto* ptr = sprite_data.color_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
@@ -341,35 +504,35 @@ namespace LSW {
 			return nullptr;
 		}
 
-		std::string* Sprite_Base::getRef(const sprite::e_string e)
+		std::function<std::string(void)>* Sprite_Base::getRef(const sprite::e_string e)
 		{
 			if (auto* ptr = sprite_data.string_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		double* Sprite_Base::getRef(const sprite::e_double e)
+		std::function<double(void)>* Sprite_Base::getRef(const sprite::e_double e)
 		{
 			if (auto* ptr = sprite_data.double_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		bool* Sprite_Base::getRef(const sprite::e_boolean e)
+		std::function<bool(void)>* Sprite_Base::getRef(const sprite::e_boolean e)
 		{
 			if (auto* ptr = sprite_data.boolean_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		int* Sprite_Base::getRef(const sprite::e_integer e)
+		std::function<int(void)>* Sprite_Base::getRef(const sprite::e_integer e)
 		{
 			if (auto* ptr = sprite_data.integer_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		ALLEGRO_COLOR* Sprite_Base::getRef(const sprite::e_color e)
+		std::function<ALLEGRO_COLOR(void)>* Sprite_Base::getRef(const sprite::e_color e)
 		{
 			if (auto* ptr = sprite_data.color_data(e); ptr)
 				return ptr;
@@ -407,23 +570,22 @@ namespace LSW {
 
 				// new position calculation
 
-				*sprite_data.double_readonly_data[sprite::e_double_readonly::ROTATION] = (1.0 - perc_run) * *sprite_data.double_readonly_data[sprite::e_double_readonly::ROTATION] + perc_run * *sprite_data.double_data[sprite::e_double::TARG_ROTATION];
-				*sprite_data.double_readonly_data[sprite::e_double_readonly::POSX] = (1.0 - perc_run) * *sprite_data.double_readonly_data[sprite::e_double_readonly::POSX] + perc_run * *sprite_data.double_data[sprite::e_double::TARG_POSX];
-				*sprite_data.double_readonly_data[sprite::e_double_readonly::POSY] = (1.0 - perc_run) * *sprite_data.double_readonly_data[sprite::e_double_readonly::POSY] + perc_run * *sprite_data.double_data[sprite::e_double::TARG_POSY];
+				*sprite_data.double_readonly_data[sprite::e_double_readonly::ROTATION] = (1.0 - perc_run) * *sprite_data.double_readonly_data[sprite::e_double_readonly::ROTATION] + perc_run * (*sprite_data.double_data[sprite::e_double::TARG_ROTATION])();
+				*sprite_data.double_readonly_data[sprite::e_double_readonly::POSX] = (1.0 - perc_run) * *sprite_data.double_readonly_data[sprite::e_double_readonly::POSX] + perc_run * (*sprite_data.double_data[sprite::e_double::TARG_POSX])();
+				*sprite_data.double_readonly_data[sprite::e_double_readonly::POSY] = (1.0 - perc_run) * *sprite_data.double_readonly_data[sprite::e_double_readonly::POSY] + perc_run * (*sprite_data.double_data[sprite::e_double::TARG_POSY])();
 
 
 
 				if (isEq(sprite::e_boolean::SHOWBOX, true)) {
-					double scale_x, scale_y;
 
-					scale_x = *sprite_data.double_data[sprite::e_double::SCALE_G] * *sprite_data.double_data[sprite::e_double::SCALE_X]/* * (camg * camx)*/;
-					scale_y = *sprite_data.double_data[sprite::e_double::SCALE_G] * *sprite_data.double_data[sprite::e_double::SCALE_Y]/* * (camg * camy)*/;
+					const double scale_x = (*sprite_data.double_data[sprite::e_double::SCALE_G])() * (*sprite_data.double_data[sprite::e_double::SCALE_X])();
+					const double scale_y = (*sprite_data.double_data[sprite::e_double::SCALE_G])() * (*sprite_data.double_data[sprite::e_double::SCALE_Y])();
 
 					al_draw_filled_rectangle(
-						/* X1: */ *sprite_data.double_data[sprite::e_double::TARG_POSX] - scale_x * 0.5,
-						/* Y1: */ *sprite_data.double_data[sprite::e_double::TARG_POSY] - scale_y * 0.5,
-						/* X2: */ *sprite_data.double_data[sprite::e_double::TARG_POSX] + scale_x * 0.5,
-						/* Y2: */ *sprite_data.double_data[sprite::e_double::TARG_POSY] + scale_y * 0.5,
+						/* X1: */ (*sprite_data.double_data[sprite::e_double::TARG_POSX])() - scale_x * 0.5,
+						/* Y1: */ (*sprite_data.double_data[sprite::e_double::TARG_POSY])() - scale_y * 0.5,
+						/* X2: */ (*sprite_data.double_data[sprite::e_double::TARG_POSX])() + scale_x * 0.5,
+						/* Y2: */ (*sprite_data.double_data[sprite::e_double::TARG_POSY])() + scale_y * 0.5,
 						al_map_rgb(255, easy_collision.was_col ? 128 : 255, easy_collision.was_col ? 128 : 255));
 
 					//al_draw_filled_rectangle(0, 0, 900, 900, al_map_rgb(255, 0, 255));
@@ -447,8 +609,10 @@ namespace LSW {
 
 			if (!oth.isEq(sprite::e_integer::LAYER, *getRef(sprite::e_integer::LAYER))) return; // not same layer
 			if (oth.isEq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE))) return; // no collision
+			//if (isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
+			if (oth.isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
 
-			if (auto* ptr = cam->getLayerConfig(*getRef(sprite::e_integer::LAYER)); ptr) {
+			if (auto* ptr = cam->getLayerConfig((*getRef(sprite::e_integer::LAYER))()); ptr) {
 				if (!ptr->hasCollision()) return;
 
 				double elasticity = ptr->getElasticity();
@@ -465,7 +629,8 @@ namespace LSW {
 		{
 			if (!cam) throw Abort::Abort(__FUNCSIG__, "Invalid camera at Sprite's update!", Abort::abort_level::GIVEUP);
 
-			if (auto* ptr = cam->getLayerConfig(*getRef(sprite::e_integer::LAYER)); ptr) {
+
+			if (auto* ptr = cam->getLayerConfig((*getRef(sprite::e_integer::LAYER))()); ptr && isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, false)) {
 				double roughness = ptr->getRoughness();
 
 				auto nogo = easy_collision.processResult();
@@ -473,103 +638,93 @@ namespace LSW {
 				switch (nogo) {
 				case sprite::e_direction::SOUTH:
 					if (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y] < 0.0) {
-						*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y] = (-roughness * *sprite_data.double_data[sprite::e_double::ELASTICITY_Y] * (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y]));
+						*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y] = (-roughness * (*sprite_data.double_data[sprite::e_double::ELASTICITY_Y])() * (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y]));
 						//*sprite_data.double_data[sprite::e_double::ACCELERATION_Y] = sprite::minimum_sprite_accel_collision;
 					}
 					break;
 				case sprite::e_direction::NORTH:
 					if (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y] > 0.0) {
-						*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y] = (-roughness * *sprite_data.double_data[sprite::e_double::ELASTICITY_Y] * (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y]));
+						*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y] = (-roughness * (*sprite_data.double_data[sprite::e_double::ELASTICITY_Y])() * (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y]));
 						//*sprite_data.double_data[sprite::e_double::ACCELERATION_Y] = -sprite::minimum_sprite_accel_collision;
 					}
 					break;
 				case sprite::e_direction::EAST:
 					if (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X] < 0.0) {
-						*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X] = (-roughness * *sprite_data.double_data[sprite::e_double::ELASTICITY_X] * (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X]));
+						*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X] = (-roughness * (*sprite_data.double_data[sprite::e_double::ELASTICITY_X])() * (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X]));
 						//*sprite_data.double_data[sprite::e_double::ACCELERATION_X] = sprite::minimum_sprite_accel_collision;
 					}
 					break;
 				case sprite::e_direction::WEST:
 					if (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X] > 0.0) {
-						*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X] = (-roughness * *sprite_data.double_data[sprite::e_double::ELASTICITY_X] * (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X]));
+						*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X] = (-roughness * (*sprite_data.double_data[sprite::e_double::ELASTICITY_X])() * (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X]));
 						//*sprite_data.double_data[sprite::e_double::ACCELERATION_X] = -sprite::minimum_sprite_accel_collision;
 					}
 					break;
 				}
+				
+				const auto targ_posx_c = (*sprite_data.double_data[sprite::e_double::TARG_POSX])();
+				const auto targ_posy_c = (*sprite_data.double_data[sprite::e_double::TARG_POSY])();
+				const auto speed_x_c   = (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X]);
+				const auto speed_y_c   = (*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y]);
+			
 
-				*sprite_data.double_data[sprite::e_double::TARG_POSX] += *sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X];
-				*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X] += *sprite_data.double_data[sprite::e_double::ACCELERATION_X];
+				*sprite_data.double_data[sprite::e_double::TARG_POSX] = [=] { return targ_posx_c + speed_x_c; };
+				*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X] += (*sprite_data.double_data[sprite::e_double::ACCELERATION_X])();
 				*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_X] *= roughness;
 
-				*sprite_data.double_data[sprite::e_double::TARG_POSY] += *sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y];
-				*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y] += *sprite_data.double_data[sprite::e_double::ACCELERATION_Y];
+				*sprite_data.double_data[sprite::e_double::TARG_POSY] = [=] { return targ_posy_c + speed_y_c; };
+				*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y] += (*sprite_data.double_data[sprite::e_double::ACCELERATION_Y])();
 				*sprite_data.double_readonly_data[sprite::e_double_readonly::SPEED_Y] *= roughness;
-
-				
-
-				if (!*sprite_data.boolean_data[sprite::e_boolean::FOLLOW_MOUSE]) {
-					double m[2] = { 0.0 };
-					bool is_mouse_pressed = false;
-
-					Database db;
-
-					db.get(database::e_double::MOUSE_X, m[0]);
-					db.get(database::e_double::MOUSE_Y, m[1]);
-
-					for (size_t u = static_cast<size_t>(database::e_boolean::MOUSE_0); !is_mouse_pressed && u <= static_cast<size_t>(database::e_boolean::MOUSE_7); u++)
-						is_mouse_pressed |= db.isEq(static_cast<database::e_boolean>(u), true);
-
-					double dist_x = *sprite_data.double_data[sprite::e_double::TARG_POSX] - m[0];
-					double dist_y = *sprite_data.double_data[sprite::e_double::TARG_POSY] - m[1];
-
-					bool mouse_collide = (
-						(fabs(dist_x) < 0.5 * *sprite_data.double_data[sprite::e_double::SCALE_X] * *sprite_data.double_data[sprite::e_double::SCALE_G]) &&
-						(fabs(dist_y) < 0.5 * *sprite_data.double_data[sprite::e_double::SCALE_X] * *sprite_data.double_data[sprite::e_double::SCALE_G])
-						);
+			}
 
 
-					if (mouse_collide) {
-						new_state = is_mouse_pressed ? sprite::e_tie_functional::COLLISION_MOUSE_CLICK : sprite::e_tie_functional::COLLISION_MOUSE_ON;
-					}
-					else if (last_state == sprite::e_tie_functional::COLLISION_MOUSE_CLICK) {
-						new_state = sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK;
-					}
-					else if (easy_collision.was_col) {
-						new_state = sprite::e_tie_functional::COLLISION_COLLIDED_OTHER;
-					}
-					else {
-						new_state = sprite::e_tie_functional::COLLISION_NONE;
-					}
+			if (!*sprite_data.boolean_data[sprite::e_boolean::FOLLOW_MOUSE]) {
+				double m[2] = { 0.0 };
+				bool is_mouse_pressed = false;
 
+				Database db;
+
+				db.get(database::e_double::MOUSE_X, m[0]);
+				db.get(database::e_double::MOUSE_Y, m[1]);
+
+				for (size_t u = static_cast<size_t>(database::e_boolean::MOUSE_0); !is_mouse_pressed && u <= static_cast<size_t>(database::e_boolean::MOUSE_7); u++)
+					is_mouse_pressed |= db.isEq(static_cast<database::e_boolean>(u), true);
+
+				double dist_x = (*sprite_data.double_data[sprite::e_double::TARG_POSX])() - m[0];
+				double dist_y = (*sprite_data.double_data[sprite::e_double::TARG_POSY])() - m[1];
+
+				bool mouse_collide = (
+					(fabs(dist_x) < 0.5 * (*sprite_data.double_data[sprite::e_double::SCALE_X])() * (*sprite_data.double_data[sprite::e_double::SCALE_G])()) &&
+					(fabs(dist_y) < 0.5 * (*sprite_data.double_data[sprite::e_double::SCALE_X])() * (*sprite_data.double_data[sprite::e_double::SCALE_G])())
+					);
+
+
+				if (mouse_collide) {
+					new_state = is_mouse_pressed ? sprite::e_tie_functional::COLLISION_MOUSE_CLICK : sprite::e_tie_functional::COLLISION_MOUSE_ON;
 				}
-
-
-				if (new_state != last_state) {
-					last_state = new_state;
-
-					if (pair_tied[static_cast<size_t>(last_state)]) pair_tied[static_cast<size_t>(last_state)]();
+				else if (last_state == sprite::e_tie_functional::COLLISION_MOUSE_CLICK) {
+					new_state = sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK;
 				}
-
-
-
-				/*double camx, camy, camg;
-				if (*sprite_data.boolean_data[sprite::e_boolean::AFFECTED_BY_CAM]) {
-					cam->get(camera::e_double::SCALE_G, camg);
-					cam->get(camera::e_double::SCALE_X, camx);
-					cam->get(camera::e_double::SCALE_Y, camy);
-					cam->apply();
+				else if (easy_collision.was_col) {
+					new_state = sprite::e_tie_functional::COLLISION_COLLIDED_OTHER;
 				}
 				else {
-					camx = camy = camg = 1.0;
-				}*/
+					new_state = sprite::e_tie_functional::COLLISION_NONE;
+				}
+			}			
 
-				double scale_x, scale_y;
+			if (new_state != last_state) {
+				last_state = new_state;
 
-				scale_x = *sprite_data.double_data[sprite::e_double::SCALE_G] * *sprite_data.double_data[sprite::e_double::SCALE_X]/* * (camg * camx)*/;
-				scale_y = *sprite_data.double_data[sprite::e_double::SCALE_G] * *sprite_data.double_data[sprite::e_double::SCALE_Y]/* * (camg * camy)*/;
-
-				easy_collision.setup(*sprite_data.double_data[sprite::e_double::TARG_POSX], *sprite_data.double_data[sprite::e_double::TARG_POSY], scale_x, scale_y);
+				if (pair_tied[static_cast<size_t>(last_state)]) pair_tied[static_cast<size_t>(last_state)]();
 			}
+
+			double scale_x, scale_y;
+
+			scale_x = (*sprite_data.double_data[sprite::e_double::SCALE_G])() * (*sprite_data.double_data[sprite::e_double::SCALE_X])();
+			scale_y = (*sprite_data.double_data[sprite::e_double::SCALE_G])() * (*sprite_data.double_data[sprite::e_double::SCALE_Y])();
+
+			easy_collision.setup((*sprite_data.double_data[sprite::e_double::TARG_POSX])(), (*sprite_data.double_data[sprite::e_double::TARG_POSY])(), scale_x, scale_y);
 		}
 
 		Sprite_Base::sprite_base_data& Sprite_Base::copyRAW()

@@ -9,10 +9,10 @@ namespace LSW {
 			if (bitmaps.empty()) return;
 
 			{
-				auto& delta_t = *data.chronomillis_readonly_data[entity::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION];
+				auto& delta_t = *data.chronomillis_readonly_data[block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION];
 
-				if (double _dd = *data.double_data[entity::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION]; _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
-					delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + entity::default_delta_t_frame_delay);
+				if (const double _dd = (*data.double_data[block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION])(); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
+					delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + block::default_delta_t_frame_delay);
 					ALLEGRO_BITMAP* trg = al_get_target_bitmap();
 					SuperResource<ALLEGRO_BITMAP> bmps;
 
@@ -29,11 +29,11 @@ namespace LSW {
 				}
 			}
 
-			int& frame = *data.integer_data[entity::e_integer::FRAME];
+			int frame = (*data.integer_data[block::e_integer::FRAME])();
 
 			{
-				double& delta = *data.double_data[entity::e_double::FRAMES_PER_SECOND]; // delta t, 1/t = sec
-				std::chrono::milliseconds& last_time = *data.chronomillis_readonly_data[entity::e_chronomillis_readonly::LAST_FRAME];
+				const double delta = (*data.double_data[block::e_double::FRAMES_PER_SECOND])(); // delta t, 1/t = sec
+				std::chrono::milliseconds& last_time = *data.chronomillis_readonly_data[block::e_chronomillis_readonly::LAST_FRAME];
 
 				if (delta >= 0.0 && frame >= 0) { // if delta <= 0 or frame < 0, static
 					std::chrono::milliseconds delta_tr = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(1.0 / delta));
@@ -50,6 +50,10 @@ namespace LSW {
 				}
 			}
 
+			if (!(*data.boolean_data[block::e_boolean::SET_FRAME_VALUE_READONLY])()) {
+				*data.integer_data[block::e_integer::FRAME] = [=]{return frame;};
+			}
+
 			ALLEGRO_BITMAP* rn = &(*bitmaps[frame].ref);
 			if (!rn) throw Abort::Abort(__FUNCSIG__, "Unexpected NULL on draw!");
 
@@ -62,19 +66,19 @@ namespace LSW {
 				throw Abort::Abort(__FUNCSIG__, "Somehow the texture have < 0 width / height!");
 			}
 
-			cx = 1.0f * bmpx * ((*getRef(sprite::e_double::CENTER_X) + 1.0) * 0.5);
-			cy = 1.0f * bmpy * ((*getRef(sprite::e_double::CENTER_Y) + 1.0) * 0.5);
+			cx = 1.0f * bmpx * (((*getRef(sprite::e_double::CENTER_X))() + 1.0) * 0.5);
+			cy = 1.0f * bmpy * (((*getRef(sprite::e_double::CENTER_Y))() + 1.0) * 0.5);
 			rot_rad = 1.0f * *getRef(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
 			/*px = 1.0f * data.dval[+Constants::io__sprite_double::POSX] * cos(rot_rad) + data.dval[+Constants::io__sprite_double::POSY] * sin(rot_rad);
 			py = 1.0f * data.dval[+Constants::io__sprite_double::POSY] * cos(rot_rad) - data.dval[+Constants::io__sprite_double::POSX] * sin(rot_rad);*/
 			px = *getRef(sprite::e_double_readonly::POSX);
 			py = *getRef(sprite::e_double_readonly::POSY);
-			dsx = 1.0f * *getRef(sprite::e_double::SCALE_X) * *getRef(sprite::e_double::SCALE_G) * (1.0 / bmpx);
-			dsy = 1.0f * *getRef(sprite::e_double::SCALE_Y) * *getRef(sprite::e_double::SCALE_G) * (1.0 / bmpy);
+			dsx = 1.0f * (*getRef(sprite::e_double::SCALE_X))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpx);
+			dsy = 1.0f * (*getRef(sprite::e_double::SCALE_Y))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpy);
 
 
 			if (*getRef(sprite::e_boolean::USE_COLOR)) {
-				al_draw_tinted_scaled_rotated_bitmap(rn, *getRef(sprite::e_color::COLOR), cx, cy, px, py, dsx, dsy, rot_rad, 0);
+				al_draw_tinted_scaled_rotated_bitmap(rn, (*getRef(sprite::e_color::COLOR))(), cx, cy, px, py, dsx, dsy, rot_rad, 0);
 			}
 			else {
 				al_draw_scaled_rotated_bitmap(rn, cx, cy, px, py, dsx, dsy, rot_rad, 0);
@@ -141,31 +145,110 @@ namespace LSW {
 				}
 			}
 		}
-		void Block::set(const entity::e_integer e, int v)
+		void Block::set(const block::e_integer e, int v)
+		{
+			if (auto* ptr = data.integer_data(e); ptr)
+				*ptr = [=] {return v; };
+		}
+		void Block::set(const block::e_double e, double v)
+		{
+			if (auto* ptr = data.double_data(e); ptr)
+				*ptr = [=] {return v; };
+		}
+
+		void Block::set(const block::e_boolean e, bool v)
+		{
+			if (auto* ptr = data.boolean_data(e); ptr)
+				*ptr = [=] {return v; };
+		}
+
+		void Block::set(const block::e_integer e, std::function<int(void)> v)
 		{
 			if (auto* ptr = data.integer_data(e); ptr)
 				*ptr = v;
 		}
-		void Block::set(const entity::e_double e, double v)
+
+		void Block::set(const block::e_double e, std::function<double(void)> v)
 		{
 			if (auto* ptr = data.double_data(e); ptr)
+				*ptr = v;
+		}
+
+		void Block::set(const block::e_boolean e, std::function<bool(void)> v)
+		{
+			if (auto* ptr = data.boolean_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Block::set(const std::string e, int v)
 		{
 			auto* ptr = data.integer_data(e.c_str(), e.length());
+			if (!ptr) data.integer_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			else *ptr = [=] {return v; };
+		}
+		void Block::set(const std::string e, double v)
+		{
+			auto* ptr = data.double_data(e.c_str(), e.length());
+			if (!ptr) data.double_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			else *ptr = [=] {return v; };
+		}
+
+		void Block::set(const std::string e, bool v)
+		{
+			auto* ptr = data.boolean_data(e.c_str(), e.length());
+			if (!ptr) data.boolean_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			else *ptr = [=] {return v; };
+		}
+
+		void Block::set(const std::string e, std::function<int(void)> v)
+		{
+			auto* ptr = data.integer_data(e.c_str(), e.length());
 			if (!ptr) data.integer_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
-		void Block::set(const std::string e, double v)
+		void Block::set(const std::string e, std::function<double(void)> v)
 		{
 			auto* ptr = data.double_data(e.c_str(), e.length());
 			if (!ptr) data.double_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
+		void Block::set(const std::string e, std::function<bool(void)> v)
+		{
+			auto* ptr = data.boolean_data(e.c_str(), e.length());
+			if (!ptr) data.boolean_data.add({ v, e.c_str(), e.length() });
+			else *ptr = v;
+		}
 
-		bool Block::get(const entity::e_integer e, int& v)
+		bool Block::get(const block::e_integer e, int& v)
+		{
+			if (auto* ptr = data.integer_data[e]; ptr)
+			{
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+		bool Block::get(const block::e_double e, double& v)
+		{
+			if (auto* ptr = data.double_data[e]; ptr)
+			{
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Block::get(const block::e_boolean e, bool& v)
+		{
+			if (auto* ptr = data.boolean_data[e]; ptr)
+			{
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Block::get(const block::e_integer e, std::function<int(void)>& v)
 		{
 			if (auto* ptr = data.integer_data[e]; ptr)
 			{
@@ -174,9 +257,20 @@ namespace LSW {
 			}
 			return false;
 		}
-		bool Block::get(const entity::e_double e, double& v)
+
+		bool Block::get(const block::e_double e, std::function<double(void)>& v)
 		{
 			if (auto* ptr = data.double_data[e]; ptr)
+			{
+				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool Block::get(const block::e_boolean e, std::function<bool(void)>& v)
+		{
+			if (auto* ptr = data.boolean_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -187,12 +281,39 @@ namespace LSW {
 		bool Block::get(const std::string e, int& v)
 		{
 			if (auto* ptr = data.integer_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
+				v = (*ptr)();
 				return true;
 			}
 			return false;
 		}
 		bool Block::get(const std::string e, double& v)
+		{
+			if (auto* ptr = data.double_data(e.c_str(), e.length()); ptr) {
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool Block::get(const std::string e, bool& v)
+		{
+			if (auto* ptr = data.boolean_data(e.c_str(), e.length()); ptr) {
+				v = (*ptr)();
+				return true;
+			}
+			return false;
+		}
+
+		bool LSW::v5::Block::get(const std::string e, std::function<int(void)>& v)
+		{
+			if (auto* ptr = data.integer_data(e.c_str(), e.length()); ptr) {
+				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool LSW::v5::Block::get(const std::string e, std::function<double(void)>& v)
 		{
 			if (auto* ptr = data.double_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
@@ -201,7 +322,16 @@ namespace LSW {
 			return false;
 		}
 
-		bool Block::get(const entity::e_chronomillis_readonly e, std::chrono::milliseconds& v)
+		bool LSW::v5::Block::get(const std::string e, std::function<bool(void)>& v)
+		{
+			if (auto* ptr = data.boolean_data(e.c_str(), e.length()); ptr) {
+				v = *ptr;
+				return true;
+			}
+			return false;
+		}
+
+		bool Block::get(const block::e_chronomillis_readonly e, std::chrono::milliseconds& v)
 		{
 			if (auto* ptr = data.chronomillis_readonly_data[e]; ptr)
 			{
@@ -211,21 +341,28 @@ namespace LSW {
 			return false;
 		}
 
-		int* Block::getRef(const entity::e_integer e)
+		std::function<int(void)>* Block::getRef(const block::e_integer e)
 		{
 			if (auto* ptr = data.integer_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		double* Block::getRef(const entity::e_double e)
+		std::function<double(void)>* Block::getRef(const block::e_double e)
 		{
 			if (auto* ptr = data.double_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		const std::chrono::milliseconds* Block::getRef(const entity::e_chronomillis_readonly e) const
+		std::function<bool(void)>* Block::getRef(const block::e_boolean e)
+		{
+			if (auto* ptr = data.boolean_data(e); ptr)
+				return ptr;
+			return nullptr;
+		}
+
+		const std::chrono::milliseconds* Block::getRef(const block::e_chronomillis_readonly e) const
 		{
 			if (auto* ptr = data.chronomillis_readonly_data(e); ptr)
 				return ptr;
@@ -294,16 +431,16 @@ namespace LSW {
 							sprintf_s(tempstr_c, "%s", (follow ? "Y" : "N"));
 							break;
 						case static_cast<size_t>(text::tags_e::T_COLOR_R):
-							sprintf_s(tempstr_c, "%.3f", getRef(sprite::e_color::COLOR)->r);
+							sprintf_s(tempstr_c, "%.3f", (*getRef(sprite::e_color::COLOR))().r);
 							break;
 						case static_cast<size_t>(text::tags_e::T_COLOR_G):
-							sprintf_s(tempstr_c, "%.3f", getRef(sprite::e_color::COLOR)->g);
+							sprintf_s(tempstr_c, "%.3f", (*getRef(sprite::e_color::COLOR))().g);
 							break;
 						case static_cast<size_t>(text::tags_e::T_COLOR_B):
-							sprintf_s(tempstr_c, "%.3f", getRef(sprite::e_color::COLOR)->b);
+							sprintf_s(tempstr_c, "%.3f", (*getRef(sprite::e_color::COLOR))().b);
 							break;
 						case static_cast<size_t>(text::tags_e::T_COLOR_A):
-							sprintf_s(tempstr_c, "%.3f", getRef(sprite::e_color::COLOR)->a);
+							sprintf_s(tempstr_c, "%.3f", (*getRef(sprite::e_color::COLOR))().a);
 							break;
 						case static_cast<size_t>(text::tags_e::T_MODE):
 							sprintf_s(tempstr_c, "%d", (*data.integer_data[text::e_integer::STRING_MODE])());
@@ -676,12 +813,12 @@ namespace LSW {
 			const auto s_dist_x		= (*data.double_data[text::e_double::SHADOW_DISTANCE_X])();
 			const auto s_dist_y		= (*data.double_data[text::e_double::SHADOW_DISTANCE_Y])();
 			const auto s_col		= (*data.color_data[text::e_color::SHADOW_COLOR])();
-			auto n_col				= *getRef(sprite::e_color::COLOR);
+			auto n_col				= (*getRef(sprite::e_color::COLOR))();
 			auto& p_str				= *data.string_readonly_data[text::e_string_readonly::PROCESSED_STRING];
 			const auto mode			= (*data.integer_data[text::e_integer::STRING_MODE])();
-			auto& scale_g			= *getRef(sprite::e_double::SCALE_G);
-			auto& scale_x			= *getRef(sprite::e_double::SCALE_X);
-			auto& scale_y			= *getRef(sprite::e_double::SCALE_Y);
+			const auto scale_g		= (*getRef(sprite::e_double::SCALE_G))();
+			const auto scale_x		= (*getRef(sprite::e_double::SCALE_X))();
+			const auto scale_y		= (*getRef(sprite::e_double::SCALE_Y))();
 			auto& delta_t			= *data.chronomillis_readonly_data[text::e_chronomillis_readonly::LAST_UPDATE_STRING];
 			const auto per_char		= (*data.boolean_data[text::e_boolean::USE_PER_CHAR_COLORING])();
 
@@ -727,7 +864,7 @@ namespace LSW {
 
 			if (should_care_about_shadow) {
 				pos_shadow_now[0] = 1.0 * text::default_sharpness_font * (((posx + s_dist_x) * cos(p_rotation_rad)) - ((posy + s_dist_y) * sin(p_rotation_rad)) + off_x);
-				pos_shadow_now[0] = 1.0 * text::default_sharpness_font * (((posy + s_dist_y) * cos(p_rotation_rad)) - ((posx + s_dist_x) * sin(p_rotation_rad)) + off_y);
+				pos_shadow_now[1] = 1.0 * text::default_sharpness_font * (((posy + s_dist_y) * cos(p_rotation_rad)) - ((posx + s_dist_x) * sin(p_rotation_rad)) + off_y);
 			}
 
 

@@ -131,18 +131,34 @@ int main(int argc, char* argv[]) {
 	ref4->set(sprite::e_double::ACCELERATION_Y, 6e-4);
 	ref4->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
 	ref4->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
-	ref4->set(entity::e_double::FRAMES_PER_SECOND, 4.0);
+	ref4->set(block::e_double::FRAMES_PER_SECOND, 4.0);
+
+
+	auto refc_orig = sprites.customLoad("testc", [](Sprite_Base*& b) {return (b = new Block()); });
+	Block* refc = (Block*)&(*refc_orig);
+	refc->set(sprite::e_boolean::SHOWBOX, true);
+	refc->set(sprite::e_boolean::SHOWDOT, true);
+	refc->set(sprite::e_double::SCALE_G, 0.32);
+	refc->set(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
+	//refc->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
+	refc->set(sprite::e_double::TARG_POSX, [] {return cos(al_get_time()) * 0.5; });
+	refc->set(sprite::e_double::TARG_POSY, [] {return sin(al_get_time()) * 0.5; });
+
 
 	auto ref5_orig = sprites.customLoad("test5", [](Sprite_Base*& b) {return (b = new Text()); });
 	Text* ref5 = (Text*)&(*ref5_orig);
 	//ref5->set(sprite::e_boolean::SHOWBOX, true);
 	ref5->set(sprite::e_boolean::SHOWDOT, true);
+	ref5->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 	ref5->set(sprite::e_boolean::DRAW, true);
 	ref5->set(sprite::e_double::TARG_POSX, 0.0);
 	ref5->set(sprite::e_double::TARG_POSY, -0.7);
 	ref5->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
 	ref5->set(sprite::e_double::SCALE_G, 0.1);
 	ref5->set(sprite::e_double::SCALE_X, 0.6);
+	ref5->set(text::e_color::SHADOW_COLOR, al_map_rgb(127, 127, 127));
+	ref5->set(text::e_double::SHADOW_DISTANCE_X, 4e-3);
+	ref5->set(text::e_double::SHADOW_DISTANCE_Y, 4e-3);
 	ref5->load("_FONT");
 	ref5->set(text::e_cstring::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
 	ref5->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
@@ -150,6 +166,7 @@ int main(int argc, char* argv[]) {
 	auto ref6_orig = sprites.customLoad("test6", [](Sprite_Base*& b) {return (b = new Text()); });
 	Text* ref6 = (Text*)&(*ref6_orig);
 	//ref6->set(sprite::e_boolean::SHOWBOX, true);
+	ref5->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 	ref6->set(sprite::e_boolean::SHOWDOT, true);
 	ref6->set(sprite::e_boolean::DRAW, true);
 	ref6->set(sprite::e_double::TARG_POSX, -1.0);
@@ -166,6 +183,7 @@ int main(int argc, char* argv[]) {
 		auto ref_orig = sprites.customLoad("_DEBUG_TEXT", [](Sprite_Base*& b) {return (b = new Text()); });
 		Text* mtt = (Text*)&(*ref_orig);
 		mtt->set(sprite::e_boolean::SHOWDOT, true);
+		ref5->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 		mtt->set(sprite::e_boolean::DRAW, true);
 		mtt->set(text::e_boolean::USE_PER_CHAR_COLORING, true);
 		mtt->set(sprite::e_double::TARG_POSX, -1.0);
