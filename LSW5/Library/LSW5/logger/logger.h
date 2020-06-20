@@ -21,11 +21,12 @@ Logger header:
 // C++
 #include <string>
 #include <mutex>
+#include <functional>
 // Others
 #include "..\Abort\abort.h"
 #include "coloured_string.h"
 #include "printer.h"
-#include "..\allegroinitialization\allegroinitialization.h"
+//#include "..\allegroinitialization\allegroinitialization.h"
 #include "..\tools\tools.h"
 #include "..\shared\shared.h"
 
@@ -52,10 +53,13 @@ namespace LSW {
 				bool m_b = false;
 				bool file_write_enabled = true;
 
-				ALLEGRO_EVENT_SOURCE evsrc = ALLEGRO_EVENT_SOURCE();
+				/*ALLEGRO_EVENT_SOURCE evsrc = ALLEGRO_EVENT_SOURCE();
 
 				coloured_string memline[logger::max_lines_stored_by_memlog];
-				size_t memlinecount = 0;
+				size_t memlinecount = 0;*/
+
+				coloured_string memline_s;
+				std::function<void(coloured_string)> sendd;
 			};
 
 			static __idata g;
@@ -69,8 +73,8 @@ namespace LSW {
 			void init(const std::string); // path, once
 			void flush();
 
-			ALLEGRO_EVENT_SOURCE* getEvent();
-
+			void hook(std::function<void(coloured_string)>);
+			void unhook();
 
 			Logger& operator<<(const L&);
 			Logger& operator<<(coloured_string&&);

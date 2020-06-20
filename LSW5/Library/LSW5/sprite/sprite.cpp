@@ -552,7 +552,7 @@ namespace LSW {
 
 
 
-				double camx, camy, camg;
+				/*double camx, camy, camg;
 				if (*sprite_data.boolean_data[sprite::e_boolean::AFFECTED_BY_CAM]) {
 					cam->get(camera::e_double::SCALE_G, camg);
 					cam->get(camera::e_double::SCALE_X, camx);
@@ -561,12 +561,12 @@ namespace LSW {
 				}
 				else {
 					camx = camy = camg = 1.0;
-				}
+				}*/
 
 				double scale_x, scale_y;
 
-				scale_x = *sprite_data.double_data[sprite::e_double::SCALE_G] * *sprite_data.double_data[sprite::e_double::SCALE_X] * (camg * camx);
-				scale_y = *sprite_data.double_data[sprite::e_double::SCALE_G] * *sprite_data.double_data[sprite::e_double::SCALE_Y] * (camg * camy);
+				scale_x = *sprite_data.double_data[sprite::e_double::SCALE_G] * *sprite_data.double_data[sprite::e_double::SCALE_X]/* * (camg * camx)*/;
+				scale_y = *sprite_data.double_data[sprite::e_double::SCALE_G] * *sprite_data.double_data[sprite::e_double::SCALE_Y]/* * (camg * camy)*/;
 
 				easy_collision.setup(*sprite_data.double_data[sprite::e_double::TARG_POSX], *sprite_data.double_data[sprite::e_double::TARG_POSY], scale_x, scale_y);
 			}

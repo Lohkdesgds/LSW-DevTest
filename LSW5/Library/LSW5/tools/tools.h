@@ -39,7 +39,11 @@ namespace LSW {
 			// FORMAT = "STARTSTUFF######ENDSTUFF" (# = number space)
 			std::vector<std::string> genStrFormat(const std::string, const size_t, const size_t = 0);
 
+			// gets Thread ID
 			uint64_t getThreadID();
+
+			// transforms [0-F] to a int 0..15
+			//int hexTransform(const char);
 
 			// value, how many bytes to test?
 			std::vector<bool> translBinary(const int, const size_t);

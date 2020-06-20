@@ -192,6 +192,14 @@ namespace LSW {
 				ss << std::this_thread::get_id();
 				return std::stoull(ss.str());
 			}
+			/*int hexTransform(const char c)
+			{
+				auto cpy = std::toupper(c);
+				if (cpy >= '0' && cpy <= '9') return cpy - '0';
+				if (cpy >= 'A' && cpy <= 'F') return 10 + (cpy - 'A');
+				throw Abort::Abort(__FUNCSIG__, "Out of range HEX value transformation!", Abort::abort_level::WARN);
+				
+			}*/
 			std::vector<bool> translBinary(const int v, const size_t lim)
 			{
 				std::vector<bool> b;

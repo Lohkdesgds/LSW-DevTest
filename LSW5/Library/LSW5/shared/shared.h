@@ -8,7 +8,7 @@ namespace LSW {
 		namespace Shared {
 
 			// this have to be global, come on																																* 100 eq 1.0							      * 1000 eq 1.0
-			enum class my_events { CUSTOM_EVENT_LOG_STRING = 512, /*CUSTOM_EVENT_SHARING_NEW_DISPLAY_SIZE,*/ CUSTOM_EVENT_CALL_FULLSCREEN, CUSTOM_EVENT_EXTERNAL_EXIT_CALL, CUSTOM_EVENT_DISPLAY_UPDATE_RESOLUTION_SCALE, CUSTOM_EVENT_DISPLAY_CHROMA_FX /* <-- TO BE DONE */ };
+			enum class my_events { /*CUSTOM_EVENT_LOG_STRING = 512, CUSTOM_EVENT_SHARING_NEW_DISPLAY_SIZE,*/ CUSTOM_EVENT_CALL_FULLSCREEN = 512, CUSTOM_EVENT_EXTERNAL_EXIT_CALL, CUSTOM_EVENT_DISPLAY_UPDATE_RESOLUTION_SCALE, CUSTOM_EVENT_DISPLAY_CHROMA_FX /* <-- TO BE DONE */ };
 
 			/* VERSIONING */
 			inline const std::string __interpret_date();
@@ -22,17 +22,17 @@ namespace LSW {
 			const int game_timing_tps = 10;
 
 			// not actually template, but shared
-			struct super_char {
+			/*struct super_char {
 				std::string ch;
 				size_t size() { return ch.length(); }
 				super_char& operator=(char a) { super_char c; c = a; return c; }
 				super_char& operator=(const char* s) { super_char c; c = s; return c; }
 				super_char& operator=(const std::string s) { super_char c; c = s; return c; }
 			};
-			using super_string = std::basic_string<super_char>; // multibyte allegro stuff lmao
+			using super_string = std::basic_string<super_char>; // multibyte allegro stuff lmao*/
 
 			// don't use this too much!
-			template<typename T> inline T& nullReference() { void* nil = nullptr; return (T&)*(int*)nil; }
+			//template<typename T> inline T& nullReference() { void* nil = nullptr; return (T&)*(int*)nil; }
 
 			// shh 
 			inline const std::string __interpret_date()

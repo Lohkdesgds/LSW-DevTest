@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
 	fs.hookPrint([&](std::string s) { logg << L::SLF << fsr(__FUNCSIG__, E::INFO) << "&5[PhysFS]&8 " << s << L::ELF; });
 
 
+
 	SuperResource<Camera> cameras;
 	SuperResource<Sprite_Base> sprites;
 	SuperResource<ALLEGRO_BITMAP> bitmaps;
@@ -92,8 +93,8 @@ int main(int argc, char* argv[]) {
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Initializing resources - - -" << L::ELF;
 
 
-	bitmaps.create("_ATLAS0", "atlas0.png"); // load big atlas
 	fonts.create("_FONT", "font.ttf"); // load main font
+	bitmaps.create("_ATLAS0", "atlas0.png"); // load big atlas
 
 	auto ref = sprites.create("test");
 	ref->set("show_box", true);
@@ -143,7 +144,7 @@ int main(int argc, char* argv[]) {
 	ref5->set(sprite::e_double::SCALE_G, 0.1);
 	ref5->set(sprite::e_double::SCALE_X, 0.6);
 	ref5->load("_FONT");
-	ref5->set(text::e_string::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
+	ref5->set(text::e_cstring::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
 	ref5->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
 
 	auto ref6_orig = sprites.customLoad("test6", [](Sprite_Base*& b) {return (b = new Text()); });
@@ -157,13 +158,55 @@ int main(int argc, char* argv[]) {
 	ref6->set(sprite::e_double::SCALE_G, 0.07);
 	ref6->set(sprite::e_double::SCALE_X, 0.4);
 	ref6->load("_FONT");
-	ref6->set(text::e_string::STRING, "%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string%");
+	ref6->set(text::e_cstring::STRING, "%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites%");
 	ref6->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
+
+	
+	{
+		auto ref_orig = sprites.customLoad("_DEBUG_TEXT", [](Sprite_Base*& b) {return (b = new Text()); });
+		Text* mtt = (Text*)&(*ref_orig);
+		mtt->set(sprite::e_boolean::SHOWDOT, true);
+		mtt->set(sprite::e_boolean::DRAW, true);
+		mtt->set(text::e_boolean::USE_PER_CHAR_COLORING, true);
+		mtt->set(sprite::e_double::TARG_POSX, -1.0);
+		mtt->set(sprite::e_double::TARG_POSY, 0.92);
+		mtt->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
+		mtt->set(sprite::e_double::SCALE_G, 0.065);
+		mtt->set(sprite::e_double::SCALE_X, 0.4);
+		mtt->load("_FONT");
+		mtt->set(text::e_cstring::STRING, "REPOLHO");
+		mtt->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
+		mtt->set(sprite::e_integer::LAYER, 100);
+		logg.hook([=](coloured_string str) {mtt->set(text::e_cstring::STRING, str); });
+
+
+
+		///logg.hook([=](coloured_string str) {mtt->set(text::e_cstring::STRING, str); });
+		//mtt->set(text::e_cstring::STRING,			"REPOLHO");
+		///mtt->set(sprite::e_boolean::DRAW,			[&]	{bool d;			db.get(database::e_boolean::WAS_OSD_ON, d);						return d; }());
+		//mtt->set(sprite::e_double::SCALE_G, 0.03);
+		//mtt->set(sprite::e_double::SCALE_X, 0.55);
+		//mtt->set(sprite::e_double::TARG_POSY, 0.965); // 0.935
+		//mtt->set(sprite::e_double::TARG_POSX, -1.0);
+		///mtt->set(text::e_integer::STRING_MODE, +text::e_alignment::ALIGN_LEFT);
+		//mtt->set(text::e_double::TEXT_UPDATE_TIME, 1.0 / 5);
+		//mtt->set(sprite::e_boolean::AFFECTED_BY_CAM, false);
+		//mtt->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
+		///mtt->set(sprite::e_color::COLOR, [&] {return clr_str; }());
+	}
+
+
+
+
+
+
 
 	cam->set(camera::e_integer::ID, 0);
 	cam->addLayerConfig(Camera::layer_each(0));
+	cam->addLayerConfig(Camera::layer_each(100));
 	cam->refresh();
 	cam->apply();
+
 	{
 		int gut;
 		if (!cam->get(camera::e_integer::ID, gut)) {
@@ -179,7 +222,13 @@ int main(int argc, char* argv[]) {
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Resting - - -" << L::ELF;
 
 
-	while (core.allAlive()); // wait user do smth
+	while (core.allAlive());/* { // wait user do smth
+		cam->set(camera::e_double::SCALE_G, cos(al_get_time() * 0.1) * 0.2 + 0.9);
+		cam->set(camera::e_double::OFFSET_X, cos(al_get_time() * 0.04) * 0.3);
+		cam->set(camera::e_double::OFFSET_Y, cos(al_get_time() * 0.11) * 0.3);
+	}*/
+
+
 	//for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 25000 && core.allAlive(););// {
 		//ref->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time()));
 		//ref2->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time() + 0.7));

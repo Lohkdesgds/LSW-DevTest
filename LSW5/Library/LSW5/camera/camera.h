@@ -10,6 +10,7 @@
 #include "..\tools\tools.h"
 #include "..\allegroinitialization\allegroinitialization.h"
 #include "..\superresource\superresource.h"
+#include "..\database\database.h"
 
 namespace LSW {
 	namespace v5 {

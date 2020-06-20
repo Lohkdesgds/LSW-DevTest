@@ -14,6 +14,7 @@
 #include "..\database\database.h"
 #include "..\superresource\superresource.h"
 #include "..\sprite\sprite.h"
+#include "..\entities\entities.h"
 
 /*
 LATER: (maybe) add a way to create threads to specific layers of collision
@@ -29,7 +30,7 @@ namespace LSW {
 			LOOP_TRACK is just to update stuff (database data)
 			*/
 
-			enum class thr_display_routines		{ LOOP_TRACK, CHECK_MEMORY_BITMAP_AND_CAMERA, UPDATE_LOG_ON_SCREEN };
+			enum class thr_display_routines		{ LOOP_TRACK, CHECK_MEMORY_BITMAP_AND_CAMERA };
 			enum class thr_collision_routines	{ LOOP_TRACK, COLLISION_WORK };
 			enum class thr_events_routines		{ LOOP_TRACK, UPDATE_MOUSE };
 			enum class thr_functional_routines	{ LOOP_TRACK };
@@ -40,7 +41,7 @@ namespace LSW {
 			};
 
 
-			typedef SuperTimer<1, 5, 5>								__display_routines;
+			typedef SuperTimer<1, 5>								__display_routines;
 			typedef SuperTimer<1, Shared::game_timing_tps>			__collision_routines;
 			typedef SuperTimer<1, 60>								__events_routines;
 			typedef SuperTimer<1>									__functional_routines;

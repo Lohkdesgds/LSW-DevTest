@@ -65,6 +65,7 @@ namespace LSW {
 
 		void Core::thr_0(Threads::boolThreadF& keep) // DRAWING
 		{
+
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 			Variables used while thread is on:
@@ -75,14 +76,34 @@ namespace LSW {
 			Logger logg;
 			Display disp;
 			Database db;
-			coloured_string clr_str;
 			SuperResource<Camera> cameras;
+			SuperResource<Sprite_Base> sprites;
+
 			if (cameras.size() == 0) {
 				throw Abort::Abort(__FUNCSIG__, "NO CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource)");
 			}
-			std::shared_ptr<Camera> main_cam = cameras.begin()->data(); // get first cam as main camera
 
-			SuperResource<Sprite_Base> sprites;
+
+			std::shared_ptr<Camera> main_cam = cameras.begin()->data(); // get first cam as main camera
+			/*{
+				auto ref_orig = sprites.customLoad("_DEBUG_TEXT", [](Sprite_Base*& b) {return (b = new Text()); });
+				Text* mtt = (Text*)&(*ref_orig);
+				mtt->load("_FONT");
+				mtt->set(text::e_cstring::STRING,			[&] {return clr_str; });
+				//mtt->set(sprite::e_boolean::DRAW,			[&]	{bool d;			db.get(database::e_boolean::WAS_OSD_ON, d);						return d; }());
+				mtt->set(sprite::e_double::SCALE_G, 0.03);
+				mtt->set(sprite::e_double::SCALE_X, 0.55);
+				mtt->set(sprite::e_double::TARG_POSY, 0.965); // 0.935
+				mtt->set(sprite::e_double::TARG_POSX, -1.0);
+				//mtt->set(text::e_integer::STRING_MODE, +text::e_alignment::ALIGN_LEFT);
+				mtt->set(text::e_double::TEXT_UPDATE_TIME, 1.0 / 5);
+				mtt->set(sprite::e_boolean::AFFECTED_BY_CAM, false);
+				mtt->set(sprite::e_integer::LAYER, 100);
+				//mtt->set(sprite::e_color::COLOR, [&] {return clr_str; }());
+			}*/
+
+
+
 
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -144,7 +165,7 @@ namespace LSW {
 
 				data.display_routine.routines.insert(&data.evsrc);
 				data.display_routine.routines.insert(disp.getEvent());
-				data.display_routine.routines.insert(logg.getEvent());
+				//data.display_routine.routines.insert(logg.getEvent()); // don't need to handle this at all
 
 				data.display_routine.routines.start();
 
@@ -182,10 +203,6 @@ namespace LSW {
 							main_cam->refresh();
 							main_cam->apply();
 						}
-						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::UPDATE_LOG_ON_SCREEN))) {
-							// to be done
-							// there's no such class to handle STRING yet (Text)
-						}
 
 						// OTHER EVENTS (Allegro and stuff)
 
@@ -209,10 +226,10 @@ namespace LSW {
 									//throw_event_update_display_size();
 								}
 								break;
-							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_LOG_STRING):
+							/*case static_cast<int>(Shared::my_events::CUSTOM_EVENT_LOG_STRING): // no reason to handle this here
 									clr_str = *(coloured_string*)ev.user.data1;
 									// set later the string on screen
-								break;
+								break;*/
 							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_EXTERNAL_EXIT_CALL):
 								internalEnd();
 								logg << L::SLF << fsr(__FUNCSIG__) << "&5Got EVENT_EXTERNAL_EXIT_CALL event on main window, setting to close the game..." << L::ELF;
@@ -244,6 +261,8 @@ namespace LSW {
 
 
 					// draw?
+
+					main_cam->matrix_debug();
 
 					for(auto& i : sprites)
 					{
@@ -283,7 +302,7 @@ namespace LSW {
 				data.display_routine.routines.stop();
 				data.display_routine.routines.remove(&data.evsrc);
 				data.display_routine.routines.remove(disp.getEvent());
-				data.display_routine.routines.remove(logg.getEvent());
+				//data.display_routine.routines.remove(logg.getEvent());
 
 				db.set(database::e_double::FX_AMOUNT,						(*disp.getRef(display::e_double::FX_AMOUNT))());
 				db.set(database::e_double::RESOLUTION_BUFFER_PROPORTION,	(*disp.getRef(display::e_double::RESOLUTION_BUFFER_PROPORTION))());

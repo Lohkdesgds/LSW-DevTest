@@ -261,12 +261,12 @@ namespace LSW {
 		{
 			double m[2] = { 0.0 };
 			double limits[4] = { 0.0 };
-			//Database db;
+			Database db;
 			Camera* psf = this;
 			Camera  org;
 
-			//db.get(Constants::ro__db_mouse_double::RAW_MOUSE_X, m[0]);
-			//db.get(Constants::ro__db_mouse_double::RAW_MOUSE_Y, m[1]);
+			db.get(database::e_double::RAW_MOUSE_X, m[0]);
+			db.get(database::e_double::RAW_MOUSE_Y, m[1]);
 
 			psf->get(camera::e_double::LIMIT_MIN_X, limits[0]);
 			psf->get(camera::e_double::LIMIT_MIN_Y, limits[1]);

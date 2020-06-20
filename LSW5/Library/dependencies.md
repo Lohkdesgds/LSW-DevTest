@@ -112,8 +112,8 @@ Lib | #include
 Abort | *none*
 AllegroInitialization | *none*
 Autocaster | *none*
-Camera | SuperMap<br>Tools<br>AllegroInitialization<br>SuperResource
-Core | Abort<br>SuperTimer<br>SuperMap<br>Logger<br>Display<br>Shared<br>Autocaster<br>Database<br>SuperResource<br>Sprite
+Camera | SuperMap<br>Tools<br>AllegroInitialization<br>SuperResource<br>Database
+Core | Abort<br>SuperTimer<br>SuperMap<br>Logger<br>Display<br>Shared<br>Autocaster<br>Database<br>SuperResource<br>Sprite<br>Entities
 Database | Abort<br>SuperMap<br>Logger<br>Tools<br>SuperMutex
 Display | Abort<br>SuperThread<br>AllegroInitialization<br>SuperMutex<br>Tools<br>SuperMap
 Downloader | *none*
@@ -122,7 +122,7 @@ FileSystem | Tools<br>AllegroInitialization
 Hash | *none*
 Launcher | *none*
 ColouredString | *none*
-Logger | Printer<br>ColouredString<br>Abort<br>AllegroInitialization<br>Tools<br>Shared
+Logger | Printer<br>ColouredString<br>Abort<br>Tools<br>Shared
 Printer | ColouredString
 Shared | *none*
 SocketSystem | Abort<br>Tools<br>FileSystem<br>SuperMutex

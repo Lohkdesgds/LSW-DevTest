@@ -30,13 +30,15 @@ namespace LSW {
 
 		void Logger::sendLast()
 		{
-			ALLEGRO_EVENT evv;
+			/*ALLEGRO_EVENT evv;
 			evv.user.data1 = (intptr_t)&g.memline[g.memlinecount];
 			evv.type = static_cast<int>(Shared::my_events::CUSTOM_EVENT_LOG_STRING);
 			al_emit_user_event(&g.evsrc, &evv, nullptr);
 
 			if (++g.memlinecount >= logger::max_lines_stored_by_memlog) g.memlinecount = 0;
-			g.memline[g.memlinecount].clear();
+			g.memline[g.memlinecount].clear();*/
+			if (g.sendd) g.sendd(g.memline_s);
+			g.memline_s.clear();
 		}
 		
 		void Logger::init(const std::string path)
@@ -54,8 +56,8 @@ namespace LSW {
 					return;
 				}
 
-				lsw_al_init();
-				al_init_user_event_source(&g.evsrc);
+				/*lsw_al_init();
+				al_init_user_event_source(&g.evsrc);*/
 			}
 
 			g.m.unlock();
@@ -68,11 +70,19 @@ namespace LSW {
 				g.m.unlock();
 			}
 		}
-		ALLEGRO_EVENT_SOURCE* Logger::getEvent()
+		void Logger::hook(std::function<void(coloured_string)> f)
+		{
+			g.sendd = f;
+		}
+		void Logger::unhook()
+		{
+			hook(std::function<void(coloured_string)>());
+		}
+		/*ALLEGRO_EVENT_SOURCE* Logger::getEvent()
 		{
 			if (g.fp) return &g.evsrc;
 			return nullptr;
-		}
+		}*/
 		/*Logger& Logger::operator<<(const C& c)
 		{
 			g.last_c = c;
@@ -176,7 +186,7 @@ namespace LSW {
 			lsw_print(clstr);
 			lsw_fprint(g.fp, clstr);
 			if (clstr.size()) g.last_c = clstr[clstr.size() - 1].cr;
-			g.memline[g.memlinecount] += clstr;
+			g.memline_s += clstr;
 			return *this;
 		}
 		Logger& Logger::operator<<(coloured_string& clstr)
@@ -186,7 +196,7 @@ namespace LSW {
 			if (clstr.size()) {
 				g.last_c = clstr[clstr.size() - 1].cr;
 			}
-			g.memline[g.memlinecount] += clstr;
+			g.memline_s += clstr;
 			return *this;
 		}
 
