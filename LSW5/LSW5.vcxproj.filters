@@ -73,10 +73,16 @@
     <Filter Include="LSW5\Library\entities">
       <UniqueIdentifier>{405588bd-d0ce-482b-9563-bc986de37594}</UniqueIdentifier>
     </Filter>
+    <Filter Include="README reference">
+      <UniqueIdentifier>{6c596632-0cdb-4def-8a66-d35b85346d79}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Library\dependencies.md" />
+    <None Include="..\readme.md">
+      <Filter>README reference</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Library\coming.txt" />

@@ -143,7 +143,10 @@ namespace LSW {
 				SuperMap<std::function<bool(void)>>				boolean_data = sprite::e_boolean_defaults;
 				SuperMap<std::function<int(void)>>				integer_data = sprite::e_integer_defaults;
 				SuperMap<std::function<ALLEGRO_COLOR(void)>>	color_data = sprite::e_color_defaults;
-			} sprite_data;
+				void* original_this = nullptr;
+			};
+
+			std::shared_ptr<sprite_base_data> data_sprite_base = std::make_shared<sprite_base_data>();
 
 			std::function<void(void)> pair_tied[sprite::tie_functional_size];
 			sprite::e_tie_functional new_state = sprite::e_tie_functional::COLLISION_NONE;
@@ -152,11 +155,16 @@ namespace LSW {
 		protected:
 			std::function<void(void)> custom_draw_task; // set this as draw() of new children (so the draw() calls this if exists for further drawing scheme)
 		public:
-			Sprite_Base() = default;
+			Sprite_Base();
 			Sprite_Base(Sprite_Base&);
 
 			void hook(const sprite::e_tie_functional, const std::function<void(void)>);
 			void unhook(const sprite::e_tie_functional);
+
+			// set to blindly use this comrade's attributes as theirs
+			void twinUpAttributes(const std::shared_ptr<Sprite_Base>);
+			// actually copy a strong "reference" to its data somewhere else (share)
+			std::shared_ptr<sprite_base_data> getAttributes();
 
 			void set(const sprite::e_string, std::string);
 			void set(const sprite::e_double, double);
@@ -221,7 +229,6 @@ namespace LSW {
 			// camera is useful for consistent run, also updates easier_collision_handle for further collide()
 			void update(Camera*);
 
-			sprite_base_data& copyRAW();
 			// YOU SHALL update() BEFORE TESTING COLLISION!
 			easier_collision_handle& getCollision();
 		};

@@ -52,7 +52,7 @@ namespace LSW {
 				SuperMap<std::function<double(void)>>		double_data					= block::e_double_defaults;
 				SuperMap<std::function<bool(void)>>			boolean_data				= block::e_boolean_defaults;
 				SuperMap<std::chrono::milliseconds>			chronomillis_readonly_data	= block::e_chronomillis_readonly_defaults;
-			} data;
+			} data_entity;
 
 			std::vector<_bitmap> bitmaps;
 
@@ -108,7 +108,6 @@ namespace LSW {
 			std::function<double(void)>*		getRef(const block::e_double);
 			std::function<bool(void)>*			getRef(const block::e_boolean);
 			const std::chrono::milliseconds*	getRef(const block::e_chronomillis_readonly) const;
-
 		};
 
 
@@ -124,29 +123,29 @@ namespace LSW {
 			enum class e_sprite_ptr { FOLLOWING };
 			enum class e_boolean { USE_FOLLOWING_COLOR_INSTEAD, NO_AUTO_STRING_INTERPRETATION, USE_PER_CHAR_COLORING };
 
-			const SuperMap<coloured_string>							e_string_readonly_defaults = {
+			const SuperMap<coloured_string>										e_string_readonly_defaults = {
 				{"",																														(e_string_readonly::PROCESSED_STRING),					CHAR_INIT("processed_string")}
 			};
-			const SuperMap<std::chrono::milliseconds>				e_chronomillis_readonly_defaults = {
+			const SuperMap<std::chrono::milliseconds>							e_chronomillis_readonly_defaults = {
 				{std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()),				(e_chronomillis_readonly::LAST_UPDATE_STRING),			CHAR_INIT("last_update_string")}
 			};
-			const SuperMap<std::function<coloured_string(void)>>	e_string_defaults = {
+			const SuperMap<std::function<coloured_string(void)>>				e_string_defaults = {
 				{[] {return coloured_string();},																							(e_cstring::STRING),									CHAR_INIT("string")}
 			};
-			const SuperMap<std::function<double(void)>>				e_double_defaults = {
+			const SuperMap<std::function<double(void)>>							e_double_defaults = {
 				{[] {return 0.0;} ,																											(e_double::SHADOW_DISTANCE_X),							CHAR_INIT("shadow_distance_x")},
 				{[] {return 0.0;} ,																											(e_double::SHADOW_DISTANCE_Y),							CHAR_INIT("shadow_distance_y")}
 			};
-			const SuperMap<std::function<ALLEGRO_COLOR(void)>>		e_color_defaults = {
+			const SuperMap<std::function<ALLEGRO_COLOR(void)>>					e_color_defaults = {
 				{[] {return ALLEGRO_COLOR();},																								(e_color::SHADOW_COLOR),								CHAR_INIT("shadow_color")}
 			};
-			const SuperMap<std::function<int(void)>>				e_integer_defaults = {
+			const SuperMap<std::function<int(void)>>							e_integer_defaults = {
 				{[] {return 0;},																											(e_integer::STRING_MODE),								CHAR_INIT("string_mode")}
 			};
-			const SuperMap<std::function<Sprite_Base*(void)>>		e_sprite_ptr_defaults = {
-				{[] {return nullptr;},																										(e_sprite_ptr::FOLLOWING),								CHAR_INIT("following")}
+			const SuperMap<std::function<std::weak_ptr<Sprite_Base>(void)>>		e_sprite_ptr_defaults = {
+				{[] {return std::weak_ptr<Sprite_Base>();},																					(e_sprite_ptr::FOLLOWING),								CHAR_INIT("following")}
 			};
-			const SuperMap<std::function<bool(void)>>				e_boolean_defaults = {
+			const SuperMap<std::function<bool(void)>>							e_boolean_defaults = {
 				{[] {return false;},																										(e_boolean::USE_FOLLOWING_COLOR_INSTEAD),				CHAR_INIT("use_following_color_instead")},
 				{[] {return false;},																										(e_boolean::NO_AUTO_STRING_INTERPRETATION),				CHAR_INIT("no_auto_string_interpretation")},
 				{[] {return false;},																										(e_boolean::USE_PER_CHAR_COLORING),						CHAR_INIT("use_per_char_coloring")}
@@ -188,7 +187,6 @@ __slice("%version%", tags_e::T_VERSION),__slice("%screen_buf_proportion%", tags_
 			constexpr auto default_delta_t_text_update_delay = std::chrono::seconds(1); // don't need to be fast
 		}
 
-
 		class Text : public Sprite_Base {
 			struct _text {
 				std::shared_ptr<ALLEGRO_FONT> ref;
@@ -196,15 +194,15 @@ __slice("%version%", tags_e::T_VERSION),__slice("%screen_buf_proportion%", tags_
 			};
 
 			struct text_data {
-				SuperMap<coloured_string>								string_readonly_data		= text::e_string_readonly_defaults;
-				SuperMap<std::chrono::milliseconds>						chronomillis_readonly_data	= text::e_chronomillis_readonly_defaults;
-				SuperMap<std::function<coloured_string(void)>>			string_data					= text::e_string_defaults;
-				SuperMap<std::function<double(void)>>					double_data					= text::e_double_defaults;
-				SuperMap<std::function<ALLEGRO_COLOR(void)>>			color_data					= text::e_color_defaults;
-				SuperMap<std::function<int(void)>>						integer_data				= text::e_integer_defaults;
-				SuperMap<std::function<Sprite_Base*(void)>>				sprite_ptr_data				= text::e_sprite_ptr_defaults;
-				SuperMap<std::function<bool(void)>>						boolean_data				= text::e_boolean_defaults;
-			} data;
+				SuperMap<coloured_string>												string_readonly_data		= text::e_string_readonly_defaults;
+				SuperMap<std::chrono::milliseconds>										chronomillis_readonly_data	= text::e_chronomillis_readonly_defaults;
+				SuperMap<std::function<coloured_string(void)>>							string_data					= text::e_string_defaults;
+				SuperMap<std::function<double(void)>>									double_data					= text::e_double_defaults;
+				SuperMap<std::function<ALLEGRO_COLOR(void)>>							color_data					= text::e_color_defaults;
+				SuperMap<std::function<int(void)>>										integer_data				= text::e_integer_defaults;
+				SuperMap<std::function<std::weak_ptr<Sprite_Base>(void)>>				sprite_ptr_data				= text::e_sprite_ptr_defaults;
+				SuperMap<std::function<bool(void)>>										boolean_data				= text::e_boolean_defaults;
+			} data_text;
 
 
 			_text font;
@@ -230,26 +228,26 @@ __slice("%version%", tags_e::T_VERSION),__slice("%screen_buf_proportion%", tags_
 			void set(const text::e_double, double);
 			void set(const text::e_color, ALLEGRO_COLOR);
 			void set(const text::e_integer, int);
-			void set(const text::e_sprite_ptr, Sprite_Base*);
+			void set(const text::e_sprite_ptr, std::shared_ptr<Sprite_Base>);
 			void set(const text::e_boolean, bool);
 			void set(const std::string, coloured_string);
 			void set(const std::string, double);
 			void set(const std::string, ALLEGRO_COLOR);
 			void set(const std::string, int);
-			void set(const std::string, Sprite_Base*);
+			void set(const std::string, std::shared_ptr<Sprite_Base>);
 			void set(const std::string, bool);
 
 			void set(const text::e_cstring, std::function<coloured_string(void)>);
 			void set(const text::e_double, std::function<double(void)>);
 			void set(const text::e_color, std::function<ALLEGRO_COLOR(void)>);
 			void set(const text::e_integer, std::function<int(void)>);
-			void set(const text::e_sprite_ptr, std::function<Sprite_Base*(void)>);
+			void set(const text::e_sprite_ptr, std::function<std::shared_ptr<Sprite_Base>(void)>);
 			void set(const text::e_boolean, std::function<bool(void)>);
 			void set(const std::string, std::function<coloured_string(void)>);
 			void set(const std::string, std::function<double(void)>);
 			void set(const std::string, std::function<ALLEGRO_COLOR(void)>);
 			void set(const std::string, std::function<int(void)>);
-			void set(const std::string, std::function<Sprite_Base*(void)>);
+			void set(const std::string, std::function<std::shared_ptr<Sprite_Base>(void)>);
 			void set(const std::string, std::function<bool(void)>);
 
 
@@ -258,37 +256,67 @@ __slice("%version%", tags_e::T_VERSION),__slice("%screen_buf_proportion%", tags_
 			bool get(const text::e_double, double&);
 			bool get(const text::e_color, ALLEGRO_COLOR&);
 			bool get(const text::e_integer, int&);
-			bool get(const text::e_sprite_ptr, Sprite_Base*&);
+			bool get(const text::e_sprite_ptr, std::shared_ptr<Sprite_Base>&);
 			bool get(const text::e_boolean, bool&);
 			bool get(const std::string, coloured_string&);
 			bool get(const std::string, double&);
 			bool get(const std::string, ALLEGRO_COLOR&);
 			bool get(const std::string, int&);
-			bool get(const std::string, Sprite_Base*&);
+			bool get(const std::string, std::shared_ptr<Sprite_Base>&);
 			bool get(const std::string, bool&);
 
 			bool get(const text::e_cstring, std::function<coloured_string(void)>&);
 			bool get(const text::e_double, std::function<double(void)>&);
 			bool get(const text::e_color, std::function<ALLEGRO_COLOR(void)>&);
 			bool get(const text::e_integer, std::function<int(void)>&);
-			bool get(const text::e_sprite_ptr, std::function<Sprite_Base*(void)>&);
+			bool get(const text::e_sprite_ptr, std::function<std::weak_ptr<Sprite_Base>(void)>&);
 			bool get(const text::e_boolean, std::function<bool(void)>&);
 			bool get(const std::string, std::function<coloured_string(void)>&);
 			bool get(const std::string, std::function<double(void)>&);
 			bool get(const std::string, std::function<ALLEGRO_COLOR(void)>&);
 			bool get(const std::string, std::function<int(void)>&);
-			bool get(const std::string, std::function<Sprite_Base*(void)>&);
+			bool get(const std::string, std::function<std::weak_ptr<Sprite_Base>(void)>&);
 			bool get(const std::string, std::function<bool(void)>&);
 
-			std::function<coloured_string(void)>*	getRef(const text::e_cstring);
-			std::function<double(void)>*			getRef(const text::e_double);
-			std::function<ALLEGRO_COLOR(void)>*		getRef(const text::e_color);
-			std::function<int(void)>*				getRef(const text::e_integer);
-			std::function<Sprite_Base*(void)>*		getRef(const text::e_sprite_ptr);
-			std::function<bool(void)>*				getRef(const text::e_boolean);
-			const coloured_string*					getRef(const text::e_string_readonly) const;
-			const std::chrono::milliseconds*		getRef(const text::e_chronomillis_readonly) const;
+			std::function<coloured_string(void)>*					getRef(const text::e_cstring);
+			std::function<double(void)>*							getRef(const text::e_double);
+			std::function<ALLEGRO_COLOR(void)>*						getRef(const text::e_color);
+			std::function<int(void)>*								getRef(const text::e_integer);
+			std::function<std::weak_ptr<Sprite_Base>(void)>*		getRef(const text::e_sprite_ptr);
+			std::function<bool(void)>*								getRef(const text::e_boolean);
+			const coloured_string*									getRef(const text::e_string_readonly) const;
+			const std::chrono::milliseconds*						getRef(const text::e_chronomillis_readonly) const;
 
+		};
+
+
+		/*namespace button {
+
+		}*/
+
+
+
+		// Button is kinda Block with Text inside (its attributes are a copy of Block's one, same stuff)
+		class Button : public Sprite_Base { // how to make them like one? Do I really need to setup all std::functions to use its data instead?
+			std::shared_ptr<Sprite_Base> block;
+			std::shared_ptr<Sprite_Base> text;
+
+		public:
+			Button();
+
+			Text* getText();
+			Block* getBlock();
+
+
+			// this might be confusing
+
+			// shared attributes, use block as reference so specific block stuff can be set too
+			//template<typename T, typename K> void set(const T t, K k) { b()->set(t, k); }
+			// shared attributes, use block as reference so specific block stuff can be set too
+			//template<typename T, typename K> bool get(const T t, K k) { return b()->get(t, k); }
+			// shared attributes, use block as reference so specific block stuff can be set too
+			//template<typename T, typename K> K* getRef(const T t) { return b()->getRef(t); }
+			
 		};
 	}
 }

@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
 	ref5->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 	ref5->set(sprite::e_boolean::DRAW, true);
 	ref5->set(sprite::e_double::TARG_POSX, 0.0);
-	ref5->set(sprite::e_double::TARG_POSY, -0.7);
+	ref5->set(sprite::e_double::TARG_POSY, -0.2);
 	ref5->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
 	ref5->set(sprite::e_double::SCALE_G, 0.1);
 	ref5->set(sprite::e_double::SCALE_X, 0.6);
@@ -162,6 +162,7 @@ int main(int argc, char* argv[]) {
 	ref5->load("_FONT");
 	ref5->set(text::e_cstring::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
 	ref5->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
+	ref5->set(text::e_sprite_ptr::FOLLOWING, refc_orig); // FOLLOWING COS/SIN BLOCK
 
 	auto ref6_orig = sprites.customLoad("test6", [](Sprite_Base*& b) {return (b = new Text()); });
 	Text* ref6 = (Text*)&(*ref6_orig);
