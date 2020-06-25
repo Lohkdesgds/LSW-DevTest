@@ -96,7 +96,9 @@ int main(int argc, char* argv[]) {
 	fonts.create("_FONT", "font.ttf"); // load main font
 	bitmaps.create("_ATLAS0", "atlas0.png"); // load big atlas
 
-	auto ref = sprites.create("test");
+	size_t countgen = 0;
+
+	auto ref = sprites.create("test" + std::to_string(countgen++));
 	ref->set("show_box", true);
 	ref->set("show_dot", true);
 	ref->set("scale_g", 0.3);
@@ -104,7 +106,7 @@ int main(int argc, char* argv[]) {
 	ref->set("target_pos_y", 0.2);
 	ref->set(sprite::e_double::ACCELERATION_X, 6e-4);
 
-	auto ref2 = sprites.create("test2");
+	auto ref2 = sprites.create("test" + std::to_string(countgen++));
 	ref2->set("show_box", true);
 	ref2->set("show_dot", true);
 	ref2->set("scale_g", 0.2);
@@ -112,7 +114,7 @@ int main(int argc, char* argv[]) {
 	ref2->set("target_pos_y", 0.2);
 	ref2->set(sprite::e_double::ACCELERATION_X, -6e-4);
 
-	auto ref3 = sprites.create("test3");
+	auto ref3 = sprites.create("test" + std::to_string(countgen++));
 	ref3->set("show_box", true);
 	ref3->set("show_dot", true);
 	ref3->set("scale_g", 0.4);
@@ -120,7 +122,7 @@ int main(int argc, char* argv[]) {
 	ref3->set("target_pos_y", 0.6);
 	ref3->set(sprite::e_double::ACCELERATION_Y, -6e-4);
 
-	auto ref4_orig = sprites.customLoad("test4", [](Sprite_Base*& b) {return (b = new Block()); });
+	auto ref4_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); });
 	Block* ref4 = (Block*)&(*ref4_orig);
 	ref4->set(sprite::e_boolean::SHOWBOX, true);
 	ref4->set(sprite::e_boolean::SHOWDOT, true);
@@ -134,7 +136,7 @@ int main(int argc, char* argv[]) {
 	ref4->set(block::e_double::FRAMES_PER_SECOND, 4.0);
 
 
-	auto refc_orig = sprites.customLoad("testc", [](Sprite_Base*& b) {return (b = new Block()); });
+	/*auto refc_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); });
 	Block* refc = (Block*)&(*refc_orig);
 	refc->set(sprite::e_boolean::SHOWBOX, true);
 	refc->set(sprite::e_boolean::SHOWDOT, true);
@@ -145,7 +147,7 @@ int main(int argc, char* argv[]) {
 	refc->set(sprite::e_double::TARG_POSY, [] {return sin(al_get_time()) * 0.5; });
 
 
-	auto ref5_orig = sprites.customLoad("test5", [](Sprite_Base*& b) {return (b = new Text()); });
+	auto ref5_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Text()); });
 	Text* ref5 = (Text*)&(*ref5_orig);
 	//ref5->set(sprite::e_boolean::SHOWBOX, true);
 	ref5->set(sprite::e_boolean::SHOWDOT, true);
@@ -153,6 +155,7 @@ int main(int argc, char* argv[]) {
 	ref5->set(sprite::e_boolean::DRAW, true);
 	ref5->set(sprite::e_double::TARG_POSX, 0.0);
 	ref5->set(sprite::e_double::TARG_POSY, -0.2);
+
 	ref5->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
 	ref5->set(sprite::e_double::SCALE_G, 0.1);
 	ref5->set(sprite::e_double::SCALE_X, 0.6);
@@ -162,12 +165,33 @@ int main(int argc, char* argv[]) {
 	ref5->load("_FONT");
 	ref5->set(text::e_cstring::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
 	ref5->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
-	ref5->set(text::e_sprite_ptr::FOLLOWING, refc_orig); // FOLLOWING COS/SIN BLOCK
+	ref5->set(text::e_sprite_ptr::FOLLOWING, refc_orig); // FOLLOWING COS/SIN BLOCK*/
 
-	auto ref6_orig = sprites.customLoad("test6", [](Sprite_Base*& b) {return (b = new Text()); });
+	auto ref5_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Button()); });
+	Button* ref5 = (Button*)&(*ref5_orig);
+	ref5->set(sprite::e_boolean::SHOWBOX, true);
+	ref5->set(sprite::e_boolean::SHOWDOT, true);
+	ref5->set(sprite::e_double::SCALE_G, 0.32);
+	ref5->set(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
+	ref5->set(sprite::e_double::TARG_POSX, [] {return cos(al_get_time()) * 0.5; });
+	ref5->set(sprite::e_double::TARG_POSY, [] {return sin(al_get_time()) * 0.5; });
+	// text
+	ref5->getText()->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
+	ref5->getText()->set(sprite::e_double::SCALE_G, 0.1);
+	ref5->getText()->set(sprite::e_double::SCALE_X, 0.6);
+	ref5->getText()->set(text::e_color::SHADOW_COLOR, al_map_rgb(127, 127, 127));
+	ref5->getText()->set(text::e_double::SHADOW_DISTANCE_X, 4e-3);
+	ref5->getText()->set(text::e_double::SHADOW_DISTANCE_Y, 4e-3);
+	ref5->getText()->load("_FONT");
+	ref5->getText()->set(text::e_cstring::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
+	ref5->getText()->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
+
+
+
+	auto ref6_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Text()); });
 	Text* ref6 = (Text*)&(*ref6_orig);
 	//ref6->set(sprite::e_boolean::SHOWBOX, true);
-	ref5->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
+	ref6->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 	ref6->set(sprite::e_boolean::SHOWDOT, true);
 	ref6->set(sprite::e_boolean::DRAW, true);
 	ref6->set(sprite::e_double::TARG_POSX, -1.0);
@@ -175,16 +199,19 @@ int main(int argc, char* argv[]) {
 	ref6->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
 	ref6->set(sprite::e_double::SCALE_G, 0.07);
 	ref6->set(sprite::e_double::SCALE_X, 0.4);
+	ref6->set("customcounter", static_cast<int>(0));
 	ref6->load("_FONT");
-	ref6->set(text::e_cstring::STRING, "%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites%");
+	//ref6->set(text::e_cstring::STRING, [ref6] {int lala = 0; ref6->get("customcounter", lala); lala++; ref6->set("customcounter", lala); return coloured_string("%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites% | LALA=") + lala; });
+	ref6->set(text::e_cstring::STRING, [ref6] {int lala = 0; ref6->get("customcounter", lala); return coloured_string("%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites% | LALA=") + lala; });
 	ref6->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
 
+	core.addFunction(0, 2.0, [ref6_orig] {Text* ref6 = (Text*)&(*ref6_orig); int lala = 0; ref6->get("customcounter", lala); lala++; ref6->set("customcounter", lala); });
 	
 	{
 		auto ref_orig = sprites.customLoad("_DEBUG_TEXT", [](Sprite_Base*& b) {return (b = new Text()); });
 		Text* mtt = (Text*)&(*ref_orig);
 		mtt->set(sprite::e_boolean::SHOWDOT, true);
-		ref5->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
+		mtt->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 		mtt->set(sprite::e_boolean::DRAW, true);
 		mtt->set(text::e_boolean::USE_PER_CHAR_COLORING, true);
 		mtt->set(sprite::e_double::TARG_POSX, -1.0);
@@ -197,21 +224,6 @@ int main(int argc, char* argv[]) {
 		mtt->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
 		mtt->set(sprite::e_integer::LAYER, 100);
 		logg.hook([=](coloured_string str) {mtt->set(text::e_cstring::STRING, str); });
-
-
-
-		///logg.hook([=](coloured_string str) {mtt->set(text::e_cstring::STRING, str); });
-		//mtt->set(text::e_cstring::STRING,			"REPOLHO");
-		///mtt->set(sprite::e_boolean::DRAW,			[&]	{bool d;			db.get(database::e_boolean::WAS_OSD_ON, d);						return d; }());
-		//mtt->set(sprite::e_double::SCALE_G, 0.03);
-		//mtt->set(sprite::e_double::SCALE_X, 0.55);
-		//mtt->set(sprite::e_double::TARG_POSY, 0.965); // 0.935
-		//mtt->set(sprite::e_double::TARG_POSX, -1.0);
-		///mtt->set(text::e_integer::STRING_MODE, +text::e_alignment::ALIGN_LEFT);
-		//mtt->set(text::e_double::TEXT_UPDATE_TIME, 1.0 / 5);
-		//mtt->set(sprite::e_boolean::AFFECTED_BY_CAM, false);
-		//mtt->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
-		///mtt->set(sprite::e_color::COLOR, [&] {return clr_str; }());
 	}
 
 
@@ -247,7 +259,6 @@ int main(int argc, char* argv[]) {
 		cam->set(camera::e_double::OFFSET_Y, cos(al_get_time() * 0.11) * 0.3);
 	}*/
 
-
 	//for (ULONGLONG t = GetTickCount64(); GetTickCount64() - t < 25000 && core.allAlive(););// {
 		//ref->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time()));
 		//ref2->set(sprite::e_double::TARG_POSX, 0.5 * cos(al_get_time() + 0.7));
@@ -274,7 +285,7 @@ int main(int argc, char* argv[]) {
 	}
 	//}
 
-	for (int a = 10; a > 0; a--) {
+	for (int a = 3; a > 0; a--) {
 		logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&e" << a << " &6sec remaining" << L::ELF;
 		Sleep(1000);
 	}

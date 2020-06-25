@@ -7,8 +7,8 @@ namespace LSW {
 	namespace v5 {
 		namespace Shared {
 
-			// this have to be global, come on																																* 100 eq 1.0							      * 1000 eq 1.0
-			enum class my_events { /*CUSTOM_EVENT_LOG_STRING = 512, CUSTOM_EVENT_SHARING_NEW_DISPLAY_SIZE,*/ CUSTOM_EVENT_CALL_FULLSCREEN = 512, CUSTOM_EVENT_EXTERNAL_EXIT_CALL, CUSTOM_EVENT_DISPLAY_UPDATE_RESOLUTION_SCALE, CUSTOM_EVENT_DISPLAY_CHROMA_FX /* <-- TO BE DONE */ };
+			// this have to be global, come on																																        * 100 eq 1.0							      * 1000 eq 1.0
+			enum class my_events { /*CUSTOM_EVENT_LOG_STRING = 512, CUSTOM_EVENT_SHARING_NEW_DISPLAY_SIZE,*/ CUSTOM_EVENT_CALL_FULLSCREEN = 512, /*CUSTOM_EVENT_EXTERNAL_EXIT_CALL,*/ CUSTOM_EVENT_DISPLAY_UPDATE_RESOLUTION_SCALE, CUSTOM_EVENT_DISPLAY_CHROMA_FX /* <-- TO BE DONE */ };
 
 			/* VERSIONING */
 			inline const std::string __interpret_date();

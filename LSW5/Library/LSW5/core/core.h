@@ -57,7 +57,7 @@ namespace LSW {
 					Threads::CustomThread<int> this_core{};
 					double last_loop = 0.0;
 					double last_delta_loop = 0.0;
-					T routines{};
+					T routines{}; // SuperTimer
 					bool pause = false;
 					bool success_pause = false;
 					bool has_initialized_once = false;
@@ -66,7 +66,7 @@ namespace LSW {
 					bool isPaused() { return success_pause = pause; }
 					double lastDeltaT() { return last_delta_loop; }
 
-					bool isAlive() { return al_get_time() - last_loop < 1.0; } // had tick < 1 seg ago
+					bool isAlive() { return al_get_time() - last_loop < 5.0; } // had tick < 5 seg ago
 					bool isInitialized() { return has_initialized_once; } // true if on mid of the thread (via initialize() in first line and unitialize() in the end ON THREAD!)
 					bool hasPausedSuccessfully() { return success_pause; }
 
@@ -84,6 +84,18 @@ namespace LSW {
 				bool has_init_once = false;
 
 				bool should_exit = false; // every thread tests this guy value
+
+				// functional part
+
+				SuperMap<std::function<void(void)>> funcs;
+
+				/*struct timed_function {
+					std::function<void(void)> f;
+					ALLEGRO_TIMER* timer = nullptr;
+				};
+
+				std::vector<std::pair<int, timed_function>> funcs;*/
+				SuperMutex funcs_m;
 			};
 
 			static core_data data;
@@ -98,6 +110,11 @@ namespace LSW {
 			void internalEnd();
 		public:
 			Core();
+
+			// id, delta_t, function
+			void addFunction(const int, const double, const std::function<void(void)>);
+			// id
+			void delFunction(const int);
 
 			void init();
 			void pause();

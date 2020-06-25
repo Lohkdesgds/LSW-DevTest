@@ -39,7 +39,7 @@ namespace LSW {
 
 			enum class e_direction { NORTH, SOUTH, EAST, WEST, NONE };
 
-			enum class e_tie_functional { COLLISION_MOUSE_ON, COLLISION_MOUSE_CLICK, COLLISION_MOUSE_UNCLICK, COLLISION_COLLIDED_OTHER, COLLISION_NONE };
+			enum class e_tie_functional { DELAYED_WORK, COLLISION_MOUSE_ON, COLLISION_MOUSE_CLICK, COLLISION_MOUSE_UNCLICK, COLLISION_COLLIDED_OTHER, COLLISION_NONE };
 			constexpr auto tie_functional_size = static_cast<size_t>(e_tie_functional::COLLISION_NONE) + 1;
 
 
@@ -162,7 +162,7 @@ namespace LSW {
 			void unhook(const sprite::e_tie_functional);
 
 			// set to blindly use this comrade's attributes as theirs
-			void twinUpAttributes(const std::shared_ptr<Sprite_Base>);
+			void twinUpAttributes(const std::shared_ptr<sprite_base_data>);
 			// actually copy a strong "reference" to its data somewhere else (share)
 			std::shared_ptr<sprite_base_data> getAttributes();
 

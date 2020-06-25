@@ -130,11 +130,13 @@ namespace LSW {
 
 		Sprite_Base::Sprite_Base()
 		{
+			if (!data_sprite_base) throw Abort::Abort(__FUNCSIG__, "Failed to create Sprite base's data!");
 			data_sprite_base->original_this = (void*)this;
 		}
 
 		Sprite_Base::Sprite_Base(Sprite_Base& other)
 		{
+			if (!data_sprite_base) throw Abort::Abort(__FUNCSIG__, "Failed to create Sprite base's data!");
 			auto oth = other.getAttributes(); // yes, but it will copy, not "replace"
 			data_sprite_base->double_readonly_data		= oth->double_readonly_data;
 			data_sprite_base->boolean_readonly_data		= oth->boolean_readonly_data;
@@ -155,9 +157,9 @@ namespace LSW {
 			hook(e, std::function<void(void)>());
 		}
 
- 		void Sprite_Base::twinUpAttributes(const std::shared_ptr<Sprite_Base> oth)
+ 		void Sprite_Base::twinUpAttributes(const std::shared_ptr<sprite_base_data> oth)
 		{
-			data_sprite_base = oth->getAttributes(); // now they share
+			data_sprite_base = oth; // now they share
 		}
 
 		std::shared_ptr<Sprite_Base::sprite_base_data> Sprite_Base::getAttributes()
@@ -562,56 +564,60 @@ namespace LSW {
 				if (isEq(sprite::e_boolean::SHOWBOX, true) || isEq(sprite::e_boolean::SHOWDOT, true)) {
 					Camera clean_camera;
 
-					//double camx, camy, camg;
-					if (*data_sprite_base->boolean_data[sprite::e_boolean::AFFECTED_BY_CAM]) {
-						//cam->get(camera::e_double::SCALE_G, camg);
-						//cam->get(camera::e_double::SCALE_X, camx);
-						//cam->get(camera::e_double::SCALE_Y, camy);
+					const auto affected_by_cam = (*data_sprite_base->boolean_data[sprite::e_boolean::AFFECTED_BY_CAM])();
+					const auto targ_rotation = (*data_sprite_base->double_data[sprite::e_double::TARG_ROTATION])();
+					const auto targ_posx = (*data_sprite_base->double_data[sprite::e_double::TARG_POSX])();
+					const auto targ_posy = (*data_sprite_base->double_data[sprite::e_double::TARG_POSY])();
+					const auto scale_g = (*data_sprite_base->double_data[sprite::e_double::SCALE_G])();
+					const auto scale_x = (*data_sprite_base->double_data[sprite::e_double::SCALE_X])();
+					const auto scale_y = (*data_sprite_base->double_data[sprite::e_double::SCALE_Y])();
+					auto& last_draw = *data_sprite_base->double_readonly_data[sprite::e_double_readonly::LAST_DRAW];
+					auto& rotation = *data_sprite_base->double_readonly_data[sprite::e_double_readonly::ROTATION];
+					auto& posx = *data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSX];
+					auto& posy = *data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSY];
+
+
+					if (affected_by_cam) {
 						cam->apply();
 					}
 					else {
 						clean_camera.apply();
-						//camx = camy = camg = 1.0;
 					}
 
 					// delta T calculation
 
 					double timee = al_get_time();
-					double dt = timee - *data_sprite_base->double_readonly_data[sprite::e_double_readonly::LAST_DRAW];
-					*data_sprite_base->double_readonly_data[sprite::e_double_readonly::LAST_DRAW] = timee;
+					double dt = timee - last_draw;
+					last_draw = timee;
 
-					double perc_run = Shared::game_timing_tps * dt; // ex: 5 per sec * 0.2 (1/5 sec) = 1, so posx = actual posx...
-					if (perc_run > 1.0) perc_run = 1.0; // 1.0 is "set value"
+					double perc_run = Shared::game_timing_tps * dt;		// ex: 5 per sec * 0.2 (1/5 sec) = 1, so posx = actual posx...
+					if (perc_run > 1.0) perc_run = 1.0;					// 1.0 is "set value"
 					if (perc_run < 1.0 / 10000) perc_run = 1.0 / 10000; // can't be infinitely smooth right? come on
 
 					// new position calculation
 
-					*data_sprite_base->double_readonly_data[sprite::e_double_readonly::ROTATION] = (1.0 - perc_run) * *data_sprite_base->double_readonly_data[sprite::e_double_readonly::ROTATION] + perc_run * (*data_sprite_base->double_data[sprite::e_double::TARG_ROTATION])();
-					*data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSX] = (1.0 - perc_run) * *data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSX] + perc_run * (*data_sprite_base->double_data[sprite::e_double::TARG_POSX])();
-					*data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSY] = (1.0 - perc_run) * *data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSY] + perc_run * (*data_sprite_base->double_data[sprite::e_double::TARG_POSY])();
-
-
+					rotation = (1.0 - perc_run) * rotation + perc_run * targ_rotation;
+					posx = (1.0 - perc_run) * posx + perc_run * targ_posx;
+					posy = (1.0 - perc_run) * posy + perc_run * targ_posy;
 
 					if (isEq(sprite::e_boolean::SHOWBOX, true)) {
 
-						const double scale_x = (*data_sprite_base->double_data[sprite::e_double::SCALE_G])() * (*data_sprite_base->double_data[sprite::e_double::SCALE_X])();
-						const double scale_y = (*data_sprite_base->double_data[sprite::e_double::SCALE_G])() * (*data_sprite_base->double_data[sprite::e_double::SCALE_Y])();
+						const double calculated_scale_x = scale_g * scale_x;
+						const double calculated_scale_y = scale_g * scale_y;
 
 						al_draw_filled_rectangle(
-							/* X1: */ (*data_sprite_base->double_data[sprite::e_double::TARG_POSX])() - scale_x * 0.5,
-							/* Y1: */ (*data_sprite_base->double_data[sprite::e_double::TARG_POSY])() - scale_y * 0.5,
-							/* X2: */ (*data_sprite_base->double_data[sprite::e_double::TARG_POSX])() + scale_x * 0.5,
-							/* Y2: */ (*data_sprite_base->double_data[sprite::e_double::TARG_POSY])() + scale_y * 0.5,
+							/* X1: */ targ_posx - calculated_scale_x * 0.5,
+							/* Y1: */ targ_posy - calculated_scale_y * 0.5,
+							/* X2: */ targ_posx + calculated_scale_x * 0.5,
+							/* Y2: */ targ_posy + calculated_scale_y * 0.5,
 							al_map_rgb(255, easy_collision.was_col ? 128 : 255, easy_collision.was_col ? 128 : 255));
-
-						//al_draw_filled_rectangle(0, 0, 900, 900, al_map_rgb(255, 0, 255));
 					}
 
 					if (isEq(sprite::e_boolean::SHOWDOT, true)) {
 						al_draw_filled_circle(
-							/* X1: */ *data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSX],
-							/* X1: */ *data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSY],
-							/* SCL */ 0.1f * (fabs(/*camg * sqrt(camx * camy) * */0.30f) + 0.12f),
+							/* X1: */ posx,
+							/* X1: */ posy,
+							/* SCL */ 0.1f * (fabs(0.30f) + 0.12f),
 							al_map_rgb(127, easy_collision.was_col ? 76 : 127, easy_collision.was_col ? 76 : 127));
 					}
 				}
@@ -645,6 +651,12 @@ namespace LSW {
 
 		void Sprite_Base::update(Camera* cam)// needs to use ACCELERATION_X when collision, ELASTICITY_X to know how much of it goes backwards, TARG_POSX
 		{
+			// delayed work to do (auto-clean)
+			if (auto& f = pair_tied[static_cast<size_t>(sprite::e_tie_functional::DELAYED_WORK)]; f) {
+				f();
+				f = std::function<void(void)>();
+			}
+
 			if (data_sprite_base->original_this != this) return; // this is a copy following attrbutes from somewhere else, no duplication in update
 			if (!cam) throw Abort::Abort(__FUNCSIG__, "Invalid camera at Sprite's update!", Abort::abort_level::GIVEUP);
 

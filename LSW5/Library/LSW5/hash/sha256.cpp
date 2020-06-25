@@ -127,7 +127,7 @@ namespace LSW {
 
                 SHA256 ctx = SHA256();
                 ctx.init();
-                ctx.update(conv.c_str(), conv.length());
+                ctx.update(conv.c_str(), static_cast<unsigned int>(conv.length()));
                 ctx.final(digest);
 
                 char buf[2 * SHA256::DIGEST_SIZE + 1];

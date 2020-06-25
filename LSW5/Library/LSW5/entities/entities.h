@@ -21,8 +21,8 @@ namespace LSW {
 			enum class e_double { FRAMES_PER_SECOND, TIE_SIZE_TO_DISPLAY_PROPORTION };
 
 			const SuperMap<std::chrono::milliseconds>		e_chronomillis_readonly_defaults{
-				{MILI_NOW,																										(e_chronomillis_readonly::LAST_FRAME),					CHAR_INIT("last_frame")},
-				{MILI_NOW,																										(e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION),	CHAR_INIT("last_tie_verification")}
+				{MILLI_NOW,																										(e_chronomillis_readonly::LAST_FRAME),					CHAR_INIT("last_frame")},
+				{MILLI_NOW,																										(e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION),	CHAR_INIT("last_tie_verification")}
 			};
 			const SuperMap<std::function<int(void)>>		e_integer_defaults = {
 				{[] {return 0;},																								(e_integer::FRAME),										CHAR_INIT("frame")}
@@ -47,12 +47,14 @@ namespace LSW {
 				bool is_sub_bitmap = false; // if true, source is source's id, else source is path
 			};
 
-			struct entity_data {
+			struct block_data {
 				SuperMap<std::function<int(void)>>			integer_data				= block::e_integer_defaults;
 				SuperMap<std::function<double(void)>>		double_data					= block::e_double_defaults;
 				SuperMap<std::function<bool(void)>>			boolean_data				= block::e_boolean_defaults;
 				SuperMap<std::chrono::milliseconds>			chronomillis_readonly_data	= block::e_chronomillis_readonly_defaults;
-			} data_entity;
+			};
+
+			std::shared_ptr<block_data> data_block = std::make_shared<block_data>();
 
 			std::vector<_bitmap> bitmaps;
 
@@ -68,6 +70,13 @@ namespace LSW {
 			Block();
 			Block(Block&);
 			//~Block(); // bitmaps are handled by SuperResource, there might be some other people around using the same resource
+
+
+			// set to blindly use this comrade's attributes as theirs (this must be Block)
+			void twinUpAttributes(const std::shared_ptr<block_data>);
+			// actually copy a strong "reference" to its data somewhere else (share)
+			std::shared_ptr<block_data> getAttributes();
+
 
 			// from what id, path (can be "null" if you know the file is indeed loaded as id)
 			void load(const std::string, const std::string = "");
@@ -202,8 +211,9 @@ __slice("%version%", tags_e::T_VERSION),__slice("%screen_buf_proportion%", tags_
 				SuperMap<std::function<int(void)>>										integer_data				= text::e_integer_defaults;
 				SuperMap<std::function<std::weak_ptr<Sprite_Base>(void)>>				sprite_ptr_data				= text::e_sprite_ptr_defaults;
 				SuperMap<std::function<bool(void)>>										boolean_data				= text::e_boolean_defaults;
-			} data_text;
+			};
 
+			std::shared_ptr<text_data> data_text = std::make_shared<text_data>();
 
 			_text font;
 
@@ -223,6 +233,11 @@ __slice("%version%", tags_e::T_VERSION),__slice("%screen_buf_proportion%", tags_
 			void load(const std::string, const std::string = "");
 			// removes font
 			void remove();
+
+			// set to blindly use this comrade's attributes as theirs (this must be Block)
+			void twinUpAttributes(const std::shared_ptr<text_data>);
+			// actually copy a strong "reference" to its data somewhere else (share)
+			std::shared_ptr<text_data> getAttributes();
 
 			void set(const text::e_cstring, coloured_string);
 			void set(const text::e_double, double);

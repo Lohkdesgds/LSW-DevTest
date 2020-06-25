@@ -187,14 +187,14 @@ namespace LSW {
 				//printf_s("new SuperPair &: %lld\n", (uintptr_t)this);
 				holding = val;
 			}
-			template<typename K>
+			/*template<typename K>
 			SuperPair& operator=(const SuperPair<K>& sp)
 			{
 				for (auto& i : *sp.__getcopy()) {
 					pairs.push_back(std::pair<std::type_index, __data_superpair<char>>{ i.first, __data_superpair<char>(i.second.c_data(), i.second.size()) }); // copies data, not reference
 				}
 				holding = sp.getValue();
-			}
+			}*/
 
 
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

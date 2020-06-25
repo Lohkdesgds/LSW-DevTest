@@ -230,10 +230,10 @@ namespace LSW {
 									clr_str = *(coloured_string*)ev.user.data1;
 									// set later the string on screen
 								break;*/
-							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_EXTERNAL_EXIT_CALL):
+							/*case static_cast<int>(Shared::my_events::CUSTOM_EVENT_EXTERNAL_EXIT_CALL):
 								internalEnd();
 								logg << L::SLF << fsr(__FUNCSIG__) << "&5Got EVENT_EXTERNAL_EXIT_CALL event on main window, setting to close the game..." << L::ELF;
-								break;
+								break;*/
 							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_DISPLAY_UPDATE_RESOLUTION_SCALE):
 								{
 									double scale = ev.user.data1 * 1.0 / 100;
@@ -275,14 +275,20 @@ namespace LSW {
 					al_clear_to_color(al_map_rgb(0, 0, 0));
 				}
 				catch (Abort::Abort err) {
-					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [LSW], but this beta version won't handle any of this yet lmao." << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eFrom: " << err.getWhereFrom() << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.getDetails() << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << static_cast<int>(err.getLevel()) << L::ELF;
 				}
+				catch (std::exception err) {
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [STD], but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.what() << L::ELF;
+
+				}
 				catch (...) {
-					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [???], but this beta version won't handle any of this yet lmao." << L::ELF;
 				}
 
 
@@ -380,12 +386,7 @@ namespace LSW {
 					}
 					else if (data.collision_routine.routines.isThisThis(static_cast<size_t>(core::thr_collision_routines::COLLISION_WORK))) {
 
-						//bool gottem = false;
-
-						//for (size_t times = 0; !(gottem = sprites.lock()) && times < 10; Sleep(10));
 						sprites.lock();
-
-						//if (gottem) {
 
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) {
@@ -401,25 +402,24 @@ namespace LSW {
 							}
 						}
 
-
-
-
 						sprites.unlock();
-						/*}
-						else {
-							throw Abort::Abort(__FUNCSIG__, "Couldn't get mutex for Sprites after 10 tries.", Abort::abort_level::GIVEUP);
-						}*/
 					}
 				}
 				catch (Abort::Abort err) {
-					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [LSW], but this beta version won't handle any of this yet lmao." << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eFrom: " << err.getWhereFrom() << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.getDetails() << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << static_cast<int>(err.getLevel()) << L::ELF;
 				}
+				catch (std::exception err) {
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [STD], but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.what() << L::ELF;
+
+				}
 				catch (...) {
-					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [???], but this beta version won't handle any of this yet lmao." << L::ELF;
 				}
 
 				//logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
@@ -577,14 +577,20 @@ namespace LSW {
 					}
 				}
 				catch (Abort::Abort err) {
-					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [LSW], but this beta version won't handle any of this yet lmao." << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eFrom: " << err.getWhereFrom() << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.getDetails() << L::ELF;
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eLevel: " << static_cast<int>(err.getLevel()) << L::ELF;
 				}
+				catch (std::exception err) {
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [STD], but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&cMore about the error: " << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&6- &eDetails: " << err.what() << L::ELF;
+
+				}
 				catch (...) {
-					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG, but this beta version won't handle any of this yet lmao." << L::ELF;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [???], but this beta version won't handle any of this yet lmao." << L::ELF;
 				}
 
 				//logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF;
@@ -601,17 +607,18 @@ namespace LSW {
 		{
 			const int thr_id = static_cast<int>(core::thr_ids::FUNCTIONAL);
 			Logger logg;
+			Database db;
 
 			// variables used here:
 
 			if (data.functional_routine.initialize()) { // has to initialize (once)
 				logg << L::SLF << fsr(__FUNCSIG__) << "Initializing Thread FUNCTIONAL..." << L::ELF;
 
+				data.functional_routine.routines.start();
 			}
 
-
-
 			logg << L::SLF << fsr(__FUNCSIG__) << "Looping Thread FUNCTIONAL..." << L::ELF;
+
 			while (keep()) {
 				data.functional_routine.tick();
 
@@ -621,8 +628,34 @@ namespace LSW {
 					data.functional_routine.tick(); // keep saying it's alive
 				}
 
+				data.functional_routine.routines.hasEventWait(); // LOOP_TRACK, UPDATE_MOUSE
+				
+				if (data.functional_routine.routines.isThisThis(static_cast<size_t>(core::thr_functional_routines::LOOP_TRACK))) {
+					db.set(database::e_sizet::ADVANCEDFUNCSPERSECOND, data.functional_routine.routines.getNumCallsDefault());
+				}
+				else {
+					auto ev = data.functional_routine.routines.getEventRaw();
+
+					switch (ev.type) {
+					case ALLEGRO_EVENT_TIMER:
+						data.funcs_m.lock();
+						/*for (auto& i : data.funcs) {
+							if (i[ev.timer.source]) {
+								if (auto j = i.getValue(); j) j();
+								break;
+							}
+						}*/
+						if (auto j = data.funcs[(uintptr_t)ev.timer.source]; j) (*j)();
+						data.funcs_m.unlock();
+						break;
+					}
+				}
+				
+
+
+
 				//logg << L::SLF << fsr(__FUNCSIG__) << "Thread &2" << thr_id << "&f looping." << L::ELF; // stop haha
-				al_rest(0.5);
+				//al_rest(0.5);
 			}
 
 
@@ -641,6 +674,7 @@ namespace LSW {
 
 		Core::Core()
 		{
+			data.funcs.clear();
 			data.gmute.lock();
 			if (!data.has_init_once) {
 				lsw_al_init_all();
@@ -655,6 +689,43 @@ namespace LSW {
 				data.has_init_once = true;
 			}
 			data.gmute.unlock();
+		}
+
+		void Core::addFunction(const int id, const double delta_t, const std::function<void(void)> func)
+		{
+			/*for (auto& i : data.funcs) {
+				if (i.first == id) {
+					data.funcs_m.unlock();
+					throw Abort::Abort(__FUNCSIG__, "Function already set!", Abort::abort_level::GIVEUP);
+					return;
+				}
+			}*/
+			data.funcs_m.lock();
+			if (data.funcs[id] != nullptr) {
+				data.funcs_m.unlock();
+				throw Abort::Abort(__FUNCSIG__, "Function already set!", Abort::abort_level::GIVEUP);
+				return;
+			}
+			ALLEGRO_TIMER* t = al_create_timer(delta_t);
+			data.functional_routine.routines.insert(al_get_timer_event_source(t));
+			al_start_timer(t);
+			data.funcs.add({ func, id, (uintptr_t)t });
+			data.funcs_m.unlock();
+		}
+
+		void Core::delFunction(const int id)
+		{
+			data.funcs_m.lock();
+			auto firstt = data.funcs.begin();
+			for (size_t p = 0; p < data.funcs.size(); p++) {
+				auto& k = *(firstt + p);
+				if (k[id] != nullptr) {
+					data.funcs.erase(p);
+					data.funcs_m.unlock();
+					return;
+				}
+			}
+			data.funcs_m.unlock();
 		}
 
 		void Core::init()
@@ -726,6 +797,15 @@ namespace LSW {
 		{
 			return data.display_routine.success_pause && data.collision_routine.success_pause && data.events_routine.success_pause && data.functional_routine.success_pause;
 		}
+
+		/*void Core::core_data::timed_function::work()
+		{
+			auto now = MILLI_NOW;
+			if (now - lt > dt) {
+				lt = now + dt;
+				if (f) f();
+			}
+		}*/
 
 	}
 }

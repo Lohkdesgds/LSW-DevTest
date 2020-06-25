@@ -15,8 +15,8 @@
 #define CHAR_INIT_LIMIT 512
 #define CHAR_INIT(a) a, strnlen_s(a, CHAR_INIT_LIMIT)
 
-#define MILI_NOW std::chrono::milliseconds(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count())
-#define MILI_ZERO std::chrono::milliseconds::zero()
+#define MILLI_NOW std::chrono::milliseconds(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count())
+#define MILLI_ZERO std::chrono::milliseconds::zero()
 
 namespace LSW {
 	namespace v5 {

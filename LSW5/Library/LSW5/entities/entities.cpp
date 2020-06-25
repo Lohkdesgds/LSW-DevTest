@@ -9,9 +9,9 @@ namespace LSW {
 			if (bitmaps.empty()) return;
 
 			{
-				auto& delta_t = *data_entity.chronomillis_readonly_data[block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION];
+				auto& delta_t = *data_block->chronomillis_readonly_data[block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION];
 
-				if (const double _dd = (*data_entity.double_data[block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION])(); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
+				if (const double _dd = (*data_block->double_data[block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION])(); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
 					delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + block::default_delta_t_frame_delay);
 					ALLEGRO_BITMAP* trg = al_get_target_bitmap();
 					SuperResource<ALLEGRO_BITMAP> bmps;
@@ -29,11 +29,11 @@ namespace LSW {
 				}
 			}
 
-			int frame = (*data_entity.integer_data[block::e_integer::FRAME])();
+			int frame = (*data_block->integer_data[block::e_integer::FRAME])();
 
 			{
-				const double delta = (*data_entity.double_data[block::e_double::FRAMES_PER_SECOND])(); // delta t, 1/t = sec
-				std::chrono::milliseconds& last_time = *data_entity.chronomillis_readonly_data[block::e_chronomillis_readonly::LAST_FRAME];
+				const double delta = (*data_block->double_data[block::e_double::FRAMES_PER_SECOND])(); // delta t, 1/t = sec
+				std::chrono::milliseconds& last_time = *data_block->chronomillis_readonly_data[block::e_chronomillis_readonly::LAST_FRAME];
 
 				if (delta >= 0.0 && frame >= 0) { // if delta <= 0 or frame < 0, static
 					std::chrono::milliseconds delta_tr = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(1.0 / delta));
@@ -50,8 +50,8 @@ namespace LSW {
 				}
 			}
 
-			if (!(*data_entity.boolean_data[block::e_boolean::SET_FRAME_VALUE_READONLY])()) {
-				*data_entity.integer_data[block::e_integer::FRAME] = [=]{return frame;};
+			if (!(*data_block->boolean_data[block::e_boolean::SET_FRAME_VALUE_READONLY])()) {
+				*data_block->integer_data[block::e_integer::FRAME] = [=]{return frame;};
 			}
 
 			ALLEGRO_BITMAP* rn = &(*bitmaps[frame].ref);
@@ -87,11 +87,21 @@ namespace LSW {
 		}
 		Block::Block() : Sprite_Base()
 		{
+			if (!data_block) throw Abort::Abort(__FUNCSIG__, "Failed to create Block's data!");
 			custom_draw_task = [&] {draw_self(); };
 		}
 		Block::Block(Block& o) : Sprite_Base(o)
 		{
+			if (!data_block) throw Abort::Abort(__FUNCSIG__, "Failed to create Block's data!");
 			custom_draw_task = [&] {draw_self(); };
+		}
+		void Block::twinUpAttributes(const std::shared_ptr<block_data> oth)
+		{
+			data_block = oth; // now they're the same
+		}
+		std::shared_ptr<Block::block_data> Block::getAttributes()
+		{
+			return data_block;
 		}
 		/*Block::~Block()
 		{
@@ -147,81 +157,81 @@ namespace LSW {
 		}
 		void Block::set(const block::e_integer e, int v)
 		{
-			if (auto* ptr = data_entity.integer_data(e); ptr)
+			if (auto* ptr = data_block->integer_data(e); ptr)
 				*ptr = [=] {return v; };
 		}
 		void Block::set(const block::e_double e, double v)
 		{
-			if (auto* ptr = data_entity.double_data(e); ptr)
+			if (auto* ptr = data_block->double_data(e); ptr)
 				*ptr = [=] {return v; };
 		}
 
 		void Block::set(const block::e_boolean e, bool v)
 		{
-			if (auto* ptr = data_entity.boolean_data(e); ptr)
+			if (auto* ptr = data_block->boolean_data(e); ptr)
 				*ptr = [=] {return v; };
 		}
 
 		void Block::set(const block::e_integer e, std::function<int(void)> v)
 		{
-			if (auto* ptr = data_entity.integer_data(e); ptr)
+			if (auto* ptr = data_block->integer_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Block::set(const block::e_double e, std::function<double(void)> v)
 		{
-			if (auto* ptr = data_entity.double_data(e); ptr)
+			if (auto* ptr = data_block->double_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Block::set(const block::e_boolean e, std::function<bool(void)> v)
 		{
-			if (auto* ptr = data_entity.boolean_data(e); ptr)
+			if (auto* ptr = data_block->boolean_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Block::set(const std::string e, int v)
 		{
-			auto* ptr = data_entity.integer_data(e.c_str(), e.length());
-			if (!ptr) data_entity.integer_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			auto* ptr = data_block->integer_data(e.c_str(), e.length());
+			if (!ptr) data_block->integer_data.add({ [=] {return v; }, e.c_str(), e.length() });
 			else *ptr = [=] {return v; };
 		}
 		void Block::set(const std::string e, double v)
 		{
-			auto* ptr = data_entity.double_data(e.c_str(), e.length());
-			if (!ptr) data_entity.double_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			auto* ptr = data_block->double_data(e.c_str(), e.length());
+			if (!ptr) data_block->double_data.add({ [=] {return v; }, e.c_str(), e.length() });
 			else *ptr = [=] {return v; };
 		}
 
 		void Block::set(const std::string e, bool v)
 		{
-			auto* ptr = data_entity.boolean_data(e.c_str(), e.length());
-			if (!ptr) data_entity.boolean_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			auto* ptr = data_block->boolean_data(e.c_str(), e.length());
+			if (!ptr) data_block->boolean_data.add({ [=] {return v; }, e.c_str(), e.length() });
 			else *ptr = [=] {return v; };
 		}
 
 		void Block::set(const std::string e, std::function<int(void)> v)
 		{
-			auto* ptr = data_entity.integer_data(e.c_str(), e.length());
-			if (!ptr) data_entity.integer_data.add({ v, e.c_str(), e.length() });
+			auto* ptr = data_block->integer_data(e.c_str(), e.length());
+			if (!ptr) data_block->integer_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 		void Block::set(const std::string e, std::function<double(void)> v)
 		{
-			auto* ptr = data_entity.double_data(e.c_str(), e.length());
-			if (!ptr) data_entity.double_data.add({ v, e.c_str(), e.length() });
+			auto* ptr = data_block->double_data(e.c_str(), e.length());
+			if (!ptr) data_block->double_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 		void Block::set(const std::string e, std::function<bool(void)> v)
 		{
-			auto* ptr = data_entity.boolean_data(e.c_str(), e.length());
-			if (!ptr) data_entity.boolean_data.add({ v, e.c_str(), e.length() });
+			auto* ptr = data_block->boolean_data(e.c_str(), e.length());
+			if (!ptr) data_block->boolean_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
 		bool Block::get(const block::e_integer e, int& v)
 		{
-			if (auto* ptr = data_entity.integer_data[e]; ptr)
+			if (auto* ptr = data_block->integer_data[e]; ptr)
 			{
 				v = (*ptr)();
 				return true;
@@ -230,7 +240,7 @@ namespace LSW {
 		}
 		bool Block::get(const block::e_double e, double& v)
 		{
-			if (auto* ptr = data_entity.double_data[e]; ptr)
+			if (auto* ptr = data_block->double_data[e]; ptr)
 			{
 				v = (*ptr)();
 				return true;
@@ -240,7 +250,7 @@ namespace LSW {
 
 		bool Block::get(const block::e_boolean e, bool& v)
 		{
-			if (auto* ptr = data_entity.boolean_data[e]; ptr)
+			if (auto* ptr = data_block->boolean_data[e]; ptr)
 			{
 				v = (*ptr)();
 				return true;
@@ -250,7 +260,7 @@ namespace LSW {
 
 		bool Block::get(const block::e_integer e, std::function<int(void)>& v)
 		{
-			if (auto* ptr = data_entity.integer_data[e]; ptr)
+			if (auto* ptr = data_block->integer_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -260,7 +270,7 @@ namespace LSW {
 
 		bool Block::get(const block::e_double e, std::function<double(void)>& v)
 		{
-			if (auto* ptr = data_entity.double_data[e]; ptr)
+			if (auto* ptr = data_block->double_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -270,7 +280,7 @@ namespace LSW {
 
 		bool Block::get(const block::e_boolean e, std::function<bool(void)>& v)
 		{
-			if (auto* ptr = data_entity.boolean_data[e]; ptr)
+			if (auto* ptr = data_block->boolean_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -280,7 +290,7 @@ namespace LSW {
 
 		bool Block::get(const std::string e, int& v)
 		{
-			if (auto* ptr = data_entity.integer_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_block->integer_data(e.c_str(), e.length()); ptr) {
 				v = (*ptr)();
 				return true;
 			}
@@ -288,7 +298,7 @@ namespace LSW {
 		}
 		bool Block::get(const std::string e, double& v)
 		{
-			if (auto* ptr = data_entity.double_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_block->double_data(e.c_str(), e.length()); ptr) {
 				v = (*ptr)();
 				return true;
 			}
@@ -297,7 +307,7 @@ namespace LSW {
 
 		bool Block::get(const std::string e, bool& v)
 		{
-			if (auto* ptr = data_entity.boolean_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_block->boolean_data(e.c_str(), e.length()); ptr) {
 				v = (*ptr)();
 				return true;
 			}
@@ -306,7 +316,7 @@ namespace LSW {
 
 		bool LSW::v5::Block::get(const std::string e, std::function<int(void)>& v)
 		{
-			if (auto* ptr = data_entity.integer_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_block->integer_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
 				return true;
 			}
@@ -315,7 +325,7 @@ namespace LSW {
 
 		bool LSW::v5::Block::get(const std::string e, std::function<double(void)>& v)
 		{
-			if (auto* ptr = data_entity.double_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_block->double_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
 				return true;
 			}
@@ -324,7 +334,7 @@ namespace LSW {
 
 		bool LSW::v5::Block::get(const std::string e, std::function<bool(void)>& v)
 		{
-			if (auto* ptr = data_entity.boolean_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_block->boolean_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
 				return true;
 			}
@@ -333,7 +343,7 @@ namespace LSW {
 
 		bool Block::get(const block::e_chronomillis_readonly e, std::chrono::milliseconds& v)
 		{
-			if (auto* ptr = data_entity.chronomillis_readonly_data[e]; ptr)
+			if (auto* ptr = data_block->chronomillis_readonly_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -343,28 +353,28 @@ namespace LSW {
 
 		std::function<int(void)>* Block::getRef(const block::e_integer e)
 		{
-			if (auto* ptr = data_entity.integer_data(e); ptr)
+			if (auto* ptr = data_block->integer_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		std::function<double(void)>* Block::getRef(const block::e_double e)
 		{
-			if (auto* ptr = data_entity.double_data(e); ptr)
+			if (auto* ptr = data_block->double_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		std::function<bool(void)>* Block::getRef(const block::e_boolean e)
 		{
-			if (auto* ptr = data_entity.boolean_data(e); ptr)
+			if (auto* ptr = data_block->boolean_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		const std::chrono::milliseconds* Block::getRef(const block::e_chronomillis_readonly e) const
 		{
-			if (auto* ptr = data_entity.chronomillis_readonly_data(e); ptr)
+			if (auto* ptr = data_block->chronomillis_readonly_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
@@ -387,7 +397,7 @@ namespace LSW {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return; // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
-						std::shared_ptr<Sprite_Base> follow = (*data_text.sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
+						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
 						Database conf;
 						ALLEGRO_DISPLAY* d = al_get_current_display();
 						char tempstr_c[128];
@@ -443,7 +453,7 @@ namespace LSW {
 							sprintf_s(tempstr_c, "%.3f", (*getRef(sprite::e_color::COLOR))().a);
 							break;
 						case static_cast<size_t>(text::tags_e::T_MODE):
-							sprintf_s(tempstr_c, "%d", (*data_text.integer_data[text::e_integer::STRING_MODE])());
+							sprintf_s(tempstr_c, "%d", (*data_text->integer_data[text::e_integer::STRING_MODE])());
 							break;
 						case static_cast<size_t>(text::tags_e::T_TIME):
 							sprintf_s(tempstr_c, "%.3lf", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() - *conf.getRef(database::e_chronomillis_readonly::STARTED_APP_TIME)).count() / 1000.0);
@@ -805,22 +815,22 @@ namespace LSW {
 
 			double off_x = 0.0;
 			double off_y = 0.0;
-			bool use_following_color = (*data_text.boolean_data[text::e_boolean::USE_FOLLOWING_COLOR_INSTEAD])();
+			bool use_following_color = (*data_text->boolean_data[text::e_boolean::USE_FOLLOWING_COLOR_INSTEAD])();
 
 			// auto looks smaller, maybe good?
 			auto& posx				= *getRef(sprite::e_double_readonly::POSX);
 			auto& posy				= *getRef(sprite::e_double_readonly::POSY);
-			const auto s_dist_x		= (*data_text.double_data[text::e_double::SHADOW_DISTANCE_X])();
-			const auto s_dist_y		= (*data_text.double_data[text::e_double::SHADOW_DISTANCE_Y])();
-			const auto s_col		= (*data_text.color_data[text::e_color::SHADOW_COLOR])();
+			const auto s_dist_x		= (*data_text->double_data[text::e_double::SHADOW_DISTANCE_X])();
+			const auto s_dist_y		= (*data_text->double_data[text::e_double::SHADOW_DISTANCE_Y])();
+			const auto s_col		= (*data_text->color_data[text::e_color::SHADOW_COLOR])();
 			auto n_col				= (*getRef(sprite::e_color::COLOR))();
-			auto& p_str				= *data_text.string_readonly_data[text::e_string_readonly::PROCESSED_STRING];
-			const auto mode			= (*data_text.integer_data[text::e_integer::STRING_MODE])();
+			auto& p_str				= *data_text->string_readonly_data[text::e_string_readonly::PROCESSED_STRING];
+			const auto mode			= (*data_text->integer_data[text::e_integer::STRING_MODE])();
 			const auto scale_g		= (*getRef(sprite::e_double::SCALE_G))();
 			const auto scale_x		= (*getRef(sprite::e_double::SCALE_X))();
 			const auto scale_y		= (*getRef(sprite::e_double::SCALE_Y))();
-			auto& delta_t			= *data_text.chronomillis_readonly_data[text::e_chronomillis_readonly::LAST_UPDATE_STRING];
-			const auto per_char		= (*data_text.boolean_data[text::e_boolean::USE_PER_CHAR_COLORING])();
+			auto& delta_t			= *data_text->chronomillis_readonly_data[text::e_chronomillis_readonly::LAST_UPDATE_STRING];
+			const auto per_char		= (*data_text->boolean_data[text::e_boolean::USE_PER_CHAR_COLORING])();
 
 			double t_rotation_rad = *getRef(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
 			double p_rotation_rad = 0.0;
@@ -830,13 +840,13 @@ namespace LSW {
 			{
 				delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + text::default_delta_t_text_update_delay);
 
-				p_str = (*data_text.string_data[text::e_cstring::STRING])();
-				if (!(*data_text.boolean_data[text::e_boolean::NO_AUTO_STRING_INTERPRETATION])()) interpretTags(p_str);
+				p_str = (*data_text->string_data[text::e_cstring::STRING])();
+				if (!(*data_text->boolean_data[text::e_boolean::NO_AUTO_STRING_INTERPRETATION])()) interpretTags(p_str);
 			}
 
 
 
-			if (std::shared_ptr<Sprite_Base> fl = (*data_text.sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock(); fl)
+			if (std::shared_ptr<Sprite_Base> fl = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock(); fl)
 			{
 				fl->get(sprite::e_double_readonly::POSX, off_x);
 				fl->get(sprite::e_double_readonly::POSY, off_y);
@@ -963,81 +973,91 @@ namespace LSW {
 			font.id.clear();
 		}
 
+		void Text::twinUpAttributes(const std::shared_ptr<text_data> oth)
+		{
+			data_text = oth;
+		}
+
+		std::shared_ptr<Text::text_data> Text::getAttributes()
+		{
+			return data_text;
+		}
+
 		void Text::set(const text::e_cstring e, coloured_string v)
 		{
-			if (auto* ptr = data_text.string_data(e); ptr)
+			if (auto* ptr = data_text->string_data(e); ptr)
 				*ptr = [=] {return v;};
 		}
 
 		void Text::set(const text::e_double e, double v)
 		{
-			if (auto* ptr = data_text.double_data(e); ptr)
+			if (auto* ptr = data_text->double_data(e); ptr)
 				*ptr = [=] {return v; };
 		}
 
 		void Text::set(const text::e_color e, ALLEGRO_COLOR v)
 		{
-			if (auto* ptr = data_text.color_data(e); ptr)
+			if (auto* ptr = data_text->color_data(e); ptr)
 				*ptr = [=] {return v; };
 		}
 
 		void Text::set(const text::e_integer e, int v)
 		{
-			if (auto* ptr = data_text.integer_data(e); ptr)
+			if (auto* ptr = data_text->integer_data(e); ptr)
 				*ptr = [=] {return v; };
 		}
 
 		void Text::set(const text::e_sprite_ptr e, std::shared_ptr<Sprite_Base> v)
 		{
-			if (auto* ptr = data_text.sprite_ptr_data(e); ptr)
+			if (auto* ptr = data_text->sprite_ptr_data(e); ptr)
 				*ptr = [=] {return v; };
 		}
 
 		void Text::set(const text::e_boolean e, bool v)
 		{
-			if (auto* ptr = data_text.boolean_data(e); ptr)
+			if (auto* ptr = data_text->boolean_data(e); ptr)
 				*ptr = [=] {return v; };
 		}
 
 		void Text::set(const std::string e, coloured_string v)
 		{
-			auto* ptr = data_text.string_data(e.c_str(), e.length());
-			if (!ptr) data_text.string_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			auto* ptr = data_text->string_data(e.c_str(), e.length());
+			if (!ptr) data_text->string_data.add({ [=] {return v; }, e.c_str(), e.length() });
 			else *ptr = [=] {return v; };
 		}
 
 		void Text::set(const std::string e, double v)
 		{
-			auto* ptr = data_text.double_data(e.c_str(), e.length());
-			if (!ptr) data_text.double_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			auto* ptr = data_text->double_data(e.c_str(), e.length());
+			if (!ptr) data_text->double_data.add({ [=] {return v; }, e.c_str(), e.length() });
 			else *ptr = [=] {return v; };
 		}
 
 		void Text::set(const std::string e, ALLEGRO_COLOR v)
 		{
-			auto* ptr = data_text.color_data(e.c_str(), e.length());
-			if (!ptr) data_text.color_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			auto* ptr = data_text->color_data(e.c_str(), e.length());
+			if (!ptr) data_text->color_data.add({ [=] {return v; }, e.c_str(), e.length() });
 			else *ptr = [=] {return v; };
 		}
 
 		void Text::set(const std::string e, int v)
 		{
-			auto* ptr = data_text.integer_data(e.c_str(), e.length());
-			if (!ptr) data_text.integer_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			auto* ptr = data_text->integer_data(e.c_str(), e.length());
+			if (!ptr) data_text->integer_data.add({ [=] {return v; }, e.c_str(), e.length() });
 			else *ptr = [=] {return v; };
 		}
 
 		void Text::set(const std::string e, std::shared_ptr<Sprite_Base> v)
 		{
-			auto* ptr = data_text.sprite_ptr_data(e.c_str(), e.length());
-			if (!ptr) data_text.sprite_ptr_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			auto* ptr = data_text->sprite_ptr_data(e.c_str(), e.length());
+			if (!ptr) data_text->sprite_ptr_data.add({ [=] {return v; }, e.c_str(), e.length() });
 			else *ptr = [=] {return v; };
 		}
 
 		void Text::set(const std::string e, bool v)
 		{
-			auto* ptr = data_text.boolean_data(e.c_str(), e.length());
-			if (!ptr) data_text.boolean_data.add({ [=] {return v; }, e.c_str(), e.length() });
+			auto* ptr = data_text->boolean_data(e.c_str(), e.length());
+			if (!ptr) data_text->boolean_data.add({ [=] {return v; }, e.c_str(), e.length() });
 			else *ptr = [=] {return v; };
 		}
 
@@ -1045,85 +1065,85 @@ namespace LSW {
 
 		void Text::set(const text::e_cstring e, std::function<coloured_string(void)> v)
 		{
-			if (auto* ptr = data_text.string_data(e); ptr)
+			if (auto* ptr = data_text->string_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Text::set(const text::e_double e, std::function<double(void)> v)
 		{
-			if (auto* ptr = data_text.double_data(e); ptr)
+			if (auto* ptr = data_text->double_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Text::set(const text::e_color e, std::function<ALLEGRO_COLOR(void)> v)
 		{
-			if (auto* ptr = data_text.color_data(e); ptr)
+			if (auto* ptr = data_text->color_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Text::set(const text::e_integer e, std::function<int(void)> v)
 		{
-			if (auto* ptr = data_text.integer_data(e); ptr)
+			if (auto* ptr = data_text->integer_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Text::set(const text::e_sprite_ptr e, std::function<std::shared_ptr<Sprite_Base>(void)> v)
 		{
-			if (auto* ptr = data_text.sprite_ptr_data(e); ptr)
+			if (auto* ptr = data_text->sprite_ptr_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Text::set(const text::e_boolean e, std::function<bool(void)> v)
 		{
-			if (auto* ptr = data_text.boolean_data(e); ptr)
+			if (auto* ptr = data_text->boolean_data(e); ptr)
 				*ptr = v;
 		}
 
 		void Text::set(const std::string e, std::function<coloured_string(void)> v)
 		{
-			auto* ptr = data_text.string_data(e.c_str(), e.length());
-			if (!ptr) data_text.string_data.add({ v, e.c_str(), e.length() });
+			auto* ptr = data_text->string_data(e.c_str(), e.length());
+			if (!ptr) data_text->string_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
 		void Text::set(const std::string e, std::function<double(void)> v)
 		{
-			auto* ptr = data_text.double_data(e.c_str(), e.length());
-			if (!ptr) data_text.double_data.add({ v, e.c_str(), e.length() });
+			auto* ptr = data_text->double_data(e.c_str(), e.length());
+			if (!ptr) data_text->double_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
 		void Text::set(const std::string e, std::function<ALLEGRO_COLOR(void)> v)
 		{
-			auto* ptr = data_text.color_data(e.c_str(), e.length());
-			if (!ptr) data_text.color_data.add({ v, e.c_str(), e.length() });
+			auto* ptr = data_text->color_data(e.c_str(), e.length());
+			if (!ptr) data_text->color_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
 		void Text::set(const std::string e, std::function<int(void)> v)
 		{
-			auto* ptr = data_text.integer_data(e.c_str(), e.length());
-			if (!ptr) data_text.integer_data.add({ v, e.c_str(), e.length() });
+			auto* ptr = data_text->integer_data(e.c_str(), e.length());
+			if (!ptr) data_text->integer_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
 		void Text::set(const std::string e, std::function<std::shared_ptr<Sprite_Base>(void)> v)
 		{
-			auto* ptr = data_text.sprite_ptr_data(e.c_str(), e.length());
-			if (!ptr) data_text.sprite_ptr_data.add({ v, e.c_str(), e.length() });
+			auto* ptr = data_text->sprite_ptr_data(e.c_str(), e.length());
+			if (!ptr) data_text->sprite_ptr_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
 		void Text::set(const std::string e, std::function<bool(void)> v)
 		{
-			auto* ptr = data_text.boolean_data(e.c_str(), e.length());
-			if (!ptr) data_text.boolean_data.add({ v, e.c_str(), e.length() });
+			auto* ptr = data_text->boolean_data(e.c_str(), e.length());
+			if (!ptr) data_text->boolean_data.add({ v, e.c_str(), e.length() });
 			else *ptr = v;
 		}
 
 		bool Text::get(const text::e_string_readonly e, coloured_string& v)
 		{
-			if (auto* ptr = data_text.string_readonly_data[e]; ptr)
+			if (auto* ptr = data_text->string_readonly_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -1133,7 +1153,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_cstring e, coloured_string& v)
 		{
-			if (auto* ptr = data_text.string_data[e]; ptr)
+			if (auto* ptr = data_text->string_data[e]; ptr)
 			{
 				v = (*ptr)();
 				return true;
@@ -1143,7 +1163,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_double e, double& v)
 		{
-			if (auto* ptr = data_text.double_data[e]; ptr)
+			if (auto* ptr = data_text->double_data[e]; ptr)
 			{
 				v = (*ptr)();
 				return true;
@@ -1153,7 +1173,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_color e, ALLEGRO_COLOR& v)
 		{
-			if (auto* ptr = data_text.color_data[e]; ptr)
+			if (auto* ptr = data_text->color_data[e]; ptr)
 			{
 				v = (*ptr)();
 				return true;
@@ -1163,7 +1183,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_integer e, int& v)
 		{
-			if (auto* ptr = data_text.integer_data[e]; ptr)
+			if (auto* ptr = data_text->integer_data[e]; ptr)
 			{
 				v = (*ptr)();
 				return true;
@@ -1173,7 +1193,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_sprite_ptr e, std::shared_ptr<Sprite_Base>& v)
 		{
-			if (auto* ptr = data_text.sprite_ptr_data[e]; ptr)
+			if (auto* ptr = data_text->sprite_ptr_data[e]; ptr)
 			{
 				v = (*ptr)().lock();
 				return true;
@@ -1183,7 +1203,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_boolean e, bool& v)
 		{
-			if (auto* ptr = data_text.boolean_data[e]; ptr)
+			if (auto* ptr = data_text->boolean_data[e]; ptr)
 			{
 				v = (*ptr)();
 				return true;
@@ -1193,7 +1213,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, coloured_string& v)
 		{
-			if (auto* ptr = data_text.string_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->string_data(e.c_str(), e.length()); ptr) {
 				v = (*ptr)();
 				return true;
 			}
@@ -1202,7 +1222,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, double& v)
 		{
-			if (auto* ptr = data_text.double_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->double_data(e.c_str(), e.length()); ptr) {
 				v = (*ptr)();
 				return true;
 			}
@@ -1211,7 +1231,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, ALLEGRO_COLOR& v)
 		{
-			if (auto* ptr = data_text.color_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->color_data(e.c_str(), e.length()); ptr) {
 				v = (*ptr)();
 				return true;
 			}
@@ -1220,7 +1240,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, int& v)
 		{
-			if (auto* ptr = data_text.integer_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->integer_data(e.c_str(), e.length()); ptr) {
 				v = (*ptr)();
 				return true;
 			}
@@ -1229,7 +1249,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, std::shared_ptr<Sprite_Base>& v)
 		{
-			if (auto* ptr = data_text.sprite_ptr_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->sprite_ptr_data(e.c_str(), e.length()); ptr) {
 				v = (*ptr)().lock();
 				return true;
 			}
@@ -1238,7 +1258,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, bool& v)
 		{
-			if (auto* ptr = data_text.boolean_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->boolean_data(e.c_str(), e.length()); ptr) {
 				v = (*ptr)();
 				return true;
 			}
@@ -1249,7 +1269,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_cstring e, std::function<coloured_string(void)>& v)
 		{
-			if (auto* ptr = data_text.string_data[e]; ptr)
+			if (auto* ptr = data_text->string_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -1259,7 +1279,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_double e, std::function<double(void)>& v)
 		{
-			if (auto* ptr = data_text.double_data[e]; ptr)
+			if (auto* ptr = data_text->double_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -1269,7 +1289,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_color e, std::function<ALLEGRO_COLOR(void)>& v)
 		{
-			if (auto* ptr = data_text.color_data[e]; ptr)
+			if (auto* ptr = data_text->color_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -1279,7 +1299,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_integer e, std::function<int(void)>& v)
 		{
-			if (auto* ptr = data_text.integer_data[e]; ptr)
+			if (auto* ptr = data_text->integer_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -1289,7 +1309,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_sprite_ptr e, std::function<std::weak_ptr<Sprite_Base>(void)>& v)
 		{
-			if (auto* ptr = data_text.sprite_ptr_data[e]; ptr)
+			if (auto* ptr = data_text->sprite_ptr_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -1299,7 +1319,7 @@ namespace LSW {
 
 		bool Text::get(const text::e_boolean e, std::function<bool(void)>& v)
 		{
-			if (auto* ptr = data_text.boolean_data[e]; ptr)
+			if (auto* ptr = data_text->boolean_data[e]; ptr)
 			{
 				v = *ptr;
 				return true;
@@ -1309,7 +1329,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, std::function<coloured_string(void)>& v)
 		{
-			if (auto* ptr = data_text.string_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->string_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
 				return true;
 			}
@@ -1318,7 +1338,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, std::function<double(void)>& v)
 		{
-			if (auto* ptr = data_text.double_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->double_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
 				return true;
 			}
@@ -1327,7 +1347,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, std::function<ALLEGRO_COLOR(void)>& v)
 		{
-			if (auto* ptr = data_text.color_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->color_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
 				return true;
 			}
@@ -1336,7 +1356,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, std::function<int(void)>& v)
 		{
-			if (auto* ptr = data_text.integer_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->integer_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
 				return true;
 			}
@@ -1345,7 +1365,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, std::function<std::weak_ptr<Sprite_Base>(void)>& v)
 		{
-			if (auto* ptr = data_text.sprite_ptr_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->sprite_ptr_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
 				return true;
 			}
@@ -1354,7 +1374,7 @@ namespace LSW {
 
 		bool Text::get(const std::string e, std::function<bool(void)>& v)
 		{
-			if (auto* ptr = data_text.boolean_data(e.c_str(), e.length()); ptr) {
+			if (auto* ptr = data_text->boolean_data(e.c_str(), e.length()); ptr) {
 				v = *ptr;
 				return true;
 			}
@@ -1366,56 +1386,56 @@ namespace LSW {
 
 		std::function<coloured_string(void)>* Text::getRef(const text::e_cstring e)
 		{
-			if (auto* ptr = data_text.string_data(e); ptr)
+			if (auto* ptr = data_text->string_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		std::function<double(void)>* Text::getRef(const text::e_double e)
 		{
-			if (auto* ptr = data_text.double_data(e); ptr)
+			if (auto* ptr = data_text->double_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		std::function<ALLEGRO_COLOR(void)>* Text::getRef(const text::e_color e)
 		{
-			if (auto* ptr = data_text.color_data(e); ptr)
+			if (auto* ptr = data_text->color_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		std::function<int(void)>* Text::getRef(const text::e_integer e)
 		{
-			if (auto* ptr = data_text.integer_data(e); ptr)
+			if (auto* ptr = data_text->integer_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		std::function<std::weak_ptr<Sprite_Base>(void)>* Text::getRef(const text::e_sprite_ptr e)
 		{
-			if (auto* ptr = data_text.sprite_ptr_data(e); ptr)
+			if (auto* ptr = data_text->sprite_ptr_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		std::function<bool(void)>* Text::getRef(const text::e_boolean e)
 		{
-			if (auto* ptr = data_text.boolean_data(e); ptr)
+			if (auto* ptr = data_text->boolean_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		const coloured_string* Text::getRef(const text::e_string_readonly e) const
 		{
-			if (auto* ptr = data_text.string_readonly_data(e); ptr)
+			if (auto* ptr = data_text->string_readonly_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
 		const std::chrono::milliseconds* Text::getRef(const text::e_chronomillis_readonly e) const
 		{
-			if (auto* ptr = data_text.chronomillis_readonly_data(e); ptr)
+			if (auto* ptr = data_text->chronomillis_readonly_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
@@ -1449,7 +1469,7 @@ namespace LSW {
 		Button::Button()
 		{
 			SuperResource<Sprite_Base> sprites;
-			auto now = MILI_NOW;
+			auto now = MILLI_NOW;
 			unsigned now_c = now.count() % static_cast<int>(1e10); // 115 days to repeat. Will you play for 115 days?
 			char sign[16];
 			sprintf_s(sign, "%010u", now_c);
@@ -1471,10 +1491,9 @@ namespace LSW {
 			text = sprites.customLoad(my_id + "_t&" + sign + "+", [](Sprite_Base*& b) {return (b = new Text()); });
 			
 			getText()->set(text::e_sprite_ptr::FOLLOWING, block);
-			getBlock()->twinUpAttributes(thus); // b() attributes now are this attributes (spritewise)
+			getText()->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 
-			
-
+			reinterpret_cast<Sprite_Base*>(getBlock())->twinUpAttributes(reinterpret_cast<Sprite_Base*>(this)->getAttributes()); // b() attributes now are this attributes (spritewise)
 		}
 
 		Text* Button::getText()

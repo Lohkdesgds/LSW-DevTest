@@ -84,6 +84,11 @@ namespace LSW {
 			auto begin() const { return sps.begin(); }
 			auto end() const { return sps.end(); }
 
+			const size_t size() const { return sps.size(); }
+
+			void erase(const size_t start) { sps.erase(sps.begin() + start); }
+			void erase(const size_t start, const size_t end) { sps.erase(sps.begin() + start, sps.begin() + end); }
+
 
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
