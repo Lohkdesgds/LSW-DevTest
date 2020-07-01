@@ -1,6 +1,7 @@
 #pragma once
 
 // C
+#define _CRT_RAND_S
 #include <windows.h>
 #include <wininet.h>
 #include <ShlObj.h>

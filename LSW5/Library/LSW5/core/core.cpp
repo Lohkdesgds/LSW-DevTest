@@ -198,8 +198,10 @@ namespace LSW {
 						if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::LOOP_TRACK))) {
 							db.set(database::e_sizet::FRAMESPERSECOND, data.display_routine.routines.getNumCallsDefault());
 						}
-						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::CHECK_MEMORY_BITMAP_AND_CAMERA))) {
+						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::CHECK_MEMORY_BITMAP))) {
 							al_convert_bitmaps();
+						}
+						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::CHECK_CAMERA_REFRESH))) {
 							main_cam->refresh();
 							main_cam->apply();
 						}
@@ -263,10 +265,14 @@ namespace LSW {
 					// draw?
 
 					main_cam->matrix_debug();
+					main_cam->apply();
+					auto& con = main_cam->getAttributes();
 
-					for(auto& i : sprites)
-					{
-						i->draw(&(*main_cam));
+					for (auto& c : con.layers) {
+						for (auto& i : sprites)
+						{
+							i->draw(&(*main_cam), c.getLayerID());
+						}
 					}
 
 					//cam.getLastCameraApply()->matrix_debug();

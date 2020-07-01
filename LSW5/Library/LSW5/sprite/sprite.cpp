@@ -121,8 +121,8 @@ namespace LSW {
 		{
 			posx = px;
 			posy = py;
-			sizx = sx;
-			sizy = sy;
+			sizx = Shared::game_collision_oversize + sx;
+			sizy = Shared::game_collision_oversize + sy;
 			resetDirections();
 			was_col = false;
 		}
@@ -555,13 +555,21 @@ namespace LSW {
 				return ptr;
 			return nullptr;
 		}
+		bool Sprite_Base::draw(Camera* cam, int layer) {
+			if (layer == (*getRef(sprite::e_integer::LAYER))()) return draw(cam, false);
+			return false;
+		}
 
-		void Sprite_Base::draw(Camera* cam)
+		bool Sprite_Base::draw(Camera* cam, bool checkcam)
 		{
 			if (!cam) throw Abort::Abort(__FUNCSIG__, "Invalid camera at Sprite's draw!", Abort::abort_level::GIVEUP);
 
+			if (checkcam) {
+				if (auto* ptr = cam->getLayerConfig((*getRef(sprite::e_integer::LAYER))()); !ptr) return false; // check layer
+			}
+
 			if (data_sprite_base->original_this == this) { // only original copy should update parameters
-				if (isEq(sprite::e_boolean::SHOWBOX, true) || isEq(sprite::e_boolean::SHOWDOT, true)) {
+				//if (isEq(sprite::e_boolean::SHOWBOX, true) || isEq(sprite::e_boolean::SHOWDOT, true)) {
 					Camera clean_camera;
 
 					const auto affected_by_cam = (*data_sprite_base->boolean_data[sprite::e_boolean::AFFECTED_BY_CAM])();
@@ -610,7 +618,7 @@ namespace LSW {
 							/* Y1: */ targ_posy - calculated_scale_y * 0.5,
 							/* X2: */ targ_posx + calculated_scale_x * 0.5,
 							/* Y2: */ targ_posy + calculated_scale_y * 0.5,
-							al_map_rgb(255, easy_collision.was_col ? 128 : 255, easy_collision.was_col ? 128 : 255));
+							al_map_rgba(180, easy_collision.was_col ? 90 : 180, easy_collision.was_col ? 90 : 180, 180));
 					}
 
 					if (isEq(sprite::e_boolean::SHOWDOT, true)) {
@@ -618,12 +626,14 @@ namespace LSW {
 							/* X1: */ posx,
 							/* X1: */ posy,
 							/* SCL */ 0.1f * (fabs(0.30f) + 0.12f),
-							al_map_rgb(127, easy_collision.was_col ? 76 : 127, easy_collision.was_col ? 76 : 127));
+							al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
 					}
-				}
+				//}
 			}
 			// custom_draw_task has nothing to do with clone attributes, so this is fine! (I guess so)
 			if (custom_draw_task) custom_draw_task();
+
+			return true;
 		}
 
 		void Sprite_Base::collide(Camera* cam, Sprite_Base& oth) // if colliding, do not accept speed entry (keyboard player moving)
@@ -633,7 +643,7 @@ namespace LSW {
 
 			if (!oth.isEq(sprite::e_integer::LAYER, *getRef(sprite::e_integer::LAYER))) return; // not same layer
 			if (oth.isEq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE))) return; // no collision
-			//if (isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
+			if (isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
 			if (oth.isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
 
 			if (auto* ptr = cam->getLayerConfig((*getRef(sprite::e_integer::LAYER))()); ptr) {
@@ -662,6 +672,10 @@ namespace LSW {
 
 
 			if (auto* ptr = cam->getLayerConfig((*getRef(sprite::e_integer::LAYER))()); ptr && isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, false)) {
+
+				// task to be done (no auto-clean, internal, only if layer (as above))
+				if (custom_think_task) custom_think_task();
+
 				double roughness = ptr->getRoughness();
 
 				auto nogo = easy_collision.processResult();

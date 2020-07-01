@@ -1,5 +1,7 @@
 #pragma once
 
+// C
+#define _CRT_RAND_S
 // C++
 #include <string>
 // Others
@@ -154,6 +156,7 @@ namespace LSW {
 
 		protected:
 			std::function<void(void)> custom_draw_task; // set this as draw() of new children (so the draw() calls this if exists for further drawing scheme)
+			std::function<void(void)> custom_think_task; // set this as a collision / every tick function (so update() calls this if exists for further tasking)
 		public:
 			Sprite_Base();
 			Sprite_Base(Sprite_Base&);
@@ -221,8 +224,10 @@ namespace LSW {
 			template<typename T, typename V> inline bool isEq(const T e, const std::function<V(void)> v) { V k; if (get(e, k)) return v() == k; return false; }
 			template<typename T, typename V> inline bool isEq(const T e, const V v) { V k; if (get(e, k)) return v == k; return false; }
 
-			// ALWAYS CALL NATIVE DRAW FROM SPRITE_BASE! | Camera is useful to make it consistent
-			void draw(Camera*);
+			// ALWAYS CALL NATIVE DRAW FROM SPRITE_BASE! | Camera is useful to make it consistent (has to be in layer size_t)
+			bool draw(Camera*, int);
+			// ALWAYS CALL NATIVE DRAW FROM SPRITE_BASE! | Camera is useful to make it consistent (bool is check if it is on any camera layer)
+			bool draw(Camera*, bool = true);
 			
 			// camera is useful for consistent run
 			void collide(Camera*, Sprite_Base&);

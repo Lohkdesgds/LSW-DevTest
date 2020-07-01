@@ -1,8 +1,10 @@
 #pragma once
 
 // C
+#define _CRT_RAND_S
 #include <Windows.h>
 #include <ShlObj.h>
+#include <stdlib.h>
 // C++
 #include <string>
 #include <vector>
@@ -53,6 +55,14 @@ namespace LSW {
 
 			// gets std::string UTF8 and converts to wchar_t (UTF16) // https://stackoverflow.com/a/26914562
 			std::wstring wideUp(const std::string&);
+
+			const double maxone(double, const double = 1.0);
+
+			// generates random number (based on rand_s())
+			const unsigned int rand();
+
+			// generates random string with numbers that shouldn't repeat until 115 days running! N means it is actually a big number, no alpha
+			std::string generateRandomUniqueStringN();
 
 			// the string, the separator (like :, =, ...), comment characters and characters in the end aka endline // setting: value#comment
 			std::vector<std::pair<std::string, std::string>> breakLines(const std::string, const std::string = ":= ", const std::string = "#", const std::string = "\r\n");

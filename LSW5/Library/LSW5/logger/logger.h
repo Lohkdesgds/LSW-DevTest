@@ -14,6 +14,7 @@ Logger header:
 
 
 // C
+#define _CRT_RAND_S
 #include <allegro5/allegro.h>
 #include <Windows.h>
 #include <stdio.h>

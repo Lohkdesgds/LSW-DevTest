@@ -1,5 +1,7 @@
 #pragma once
 
+// C
+#define _CRT_RAND_S
 // C++
 #include <thread>
 #include <mutex>
@@ -30,7 +32,7 @@ namespace LSW {
 			LOOP_TRACK is just to update stuff (database data)
 			*/
 
-			enum class thr_display_routines		{ LOOP_TRACK, CHECK_MEMORY_BITMAP_AND_CAMERA };
+			enum class thr_display_routines		{ LOOP_TRACK, CHECK_MEMORY_BITMAP, CHECK_CAMERA_REFRESH };
 			enum class thr_collision_routines	{ LOOP_TRACK, COLLISION_WORK };
 			enum class thr_events_routines		{ LOOP_TRACK, UPDATE_MOUSE };
 			enum class thr_functional_routines	{ LOOP_TRACK };
@@ -41,7 +43,7 @@ namespace LSW {
 			};
 
 
-			typedef SuperTimer<1, 5>								__display_routines;
+			typedef SuperTimer<1, 3, 1>								__display_routines;
 			typedef SuperTimer<1, Shared::game_timing_tps>			__collision_routines;
 			typedef SuperTimer<1, 60>								__events_routines;
 			typedef SuperTimer<1>									__functional_routines;
@@ -65,8 +67,11 @@ namespace LSW {
 					void tick() { last_delta_loop = al_get_time() - last_loop; last_loop = al_get_time(); } // update time
 					bool isPaused() { return success_pause = pause; }
 					double lastDeltaT() { return last_delta_loop; }
-
-					bool isAlive() { return al_get_time() - last_loop < 5.0; } // had tick < 5 seg ago
+#ifdef _DEBUG
+					bool isAlive() { return al_get_time() - last_loop < 360.0 && has_initialized_once; } // debug should be cool with long debugging lmao
+#else
+					bool isAlive() { return al_get_time() - last_loop < 5.0 && has_initialized_once; } // had tick < 5 seg ago
+#endif
 					bool isInitialized() { return has_initialized_once; } // true if on mid of the thread (via initialize() in first line and unitialize() in the end ON THREAD!)
 					bool hasPausedSuccessfully() { return success_pause; }
 

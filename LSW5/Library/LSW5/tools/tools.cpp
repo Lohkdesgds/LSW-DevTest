@@ -246,6 +246,31 @@ namespace LSW {
 
 				return std::wstring(&buffer[0], charsConverted);
 			}
+			const double maxone(double gotten, const double prop)
+			{
+				/*while (gotten > 1.0) {
+					for(double u = 1e96; u > 10.0; u /= 1e4) if (gotten > u) gotten -= u;
+					if (gotten > 1.0) gotten = 2.0 - gotten;
+					else gotten -= 1.0;
+				}*/
+				return sin(gotten * 3.1415) * prop;
+			}
+			const unsigned int rand()
+			{
+				unsigned int r = 0;
+				rand_s(&r);
+				return r;
+			}
+			std::string generateRandomUniqueStringN()
+			{
+				auto cool_n = Tools::rand() % 1000; // 3 digits max
+				auto now = MILLI_NOW;
+				unsigned now_c = now.count() % static_cast<int>(1e10); // 115 days to repeat. Will you play for 115 days? even then there's a random number. You'll have to try REALLY HARD
+				char sign[32];
+				sprintf_s(sign, "%010u%03u", now_c, cool_n);
+				return sign;
+
+			}
 			std::vector<std::pair<std::string, std::string>> breakLines(const std::string a, const std::string spr, const std::string comment, const std::string endline)
 			{
 				std::vector<std::pair<std::string, std::string>> vectu;

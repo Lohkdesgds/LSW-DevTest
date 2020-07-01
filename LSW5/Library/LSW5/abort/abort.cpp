@@ -1,5 +1,6 @@
 #include "abort.h"
 
+
 namespace LSW {
 	namespace v5 {
 		namespace Abort {
@@ -9,6 +10,17 @@ namespace LSW {
 				s_details = dt;
 				abort_lvl = lv;
 				quick_exit = fc;
+#ifdef _DEBUG
+				if (abort_lvl == abort_level::FATAL_ERROR) {
+					al_show_native_message_box(
+						nullptr,
+						"[FATAL ERROR ABORT] Throw has been done!",
+						fw.c_str(),
+						("Details: " + dt).c_str(),
+						NULL,
+						ALLEGRO_MESSAGEBOX_ERROR);
+				}
+#endif
 			}
 			const std::string& Abort::getWhereFrom()
 			{
@@ -35,7 +47,16 @@ namespace LSW {
 				autodrop = [&]() {
 					while (GetTickCount64() - t > 0) {
 						if (drop) return;
-					} 
+					}
+#ifdef _DEBUG
+					al_show_native_message_box(
+						nullptr,
+						"[Debug] AUTOABORT",
+						"Something really bad happened: timeout",
+						"The application has frozen and now it needs to stop in the worst way possible. I'm sorry.",
+						NULL,
+						ALLEGRO_MESSAGEBOX_ERROR);
+#endif
 					if (call_death) call_death();
 					exit(EXIT_FAILURE);
 				};

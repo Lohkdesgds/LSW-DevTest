@@ -14,6 +14,7 @@ SuperPair header:
 
 
 // C
+#define _CRT_RAND_S
 #include <stdio.h>
 // C++
 #include <mutex>

@@ -1,5 +1,7 @@
 #pragma once
 
+// C
+#define _CRT_RAND_S
 // Others
 #include "..\allegroinitialization\allegroinitialization.h"
 

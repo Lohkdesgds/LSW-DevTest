@@ -1,6 +1,7 @@
 #pragma once
 
 // C
+#define _CRT_RAND_S
 #include <assert.h>
 // C++
 #include <string>
@@ -56,10 +57,10 @@ namespace LSW {
 				}*/
 				_data.reset();
 			}
-			auto data() {
+			auto& data() {
 				return _data;
 			}
-			const auto data() const {
+			const auto& data() const {
 				return _data;
 			}
 			auto operator*() {
@@ -190,7 +191,7 @@ namespace LSW {
 
 				if (!r) {
 					//ret = std::make_shared<generic_class<T>>(data.load, data.unload, id);
-					std::function<bool(std::string&, T*&)> _f = [&](std::string& a, T*& v)->bool { return f(v); };
+					std::function<bool(std::string&, T*&)> _f = [=](std::string& a, T*& v)->bool { return f(v); };
 					generic_class<T> ret2 = generic_class<T>(_f, data.unload, id, "");
 
 					if (!ret2.data()) throw Abort::Abort(__FUNCSIG__, "Can't load a resource! id=" + id, Abort::abort_level::FATAL_ERROR);
@@ -291,17 +292,53 @@ namespace LSW {
 				}
 				return lst;
 			}
-			bool swap(const std::string id, std::shared_ptr<T>& p) {
+			// swap ptrs
+			std::shared_ptr<T> swap(const std::string id, std::shared_ptr<T>& p) {
 				data.m.lock();
 				for (auto& i : data.vec) {
 					if (i == id) {
 						i.data().swap(p);
 						data.m.unlock();
-						return true;
+						return p;
 					}
 				}
 				data.m.unlock();
-				return false;
+				return std::shared_ptr<T>();
+			}
+			// creates new and replace/reset
+			std::shared_ptr<T> swap(const std::string id, std::string path = "") {
+				data.m.lock();
+				for (auto& i : data.vec) {
+					if (i == id) {
+						generic_class<T> ret2 = generic_class<T>(data.load, data.unload, id, path);
+
+						if (!ret2.data()) throw Abort::Abort(__FUNCSIG__, "Can't load a resource! id=" + id, Abort::abort_level::FATAL_ERROR);
+
+						i.data().swap(ret2.data());
+						data.m.unlock();
+						return i.data();
+					}
+				}
+				data.m.unlock();
+				return std::shared_ptr<T>();
+			}
+			// creates new and replace/reset
+			std::shared_ptr<T> swapCustomLoad(const std::string id, std::function<bool(T*&)> f) {
+				data.m.lock();
+				for (auto& i : data.vec) {
+					if (i == id) {
+						std::function<bool(std::string&, T*&)> _f = [=](std::string& a, T*& v)->bool { return f(v); };
+						generic_class<T> ret2 = generic_class<T>(_f, data.unload, id, "");
+
+						if (!ret2.data()) throw Abort::Abort(__FUNCSIG__, "Can't load a resource! id=" + id, Abort::abort_level::FATAL_ERROR);
+
+						i.data().swap(ret2.data());
+						data.m.unlock();
+						return i.data();
+					}
+				}
+				data.m.unlock();
+				return std::shared_ptr<T>();
 			}
 			void clear() {
 				if (!data.unload) throw Abort::Abort(__FUNCSIG__, "You have to setup load/unload lambdas before using dynamic resource", Abort::abort_level::FATAL_ERROR);

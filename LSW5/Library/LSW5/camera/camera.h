@@ -1,9 +1,10 @@
 #pragma once
 
 // C
+#define _CRT_RAND_S
 #include <allegro5/allegro.h>
 // C++
-#include <map>
+#include <algorithm>
 #include <vector>
 // Others
 #include "..\supermap\supermap.h"
@@ -16,7 +17,7 @@ namespace LSW {
 	namespace v5 {
 		namespace camera {
 
-			constexpr double roughness_default = 0.999;
+			constexpr double roughness_default = 0.9999;
 
 			enum class e_double { SCALE_X, SCALE_Y, SCALE_G, OFFSET_X, OFFSET_Y, ROTATION_RAD, LIMIT_MIN_X, LIMIT_MIN_Y, LIMIT_MAX_X, LIMIT_MAX_Y };
 			enum class e_boolean { RESPECT_LIMITS, READONLY_NOW };
@@ -89,6 +90,9 @@ namespace LSW {
 			void delLayerConfig(const int);
 			layer_each* getLayerConfig(const int);
 
+			// fix for any weird ordering
+			void sort();
+
 			void set(const camera::e_double, double);
 			void set(const camera::e_boolean, bool);
 			void set(const camera::e_integer, int);
@@ -120,7 +124,7 @@ namespace LSW {
 
 			void matrix_debug();
 
-			Camera::Camera_configuration& copyRAW();
+			Camera::Camera_configuration& getAttributes();
 		};
 
 

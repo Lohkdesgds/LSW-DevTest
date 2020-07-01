@@ -432,7 +432,7 @@ namespace LSW {
 
             bool con_client::hadEventRightNow(const size_t max_t)
             {
-                return ((std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()) - latest_update).count() < max_t);
+                return (MILLI_NOW - latest_update < std::chrono::milliseconds(max_t));
             }
 
             void con_client::hookPrintBandwidth(std::function<void(const std::string)> f)

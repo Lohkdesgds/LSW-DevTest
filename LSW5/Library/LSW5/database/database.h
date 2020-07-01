@@ -2,6 +2,8 @@
 
 //#define LSW_NO_AUTOSAVE_DEBUG
 
+// C
+#define _CRT_RAND_S
 // C++
 #include <string>
 // Others

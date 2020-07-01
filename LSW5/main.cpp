@@ -98,39 +98,53 @@ int main(int argc, char* argv[]) {
 
 	size_t countgen = 0;
 
-	auto ref = sprites.create("test" + std::to_string(countgen++));
-	ref->set("show_box", true);
-	ref->set("show_dot", true);
+
+
+	auto ref_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); }); // sprites.create("test" + std::to_string(countgen++));
+	Block* ref = (Block*)&(*ref_orig);
+	//ref->set("show_box", true);
+	//ref->set("show_dot", true);
 	ref->set("scale_g", 0.3);
-	ref->set("target_pos_x", -0.5);
+	ref->set("target_pos_x", -0.9);
 	ref->set("target_pos_y", 0.2);
-	ref->set(sprite::e_double::ACCELERATION_X, 6e-4);
+	ref->set(sprite::e_double::ACCELERATION_X, 2e-3);
+	ref->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
+	ref->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
+	ref->set(block::e_double::FRAMES_PER_SECOND, 2.0);
 
-	auto ref2 = sprites.create("test" + std::to_string(countgen++));
-	ref2->set("show_box", true);
-	ref2->set("show_dot", true);
+	auto ref2_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); }); // sprites.create("test" + std::to_string(countgen++));
+	Block* ref2 = (Block*)&(*ref2_orig);
+	//ref->set("show_box", true);
+	//ref->set("show_dot", true);
 	ref2->set("scale_g", 0.2);
-	ref2->set("target_pos_x", 0.5);
+	ref2->set("target_pos_x", 0.9);
 	ref2->set("target_pos_y", 0.2);
-	ref2->set(sprite::e_double::ACCELERATION_X, -6e-4);
+	ref2->set(sprite::e_double::ACCELERATION_X, -2e-3);
+	ref2->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
+	ref2->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
+	ref2->set(block::e_double::FRAMES_PER_SECOND, 6.0);
 
-	auto ref3 = sprites.create("test" + std::to_string(countgen++));
-	ref3->set("show_box", true);
-	ref3->set("show_dot", true);
+	auto ref3_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); }); // sprites.create("test" + std::to_string(countgen++));
+	Block* ref3 = (Block*)&(*ref3_orig);
+	//ref->set("show_box", true);
+	//ref->set("show_dot", true);
 	ref3->set("scale_g", 0.4);
 	ref3->set("target_pos_x", 0.0);
-	ref3->set("target_pos_y", 0.6);
-	ref3->set(sprite::e_double::ACCELERATION_Y, -6e-4);
+	ref3->set("target_pos_y", 0.9);
+	ref3->set(sprite::e_double::ACCELERATION_Y, -2e-3);
+	ref3->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
+	ref3->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
+	ref3->set(block::e_double::FRAMES_PER_SECOND, 10.0);
 
 	auto ref4_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); });
 	Block* ref4 = (Block*)&(*ref4_orig);
-	ref4->set(sprite::e_boolean::SHOWBOX, true);
-	ref4->set(sprite::e_boolean::SHOWDOT, true);
+	//ref4->set(sprite::e_boolean::SHOWBOX, true);
+	//ref4->set(sprite::e_boolean::SHOWDOT, true);
 	ref4->set(sprite::e_boolean::DRAW, true);
 	ref4->set(sprite::e_double::SCALE_G, 0.32);
 	ref4->set(sprite::e_double::TARG_POSX, 0.0);
-	ref4->set(sprite::e_double::TARG_POSY, -0.6);
-	ref4->set(sprite::e_double::ACCELERATION_Y, 6e-4);
+	ref4->set(sprite::e_double::TARG_POSY, -0.9);
+	ref4->set(sprite::e_double::ACCELERATION_Y, 2e-3);
 	ref4->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
 	ref4->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
 	ref4->set(block::e_double::FRAMES_PER_SECOND, 4.0);
@@ -206,7 +220,23 @@ int main(int argc, char* argv[]) {
 	ref6->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
 
 	core.addFunction(0, 2.0, [ref6_orig] {Text* ref6 = (Text*)&(*ref6_orig); int lala = 0; ref6->get("customcounter", lala); lala++; ref6->set("customcounter", lala); });
-	
+
+
+
+	auto ref7_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new BubbleFX()); });
+	BubbleFX* ref7 = (BubbleFX*)&(*ref7_orig);
+	//ref7->set(sprite::e_boolean::SHOWBOX, true);
+	//ref7->set(sprite::e_boolean::SHOWDOT, true);
+	ref7->set(sprite::e_boolean::DRAW, true);
+	ref7->set(sprite::e_double::SCALE_G, 2.0);
+	ref7->set(sprite::e_double::TARG_POSX, 0.0);
+	ref7->set(sprite::e_double::TARG_POSY, 0.0);
+	ref7->set(sprite::e_integer::LAYER, -1);
+	/*ref7->set(sprite::e_double::ACCELERATION_Y, 6e-4);*/
+
+
+
+	// debug
 	{
 		auto ref_orig = sprites.customLoad("_DEBUG_TEXT", [](Sprite_Base*& b) {return (b = new Text()); });
 		Text* mtt = (Text*)&(*ref_orig);
@@ -234,6 +264,7 @@ int main(int argc, char* argv[]) {
 
 	cam->set(camera::e_integer::ID, 0);
 	cam->addLayerConfig(Camera::layer_each(0));
+	cam->addLayerConfig(Camera::layer_each(-1));
 	cam->addLayerConfig(Camera::layer_each(100));
 	cam->refresh();
 	cam->apply();

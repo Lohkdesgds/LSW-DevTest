@@ -1,5 +1,7 @@
 #pragma once
 
+// C
+#define _CRT_RAND_S
 // C++
 #include <string>
 
@@ -19,7 +21,8 @@ namespace LSW {
 			constexpr size_t NoSolution = static_cast<size_t>(-1);
 
 			// game timing
-			const int game_timing_tps = 10;
+			constexpr int game_timing_tps = 17;
+			constexpr double game_collision_oversize = 1e-3;
 
 			// not actually template, but shared
 			/*struct super_char {

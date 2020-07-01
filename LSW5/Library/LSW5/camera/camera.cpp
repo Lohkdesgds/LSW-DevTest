@@ -68,7 +68,7 @@ namespace LSW {
 
 		Camera::Camera(Camera& other)
 		{
-			auto& j = other.copyRAW();
+			auto& j = other.getAttributes();
 
 			data.double_data = j.double_data;
 			data.boolean_data = j.boolean_data;
@@ -98,6 +98,7 @@ namespace LSW {
 				}
 			}
 			data.layers.push_back(v);
+			sort();
 		}
 
 		void Camera::delLayerConfig(const int v)
@@ -116,6 +117,11 @@ namespace LSW {
 				if (data.layers[p].getLayerID() == v) return &data.layers[p];
 			}
 			return nullptr;
+		}
+
+		void Camera::sort()
+		{
+			std::sort(data.layers.begin(), data.layers.end(), [](layer_each& a, layer_each& b) {return a.getLayerID() < b.getLayerID(); }); //sort the vector
 		}
 
 		void Camera::set(const camera::e_double e, double v)
@@ -324,7 +330,7 @@ namespace LSW {
 			if (psf->isEq(camera::e_boolean::RESPECT_LIMITS, true)) al_draw_rectangle(limits[0], limits[1], limits[2], limits[3], cp2, 0.010);
 		}
 
-		Camera::Camera_configuration& Camera::copyRAW()
+		Camera::Camera_configuration& Camera::getAttributes()
 		{
 			return data;
 		}

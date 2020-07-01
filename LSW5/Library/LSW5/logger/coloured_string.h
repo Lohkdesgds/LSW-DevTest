@@ -1,5 +1,7 @@
 #pragma once
 
+// C
+#define _CRT_RAND_S
 // C++
 #include <string>
 

@@ -1,11 +1,17 @@
 #pragma once
 
 // C
+#define _CRT_RAND_S
 #include <Windows.h>
 // C++
 #include <string>
 #include <functional>
 #include <thread>
+
+#ifdef _DEBUG
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_native_dialog.h>
+#endif
 
 namespace LSW {
 	namespace v5 {
