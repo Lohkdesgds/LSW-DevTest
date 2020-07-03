@@ -27,7 +27,6 @@ Logger header:
 #include "..\Abort\abort.h"
 #include "coloured_string.h"
 #include "printer.h"
-//#include "..\allegroinitialization\allegroinitialization.h"
 #include "..\tools\tools.h"
 #include "..\shared\shared.h"
 

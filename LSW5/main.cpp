@@ -197,7 +197,13 @@ int main(int argc, char* argv[]) {
 	ref5->getText()->set(text::e_double::SHADOW_DISTANCE_X, 4e-3);
 	ref5->getText()->set(text::e_double::SHADOW_DISTANCE_Y, 4e-3);
 	ref5->getText()->load("_FONT");
-	ref5->getText()->set(text::e_cstring::STRING, "HELLO WORLD DAMN IT FPS=%int_fps%");
+
+	const auto just_a_test = [] {return std::string("this is a F test lmao"); };
+	const std::string just_a_test_id = "testingg";
+
+	ref5->getText()->addNewEntry(just_a_test_id, just_a_test);
+
+	ref5->getText()->set(text::e_cstring::STRING, "RELOU FPS=%int_fps% %testingg%");
 	ref5->getText()->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
 
 

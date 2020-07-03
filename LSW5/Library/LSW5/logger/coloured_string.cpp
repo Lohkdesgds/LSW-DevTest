@@ -132,9 +132,7 @@ namespace LSW {
 		coloured_string coloured_string::substr(const size_t start, const size_t len)
 		{
 			coloured_string cpy;
-			size_t summ = start + len;
-			if (summ <= start && len != 0) summ = static_cast<size_t>(-1); // any start + max val < start, so it must be max
-			for (size_t p = start; p < str.size() && p < summ; p++) cpy += str[p];
+			for (size_t p = 0; (p + start) < str.size() && p < len; p++) cpy += str[p + start];
 			return cpy;
 		}
 
@@ -159,13 +157,14 @@ namespace LSW {
 
 		coloured_string& coloured_string::operator+=(const coloured_string & oth) {
 			//str.clear();
-			for(auto& i : oth) {
+			for(auto& i : oth) 
 				str += i;
-			}
+			
 			return *this;
 		}
 		coloured_string& coloured_string::operator+=(const std::string& rstr) {
 			//str.clear();
+			if (!rstr.size()) return *this;
 			C curr_color = C::WHITE, last_added_color = C::WHITE;
 			bool ignore_once = false;
 			bool percentage_c = false;
@@ -173,6 +172,7 @@ namespace LSW {
 
 			for (auto& i : rstr) {
 				has_backslash_to_add = false;
+				
 				if (i == '&' && !ignore_once) {
 					percentage_c = true;
 					continue;

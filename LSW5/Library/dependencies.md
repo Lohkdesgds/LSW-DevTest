@@ -1,5 +1,5 @@
 # Dependencies in LSW 5
-*Updated 2020/06/15 approx 07:42 GMT*
+*Updated 2020/07/02 approx 03:35 GMT*
 
 <hr>
 
@@ -117,7 +117,7 @@ Core | Abort<br>SuperTimer<br>SuperMap<br>Logger<br>Display<br>Shared<br>Autocas
 Database | Abort<br>SuperMap<br>Logger<br>Tools<br>SuperMutex
 Display | Abort<br>SuperThread<br>AllegroInitialization<br>SuperMutex<br>Tools<br>SuperMap
 Downloader | *none*
-Entities | Sprite<br>SuperResource<br>Database<br>Tools
+Entities | Sprite<br>SuperResource<br>Database<br>Tools<br>Shared
 FileSystem | Tools<br>AllegroInitialization
 Hash | *none*
 Launcher | *none*
@@ -129,6 +129,7 @@ SocketSystem | Abort<br>Tools<br>FileSystem<br>SuperMutex
 Sprite | Abort<br>SuperMap<br>AllegroInitialization<br>Autocaster<br>Tools<br>Camera<br>Shared<br>Database
 SuperMap | SuperPair
 SuperPair | Autocaster<br>Abort
+SuperMutex | *none*
 SuperResource | Abort<br>AllegroInitialization<br>SuperMutex
 SuperThread | AllegroInitialization
 SuperTimer | AllegroInitialization

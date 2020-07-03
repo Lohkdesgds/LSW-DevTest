@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <ShlObj.h>
 #include <stdlib.h>
+#include <stdarg.h>
 // C++
 #include <string>
 #include <vector>
@@ -72,6 +73,24 @@ namespace LSW {
 			template<typename T> const T* assert_cast(const T* w, const Abort::abort_level ab = Abort::abort_level::GIVEUP) { if (!w) { throw Abort::Abort(__FUNCSIG__, "assert_cast got exception: null", ab); } return w; }
 
 			template<typename T, typename... Args> T* new_guaranteed(Args... args) { T* ptr = nullptr; while (!(ptr = new T(args...))); return ptr; }
+
+
+			// sprintf, but creates its memory and save them as std::string
+			template<size_t len = 512> std::string sprintf_a(const char* format, ...) {
+				std::string str;
+				str.resize(len);
+
+				va_list args;
+				va_start(args, format);
+
+				auto readd = vsprintf_s(str.data(), str.size(), format, args);
+
+				va_end(args);
+
+				str.resize(readd); // set what is there
+				str.shrink_to_fit(); // clean up the rest of it (won't clear after it)
+				return str;
+			}
 		}
 	}
 }
