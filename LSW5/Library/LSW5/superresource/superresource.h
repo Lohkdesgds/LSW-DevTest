@@ -109,6 +109,7 @@ namespace LSW {
 
 				LSW::v5::SuperMutex m;
 				std::vector<generic_class<Q>> vec;
+				std::shared_ptr<Q> main_o; // useful for "priority" stuff like the main Mixer, main Camera and stuff like that
 
 				_data(std::function<bool(std::string&, Q*&)> a, std::function<void(Q*&)> b) { load = a; unload = b; }
 			};
@@ -117,6 +118,27 @@ namespace LSW {
 			bool is_this_autodie = false;
 		public:
 			~SuperResource() { if (is_this_autodie) clear(); }
+
+			// gets the main resource (the one set to be main via setMain)
+			std::shared_ptr<T> getMain() {
+				return data.main_o;
+			}
+			/* set a particular resource as main resource (good for main Mixer, Camera, and stuff)
+			   WARN: it won't automatically switch if you delete the same from SuperResource and replace with other one.
+			   WARN: if it is deleted from SuperResource, it might not get deleted until cleanMain() or a new setMain() is called. (no worries about invalid pointer)*/
+			bool setMain(const std::string id) {
+				for (auto& i : data.vec) {
+					if (i == id) {
+						data.main_o = i.data();
+						return true;
+					}
+				}
+				return false;
+			}
+			// removes any main stuff
+			void cleanMain() {
+				data.main_o.reset();
+			}
 
 			void autodie(bool die = true) {
 				is_this_autodie = die;

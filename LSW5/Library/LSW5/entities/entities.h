@@ -84,8 +84,12 @@ namespace LSW {
 
 			// from what id, path (can be "null" if you know the file is indeed loaded as id)
 			void load(const std::string, const std::string = "");
-			// new id, from what id copy, x, y, w, h
-			void loadCut(const std::string, const std::string, const int, const int, const int, const int);
+			// assumes that you want main texture (see SuperResource.setMain())
+			void load();
+			// from what id copy, x, y, w, h
+			void loadCut(const std::string, const int, const int, const int, const int);
+			// assumes that you want main texture (see SuperResource.setMain()), x, y, w, h
+			void loadCut(const int, const int, const int, const int);
 			// removes from its list all matches
 			void remove(const std::string);
 
@@ -182,10 +186,10 @@ namespace LSW {
 		}
 
 		class Text : public Sprite_Base {
-			struct _text {
+			/*struct _text {
 				std::shared_ptr<ALLEGRO_FONT> ref;
 				std::string source, id;
-			};
+			};*/
 
 			struct text_data {
 				SuperMap<coloured_string>												string_readonly_data		= text::e_string_readonly_defaults;
@@ -201,8 +205,9 @@ namespace LSW {
 			};
 
 			std::shared_ptr<text_data> data_text = std::make_shared<text_data>();
-
-			_text font;
+			
+			//_text font;
+			std::shared_ptr<ALLEGRO_FONT> fontt;
 
 			// call on Text() build
 			void __link_hard_task();
@@ -221,6 +226,8 @@ namespace LSW {
 
 			// from what id, path (can be "null" if you know the file is indeed loaded as id)
 			void load(const std::string, const std::string = "");
+			// gets from main font (SuperResource.setMain(...))
+			void load();
 			// removes font
 			void remove();
 

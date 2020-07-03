@@ -78,6 +78,7 @@ int main(int argc, char* argv[]) {
 
 
 	auto cam = cameras.create("MAIN_CAMERA");
+	cameras.setMain("MAIN_CAMERA");
 
 	Core core;
 
@@ -94,7 +95,9 @@ int main(int argc, char* argv[]) {
 
 
 	fonts.create("_FONT", "font.ttf"); // load main font
+	fonts.setMain("_FONT");
 	bitmaps.create("_ATLAS0", "atlas0.png"); // load big atlas
+	bitmaps.setMain("_ATLAS0");
 
 	size_t countgen = 0;
 
@@ -108,8 +111,8 @@ int main(int argc, char* argv[]) {
 	ref->set("target_pos_x", -0.9);
 	ref->set("target_pos_y", 0.2);
 	ref->set(sprite::e_double::ACCELERATION_X, 2e-3);
-	ref->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
-	ref->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
+	ref->loadCut(0, 1536, 512, 512);
+	ref->loadCut(0, 1024, 512, 512);
 	ref->set(block::e_double::FRAMES_PER_SECOND, 2.0);
 
 	auto ref2_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); }); // sprites.create("test" + std::to_string(countgen++));
@@ -120,8 +123,8 @@ int main(int argc, char* argv[]) {
 	ref2->set("target_pos_x", 0.9);
 	ref2->set("target_pos_y", 0.2);
 	ref2->set(sprite::e_double::ACCELERATION_X, -2e-3);
-	ref2->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
-	ref2->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
+	ref2->loadCut(0, 1536, 512, 512);
+	ref2->loadCut(0, 1024, 512, 512);
 	ref2->set(block::e_double::FRAMES_PER_SECOND, 6.0);
 
 	auto ref3_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); }); // sprites.create("test" + std::to_string(countgen++));
@@ -132,8 +135,8 @@ int main(int argc, char* argv[]) {
 	ref3->set("target_pos_x", 0.0);
 	ref3->set("target_pos_y", 0.9);
 	ref3->set(sprite::e_double::ACCELERATION_Y, -2e-3);
-	ref3->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
-	ref3->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
+	ref3->loadCut(0, 1536, 512, 512);
+	ref3->loadCut(0, 1024, 512, 512);
 	ref3->set(block::e_double::FRAMES_PER_SECOND, 10.0);
 
 	auto ref4_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); });
@@ -145,8 +148,8 @@ int main(int argc, char* argv[]) {
 	ref4->set(sprite::e_double::TARG_POSX, 0.0);
 	ref4->set(sprite::e_double::TARG_POSY, -0.9);
 	ref4->set(sprite::e_double::ACCELERATION_Y, 2e-3);
-	ref4->loadCut("fatia_atlas_0", "_ATLAS0", 0, 1536, 512, 512);
-	ref4->loadCut("fatia_atlas_1", "_ATLAS0", 0, 1024, 512, 512);
+	ref4->loadCut(0, 1536, 512, 512);
+	ref4->loadCut(0, 1024, 512, 512);
 	ref4->set(block::e_double::FRAMES_PER_SECOND, 4.0);
 
 
@@ -196,7 +199,7 @@ int main(int argc, char* argv[]) {
 	ref5->getText()->set(text::e_color::SHADOW_COLOR, al_map_rgb(127, 127, 127));
 	ref5->getText()->set(text::e_double::SHADOW_DISTANCE_X, 4e-3);
 	ref5->getText()->set(text::e_double::SHADOW_DISTANCE_Y, 4e-3);
-	ref5->getText()->load("_FONT");
+	ref5->getText()->load();
 
 	const auto just_a_test = [] {return std::string("this is a F test lmao"); };
 	const std::string just_a_test_id = "testingg";
@@ -207,7 +210,7 @@ int main(int argc, char* argv[]) {
 	ref5->getText()->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
 
 
-
+	
 	auto ref6_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Text()); });
 	Text* ref6 = (Text*)&(*ref6_orig);
 	//ref6->set(sprite::e_boolean::SHOWBOX, true);
@@ -220,9 +223,10 @@ int main(int argc, char* argv[]) {
 	ref6->set(sprite::e_double::SCALE_G, 0.07);
 	ref6->set(sprite::e_double::SCALE_X, 0.4);
 	ref6->set("customcounter", static_cast<int>(0));
-	ref6->load("_FONT");
+	ref6->load();
 	//ref6->set(text::e_cstring::STRING, [ref6] {int lala = 0; ref6->get("customcounter", lala); lala++; ref6->set("customcounter", lala); return coloured_string("%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites% | LALA=") + lala; });
-	ref6->set(text::e_cstring::STRING, [ref6] {int lala = 0; ref6->get("customcounter", lala); return coloured_string("%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites% | LALA=") + lala; });
+	ref6->addNewEntry("lala_lmao", [ref6] {int lala = 0; ref6->get("customcounter", lala); return std::to_string(lala); });
+	ref6->set(text::e_cstring::STRING, "%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites% | LALA=%lala_lmao%");
 	ref6->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
 
 	core.addFunction(0, 2.0, [ref6_orig] {Text* ref6 = (Text*)&(*ref6_orig); int lala = 0; ref6->get("customcounter", lala); lala++; ref6->set("customcounter", lala); });
@@ -255,7 +259,7 @@ int main(int argc, char* argv[]) {
 		mtt->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
 		mtt->set(sprite::e_double::SCALE_G, 0.065);
 		mtt->set(sprite::e_double::SCALE_X, 0.4);
-		mtt->load("_FONT");
+		mtt->load();
 		mtt->set(text::e_cstring::STRING, "REPOLHO");
 		mtt->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
 		mtt->set(sprite::e_integer::LAYER, 100);

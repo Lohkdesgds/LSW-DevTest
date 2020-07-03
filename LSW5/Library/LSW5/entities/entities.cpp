@@ -121,17 +121,30 @@ namespace LSW {
 			SuperResource<ALLEGRO_BITMAP> bmps;
 			_bitmap binfo;
 
-			binfo.ref = bmps.load(id, str);
-			binfo.is_sub_bitmap = false;
-			binfo.source = str;
-			binfo.id = id;
+			if (binfo.ref = bmps.load(id, str)) {
+				binfo.is_sub_bitmap = false;
+				binfo.source = str;
+				binfo.id = id;
 
-			if (!binfo.ref) throw Abort::Abort(__FUNCSIG__, "Cannot load '" + id + "'!");
-
-			bitmaps.push_back(binfo);
-
+				bitmaps.push_back(binfo);
+			}
+			throw Abort::Abort(__FUNCSIG__, "Cannot load '" + id + "'!");
 		}
-		void Block::loadCut(const std::string id, const std::string parent_id, const int x, const int y, const int w, const int h)
+		void Block::load()
+		{
+			SuperResource<ALLEGRO_BITMAP> bmps;
+			_bitmap binfo;
+
+			if (binfo.ref = bmps.getMain()) {
+				binfo.is_sub_bitmap = false;
+				binfo.source.clear(); // main
+				binfo.id.clear(); // main
+
+				bitmaps.push_back(binfo);
+			}
+			throw Abort::Abort(__FUNCSIG__, "There's no MAIN TEXTURE set! (See SuperResource.setMain(...))");
+		}
+		void Block::loadCut(const std::string parent_id, const int x, const int y, const int w, const int h)
 		{
 			SuperResource<ALLEGRO_BITMAP> bmps;
 			std::shared_ptr<ALLEGRO_BITMAP> parent;
@@ -141,8 +154,8 @@ namespace LSW {
 
 				binfo.source = parent_id;
 				binfo.is_sub_bitmap = true;
-				binfo.id = id;
-				binfo.ref = bmps.customLoad(id, [=](ALLEGRO_BITMAP*& ret) {return ret = al_create_sub_bitmap(&(*parent), x, y, w, h); });
+				binfo.id = parent_id + "_cut&" + Tools::generateRandomUniqueStringN();
+				binfo.ref = bmps.customLoad(binfo.id, [=](ALLEGRO_BITMAP*& ret) {return ret = al_create_sub_bitmap(&(*parent), x, y, w, h); });
 
 				if (binfo.ref)
 				{
@@ -151,6 +164,26 @@ namespace LSW {
 				}
 			}
 			throw Abort::Abort(__FUNCSIG__, "Cannot get sub part of '" + parent_id + "'!");
+		}
+		void Block::loadCut(const int x, const int y, const int w, const int h)
+		{
+			SuperResource<ALLEGRO_BITMAP> bmps;
+			if (std::shared_ptr<ALLEGRO_BITMAP> parent = bmps.getMain())
+			{
+				_bitmap binfo;
+
+				binfo.source.clear(); // main
+				binfo.is_sub_bitmap = true;
+				binfo.id = "_cut&" + Tools::generateRandomUniqueStringN();
+				binfo.ref = bmps.customLoad(binfo.id, [=](ALLEGRO_BITMAP*& ret) {return ret = al_create_sub_bitmap(&(*parent), x, y, w, h); });
+
+				if (binfo.ref)
+				{
+					bitmaps.push_back(binfo);
+					return;
+				}
+			}
+			throw Abort::Abort(__FUNCSIG__, "There's no MAIN TEXTURE set! (See SuperResource.setMain(...))");
 		}
 		void Block::remove(const std::string id)
 		{
@@ -390,7 +423,7 @@ namespace LSW {
 		{
 			/*SuperResource<Camera> cameras;
 			//if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-			std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera*/
+			std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera*/
 			//std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
 			//Database conf;
 			//ALLEGRO_DISPLAY* d = al_get_current_display();
@@ -402,7 +435,7 @@ namespace LSW {
 						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (*getRef(sprite::e_double_readonly::POSX) + (follow ? *follow->getRef(sprite::e_double_readonly::POSX) : 0.0) + (cam ? *cam->getRef(camera::e_double::OFFSET_X) : 0.0)));
 					},
 						CHAR_INIT("%pos_x%"), 						(text::e_custom_tags::T_POSX)
@@ -412,7 +445,7 @@ namespace LSW {
 						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (*getRef(sprite::e_double_readonly::POSY) + (follow ? *follow->getRef(sprite::e_double_readonly::POSY) : 0.0) + (cam ? *cam->getRef(camera::e_double::OFFSET_Y) : 0.0)));
 					},
 						CHAR_INIT("%pos_y%"), 						(text::e_custom_tags::T_POSY)
@@ -422,7 +455,7 @@ namespace LSW {
 						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (*getRef(sprite::e_double_readonly::POSX) * (*getRef(sprite::e_boolean::AFFECTED_BY_CAM) ? (cam ? (*cam->getRef(camera::e_double::SCALE_G) * *cam->getRef(camera::e_double::SCALE_X)) : 1.0) : 1.0) + (follow ? *follow->getRef(sprite::e_double_readonly::POSX) : 0.0) * (cam ? (*cam->getRef(camera::e_double::SCALE_G) * *cam->getRef(camera::e_double::SCALE_X)) : 1.0)));
 					},
 						CHAR_INIT("%screen_pos_x%"), 				(text::e_custom_tags::T_SCREEN_POSX)
@@ -432,7 +465,7 @@ namespace LSW {
 						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (*getRef(sprite::e_double_readonly::POSY) * (*getRef(sprite::e_boolean::AFFECTED_BY_CAM) ? (cam ? (*cam->getRef(camera::e_double::SCALE_G) * *cam->getRef(camera::e_double::SCALE_Y)) : 1.0) : 1.0) + (follow ? *follow->getRef(sprite::e_double_readonly::POSY) : 0.0) * (cam ? (*cam->getRef(camera::e_double::SCALE_G) * *cam->getRef(camera::e_double::SCALE_Y)) : 1.0)));
 
 					},
@@ -624,7 +657,7 @@ namespace LSW {
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::OFFSET_X) : 0.0));
 					},
 						CHAR_INIT("%cam_x%"), 						(text::e_custom_tags::T_CAM_X)
@@ -633,7 +666,7 @@ namespace LSW {
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::OFFSET_Y) : 0.0));
 					},
 						CHAR_INIT("%cam_y%"), 						(text::e_custom_tags::T_CAM_Y)
@@ -642,7 +675,7 @@ namespace LSW {
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (cam ? (*cam->getRef(camera::e_double::SCALE_G) * sqrt(*cam->getRef(camera::e_double::SCALE_X) * *cam->getRef(camera::e_double::SCALE_Y))) : 0.0));
 					},
 						CHAR_INIT("%cam_zoom_combined%"), 			(text::e_custom_tags::T_CAM_ZOOM)
@@ -651,7 +684,7 @@ namespace LSW {
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::SCALE_G) : 0.0));
 					},
 						CHAR_INIT("%cam_zoom_g%"), 					(text::e_custom_tags::T_CAM_ZOOMG)
@@ -660,7 +693,7 @@ namespace LSW {
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::SCALE_X) : 0.0));
 					},
 						CHAR_INIT("%cam_zoom_x%"), 					(text::e_custom_tags::T_CAM_ZOOMX)
@@ -669,7 +702,7 @@ namespace LSW {
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
-						std::shared_ptr<Camera> cam = cameras.begin()->data(); // get first cam as main camera
+						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
 						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::SCALE_Y) : 0.0));
 					},
 						CHAR_INIT("%cam_zoom_y%"), 					(text::e_custom_tags::T_CAM_ZOOMY)
@@ -963,7 +996,13 @@ namespace LSW {
 
 		void Text::draw_self()
 		{
-			if (!font.ref) throw Abort::Abort(__FUNCSIG__, "No font texture, but called draw anyway!", Abort::abort_level::GIVEUP);
+			if (!fontt) {
+#ifdef _DEBUG
+				throw Abort::Abort(__FUNCSIG__, "No font texture, but called draw anyway!", Abort::abort_level::GIVEUP);
+#elif
+				load(); // assume you have default texture set up (main)
+#endif
+			}
 
 			double off_x = 0.0;
 			double off_y = 0.0;
@@ -1047,10 +1086,8 @@ namespace LSW {
 			}
 
 			SuperResource<Camera> cameras;
-			if (cameras.size() == 0) {
-				throw Abort::Abort(__FUNCSIG__, "NO CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource)", Abort::abort_level::GIVEUP);
-			}
-			std::shared_ptr<Camera> ruler = cameras.begin()->data(); // get first cam as main camera
+			std::shared_ptr<Camera> ruler;
+			if (ruler = cameras.getMain(); !ruler) throw Abort::Abort(__FUNCSIG__, "NO MAIN CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource.setMain())");
 			Camera preset;
 
 			//double camx, camy, camg;
@@ -1067,7 +1104,7 @@ namespace LSW {
 			preset.apply();
 
 			if (s_dist_x != 0.0 || s_dist_y != 0.0) {
-				al_draw_text(&(*font.ref), s_col, 1.0 * targ_draw_xy_shadow[0] / (scale_g), 1.0 * targ_draw_xy_shadow[1] / (scale_g), mode, p_str.s_str().c_str());
+				al_draw_text(&(*fontt), s_col, 1.0 * targ_draw_xy_shadow[0] / (scale_g), 1.0 * targ_draw_xy_shadow[1] / (scale_g), mode, p_str.s_str().c_str());
 			}
 			if (per_char) {
 				//char minibuf[2] = { 0 };
@@ -1085,13 +1122,13 @@ namespace LSW {
 						p++;
 					}
 
-					al_draw_text(&(*font.ref), clr_now, 1.0 * targ_draw_xy[0] / (scale_g) + offset_x_f * cos(rotation_rad), 1.0 * targ_draw_xy[1] / (scale_g) - offset_x_f * sin(rotation_rad), mode, thebuff.c_str());
+					al_draw_text(&(*fontt), clr_now, 1.0 * targ_draw_xy[0] / (scale_g) + offset_x_f * cos(rotation_rad), 1.0 * targ_draw_xy[1] / (scale_g) - offset_x_f * sin(rotation_rad), mode, thebuff.c_str());
 
-					offset_x_f += al_get_text_width(&(*font.ref), thebuff.c_str());
+					offset_x_f += al_get_text_width(&(*fontt), thebuff.c_str());
 					thebuff.clear();
 				}
 			}
-			else al_draw_text(&(*font.ref), n_col, 1.0 * targ_draw_xy[0] / (scale_g), 1.0 * targ_draw_xy[1] / (scale_g), mode, p_str.s_str().c_str());
+			else al_draw_text(&(*fontt), n_col, 1.0 * targ_draw_xy[0] / (scale_g), 1.0 * targ_draw_xy[1] / (scale_g), mode, p_str.s_str().c_str());
 
 			ruler->apply();
 		}
@@ -1112,19 +1149,28 @@ namespace LSW {
 		{
 			SuperResource<ALLEGRO_FONT> bmps;
 
-			font.ref = bmps.load(id, str);
+			/*font.ref = bmps.load(id, str);
 			font.source = str;
-			font.id = id;
+			font.id = id;*/
+			fontt = bmps.load(id, str);
 
-			if (!font.ref) throw Abort::Abort(__FUNCSIG__, "Cannot load '" + id + "'!");
+			if (!fontt) throw Abort::Abort(__FUNCSIG__, "Cannot load '" + id + "'!");
 
+		}
+
+		void Text::load()
+		{
+			SuperResource<ALLEGRO_FONT> fonts;
+			fontt = fonts.getMain();
+			if (!fontt) throw Abort::Abort(__FUNCSIG__, "There's no MAIN FONT set! (See SuperResource.setMain(...))");
 		}
 
 		void Text::remove()
 		{
-			font.ref.reset();
+			/*font.ref.reset();
 			font.source.clear();
-			font.id.clear();
+			font.id.clear();*/
+			fontt.reset();
 		}
 
 		void Text::twinUpAttributes(const std::shared_ptr<text_data> oth)

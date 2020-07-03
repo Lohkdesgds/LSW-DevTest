@@ -79,12 +79,12 @@ namespace LSW {
 			SuperResource<Camera> cameras;
 			SuperResource<Sprite_Base> sprites;
 
-			if (cameras.size() == 0) {
+			/*if (cameras.size() == 0) {
 				throw Abort::Abort(__FUNCSIG__, "NO CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource)");
-			}
+			}*/
 
 
-			std::shared_ptr<Camera> main_cam = cameras.begin()->data(); // get first cam as main camera
+			//std::shared_ptr<Camera> main_cam = cameras.getMain(); // get main cam as main camera
 			/*{
 				auto ref_orig = sprites.customLoad("_DEBUG_TEXT", [](Sprite_Base*& b) {return (b = new Text()); });
 				Text* mtt = (Text*)&(*ref_orig);
@@ -202,8 +202,10 @@ namespace LSW {
 							al_convert_bitmaps();
 						}
 						else if (data.display_routine.routines.isThisThis(static_cast<size_t>(core::thr_display_routines::CHECK_CAMERA_REFRESH))) {
-							main_cam->refresh();
-							main_cam->apply();
+							if (auto cam = cameras.getMain(); cam) {
+								cam->refresh();
+								cam->apply();
+							}
 						}
 
 						// OTHER EVENTS (Allegro and stuff)
@@ -263,16 +265,20 @@ namespace LSW {
 
 
 					// draw?
+					if (auto main_cam = cameras.getMain(); main_cam) {
+						main_cam->matrix_debug();
+						main_cam->apply();
+						auto& con = main_cam->getAttributes();
 
-					main_cam->matrix_debug();
-					main_cam->apply();
-					auto& con = main_cam->getAttributes();
-
-					for (auto& c : con.layers) {
-						for (auto& i : sprites)
-						{
-							i->draw(&(*main_cam), c.getLayerID());
+						for (auto& c : con.layers) {
+							for (auto& i : sprites)
+							{
+								i->draw(&(*main_cam), c.getLayerID());
+							}
 						}
+					}
+					else {
+						throw Abort::Abort(__FUNCSIG__, "NO MAIN CAMERA HAS BEEN SET UP! Please set up a Camera for drawing! (Using SuperResource.setMain())");
 					}
 
 					//cam.getLastCameraApply()->matrix_debug();
@@ -395,17 +401,19 @@ namespace LSW {
 						sprites.lock();
 
 						SuperResource<Camera> cameras;
-						if (cameras.size() == 0) {
-							throw Abort::Abort(__FUNCSIG__, "NO CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource)");
-						}
-						std::shared_ptr<Camera> main_cam = cameras.begin()->data(); // get first cam as main camera
-								
-						for (auto& i : sprites) {
-							i->update(&(*main_cam)); // process positioning
 
-							for (auto& j : sprites) {
-								if (i != j) i->collide(&(*main_cam), *j.data());
+						if (auto main_cam = cameras.getMain(); main_cam) {
+							for (auto& i : sprites) {
+								i->update(&(*main_cam)); // process positioning
+
+								for (auto& j : sprites) {
+									if (i != j) i->collide(&(*main_cam), *j.data());
+								}
 							}
+						}
+						else {
+							sprites.unlock();
+							throw Abort::Abort(__FUNCSIG__, "NO MAIN CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource.setMain())");
 						}
 
 						sprites.unlock();
@@ -477,29 +485,32 @@ namespace LSW {
 					}
 					else if (data.events_routine.routines.isThisThis(static_cast<size_t>(core::thr_events_routines::UPDATE_MOUSE))) {
 						SuperResource<Camera> cameras;
-						if (cameras.size() == 0) throw Abort::Abort(__FUNCSIG__, "Cannot work with mouse positioning without a camera set at pos 0!", Abort::abort_level::GIVEUP);
 
 						double md[2];
 						db.get(database::e_double::RAW_MOUSE_X, md[0]);
 						db.get(database::e_double::RAW_MOUSE_Y, md[1]);
 
 						float m[2];
-						for (short p = 0; p < 2; p++) m[p] = +md[p];
+						for (short p = 0; p < 2; p++) m[p] = static_cast<float>(md[p]);
 
 						// transform based on cam
-						auto psf = cameras.begin()->data();
+						if (auto psf = cameras.getMain(); psf) {
 
-						ALLEGRO_TRANSFORM untransf = psf->getTransform();
-						al_invert_transform(&untransf);
-						al_transform_coordinates(&untransf, &m[0], &m[1]);
+							ALLEGRO_TRANSFORM untransf = psf->getTransform();
+							al_invert_transform(&untransf);
+							al_transform_coordinates(&untransf, &m[0], &m[1]);
 
-						for (short p = 0; p < 2; p++) {
-							md[p] = static_cast<double>(m[p]);
+							for (short p = 0; p < 2; p++) {
+								md[p] = static_cast<double>(m[p]);
+							}
+
+							db.set(database::e_double::MOUSE_X, md[0]);
+							db.set(database::e_double::MOUSE_Y, md[1]);
 						}
-
-						db.set(database::e_double::MOUSE_X, md[0]);
-						db.set(database::e_double::MOUSE_Y, md[1]);
-
+						else {
+							md[0] = md[1] = 0.0;
+							throw Abort::Abort(__FUNCSIG__, "Cannot work with mouse positioning without a camera set at pos 0!", Abort::abort_level::GIVEUP);
+						}
 
 						for (auto& i : sprites) {
 							if (!i.getEnabled()) continue;
