@@ -1,5 +1,5 @@
 # Dependencies in LSW 5
-*Updated 2020/07/02 approx 03:35 GMT*
+*Updated 2020/07/04 approx 21:14 GMT-3*
 
 <hr>
 
@@ -103,6 +103,22 @@
 *Useful tools to use around the app!*
 <hr>
 
+#### Voice
+*It's the sound device itself (hardware or software).*
+<hr>
+
+#### Mixer
+*It's an interface for handling samples/tracks/other mixers.*
+<hr>
+
+#### Sample
+*It's the music file handler itself. If you want to load a music, you have to firstly create a Sample of it.*
+<hr>
+
+#### Track
+*It's the music "player" (instance). You can load a Sample and handle it with this.*
+<hr>
+
 ## Dependency configuration
 *Some dependencies may be chained from other headers.*
 
@@ -113,7 +129,7 @@ Abort | *none*
 AllegroInitialization | *none*
 Autocaster | *none*
 Camera | SuperMap<br>Tools<br>AllegroInitialization<br>SuperResource<br>Database
-Core | Abort<br>SuperTimer<br>SuperMap<br>Logger<br>Display<br>Shared<br>Autocaster<br>Database<br>SuperResource<br>Sprite<br>Entities
+Core | Abort<br>SuperTimer<br>SuperMap<br>Logger<br>Display<br>Shared<br>Autocaster<br>Database<br>SuperResource<br>Sprite<br>Entities<br>Tracks
 Database | Abort<br>SuperMap<br>Logger<br>Tools<br>SuperMutex
 Display | Abort<br>SuperThread<br>AllegroInitialization<br>SuperMutex<br>Tools<br>SuperMap
 Downloader | *none*
@@ -134,3 +150,7 @@ SuperResource | Abort<br>AllegroInitialization<br>SuperMutex
 SuperThread | AllegroInitialization
 SuperTimer | AllegroInitialization
 Tools | Abort
+Voice | SuperResource<br>AllegroInitialization<br>Mixer<br>Tools
+Mixer | SuperResource<br>AllegroInitialization<br>Tracks
+Track | Abort<br>SuperResource<br>AllegroInitialization<br>Sample<br>SuperMap<br>Tools
+Sample | SuperResource<br>AllegroInitialization<br>Tools

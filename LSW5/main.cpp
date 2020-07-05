@@ -11,6 +11,10 @@
 #include "Library\LSW5\autocaster\autocaster.h"
 #include "Library\LSW5\filesystem\filesystem.h"
 
+
+// testing
+#include "Library\LSW5\voice\voice.h"
+
 using namespace LSW::v5;
 
 // nvidia stuff
@@ -289,6 +293,37 @@ int main(int argc, char* argv[]) {
 	core.unpause();
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Unpaused CORE - - -" << L::ELF;
+
+
+	// VOICE/MIXER/TRACK test
+
+	SuperResource<Voice> voices;
+	SuperResource<Mixer> mixers;
+	SuperResource<Sample> samples;
+	SuperResource<Track> tracks;
+
+
+	std::shared_ptr<Voice> voice = voices.create("MAIN_VOICE");
+	std::shared_ptr<Mixer> mixer = mixers.create("GLOBAL");
+	voice->attach(mixer);
+
+	
+	std::shared_ptr<Sample> file_music = samples.create("mymusic");
+	file_music->load("musics/music_02.ogg");
+
+	std::shared_ptr<Track> trk = tracks.create("mytrack");
+
+	trk->load(file_music);
+
+	trk->set(track::e_boolean::PLAYING, true);
+
+	mixer->attach(trk);
+
+	//trk->update();
+	
+
+
+
 
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Resting - - -" << L::ELF;

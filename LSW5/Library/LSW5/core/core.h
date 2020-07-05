@@ -17,6 +17,7 @@
 #include "..\superresource\superresource.h"
 #include "..\sprite\sprite.h"
 #include "..\entities\entities.h"
+#include "..\track\track.h"
 
 /*
 LATER: (maybe) add a way to create threads to specific layers of collision
@@ -36,9 +37,10 @@ namespace LSW {
 			enum class thr_collision_routines	{ LOOP_TRACK, COLLISION_WORK };
 			enum class thr_events_routines		{ LOOP_TRACK, UPDATE_MOUSE };
 			enum class thr_functional_routines	{ LOOP_TRACK };
+			enum class thr_musical_routines		{ LOOP_TRACK, UPDATE_TRACKS };
 
 			enum class thr_ids {
-				ALL = -1, DRAWING, COLLIDING, EVENTS, FUNCTIONAL,
+				ALL = -1, DRAWING, COLLIDING, EVENTS, FUNCTIONAL, MUSICAL,
 				__THREADS_COUNT
 			};
 
@@ -47,6 +49,7 @@ namespace LSW {
 			typedef SuperTimer<1, Shared::game_timing_tps>			__collision_routines;
 			typedef SuperTimer<1, 60>								__events_routines;
 			typedef SuperTimer<1>									__functional_routines;
+			typedef SuperTimer<1, 5>								__musical_routines;
 		}
 
 
@@ -83,6 +86,7 @@ namespace LSW {
 				core_each_core_data<core::__collision_routines>		collision_routine;
 				core_each_core_data<core::__events_routines>		events_routine;
 				core_each_core_data<core::__functional_routines>	functional_routine;
+				core_each_core_data<core::__musical_routines>		musical_routine;
 
 				ALLEGRO_EVENT_SOURCE evsrc{};
 				std::mutex gmute;
@@ -111,6 +115,7 @@ namespace LSW {
 			void thr_1(Threads::boolThreadF&); // COLLIDING
 			void thr_2(Threads::boolThreadF&); // EVENTS
 			void thr_3(Threads::boolThreadF&); // FUNCTIONAL
+			void thr_4(Threads::boolThreadF&); // MUSICAL
 
 			void internalEnd();
 		public:

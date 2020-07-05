@@ -285,6 +285,20 @@ namespace LSW {
 				data.m.unlock();
 				return false;
 			}
+			bool remove(const std::shared_ptr<T> sptr) {
+				if (!data.unload) throw Abort::Abort(__FUNCSIG__, "You have to setup load/unload lambdas before using dynamic resource", Abort::abort_level::FATAL_ERROR);
+				data.m.lock();
+				for (size_t p = 0; p < data.vec.size(); p++) {
+					auto& i = data.vec[p];
+					if (i.data() == sptr) {
+						data.vec.erase(data.vec.begin() + p);
+						data.m.unlock();
+						return true;
+					}
+				}
+				data.m.unlock();
+				return false;
+			}
 			size_t remove(const std::function<bool(const std::string)> f)
 			{
 				if (!data.unload) throw Abort::Abort(__FUNCSIG__, "You have to setup load/unload lambdas before using dynamic resource", Abort::abort_level::FATAL_ERROR);
@@ -379,22 +393,34 @@ namespace LSW {
 		template<typename K> const auto lambda_default_unload = [](K*& b) -> void { if (b) delete b; b = nullptr; };
 
 
-		inline const auto lambda_bitmap_load = [](std::string& p, ALLEGRO_BITMAP*& b) -> bool { return ((b = al_load_bitmap(p.c_str()))); };
+		inline const auto lambda_bitmap_load = [](std::string& p, ALLEGRO_BITMAP*& b) -> bool { return (b = al_load_bitmap(p.c_str())); };
 		inline const auto lambda_bitmap_unload = [](ALLEGRO_BITMAP*& b) -> void {if (al_is_system_installed() && b) { al_destroy_bitmap(b); b = nullptr; } };
 
-		inline const auto lambda_font_load = [](std::string& p, ALLEGRO_FONT*& b) -> bool { return ((b = al_load_ttf_font(p.c_str(), 75.0, 0))); };
+		inline const auto lambda_font_load = [](std::string& p, ALLEGRO_FONT*& b) -> bool { return (b = al_load_ttf_font(p.c_str(), 75.0, 0)); };
 		inline const auto lambda_font_unload = [](ALLEGRO_FONT*& b) -> void { if (al_is_system_installed() && b) { al_destroy_font(b); b = nullptr; } };
 
-		inline const auto lambda_sample_load = [](std::string& p, ALLEGRO_SAMPLE*& b) -> bool { return ((b = al_load_sample(p.c_str()))); };
+		inline const auto lambda_sample_load = [](std::string& p, ALLEGRO_SAMPLE*& b) -> bool { return (b = al_load_sample(p.c_str())); };
 		inline const auto lambda_sample_unload = [](ALLEGRO_SAMPLE*& b) -> void { if (al_is_system_installed() && b) { al_destroy_sample(b); b = nullptr; } };
+
+		inline const auto lambda_sampleinst_load = [](std::string& p, ALLEGRO_SAMPLE_INSTANCE*& b) -> bool { return (b = al_create_sample_instance(nullptr)); };
+		inline const auto lambda_sampleinst_unload = [](ALLEGRO_SAMPLE_INSTANCE*& b) -> void { if (al_is_system_installed() && b) { al_detach_sample_instance(b); al_destroy_sample_instance(b); b = nullptr; } };
+
+		inline const auto lambda_voice_load = [](std::string& p, ALLEGRO_VOICE*& b) -> bool { return (b = al_create_voice(48000, ALLEGRO_AUDIO_DEPTH_INT16, ALLEGRO_CHANNEL_CONF_2)); };
+		inline const auto lambda_voice_unload = [](ALLEGRO_VOICE*& b) -> void { if (al_is_system_installed() && b) { al_detach_voice(b); al_destroy_voice(b); b = nullptr; } };
+
+		inline const auto lambda_mixer_load = [](std::string& p, ALLEGRO_MIXER*& b) -> bool { return (b = al_create_mixer(48000, ALLEGRO_AUDIO_DEPTH_INT16, ALLEGRO_CHANNEL_CONF_2)); };
+		inline const auto lambda_mixer_unload = [](ALLEGRO_MIXER*& b) -> void { if (al_is_system_installed() && b) { al_detach_mixer(b); al_destroy_mixer(b); b = nullptr; } };
 
 
 		template<typename T> SuperResource<T>::_data<T> SuperResource<T>::data = { lambda_default_load<T>, lambda_default_unload<T> };
 
 		// type specific
-		template <> SuperResource<ALLEGRO_BITMAP>::_data<ALLEGRO_BITMAP>	SuperResource<ALLEGRO_BITMAP>::data = { lambda_bitmap_load, lambda_bitmap_unload };
-		template <> SuperResource<ALLEGRO_FONT>::_data<ALLEGRO_FONT>		SuperResource<ALLEGRO_FONT>::data = { lambda_font_load, lambda_font_unload };
-		template <> SuperResource<ALLEGRO_SAMPLE>::_data<ALLEGRO_SAMPLE>	SuperResource<ALLEGRO_SAMPLE>::data = { lambda_sample_load, lambda_sample_unload };
+		template <> SuperResource<ALLEGRO_BITMAP>::_data<ALLEGRO_BITMAP>					SuperResource<ALLEGRO_BITMAP>::data				= { lambda_bitmap_load, lambda_bitmap_unload };
+		template <> SuperResource<ALLEGRO_FONT>::_data<ALLEGRO_FONT>						SuperResource<ALLEGRO_FONT>::data				= { lambda_font_load, lambda_font_unload };
+		template <> SuperResource<ALLEGRO_SAMPLE>::_data<ALLEGRO_SAMPLE>					SuperResource<ALLEGRO_SAMPLE>::data				= { lambda_sample_load, lambda_sample_unload };
+		template <> SuperResource<ALLEGRO_SAMPLE_INSTANCE>::_data<ALLEGRO_SAMPLE_INSTANCE>	SuperResource<ALLEGRO_SAMPLE_INSTANCE>::data	= { lambda_sampleinst_load, lambda_sampleinst_unload };
+		template <> SuperResource<ALLEGRO_VOICE>::_data<ALLEGRO_VOICE>						SuperResource<ALLEGRO_VOICE>::data				= { lambda_voice_load, lambda_voice_unload };
+		template <> SuperResource<ALLEGRO_MIXER>::_data<ALLEGRO_MIXER>						SuperResource<ALLEGRO_MIXER>::data				= { lambda_mixer_load, lambda_mixer_unload };
 
 
 	}

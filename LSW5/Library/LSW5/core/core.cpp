@@ -29,6 +29,10 @@ namespace LSW {
 						thr_3(f);
 						exit_this = true;
 						break;
+					case core::thr_ids::MUSICAL:
+						thr_4(f);
+						exit_this = true;
+						break;
 					}
 				}
 				catch (Abort::Abort err) {
@@ -681,12 +685,54 @@ namespace LSW {
 			data.functional_routine.deinitialize(); // set as unitialized once ended the thread stuff
 		}
 
+		void Core::thr_4(Threads::boolThreadF& keep)
+		{
+			const int thr_id = static_cast<int>(core::thr_ids::MUSICAL);
+			Logger logg;
+			Database db;
+
+			if (data.musical_routine.initialize()) { // has to initialize (once)
+				logg << L::SLF << fsr(__FUNCSIG__) << "Initializing Thread MUSICAL..." << L::ELF;
+
+				data.musical_routine.routines.start();
+			}
+
+			logg << L::SLF << fsr(__FUNCSIG__) << "Looping Thread MUSICAL..." << L::ELF;
+
+			while (keep()) {
+				data.musical_routine.tick();
+
+				while (data.musical_routine.isPaused()) {
+					std::this_thread::sleep_for(std::chrono::milliseconds(200));
+					//Sleep(50); // 20 per sec
+					data.musical_routine.tick(); // keep saying it's alive
+				}
+
+				data.musical_routine.routines.hasEventWait(); // LOOP_TRACK, UPDATE_TRACKS
+
+				if (data.musical_routine.routines.isThisThis(static_cast<size_t>(core::thr_musical_routines::LOOP_TRACK))) {
+					db.set(database::e_sizet::MUSICSPERSECOND, data.musical_routine.routines.getNumCallsDefault());					
+				}
+				else if (data.musical_routine.routines.isThisThis(static_cast<size_t>(core::thr_musical_routines::UPDATE_TRACKS)))
+				{
+					SuperResource<Track> tracks;
+					for (auto& i : tracks) {
+						i->update();
+					}
+				}
+			}
+
+			logg << L::SLF << fsr(__FUNCSIG__) << "Ending Thread MUSICAL..." << L::ELF;
+			data.musical_routine.deinitialize(); // set as unitialized once ended the thread stuff
+		}
+
 		void Core::internalEnd()
 		{
 			data.display_routine.this_core.stop();
 			data.collision_routine.this_core.stop();
 			data.events_routine.this_core.stop();
 			data.functional_routine.this_core.stop();
+			data.musical_routine.this_core.stop();
 		}
 
 		Core::Core()
@@ -702,6 +748,7 @@ namespace LSW {
 				data.collision_routine.this_core.setFunc([&](Threads::boolThreadF f)->int {return thr_base(core::thr_ids::COLLIDING, f); });
 				data.events_routine.this_core.setFunc([&](Threads::boolThreadF f)->int {return thr_base(core::thr_ids::EVENTS, f); });
 				data.functional_routine.this_core.setFunc([&](Threads::boolThreadF f)->int {return thr_base(core::thr_ids::FUNCTIONAL, f); });
+				data.musical_routine.this_core.setFunc([&](Threads::boolThreadF f)->int {return thr_base(core::thr_ids::MUSICAL, f); });
 
 				data.has_init_once = true;
 			}
@@ -753,6 +800,7 @@ namespace LSW {
 			data.collision_routine.this_core.start();
 			data.events_routine.this_core.start();
 			data.functional_routine.this_core.start();
+			data.musical_routine.this_core.start();
 
 			data.gmute.unlock();
 		}
@@ -763,6 +811,7 @@ namespace LSW {
 			data.collision_routine.pause = true;
 			data.events_routine.pause = true;
 			data.functional_routine.pause = true;
+			data.musical_routine.pause = true;
 		}
 
 		void Core::unpause()
@@ -771,6 +820,7 @@ namespace LSW {
 			data.collision_routine.pause = false;
 			data.events_routine.pause = false;
 			data.functional_routine.pause = false;
+			data.musical_routine.pause = false;
 		}
 
 
@@ -789,6 +839,7 @@ namespace LSW {
 			data.collision_routine.this_core.join();
 			data.events_routine.this_core.join();
 			data.functional_routine.this_core.join();
+			data.musical_routine.this_core.join();
 
 			aa.abort();
 
@@ -797,22 +848,22 @@ namespace LSW {
 
 		bool Core::allEnded()
 		{
-			return !data.display_routine.isInitialized() && !data.collision_routine.isInitialized() && !data.events_routine.isInitialized() && !data.functional_routine.isInitialized();
+			return !data.display_routine.isInitialized() && !data.collision_routine.isInitialized() && !data.events_routine.isInitialized() && !data.functional_routine.isInitialized() && !data.musical_routine.isInitialized();
 		}
 
 		bool Core::oneAlive()
 		{
-			return data.display_routine.isAlive() || data.collision_routine.isAlive() || data.events_routine.isAlive() || data.functional_routine.isAlive();
+			return data.display_routine.isAlive() || data.collision_routine.isAlive() || data.events_routine.isAlive() || data.functional_routine.isAlive() || data.musical_routine.isAlive();
 		}
 
 		bool Core::allAlive()
 		{
-			return data.display_routine.isAlive() && data.collision_routine.isAlive() && data.events_routine.isAlive() && data.functional_routine.isAlive();
+			return data.display_routine.isAlive() && data.collision_routine.isAlive() && data.events_routine.isAlive() && data.functional_routine.isAlive() && data.musical_routine.isAlive();
 		}
 
 		bool Core::allPaused()
 		{
-			return data.display_routine.success_pause && data.collision_routine.success_pause && data.events_routine.success_pause && data.functional_routine.success_pause;
+			return data.display_routine.success_pause && data.collision_routine.success_pause && data.events_routine.success_pause && data.functional_routine.success_pause && data.musical_routine.success_pause;
 		}
 
 		/*void Core::core_data::timed_function::work()

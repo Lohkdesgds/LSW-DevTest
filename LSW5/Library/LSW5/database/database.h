@@ -26,7 +26,7 @@ namespace LSW {
 			};
 			enum class e_double {
 				LAST_VOLUME, RESOLUTION_BUFFER_PROPORTION, FX_AMOUNT, // on file
-				MOUSE_X, MOUSE_Y, RAW_MOUSE_X, RAW_MOUSE_Y, INSTANT_FRAMESPERSECOND, INSTANT_COLLISIONSPERSECOND, INSTANT_USEREVENTSPERSECOND, INSTANT_ADVANCEDFUNCSPERSECOND }; // not on file
+				MOUSE_X, MOUSE_Y, RAW_MOUSE_X, RAW_MOUSE_Y, INSTANT_FRAMESPERSECOND, INSTANT_COLLISIONSPERSECOND, INSTANT_USEREVENTSPERSECOND, INSTANT_ADVANCEDFUNCSPERSECOND, INSTANT_MUSICSPERSECOND }; // not on file
 
 			enum class e_boolean { 
 				WAS_OSD_ON, ENABLE_SECOND_DEBUGGING_SCREEN, ULTRADEBUG, DOUBLE_BUFFERING, HIDEMOUSE, // on file
@@ -37,7 +37,7 @@ namespace LSW {
 
 			enum class e_sizet {
 				TIMES_LIT, // on file
-				MAXIMUM_STRING_INPUT_LEN, FRAMESPERSECOND, COLLISIONSPERSECOND, USEREVENTSPERSECOND, ADVANCEDFUNCSPERSECOND }; // not on file
+				MAXIMUM_STRING_INPUT_LEN, FRAMESPERSECOND, COLLISIONSPERSECOND, USEREVENTSPERSECOND, ADVANCEDFUNCSPERSECOND, MUSICSPERSECOND }; // not on file
 
 			enum class e_string {
 				LAST_VERSION, LAST_PLAYERNAME, PRINT_PATH, // on file
@@ -72,7 +72,8 @@ namespace LSW {
 				{0.0, 															(e_double::INSTANT_FRAMESPERSECOND),								CHAR_INIT("instant_frames_per_second_ms")},
 				{0.0, 															(e_double::INSTANT_COLLISIONSPERSECOND),							CHAR_INIT("instant_collisions_per_second_ms")},
 				{0.0, 															(e_double::INSTANT_USEREVENTSPERSECOND),							CHAR_INIT("instant_events_per_second_ms")},
-				{0.0,			 												(e_double::INSTANT_ADVANCEDFUNCSPERSECOND),							CHAR_INIT("instant_functions_per_second_ms")}
+				{0.0,			 												(e_double::INSTANT_ADVANCEDFUNCSPERSECOND),							CHAR_INIT("instant_functions_per_second_ms")},
+				{0.0,			 												(e_double::INSTANT_MUSICSPERSECOND),								CHAR_INIT("instant_musics_per_second_ms")}
 			};
 			const SuperMap<bool>			e_boolean_defaults  = {
 				{false, 														(e_boolean::WAS_OSD_ON),											CHAR_INIT("was_osd_on"),						customtriggers::SAVE_ON_FILE},
@@ -103,7 +104,8 @@ namespace LSW {
 				{0ULL,  														(e_sizet::FRAMESPERSECOND),											CHAR_INIT("frames_per_second")},
 				{0ULL,  														(e_sizet::COLLISIONSPERSECOND),										CHAR_INIT("collisions_per_second")},
 				{0ULL,  														(e_sizet::USEREVENTSPERSECOND), 									CHAR_INIT("events_per_second")},
-				{0ULL,  														(e_sizet::ADVANCEDFUNCSPERSECOND),									CHAR_INIT("functions_per_second")}
+				{0ULL,  														(e_sizet::ADVANCEDFUNCSPERSECOND),									CHAR_INIT("functions_per_second")},
+				{0ULL,  														(e_sizet::MUSICSPERSECOND),											CHAR_INIT("musics_per_second")}
 			};
 			const SuperMap<std::string>		e_string_defaults	= {
 				{std::string("V1.0.0"),											(e_string::LAST_VERSION),											CHAR_INIT("last_version"),						customtriggers::SAVE_ON_FILE},

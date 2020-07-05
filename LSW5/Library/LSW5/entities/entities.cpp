@@ -584,6 +584,15 @@ namespace LSW {
 				{
 					[&] {
 						Database conf;
+						size_t t;
+						conf.get(database::e_sizet::MUSICSPERSECOND, t);
+						return Tools::sprintf_a("%zu", t);
+					},
+						CHAR_INIT("%int_mps%"), 					(text::e_custom_tags::T_MPS)
+				},
+				{
+					[&] {
+						Database conf;
 						double dt;
 						conf.get(database::e_double::INSTANT_FRAMESPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1.0 / dt : -1);
@@ -621,6 +630,15 @@ namespace LSW {
 					[&] {
 						Database conf;
 						double dt;
+						conf.get(database::e_double::INSTANT_MUSICSPERSECOND, dt);
+						return Tools::sprintf_a("%05.1lf", dt ? 1.0 / dt : -1);
+					},
+						CHAR_INIT("%instant_mps%"), 				(text::e_custom_tags::T_I_MPS)
+				},
+				{
+					[&] {
+						Database conf;
+						double dt;
 						conf.get(database::e_double::INSTANT_FRAMESPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1000.0 * dt : -1);
 					},
@@ -652,6 +670,15 @@ namespace LSW {
 						return Tools::sprintf_a("%05.1lf", dt ? 1000.0 * dt : -1);
 					},
 						CHAR_INIT("%ms_aps%"), 						(text::e_custom_tags::T_MS_APS)
+				},
+				{
+					[&] {
+						Database conf;
+						double dt;
+						conf.get(database::e_double::INSTANT_MUSICSPERSECOND, dt);
+						return Tools::sprintf_a("%05.1lf", dt ? 1000.0 * dt : -1);
+					},
+						CHAR_INIT("%ms_aps%"), 						(text::e_custom_tags::T_MS_MPS)
 				},
 				{
 					[&] {

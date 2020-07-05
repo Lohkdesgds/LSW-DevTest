@@ -217,10 +217,14 @@
     <ClCompile Include="Library\LSW5\logger\coloured_string.cpp" />
     <ClCompile Include="Library\LSW5\logger\logger.cpp" />
     <ClCompile Include="Library\LSW5\logger\printer.cpp" />
+    <ClCompile Include="Library\LSW5\mixer\mixer.cpp" />
+    <ClCompile Include="Library\LSW5\sample\sample.cpp" />
     <ClCompile Include="Library\LSW5\socketsystem\socketsystem.cpp" />
     <ClCompile Include="Library\LSW5\sprite\sprite.cpp" />
     <ClCompile Include="Library\LSW5\supermutex\supermutex.cpp" />
     <ClCompile Include="Library\LSW5\tools\tools.cpp" />
+    <ClCompile Include="Library\LSW5\track\track.cpp" />
+    <ClCompile Include="Library\LSW5\voice\voice.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -239,6 +243,8 @@
     <ClInclude Include="Library\LSW5\logger\coloured_string.h" />
     <ClInclude Include="Library\LSW5\logger\logger.h" />
     <ClInclude Include="Library\LSW5\logger\printer.h" />
+    <ClInclude Include="Library\LSW5\mixer\mixer.h" />
+    <ClInclude Include="Library\LSW5\sample\sample.h" />
     <ClInclude Include="Library\LSW5\shared\shared.h" />
     <ClInclude Include="Library\LSW5\socketsystem\socketsystem.h" />
     <ClInclude Include="Library\LSW5\sprite\sprite.h" />
@@ -249,6 +255,8 @@
     <ClInclude Include="Library\LSW5\superthread\superthread.h" />
     <ClInclude Include="Library\LSW5\supertimer\supertimer.h" />
     <ClInclude Include="Library\LSW5\tools\tools.h" />
+    <ClInclude Include="Library\LSW5\track\track.h" />
+    <ClInclude Include="Library\LSW5\voice\voice.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

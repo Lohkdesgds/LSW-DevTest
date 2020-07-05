@@ -76,6 +76,18 @@
     <Filter Include="README reference">
       <UniqueIdentifier>{6c596632-0cdb-4def-8a66-d35b85346d79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW5\Library\voice">
+      <UniqueIdentifier>{d1d37215-0609-4169-88a0-d15706d38eb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\mixer">
+      <UniqueIdentifier>{b40835d1-8c32-4a15-95a6-f2388857bd31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\sample">
+      <UniqueIdentifier>{42182d1b-6c79-4c62-a6fc-edcbb71199fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\track">
+      <UniqueIdentifier>{293400e2-f2ce-424d-b5b0-1d7d1acfbd72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -139,6 +151,18 @@
     </ClCompile>
     <ClCompile Include="Library\LSW5\entities\entities.cpp">
       <Filter>LSW5\Library\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\voice\voice.cpp">
+      <Filter>LSW5\Library\voice</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\mixer\mixer.cpp">
+      <Filter>LSW5\Library\mixer</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\sample\sample.cpp">
+      <Filter>LSW5\Library\sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\track\track.cpp">
+      <Filter>LSW5\Library\track</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -216,6 +240,18 @@
     </ClInclude>
     <ClInclude Include="Library\LSW5\entities\entities.h">
       <Filter>LSW5\Library\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\voice\voice.h">
+      <Filter>LSW5\Library\voice</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\mixer\mixer.h">
+      <Filter>LSW5\Library\mixer</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\sample\sample.h">
+      <Filter>LSW5\Library\sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\track\track.h">
+      <Filter>LSW5\Library\track</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
