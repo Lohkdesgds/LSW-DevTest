@@ -1,19 +1,15 @@
-#define LSW_THREAD_ALLEGRO
+	#define LSW_THREAD_ALLEGRO
 
-#include "Library\LSW5\logger\logger.h"
-#include "Library\LSW5\camera\camera.h"
-#include "Library\LSW5\database\database.h"
-#include "Library\LSW5\core\core.h"
-#include "Library\LSW5\display\display.h"
-#include "Library\LSW5\superresource\superresource.h"
-#include "Library\LSW5\sprite\sprite.h"
-#include "Library\LSW5\entities\entities.h"
-#include "Library\LSW5\autocaster\autocaster.h"
-#include "Library\LSW5\filesystem\filesystem.h"
-
-
-// testing
-#include "Library\LSW5\voice\voice.h"
+	#include "Library\LSW5\logger\logger.h"
+	#include "Library\LSW5\camera\camera.h"
+	#include "Library\LSW5\database\database.h"
+	#include "Library\LSW5\core\core.h"
+	#include "Library\LSW5\display\display.h"
+	#include "Library\LSW5\superresource\superresource.h"
+	#include "Library\LSW5\sprite\sprite.h"
+	#include "Library\LSW5\entities\entities.h"
+	#include "Library\LSW5\autocaster\autocaster.h"
+	#include "Library\LSW5\filesystem\filesystem.h"
 
 using namespace LSW::v5;
 
@@ -304,8 +300,10 @@ int main(int argc, char* argv[]) {
 
 
 	std::shared_ptr<Voice> voice = voices.create("MAIN_VOICE");
-	std::shared_ptr<Mixer> mixer = mixers.create("GLOBAL");
-	voice->attach(mixer);
+	std::shared_ptr<Mixer> mixer = mixers.create("MAIN_MIXER");
+	voices.setMain("MAIN_VOICE");
+	mixer->autoAttach();
+	mixers.setMain("MAIN_MIXER");
 
 	
 	std::shared_ptr<Sample> file_music = samples.create("mymusic");
@@ -317,7 +315,7 @@ int main(int argc, char* argv[]) {
 
 	trk->set(track::e_boolean::PLAYING, true);
 
-	mixer->attach(trk);
+	trk->autoAttach();
 
 	//trk->update();
 	

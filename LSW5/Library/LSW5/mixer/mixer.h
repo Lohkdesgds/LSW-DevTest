@@ -7,7 +7,7 @@
 // Others
 #include "..\superresource\superresource.h"
 #include "..\allegroinitialization\allegroinitialization.h"
-#include "..\track\track.h"
+#include "..\voice\voice.h"
 
 
 namespace LSW {
@@ -29,7 +29,10 @@ namespace LSW {
 			// attaches a mixer into the mixer
 			bool attach(std::shared_ptr<Mixer>);
 			// attach Track to mixer
-			bool attach(std::shared_ptr<Track>);
+			bool attach(std::shared_ptr<Voice>);
+
+			// attach to a Voice (master voice) (see SuperResource.setMain(...))
+			bool autoAttach();
 
 			std::shared_ptr<ALLEGRO_MIXER> getInstance();
 		};

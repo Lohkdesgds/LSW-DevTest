@@ -29,6 +29,19 @@ namespace LSW {
 			}
 		}
 
+		bool Track::attach(const std::shared_ptr<Mixer> s)
+		{
+			return al_attach_sample_instance_to_mixer(&(*playing), &(*s->getInstance()));
+		}
+
+		bool Track::autoAttach()
+		{
+			SuperResource<Mixer> mixers;
+			auto mmixer = mixers.getMain();
+			if (mmixer) return attach(mmixer);
+			return false;
+		}
+
 		void Track::twinUpAttributes(const std::shared_ptr<track_data> oth)
 		{
 			data_track = oth;

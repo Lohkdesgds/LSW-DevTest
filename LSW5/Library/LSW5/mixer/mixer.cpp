@@ -29,9 +29,18 @@ namespace LSW {
 			return al_attach_mixer_to_mixer(&(*s->getInstance()), &(*mixer));
 		}
 
-		bool Mixer::attach(std::shared_ptr<Track> s)
+		bool Mixer::attach(std::shared_ptr<Voice> s)
 		{
-			return al_attach_sample_instance_to_mixer(&(*s->getInstance()), &(*mixer));
+			return al_attach_mixer_to_voice(&(*mixer), &(*s->getInstance()));
+			//return al_attach_sample_instance_to_mixer(&(*s->getInstance()), &(*mixer));
+		}
+
+		bool Mixer::autoAttach()
+		{
+			SuperResource<Voice> voices;
+			auto mvoice = voices.getMain();
+			if (mvoice) return attach(mvoice);
+			return false;
 		}
 
 		std::shared_ptr<ALLEGRO_MIXER> Mixer::getInstance()

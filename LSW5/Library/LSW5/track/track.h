@@ -9,6 +9,7 @@
 #include "..\abort\abort.h"
 #include "..\superresource\superresource.h"
 #include "..\allegroinitialization\allegroinitialization.h"
+#include "..\mixer\mixer.h"
 #include "..\sample\sample.h"
 #include "..\supermap\supermap.h"
 #include "..\tools\tools.h"
@@ -52,6 +53,12 @@ namespace LSW {
 
 			// id, sample id to load
 			void load(const std::shared_ptr<Sample>);
+
+			// attaches to a Mixer
+			bool attach(const std::shared_ptr<Mixer>);
+
+			// auto attach to main Mixer (see SuperResource.setMain(...))
+			bool autoAttach();
 
 			// set to blindly use this comrade's attributes as theirs (this must be Block)
 			void twinUpAttributes(const std::shared_ptr<track_data>);

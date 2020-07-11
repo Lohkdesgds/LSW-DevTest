@@ -7,7 +7,6 @@
 // Others
 #include "..\superresource\superresource.h"
 #include "..\allegroinitialization\allegroinitialization.h"
-#include "..\mixer\mixer.h"
 #include "..\tools\tools.h"
 
 namespace LSW {
@@ -31,7 +30,7 @@ namespace LSW {
 			// true = muted
 			void mute(const bool);
 			// attaches 
-			bool attach(std::shared_ptr<Mixer>);
+			//bool attach(std::shared_ptr<Mixer>);
 
 			std::shared_ptr<ALLEGRO_VOICE> getInstance();
 		};

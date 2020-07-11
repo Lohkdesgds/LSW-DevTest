@@ -27,10 +27,10 @@ namespace LSW {
 			al_set_voice_playing(&(*device), m);
 		}
 
-		bool Voice::attach(std::shared_ptr<Mixer> s)
+		/*bool Voice::attach(std::shared_ptr<Mixer> s)
 		{
 			return al_attach_mixer_to_voice(&(*s->getInstance()), &(*device));
-		}
+		}*/
 
 		std::shared_ptr<ALLEGRO_VOICE> Voice::getInstance()
 		{
