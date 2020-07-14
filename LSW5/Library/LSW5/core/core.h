@@ -96,7 +96,7 @@ namespace LSW {
 
 				// functional part
 
-				SuperMap<std::function<void(void)>> funcs;
+				SuperMap<std::function<void(ALLEGRO_EVENT&)>> funcs;
 
 				/*struct timed_function {
 					std::function<void(void)> f;
@@ -122,14 +122,20 @@ namespace LSW {
 			Core();
 
 			// id, delta_t, function
-			void addFunction(const int, const double, const std::function<void(void)>);
+			void addFunction(const int, const double, const std::function<void(ALLEGRO_EVENT&)>);
+			// id, event source, function
+			void addFunction(const int, ALLEGRO_EVENT_SOURCE*, const std::function<void(ALLEGRO_EVENT&)>);
 			// id
 			void delFunction(const int);
+			// get ALLEGRO_EVENT_SOURCE from its function id
+			ALLEGRO_EVENT_SOURCE* getFunctionSource(const int);
 
 			void init();
 			void pause();
 			void unpause();
 			void fEnd();
+
+			void sendEvent(const int, const intptr_t, const intptr_t, const intptr_t, const intptr_t);
 
 			bool allEnded(); // all threads said they're not "initialized", so must be dead.
 			bool oneAlive(); // at least one thread still running (1 sec max unload time)

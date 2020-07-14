@@ -16,17 +16,36 @@ namespace LSW {
 			if (playing) instances.remove(playing);
 		}
 
-		void Track::load(const std::shared_ptr<Sample> sample)
+		bool Track::load(const std::shared_ptr<Sample> sample)
 		{
-			SuperResource<ALLEGRO_SAMPLE_INSTANCE> instances;
+			if (!playing) {
+				SuperResource<ALLEGRO_SAMPLE_INSTANCE> instances;
 
-			playing = instances.load("track_t&" + Tools::generateRandomUniqueStringN());
+				playing = instances.load("track_t&" + Tools::generateRandomUniqueStringN());
 
-			al_set_sample_instance_playing(&(*playing), false);
+				al_set_sample_instance_playing(&(*playing), false);
+			}
 
 			if (sample) {
-				al_set_sample(&(*playing), &(*sample->getInstance()));
+				return al_set_sample(&(*playing), &(*sample->getInstance()));
 			}
+			return false;
+		}
+
+		bool Track::load(const std::string str)
+		{
+			if (!playing) {
+				SuperResource<ALLEGRO_SAMPLE_INSTANCE> instances;
+
+				playing = instances.load("track_t&" + Tools::generateRandomUniqueStringN());
+
+				al_set_sample_instance_playing(&(*playing), false);
+			}
+			SuperResource<Sample> samples;
+			if (std::shared_ptr<Sample> sample; samples.get(str, sample)) {
+				return al_set_sample(&(*playing), &(*sample->getInstance()));
+			}
+			return false;
 		}
 
 		bool Track::attach(const std::shared_ptr<Mixer> s)

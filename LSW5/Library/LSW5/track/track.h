@@ -52,7 +52,9 @@ namespace LSW {
 			~Track();
 
 			// id, sample id to load
-			void load(const std::shared_ptr<Sample>);
+			bool load(const std::shared_ptr<Sample>);
+			// id, sample name
+			bool load(const std::string);
 
 			// attaches to a Mixer
 			bool attach(const std::shared_ptr<Mixer>);

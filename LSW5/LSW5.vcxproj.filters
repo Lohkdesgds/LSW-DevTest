@@ -88,6 +88,9 @@
     <Filter Include="LSW5\Library\track">
       <UniqueIdentifier>{293400e2-f2ce-424d-b5b0-1d7d1acfbd72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW5\Library\independenteventhandler">
+      <UniqueIdentifier>{b2b194d1-85d3-4fdf-a754-864c6e07d5ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -163,6 +166,9 @@
     </ClCompile>
     <ClCompile Include="Library\LSW5\track\track.cpp">
       <Filter>LSW5\Library\track</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\independenteventhandler\independenteventhandler.cpp">
+      <Filter>LSW5\Library\independenteventhandler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -252,6 +258,9 @@
     </ClInclude>
     <ClInclude Include="Library\LSW5\track\track.h">
       <Filter>LSW5\Library\track</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\independenteventhandler\independenteventhandler.h">
+      <Filter>LSW5\Library\independenteventhandler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -657,19 +657,23 @@ namespace LSW {
 				else {
 					auto ev = data.functional_routine.routines.getEventRaw();
 
-					switch (ev.type) {
+					/*switch (ev.type) {
 					case ALLEGRO_EVENT_TIMER:
+					{
 						data.funcs_m.lock();
-						/*for (auto& i : data.funcs) {
-							if (i[ev.timer.source]) {
-								if (auto j = i.getValue(); j) j();
-								break;
-							}
-						}*/
-						if (auto j = data.funcs[(uintptr_t)ev.timer.source]; j) (*j)();
+						ALLEGRO_EVENT_SOURCE* ev_ss = al_get_timer_event_source(ev.timer.source);
+						if (auto j = data.funcs[(uintptr_t)ev_ss]; j) (*j)();
 						data.funcs_m.unlock();
-						break;
 					}
+						break;
+					default: // others*/
+
+					data.funcs_m.lock();
+					if (auto j = data.funcs[(uintptr_t)ev.any.source]; j) (*j)(ev);
+					data.funcs_m.unlock();
+
+						/*break;
+					}*/
 				}
 				
 
@@ -755,25 +759,27 @@ namespace LSW {
 			data.gmute.unlock();
 		}
 
-		void Core::addFunction(const int id, const double delta_t, const std::function<void(void)> func)
+		void Core::addFunction(const int id, const double delta_t, const std::function<void(ALLEGRO_EVENT&)> func)
 		{
-			/*for (auto& i : data.funcs) {
-				if (i.first == id) {
-					data.funcs_m.unlock();
-					throw Abort::Abort(__FUNCSIG__, "Function already set!", Abort::abort_level::GIVEUP);
-					return;
-				}
-			}*/
+			ALLEGRO_TIMER* t = al_create_timer(delta_t);
+			addFunction(id, al_get_timer_event_source(t), func);
+			al_start_timer(t);
+		}
+
+		void Core::addFunction(const int id, ALLEGRO_EVENT_SOURCE* src, const std::function<void(ALLEGRO_EVENT&)> func)
+		{
+			if (!src) {
+				throw Abort::Abort(__FUNCSIG__, "Invalid event source!");
+				return;
+			}
 			data.funcs_m.lock();
 			if (data.funcs[id] != nullptr) {
 				data.funcs_m.unlock();
 				throw Abort::Abort(__FUNCSIG__, "Function already set!", Abort::abort_level::GIVEUP);
 				return;
 			}
-			ALLEGRO_TIMER* t = al_create_timer(delta_t);
-			data.functional_routine.routines.insert(al_get_timer_event_source(t));
-			al_start_timer(t);
-			data.funcs.add({ func, id, (uintptr_t)t });
+			data.functional_routine.routines.insert(src);
+			data.funcs.add({ func, id, (uintptr_t)src });
 			data.funcs_m.unlock();
 		}
 
@@ -790,6 +796,21 @@ namespace LSW {
 				}
 			}
 			data.funcs_m.unlock();
+		}
+
+		ALLEGRO_EVENT_SOURCE* Core::getFunctionSource(const int id)
+		{
+			data.funcs_m.lock();
+			for (auto& i : data.funcs) {
+				if (i[id]) {
+					uintptr_t ptr_i;
+					i.getType(ptr_i);
+					data.funcs_m.unlock();
+					return (ALLEGRO_EVENT_SOURCE*)ptr_i;
+				}
+			}
+			data.funcs_m.unlock();
+			return nullptr;
 		}
 
 		void Core::init()
@@ -844,6 +865,17 @@ namespace LSW {
 			aa.abort();
 
 			data.gmute.unlock();
+		}
+
+		void Core::sendEvent(const int at, const intptr_t a, const intptr_t b, const intptr_t c, const intptr_t d)
+		{
+			ALLEGRO_EVENT ev;
+			ev.type = at;
+			ev.user.data1 = a;
+			ev.user.data2 = b;
+			ev.user.data3 = c;
+			ev.user.data4 = d;
+			al_emit_user_event(&data.evsrc, &ev, NULL);
 		}
 
 		bool Core::allEnded()

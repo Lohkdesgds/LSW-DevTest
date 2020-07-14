@@ -213,6 +213,7 @@
     <ClCompile Include="Library\LSW5\entities\entities.cpp" />
     <ClCompile Include="Library\LSW5\filesystem\filesystem.cpp" />
     <ClCompile Include="Library\LSW5\hash\sha256.cpp" />
+    <ClCompile Include="Library\LSW5\independenteventhandler\independenteventhandler.cpp" />
     <ClCompile Include="Library\LSW5\launcher\launcher.cpp" />
     <ClCompile Include="Library\LSW5\logger\coloured_string.cpp" />
     <ClCompile Include="Library\LSW5\logger\logger.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="Library\LSW5\entities\entities.h" />
     <ClInclude Include="Library\LSW5\filesystem\filesystem.h" />
     <ClInclude Include="Library\LSW5\hash\sha256.h" />
+    <ClInclude Include="Library\LSW5\independenteventhandler\independenteventhandler.h" />
     <ClInclude Include="Library\LSW5\launcher\launcher.h" />
     <ClInclude Include="Library\LSW5\logger\coloured_string.h" />
     <ClInclude Include="Library\LSW5\logger\logger.h" />

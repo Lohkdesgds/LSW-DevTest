@@ -1,15 +1,16 @@
-	#define LSW_THREAD_ALLEGRO
+#define LSW_THREAD_ALLEGRO
 
-	#include "Library\LSW5\logger\logger.h"
-	#include "Library\LSW5\camera\camera.h"
-	#include "Library\LSW5\database\database.h"
-	#include "Library\LSW5\core\core.h"
-	#include "Library\LSW5\display\display.h"
-	#include "Library\LSW5\superresource\superresource.h"
-	#include "Library\LSW5\sprite\sprite.h"
-	#include "Library\LSW5\entities\entities.h"
-	#include "Library\LSW5\autocaster\autocaster.h"
-	#include "Library\LSW5\filesystem\filesystem.h"
+#include "Library\LSW5\logger\logger.h"
+#include "Library\LSW5\camera\camera.h"
+#include "Library\LSW5\database\database.h"
+#include "Library\LSW5\core\core.h"
+#include "Library\LSW5\display\display.h"
+#include "Library\LSW5\superresource\superresource.h"
+#include "Library\LSW5\sprite\sprite.h"
+#include "Library\LSW5\entities\entities.h"
+#include "Library\LSW5\autocaster\autocaster.h"
+#include "Library\LSW5\filesystem\filesystem.h"
+#include "Library\LSW5\independenteventhandler\independenteventhandler.h"
 
 using namespace LSW::v5;
 
@@ -114,6 +115,7 @@ int main(int argc, char* argv[]) {
 	ref->loadCut(0, 1536, 512, 512);
 	ref->loadCut(0, 1024, 512, 512);
 	ref->set(block::e_double::FRAMES_PER_SECOND, 2.0);
+
 
 	auto ref2_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); }); // sprites.create("test" + std::to_string(countgen++));
 	Block* ref2 = (Block*)&(*ref2_orig);
@@ -229,8 +231,43 @@ int main(int argc, char* argv[]) {
 	ref6->set(text::e_cstring::STRING, "%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites% | LALA=%lala_lmao%");
 	ref6->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
 
-	core.addFunction(0, 2.0, [ref6_orig] {Text* ref6 = (Text*)&(*ref6_orig); int lala = 0; ref6->get("customcounter", lala); lala++; ref6->set("customcounter", lala); });
+	core.addFunction(0, 2.0, [ref6_orig](ALLEGRO_EVENT&) {Text* ref6 = (Text*)&(*ref6_orig); int lala = 0; ref6->get("customcounter", lala); lala++; ref6->set("customcounter", lala); });
+	core.addFunction(1, al_get_keyboard_event_source(), [ref6_orig](ALLEGRO_EVENT& ev) {
+		if (ev.type != ALLEGRO_EVENT_KEY_DOWN) return;
+		Text* ref6 = (Text*)&(*ref6_orig);
+		int lala = 0;
+		ref6->get("customcounter", lala);
+		switch (ev.keyboard.keycode) {
+		case ALLEGRO_KEY_PAD_PLUS:
+			lala++;
+			break;
+		case ALLEGRO_KEY_PAD_MINUS:
+			lala--;
+			break;
+		}
+		ref6->set("customcounter", lala);
+		});
 
+	// example add new thread to handle keybinds
+	/*IndependentEventHandler c_event;
+	c_event.add(al_get_keyboard_event_source());
+	c_event.startAutoEventHandlerWith([ref6_orig](ALLEGRO_EVENT& ev) {
+		if (ev.type != ALLEGRO_EVENT_KEY_DOWN) return;
+		Text* ref6 = (Text*)&(*ref6_orig);
+		int lala = 0;
+		ref6->get("customcounter", lala);
+		switch (ev.keyboard.keycode) {
+		case ALLEGRO_KEY_PAD_PLUS:
+			lala++;
+			break;
+		case ALLEGRO_KEY_PAD_MINUS:
+			lala--;
+			break;
+		}
+		ref6->set("customcounter", lala);
+		});
+	
+	*/
 
 
 	auto ref7_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new BubbleFX()); });
@@ -303,7 +340,7 @@ int main(int argc, char* argv[]) {
 	std::shared_ptr<Mixer> mixer = mixers.create("MAIN_MIXER");
 	voices.setMain("MAIN_VOICE");
 	mixer->autoAttach();
-	mixers.setMain("MAIN_MIXER");
+	mixers.setMain("MAIN_MIXER");	
 
 	
 	std::shared_ptr<Sample> file_music = samples.create("mymusic");
@@ -311,9 +348,10 @@ int main(int argc, char* argv[]) {
 
 	std::shared_ptr<Track> trk = tracks.create("mytrack");
 
-	trk->load(file_music);
-
+	trk->load("mymusic");
+	trk->set(track::e_double::VOLUME, 0.1);
 	trk->set(track::e_boolean::PLAYING, true);
+
 
 	trk->autoAttach();
 
