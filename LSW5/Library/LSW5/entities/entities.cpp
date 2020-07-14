@@ -1078,42 +1078,6 @@ namespace LSW {
 				}
 			}
 
-
-			double rotation_rad = t_rotation_rad + p_rotation_rad;
-			if (rotation_rad > ALLEGRO_PI * 2) rotation_rad -= ALLEGRO_PI * 2;
-			if (rotation_rad < 0) rotation_rad += ALLEGRO_PI * 2;
-
-			bool should_care_about_shadow = (s_dist_x != 0.0 || s_dist_y != 0.0);
-
-			double pos_now[2];
-
-			pos_now[0] = 1.0 * text::default_sharpness_font *  (((posx) * cos(p_rotation_rad)) - ((posy) * sin(p_rotation_rad)) + off_x);
-			pos_now[1] = 1.0 * text::default_sharpness_font *  (((posy) * cos(p_rotation_rad)) - ((posx) * sin(p_rotation_rad)) + off_y);
-
-			double pos_shadow_now[2] = { 0,0 };
-
-			if (should_care_about_shadow) {
-				pos_shadow_now[0] = 1.0 * text::default_sharpness_font * (((posx + s_dist_x) * cos(p_rotation_rad)) - ((posy + s_dist_y) * sin(p_rotation_rad)) + off_x);
-				pos_shadow_now[1] = 1.0 * text::default_sharpness_font * (((posy + s_dist_y) * cos(p_rotation_rad)) - ((posx + s_dist_x) * sin(p_rotation_rad)) + off_y);
-			}
-
-
-			double targ_draw_xy[2];
-			targ_draw_xy[0] = pos_now[0] * cos(rotation_rad) + pos_now[1] * sin(rotation_rad);
-			targ_draw_xy[1] = pos_now[1] * cos(rotation_rad) - pos_now[0] * sin(rotation_rad);
-			targ_draw_xy[0] /= scale_x;
-			targ_draw_xy[1] /= scale_y;
-
-
-			double targ_draw_xy_shadow[2] = { 0,0 };
-
-			if (should_care_about_shadow) {
-				targ_draw_xy_shadow[0] = pos_shadow_now[0] * cos(rotation_rad) + pos_shadow_now[1] * sin(rotation_rad);
-				targ_draw_xy_shadow[1] = pos_shadow_now[1] * cos(rotation_rad) - pos_shadow_now[0] * sin(rotation_rad);
-				targ_draw_xy_shadow[0] /= scale_x;
-				targ_draw_xy_shadow[1] /= scale_y;
-			}
-
 			SuperResource<Camera> cameras;
 			std::shared_ptr<Camera> ruler;
 			if (ruler = cameras.getMain(); !ruler) throw Abort::Abort(__FUNCSIG__, "NO MAIN CAMERA HAS BEEN SET UP! Please set up a Camera! (Using SuperResource.setMain())");
@@ -1122,18 +1086,52 @@ namespace LSW {
 			//double camx, camy, camg;
 			if (*getRef(sprite::e_boolean::AFFECTED_BY_CAM)) preset = *ruler; // copy
 
+			double rotation_rad = t_rotation_rad + p_rotation_rad;
+
+			bool should_care_about_shadow = (s_dist_x != 0.0 || s_dist_y != 0.0);
+
+			double pos_now[2];
+
+			pos_now[0] = 1.0 * text::default_sharpness_font * (((posx) * cos(p_rotation_rad)) - ((posy) * sin(p_rotation_rad)) + off_x); // transformed to sprite's coords
+			pos_now[1] = 1.0 * text::default_sharpness_font * (((posy) * cos(p_rotation_rad)) + ((posx) * sin(p_rotation_rad)) + off_y); // transformed to sprite's coords
+
+			double pos_shadow_now[2] = { 0,0 };
+
+			if (should_care_about_shadow) {
+				pos_shadow_now[0] = 1.0 * text::default_sharpness_font * (((posx + s_dist_x) * cos(p_rotation_rad)) - ((posy + s_dist_y) * sin(p_rotation_rad)) + off_x);
+				pos_shadow_now[1] = 1.0 * text::default_sharpness_font * (((posy + s_dist_y) * cos(p_rotation_rad)) + ((posx + s_dist_x) * sin(p_rotation_rad)) + off_y);
+			}
+
+			// not used anymore because of change there on preset.set OFFSET (this moves center to point and then rotates exactly there)
+
+			/*double targ_draw_xy[2];
+			targ_draw_xy[0] = pos_now[0];// *cos(rotation_rad) - pos_now[1] * sin(rotation_rad);
+			targ_draw_xy[1] = pos_now[1];// *cos(rotation_rad) + pos_now[0] * sin(rotation_rad);
+			targ_draw_xy[0] /= scale_x;
+			targ_draw_xy[1] /= scale_y;
+
+
+			double targ_draw_xy_shadow[2] = { 0,0 };
+
+			if (should_care_about_shadow) {
+				targ_draw_xy_shadow[0] = pos_shadow_now[0] * cos(rotation_rad) - pos_shadow_now[1] * sin(rotation_rad);
+				targ_draw_xy_shadow[1] = pos_shadow_now[1] * cos(rotation_rad) + pos_shadow_now[0] * sin(rotation_rad);
+				targ_draw_xy_shadow[0] /= scale_x;
+				targ_draw_xy_shadow[1] /= scale_y;
+			}*/
+
 			preset.set(camera::e_double::SCALE_G,  *preset.getRef(camera::e_double::SCALE_G)  * scale_g * 1.0 / text::default_sharpness_font);
 			preset.set(camera::e_double::SCALE_X,  *preset.getRef(camera::e_double::SCALE_X)  * scale_x);
 			preset.set(camera::e_double::SCALE_Y,  *preset.getRef(camera::e_double::SCALE_Y)  * scale_y);
-			preset.set(camera::e_double::OFFSET_X, *preset.getRef(camera::e_double::OFFSET_X) * text::default_sharpness_font / scale_g);
-			preset.set(camera::e_double::OFFSET_Y, *preset.getRef(camera::e_double::OFFSET_Y) * text::default_sharpness_font / scale_g);
+			preset.set(camera::e_double::OFFSET_X, (*preset.getRef(camera::e_double::OFFSET_X) * text::default_sharpness_font / scale_g) - (pos_now[0] / (scale_x * scale_g))); // offset of current cam + move center to its pos
+			preset.set(camera::e_double::OFFSET_Y, (*preset.getRef(camera::e_double::OFFSET_Y) * text::default_sharpness_font / scale_g) - (pos_now[1] / (scale_y * scale_g))); // offset of current cam + move center to its pos
 
-			preset.set(camera::e_double::ROTATION_RAD, *preset.getRef(camera::e_double::ROTATION_RAD) + rotation_rad);
+			preset.set(camera::e_double::ROTATION_RAD, *preset.getRef(camera::e_double::ROTATION_RAD) + rotation_rad); // now it rotates based on center
 			preset.refresh();
 			preset.apply();
 
 			if (s_dist_x != 0.0 || s_dist_y != 0.0) {
-				al_draw_text(&(*fontt), s_col, 1.0 * targ_draw_xy_shadow[0] / (scale_g), 1.0 * targ_draw_xy_shadow[1] / (scale_g), mode, p_str.s_str().c_str());
+				al_draw_text(&(*fontt), s_col, 0.0, 0.0, mode, p_str.s_str().c_str());
 			}
 			if (per_char) {
 				//char minibuf[2] = { 0 };
@@ -1151,13 +1149,24 @@ namespace LSW {
 						p++;
 					}
 
-					al_draw_text(&(*fontt), clr_now, 1.0 * targ_draw_xy[0] / (scale_g) + offset_x_f * cos(rotation_rad), 1.0 * targ_draw_xy[1] / (scale_g) - offset_x_f * sin(rotation_rad), mode, thebuff.c_str());
+					al_draw_text(&(*fontt), clr_now,
+						offset_x_f/* * cos(t_rotation_rad + p_rotation_rad)*/,
+						/*- offset_x_f * sin(t_rotation_rad + p_rotation_rad)*/ 0.0,
+						mode, thebuff.c_str());
 
 					offset_x_f += al_get_text_width(&(*fontt), thebuff.c_str());
 					thebuff.clear();
 				}
 			}
-			else al_draw_text(&(*fontt), n_col, 1.0 * targ_draw_xy[0] / (scale_g), 1.0 * targ_draw_xy[1] / (scale_g), mode, p_str.s_str().c_str());
+			else al_draw_text(&(*fontt), n_col, 0.0, 0.0, mode, p_str.s_str().c_str());
+			
+			if (isEq(sprite::e_boolean::SHOWDOT, true)) {
+				al_draw_filled_circle(
+					/* X1: */ 0.0,
+					/* Y1: */ 0.0,
+					/* SCL */ 2.0f * text::default_sharpness_font,
+					al_map_rgba(0, 45, 90, 90));
+			}
 
 			ruler->apply();
 		}

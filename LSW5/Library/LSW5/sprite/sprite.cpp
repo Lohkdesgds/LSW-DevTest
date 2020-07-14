@@ -721,10 +721,10 @@ namespace LSW {
 				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] += (*data_sprite_base->double_data[sprite::e_double::ACCELERATION_Y])();
 				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] *= roughness;
 
-				if (auto spr = (*data_sprite_base->double_data[sprite::e_double::SPEED_ROTATION])(); spr != 0.0) {
+				/*if (auto spr = (*data_sprite_base->double_data[sprite::e_double::SPEED_ROTATION])(); spr != 0.0) {
 					double act = (*data_sprite_base->double_data[sprite::e_double::TARG_ROTATION])();
 					*data_sprite_base->double_data[sprite::e_double::TARG_ROTATION] = [spr,act] {return act + spr; };
-				}
+				}*/
 			}
 
 

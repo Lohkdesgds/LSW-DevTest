@@ -3,55 +3,6 @@
 namespace LSW {
 	namespace v5 {
 
-		coloured_string::coloured_string(coloured_string & oth) {
-			*this = oth;
-		}
-		coloured_string::coloured_string(const coloured_string & oth) {
-			*this = oth;
-		}
-		coloured_string::coloured_string(std::string & oth) {
-			*this = oth;
-		}
-
-		coloured_string::coloured_string(const char& o)
-		{
-			*this = o;
-		}
-
-		coloured_string::coloured_string(const int& o)
-		{
-			*this = o;
-		}
-
-		coloured_string::coloured_string(const float& o)
-		{
-			*this = o;
-		}
-
-		coloured_string::coloured_string(const double& o)
-		{
-			*this = o;
-		}
-
-		coloured_string::coloured_string(const unsigned& o)
-		{
-			*this = o;
-		}
-
-		coloured_string::coloured_string(const long& o)
-		{
-			*this = o;
-		}
-
-		coloured_string::coloured_string(const long long& o)
-		{
-			*this = o;
-		}
-
-		coloured_string::coloured_string(const size_t& o)
-		{
-			*this = o;
-		}
 
 		const size_t coloured_string::find(const char c) const
 		{
@@ -132,7 +83,12 @@ namespace LSW {
 		coloured_string coloured_string::substr(const size_t start, const size_t len)
 		{
 			coloured_string cpy;
+			
 			for (size_t p = 0; (p + start) < str.size() && p < len; p++) cpy += str[p + start];
+
+			if (start + len + 1 < str.size()) cpy.__change_last_color(str[start + len + 1].cr);
+			else cpy.__change_last_color(__last_color());
+
 			return cpy;
 		}
 
@@ -147,6 +103,7 @@ namespace LSW {
 			if (str.size() > 0) {
 				char_c cpy = str.front();
 				str.erase(str.begin());
+				if (str.length() > 0) last_added_color = str.back().cr;
 				return cpy;
 			}
 			else return char_c();
@@ -155,17 +112,17 @@ namespace LSW {
 			return str.size();
 		}
 
-		coloured_string& coloured_string::operator+=(const coloured_string & oth) {
+		coloured_string& coloured_string::append(const coloured_string& oth) {
 			//str.clear();
-			for(auto& i : oth) 
-				str += i;
+			for(auto& i : oth) str += i;
+			last_added_color = oth.__last_color();
 			
 			return *this;
 		}
-		coloured_string& coloured_string::operator+=(const std::string& rstr) {
+		coloured_string& coloured_string::append(const std::string& rstr) {
 			//str.clear();
 			if (!rstr.size()) return *this;
-			C curr_color = C::WHITE, last_added_color = C::WHITE;
+			C curr_color = last_added_color;
 			bool ignore_once = false;
 			bool percentage_c = false;
 			bool has_backslash_to_add = false;
@@ -192,9 +149,11 @@ namespace LSW {
 					char k = toupper(i);
 					if (k >= '0' && k <= '9') {
 						curr_color = static_cast<C>(k - '0');
+						last_added_color = curr_color;
 					}
 					else if (k >= 'A' && k <= 'F') {
 						curr_color = static_cast<C>(k - 'A' + 10);
+						last_added_color = curr_color;
 					}
 					else {
 						str.push_back({ '&', curr_color }); // wasn't &color, so + &
@@ -204,8 +163,7 @@ namespace LSW {
 				}
 
 				if (has_backslash_to_add) str.push_back({ '\\', curr_color });
-				str += { i, curr_color };
-				last_added_color = curr_color;
+				append({ i, curr_color });
 			}
 
 			//auto& cpyy = str.at(str.size() - 1);
@@ -213,123 +171,41 @@ namespace LSW {
 			return *this;
 		}
 
-		coloured_string& coloured_string::operator+=(const char& a)
-		{
-			char arr[2] = { a, '\0' };
-			return this->operator+=(std::string(arr));
-		}
-		coloured_string& coloured_string::operator+=(const char_c& a)
+		coloured_string& coloured_string::append(const char_c& a)
 		{
 			str.push_back(a);
+			last_added_color = str.back().cr;
 			return *this;
 		}
-
-		coloured_string& coloured_string::operator+=(const int& a)
-		{
-			return this->operator+=(std::to_string(a));
-		}
-
-		coloured_string& coloured_string::operator+=(const float& a)
+		coloured_string& coloured_string::append(const float& a)
 		{
 			char temp[32];
 			if (fabs(a) < 1e15) sprintf_s(temp, "%.3f", a);
 			else sprintf_s(temp, a > 0 ? "+++" : "---");
-			return this->operator+=(std::string(temp));
+			return this->append(std::string(temp));
 		}
 
-		coloured_string& coloured_string::operator+=(const double& a)
+		coloured_string& coloured_string::append(const double& a)
 		{
 			char temp[32];
 			if (fabs(a) < 1e15) sprintf_s(temp, "%.5lf", a);
 			else sprintf_s(temp, a > 0 ? "+++" : "---");
-			return this->operator+=(std::string(temp));
+			return this->append(std::string(temp));
 		}
 
-		coloured_string& coloured_string::operator+=(const unsigned& a)
+		coloured_string& coloured_string::append(const char* a)
 		{
-			return this->operator+=(std::to_string(a));
+			return this->append(std::string(a));
 		}
 
-		coloured_string& coloured_string::operator+=(const long& a)
+		coloured_string& coloured_string::append(const char& a)
 		{
-			return this->operator+=(std::to_string(a));
+			return this->append(std::string(&a, sizeof(char)));
 		}
 
-		coloured_string& coloured_string::operator+=(const long long& a)
+		void coloured_string::push_back(char_c&& u)
 		{
-			return this->operator+=(std::to_string(a));
-		}
-
-
-		coloured_string& coloured_string::operator+=(const size_t& a)
-		{
-			return this->operator+=(std::to_string(a));
-		}
-
-		coloured_string& coloured_string::operator=(const coloured_string& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const std::string& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const char& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const char_c& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const int& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const float& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const double& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const unsigned& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const long& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const long long& a)
-		{
-			str.clear();
-			return this->operator+=(a);
-		}
-
-		coloured_string& coloured_string::operator=(const size_t& a)
-		{
-			str.clear();
-			return this->operator+=(a);
+			append(u);
 		}
 
 		std::basic_string<char_c>::const_iterator coloured_string::begin() const {
@@ -345,10 +221,6 @@ namespace LSW {
 		const char_c& coloured_string::operator[](const size_t p) const{
 			return str[p];
 		}
-		void coloured_string::push_back(char_c&& c)
-		{
-			str += c;
-		}
 		void coloured_string::clear()
 		{
 			str.clear();
@@ -360,6 +232,14 @@ namespace LSW {
 		const char_c* coloured_string::data() const
 		{
 			return str.data();
+		}
+		C coloured_string::__last_color() const
+		{
+			return last_added_color;
+		}
+		void coloured_string::__change_last_color(const C c)
+		{
+			last_added_color = c;
 		}
 	}
 }

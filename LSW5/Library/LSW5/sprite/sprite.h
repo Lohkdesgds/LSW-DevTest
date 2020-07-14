@@ -27,7 +27,7 @@ namespace LSW {
 
 
 			enum class e_string { ID };
-			enum class e_double { TARG_POSX, TARG_POSY, SCALE_X, SCALE_Y, SCALE_G, CENTER_X, CENTER_Y, TARG_ROTATION, ACCELERATION_X, ACCELERATION_Y, SPEED_ROTATION, SPEEDXY_LIMIT, ELASTICITY_X, ELASTICITY_Y };
+			enum class e_double { TARG_POSX, TARG_POSY, SCALE_X, SCALE_Y, SCALE_G, CENTER_X, CENTER_Y, TARG_ROTATION, ACCELERATION_X, ACCELERATION_Y, SPEEDXY_LIMIT, ELASTICITY_X, ELASTICITY_Y };
 			enum class e_boolean { DRAW, USE_COLOR, AFFECTED_BY_CAM, SHOWDOT, SHOWBOX, RESPECT_CAMERA_LIMITS, FOLLOW_MOUSE, FOLLOW_KEYBOARD, SET_TARG_POS_VALUE_READONLY /*Readonly means no collision or acceleration, just f()*/ };
 			enum class e_integer { LAYER, COLLISION_MODE };
 			enum class e_color { COLOR };
@@ -80,7 +80,6 @@ namespace LSW {
 				{[] {return 0.0;},															(e_double::TARG_ROTATION),							CHAR_INIT("target_rotation")},
 				{[] {return 0.0;},															(e_double::ACCELERATION_X),							CHAR_INIT("acceleration_x")},
 				{[] {return 0.0;},															(e_double::ACCELERATION_Y),							CHAR_INIT("acceleration_y")},
-				{[] {return 0.0;},															(e_double::SPEED_ROTATION),							CHAR_INIT("speed_rotation")},
 				{[] {return 0.3;},															(e_double::SPEEDXY_LIMIT),							CHAR_INIT("speed_limit")},
 				{[] {return 0.85;},															(e_double::ELASTICITY_X),							CHAR_INIT("elasticity_x")},
 				{[] {return 0.85;},															(e_double::ELASTICITY_Y),							CHAR_INIT("elasticity_y")}
