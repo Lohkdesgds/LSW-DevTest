@@ -234,14 +234,9 @@ namespace LSW {
 									//throw_event_update_display_size();
 								}
 								break;
-							/*case static_cast<int>(Shared::my_events::CUSTOM_EVENT_LOG_STRING): // no reason to handle this here
-									clr_str = *(coloured_string*)ev.user.data1;
-									// set later the string on screen
-								break;*/
-							/*case static_cast<int>(Shared::my_events::CUSTOM_EVENT_EXTERNAL_EXIT_CALL):
-								internalEnd();
-								logg << L::SLF << fsr(__FUNCSIG__) << "&5Got EVENT_EXTERNAL_EXIT_CALL event on main window, setting to close the game..." << L::ELF;
-								break;*/
+							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_PRINTSCREEN):
+								disp.printscreen();
+								break;
 							case static_cast<int>(Shared::my_events::CUSTOM_EVENT_DISPLAY_UPDATE_RESOLUTION_SCALE):
 								{
 									double scale = ev.user.data1 * 1.0 / 100;
@@ -270,7 +265,9 @@ namespace LSW {
 
 					// draw?
 					if (auto main_cam = cameras.getMain(); main_cam) {
+#ifdef LSW_DEBUG
 						main_cam->matrix_debug();
+#endif
 						main_cam->apply();
 						auto& con = main_cam->getAttributes();
 

@@ -713,13 +713,18 @@ namespace LSW {
 				const auto speed_y_c   = (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y]);
 			
 
-				*data_sprite_base->double_data[sprite::e_double::TARG_POSX] = [=] { return targ_posx_c + speed_x_c; };
+				*data_sprite_base->double_data[sprite::e_double::TARG_POSX] = [targ_posx_c,speed_x_c] { return targ_posx_c + speed_x_c; };
 				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X] += (*data_sprite_base->double_data[sprite::e_double::ACCELERATION_X])();
 				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X] *= roughness;
 
-				*data_sprite_base->double_data[sprite::e_double::TARG_POSY] = [=] { return targ_posy_c + speed_y_c; };
+				*data_sprite_base->double_data[sprite::e_double::TARG_POSY] = [targ_posy_c, speed_y_c] { return targ_posy_c + speed_y_c; };
 				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] += (*data_sprite_base->double_data[sprite::e_double::ACCELERATION_Y])();
 				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] *= roughness;
+
+				if (auto spr = (*data_sprite_base->double_data[sprite::e_double::SPEED_ROTATION])(); spr != 0.0) {
+					double act = (*data_sprite_base->double_data[sprite::e_double::TARG_ROTATION])();
+					*data_sprite_base->double_data[sprite::e_double::TARG_ROTATION] = [spr,act] {return act + spr; };
+				}
 			}
 
 

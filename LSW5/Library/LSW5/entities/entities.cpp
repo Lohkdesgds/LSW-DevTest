@@ -127,6 +127,7 @@ namespace LSW {
 				binfo.id = id;
 
 				bitmaps.push_back(binfo);
+				return;
 			}
 			throw Abort::Abort(__FUNCSIG__, "Cannot load '" + id + "'!");
 		}
@@ -141,6 +142,7 @@ namespace LSW {
 				binfo.id.clear(); // main
 
 				bitmaps.push_back(binfo);
+				return;
 			}
 			throw Abort::Abort(__FUNCSIG__, "There's no MAIN TEXTURE set! (See SuperResource.setMain(...))");
 		}
