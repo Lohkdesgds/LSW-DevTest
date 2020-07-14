@@ -124,7 +124,7 @@ namespace LSW {
 			char temp[26];
 			SYSTEMTIME t;
 			GetLocalTime(&t);
-			auto ss = sprintf_s(temp, "%02d_%02d_%02d_%02d_%02d_%02d_%04d]", t.wYear % 100, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, ((int)(al_get_time() * 1000) % 1000));
+			auto ss = sprintf_s(temp, "%02d_%02d_%02d_%02d_%02d_%02d_%04d", t.wYear % 100, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, ((int)(al_get_time() * 1000) % 1000));
 			if (ss == 0) {
 				throw Abort::Abort(__FUNCSIG__, "Unexpected behaviour on sprintf_s: null string?", Abort::abort_level::GIVEUP);
 			}
@@ -150,10 +150,10 @@ namespace LSW {
 
 			print_thread.setFunc([=](Threads::boolThreadF wl)->int {
 				int retval = 1;
-				if (!al_save_bitmap(path.c_str(), u)) {
+				if (!al_save_bitmap(path.c_str(), cpy)) {
 					retval = 2;
 				}
-				al_destroy_bitmap(u);
+				al_destroy_bitmap(cpy);
 				return retval;
 				});
 
