@@ -16,7 +16,9 @@
 #include "..\database\database.h"
 #include "..\superresource\superresource.h"
 #include "..\sprite\sprite.h"
-#include "..\entities\entities.h"
+#include "..\block\block.h"
+#include "..\text\text.h"
+#include "..\button\button.h"
 #include "..\track\track.h"
 
 /*

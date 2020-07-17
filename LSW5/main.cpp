@@ -7,7 +7,11 @@
 #include "Library\LSW5\display\display.h"
 #include "Library\LSW5\superresource\superresource.h"
 #include "Library\LSW5\sprite\sprite.h"
-#include "Library\LSW5\entities\entities.h"
+#include "Library\LSW5\block\block.h"
+#include "Library\LSW5\text\text.h"
+#include "Library\LSW5\button\button.h"
+#include "Library\LSW5\bubblefx_addon\bubblefx.h"
+#include "Library\LSW5\shinefx_addon\shinefx.h"
 #include "Library\LSW5\autocaster\autocaster.h"
 #include "Library\LSW5\filesystem\filesystem.h"
 #include "Library\LSW5\independenteventhandler\independenteventhandler.h"
@@ -269,8 +273,19 @@ int main(int argc, char* argv[]) {
 	
 	*/
 
+	auto ref7_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new ShineFX()); });
+	ShineFX* ref7 = (ShineFX*)&(*ref7_orig);
 
-	auto ref7_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new BubbleFX()); });
+	ref7->set(sprite::e_boolean::DRAW, true);
+	ref7->set(sprite::e_double::SCALE_G, 2.0);
+	ref7->set(sprite::e_double::TARG_POSX, 0.0);
+	ref7->set(sprite::e_double::TARG_POSY, 0.0);
+	ref7->set(shinefx::e_double::FRAMES_PER_SECOND_UPDATE, 144.0);
+	ref7->set(sprite::e_integer::LAYER, -1);
+	ref7->set(shinefx::e_color::FOREGROUND, [] {return al_map_rgb(cos(MILLI_NOW.count() / 1000.0) * 128 + 127, cos(MILLI_NOW.count() / 1500.0) * 128 + 127, cos(MILLI_NOW.count() / 800.0) * 128 + 127); });
+	ref7->set(shinefx::e_color::BACKGROUND, al_map_rgb(35, 35, 5));
+
+	/*auto ref7_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new BubbleFX()); });
 	BubbleFX* ref7 = (BubbleFX*)&(*ref7_orig);
 	//ref7->set(sprite::e_boolean::SHOWBOX, true);
 	//ref7->set(sprite::e_boolean::SHOWDOT, true);
@@ -278,7 +293,7 @@ int main(int argc, char* argv[]) {
 	ref7->set(sprite::e_double::SCALE_G, 2.0);
 	ref7->set(sprite::e_double::TARG_POSX, 0.0);
 	ref7->set(sprite::e_double::TARG_POSY, 0.0);
-	ref7->set(sprite::e_integer::LAYER, -1);
+	ref7->set(sprite::e_integer::LAYER, -1);*/
 	/*ref7->set(sprite::e_double::ACCELERATION_Y, 6e-4);*/
 
 
@@ -381,6 +396,9 @@ int main(int argc, char* argv[]) {
 
 
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Ending CORE once - - -" << L::ELF;
+
+	trk->set(track::e_boolean::PLAYING, false);
+	trk->update();
 
 	core.fEnd();
 

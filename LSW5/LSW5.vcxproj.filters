@@ -70,9 +70,6 @@
     <Filter Include="LSW5\Library\supermutex">
       <UniqueIdentifier>{1c2e96ff-a1c9-44db-8124-9de3809c4aef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW5\Library\entities">
-      <UniqueIdentifier>{405588bd-d0ce-482b-9563-bc986de37594}</UniqueIdentifier>
-    </Filter>
     <Filter Include="README reference">
       <UniqueIdentifier>{6c596632-0cdb-4def-8a66-d35b85346d79}</UniqueIdentifier>
     </Filter>
@@ -90,6 +87,27 @@
     </Filter>
     <Filter Include="LSW5\Library\independenteventhandler">
       <UniqueIdentifier>{b2b194d1-85d3-4fdf-a754-864c6e07d5ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\block">
+      <UniqueIdentifier>{0e7adc98-5dd5-4f92-a4ac-f362c5a672e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\text">
+      <UniqueIdentifier>{15da7057-f740-41aa-8aa4-02a6eff41443}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\button">
+      <UniqueIdentifier>{50d3c0d2-2b73-498e-9191-7b63f1669ced}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\coloured_string">
+      <UniqueIdentifier>{a4e474c5-229f-4b67-9c0c-053ddfcb89f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\bubblefx_addon">
+      <UniqueIdentifier>{f5fb4178-11fa-44e1-98b2-f05db14be5ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\printer">
+      <UniqueIdentifier>{d641749a-04e5-42c3-af09-d96b41be39de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\shinefx_addon">
+      <UniqueIdentifier>{f01020ba-bb68-41bb-8950-d8473807cdbc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -115,16 +133,10 @@
     <ClCompile Include="Library\LSW5\logger\logger.cpp">
       <Filter>LSW5\Library\logger</Filter>
     </ClCompile>
-    <ClCompile Include="Library\LSW5\logger\coloured_string.cpp">
-      <Filter>LSW5\Library\logger</Filter>
-    </ClCompile>
     <ClCompile Include="Library\LSW5\tools\tools.cpp">
       <Filter>LSW5\Library\tools</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Library\LSW5\logger\printer.cpp">
-      <Filter>LSW5\Library\logger</Filter>
-    </ClCompile>
     <ClCompile Include="Library\LSW5\database\database.cpp">
       <Filter>LSW5\Library\database</Filter>
     </ClCompile>
@@ -152,9 +164,6 @@
     <ClCompile Include="Library\LSW5\supermutex\supermutex.cpp">
       <Filter>LSW5\Library\supermutex</Filter>
     </ClCompile>
-    <ClCompile Include="Library\LSW5\entities\entities.cpp">
-      <Filter>LSW5\Library\entities</Filter>
-    </ClCompile>
     <ClCompile Include="Library\LSW5\voice\voice.cpp">
       <Filter>LSW5\Library\voice</Filter>
     </ClCompile>
@@ -169,6 +178,27 @@
     </ClCompile>
     <ClCompile Include="Library\LSW5\independenteventhandler\independenteventhandler.cpp">
       <Filter>LSW5\Library\independenteventhandler</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\block\block.cpp">
+      <Filter>LSW5\Library\block</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\text\text.cpp">
+      <Filter>LSW5\Library\text</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\button\button.cpp">
+      <Filter>LSW5\Library\button</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\bubblefx_addon\bubblefx.cpp">
+      <Filter>LSW5\Library\bubblefx_addon</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\coloured_string\coloured_string.cpp">
+      <Filter>LSW5\Library\coloured_string</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\printer\printer.cpp">
+      <Filter>LSW5\Library\printer</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\shinefx_addon\shinefx.cpp">
+      <Filter>LSW5\Library\shinefx_addon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -200,12 +230,6 @@
       <Filter>LSW5\Library\allegroinitialization</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\logger\logger.h">
-      <Filter>LSW5\Library\logger</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\LSW5\logger\coloured_string.h">
-      <Filter>LSW5\Library\logger</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\LSW5\logger\printer.h">
       <Filter>LSW5\Library\logger</Filter>
     </ClInclude>
     <ClInclude Include="Library\LSW5\tools\tools.h">
@@ -244,9 +268,6 @@
     <ClInclude Include="Library\LSW5\supermutex\supermutex.h">
       <Filter>LSW5\Library\supermutex</Filter>
     </ClInclude>
-    <ClInclude Include="Library\LSW5\entities\entities.h">
-      <Filter>LSW5\Library\entities</Filter>
-    </ClInclude>
     <ClInclude Include="Library\LSW5\voice\voice.h">
       <Filter>LSW5\Library\voice</Filter>
     </ClInclude>
@@ -261,6 +282,27 @@
     </ClInclude>
     <ClInclude Include="Library\LSW5\independenteventhandler\independenteventhandler.h">
       <Filter>LSW5\Library\independenteventhandler</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\block\block.h">
+      <Filter>LSW5\Library\block</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\text\text.h">
+      <Filter>LSW5\Library\text</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\button\button.h">
+      <Filter>LSW5\Library\button</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\bubblefx_addon\bubblefx.h">
+      <Filter>LSW5\Library\bubblefx_addon</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\coloured_string\coloured_string.h">
+      <Filter>LSW5\Library\coloured_string</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\printer\printer.h">
+      <Filter>LSW5\Library\printer</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\shinefx_addon\shinefx.h">
+      <Filter>LSW5\Library\shinefx_addon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,7 +8,7 @@
 // C++
 #include <string>
 // Others
-#include "coloured_string.h"
+#include "..\coloured_string\coloured_string.h"
 
 namespace LSW {
 	namespace v5 {	

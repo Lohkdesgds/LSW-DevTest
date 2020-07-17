@@ -358,7 +358,7 @@ namespace LSW {
 				data.m.unlock();
 				return std::shared_ptr<T>();
 			}
-			// creates new and replace/reset
+			// creates new and replace/reset (only works if there's one there with this ID, else return null shared_ptr)
 			std::shared_ptr<T> swapCustomLoad(const std::string id, std::function<bool(T*&)> f) {
 				data.m.lock();
 				for (auto& i : data.vec) {

@@ -25,8 +25,8 @@ Logger header:
 #include <functional>
 // Others
 #include "..\Abort\abort.h"
-#include "coloured_string.h"
-#include "printer.h"
+#include "..\coloured_string\coloured_string.h"
+#include "..\printer\printer.h"
 #include "..\tools\tools.h"
 #include "..\shared\shared.h"
 
