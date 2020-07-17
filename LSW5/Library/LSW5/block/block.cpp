@@ -12,24 +12,24 @@ namespace LSW {
 
 				if (const double _dd = (*data_block->double_data[block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION])(); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
 					delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + block::default_delta_t_frame_delay);
-					ALLEGRO_BITMAP* trg = al_get_target_bitmap();
-					if (trg) {
-						SuperResource<ALLEGRO_BITMAP> bmps;
-						int tx = al_get_bitmap_width(trg) * _dd;
-						int ty = al_get_bitmap_height(trg) * _dd;
+					SuperResource<Bitmap> bmps;
+					auto& trg = reference;
+					if (trg && *trg) {
+						int tx = trg->get_width() * _dd;
+						int ty = trg->get_height() * _dd;
 
 						for (auto& i : bitmaps) {
-							int _w = al_get_bitmap_width(&(*i.ref));
-							int _h = al_get_bitmap_height(&(*i.ref));
+							int _w = i.ref->get_width();
+							int _h = i.ref->get_height();
 							if (_w == tx && _h == ty) continue; // no need to "reload"
 
-							auto nww = bmps.swapCustomLoad(i.id, [&](ALLEGRO_BITMAP*& b) {return b = al_create_bitmap(tx, ty); });
-							if (!nww) nww = bmps.customLoad(i.id, [&](ALLEGRO_BITMAP*& b) {return b = al_create_bitmap(tx, ty); });
-							al_set_target_bitmap(&(*nww));
-							al_draw_scaled_bitmap(&(*i.ref), 0, 0, al_get_bitmap_width(&(*i.ref)), al_get_bitmap_height(&(*i.ref)), 0, 0, al_get_bitmap_width(trg), al_get_bitmap_height(trg), 0);
-							i.ref = nww;
+							auto old = i.ref;
+							i.ref = bmps.swapNew(i.id);
+							i.ref->create(tx, ty);
+							i.ref->set_as_target();
+							if (old) old->draw(0, 0, tx, ty);
 						}
-						al_set_target_bitmap(trg);
+						trg->set_as_target();
 					}
 				}
 			}
@@ -59,14 +59,14 @@ namespace LSW {
 				*data_block->integer_data[block::e_integer::FRAME] = [=] {return frame; };
 			}
 
-			ALLEGRO_BITMAP* rn = &(*bitmaps[frame].ref);
-			if (!rn) throw Abort::Abort(__FUNCSIG__, "Unexpected NULL on draw!");
+			auto rnn = bitmaps[frame].ref;
+			if (!rnn || !*rnn) throw Abort::Abort(__FUNCSIG__, "Unexpected NULL on draw!");
 
 
 			float cx, cy, px, py, dsx, dsy, rot_rad;
 			int bmpx, bmpy;
-			bmpx = al_get_bitmap_width(rn);
-			bmpy = al_get_bitmap_height(rn);
+			bmpx = rnn->get_width();
+			bmpy = rnn->get_height();
 			if (bmpx <= 0 || bmpy <= 0) {
 				throw Abort::Abort(__FUNCSIG__, "Somehow the texture have < 0 width / height!");
 			}
@@ -74,8 +74,6 @@ namespace LSW {
 			cx = 1.0f * bmpx * (((*getRef(sprite::e_double::CENTER_X))() + 1.0) * 0.5);
 			cy = 1.0f * bmpy * (((*getRef(sprite::e_double::CENTER_Y))() + 1.0) * 0.5);
 			rot_rad = 1.0f * *getRef(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
-			/*px = 1.0f * data.dval[+Constants::io__sprite_double::POSX] * cos(rot_rad) + data.dval[+Constants::io__sprite_double::POSY] * sin(rot_rad);
-			py = 1.0f * data.dval[+Constants::io__sprite_double::POSY] * cos(rot_rad) - data.dval[+Constants::io__sprite_double::POSX] * sin(rot_rad);*/
 			px = *getRef(sprite::e_double_readonly::POSX);
 			py = *getRef(sprite::e_double_readonly::POSY);
 			dsx = 1.0f * (*getRef(sprite::e_double::SCALE_X))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpx);
@@ -83,10 +81,19 @@ namespace LSW {
 
 
 			if ((*getRef(sprite::e_boolean::USE_COLOR))()) {
-				al_draw_tinted_scaled_rotated_bitmap(rn, (*getRef(sprite::e_color::COLOR))(), cx, cy, px, py, dsx, dsy, rot_rad, 0);
+				rnn->draw(
+					(*getRef(sprite::e_color::COLOR))(),
+					cx, cy,
+					px, py,
+					dsx, dsy,
+					rot_rad);
 			}
 			else {
-				al_draw_scaled_rotated_bitmap(rn, cx, cy, px, py, dsx, dsy, rot_rad, 0);
+				rnn->draw(
+					cx, cy,
+					px, py,
+					dsx, dsy,
+					rot_rad);
 			}
 
 		}
@@ -94,11 +101,17 @@ namespace LSW {
 		{
 			if (!data_block) throw Abort::Abort(__FUNCSIG__, "Failed to create Block's data!");
 			custom_draw_task = [&] {draw_self(); };
+
+			reference = std::make_shared<Bitmap>();
+			reference->be_reference_to_target(true);
 		}
 		Block::Block(Block& o) : Sprite_Base(o)
 		{
 			if (!data_block) throw Abort::Abort(__FUNCSIG__, "Failed to create Block's data!");
 			custom_draw_task = [&] {draw_self(); };
+
+			reference = std::make_shared<Bitmap>();
+			reference->be_reference_to_target(true);
 		}
 		void Block::twinUpAttributes(const std::shared_ptr<block_data> oth)
 		{
@@ -117,13 +130,15 @@ namespace LSW {
 		}*/
 		void Block::load(const std::string id, const std::string str)
 		{
-			SuperResource<ALLEGRO_BITMAP> bmps;
+			SuperResource<Bitmap> bmps;
 			_bitmap binfo;
 
-			if (binfo.ref = bmps.load(id, str)) {
+			if (binfo.ref = bmps.load(id)) {
 				binfo.is_sub_bitmap = false;
 				binfo.source = str;
 				binfo.id = id;
+
+				if (!binfo.ref->load(str.c_str())) throw Abort::Abort(__FUNCSIG__, "Cannot load '" + id + "'!");
 
 				bitmaps.push_back(binfo);
 				return;
@@ -132,7 +147,7 @@ namespace LSW {
 		}
 		void Block::load()
 		{
-			SuperResource<ALLEGRO_BITMAP> bmps;
+			SuperResource<Bitmap> bmps;
 			_bitmap binfo;
 
 			if (binfo.ref = bmps.getMain()) {
@@ -147,18 +162,19 @@ namespace LSW {
 		}
 		void Block::loadCut(const std::string parent_id, const int x, const int y, const int w, const int h)
 		{
-			SuperResource<ALLEGRO_BITMAP> bmps;
-			std::shared_ptr<ALLEGRO_BITMAP> parent;
-			if (bmps.get(parent_id, parent))
+			SuperResource<Bitmap> bmps;
+			if (std::shared_ptr<Bitmap> parent; bmps.get(parent_id, parent))
 			{
 				_bitmap binfo;
 
 				binfo.source = parent_id;
 				binfo.is_sub_bitmap = true;
 				binfo.id = parent_id + "_cut&" + Tools::generateRandomUniqueStringN();
-				binfo.ref = bmps.customLoad(binfo.id, [=](ALLEGRO_BITMAP*& ret) {return ret = al_create_sub_bitmap(&(*parent), x, y, w, h); });
+				binfo.ref = bmps.create(binfo.id);
+				binfo.ref->create_sub(**parent, x, y, w, h);
+				//binfo.ref = bmps.customLoad(binfo.id, [=](ALLEGRO_BITMAP*& ret) {return ret = al_create_sub_bitmap(&(*parent), x, y, w, h); });
 
-				if (binfo.ref)
+				if (binfo.ref && *binfo.ref)
 				{
 					bitmaps.push_back(binfo);
 					return;
@@ -168,15 +184,17 @@ namespace LSW {
 		}
 		void Block::loadCut(const int x, const int y, const int w, const int h)
 		{
-			SuperResource<ALLEGRO_BITMAP> bmps;
-			if (std::shared_ptr<ALLEGRO_BITMAP> parent = bmps.getMain())
+			SuperResource<Bitmap> bmps;
+			if (std::shared_ptr<Bitmap> parent = bmps.getMain())
 			{
 				_bitmap binfo;
 
 				binfo.source.clear(); // main
 				binfo.is_sub_bitmap = true;
 				binfo.id = "_cut&" + Tools::generateRandomUniqueStringN();
-				binfo.ref = bmps.customLoad(binfo.id, [=](ALLEGRO_BITMAP*& ret) {return ret = al_create_sub_bitmap(&(*parent), x, y, w, h); });
+				binfo.ref = bmps.create(binfo.id);
+				binfo.ref->create_sub(**parent, x, y, w, h);
+				//binfo.ref = bmps.customLoad(binfo.id, [=](ALLEGRO_BITMAP*& ret) {return ret = al_create_sub_bitmap(&(*parent), x, y, w, h); });
 
 				if (binfo.ref)
 				{

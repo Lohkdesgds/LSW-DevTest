@@ -105,7 +105,7 @@ namespace LSW {
 
 		PhysFS::PhysFS()
 		{
-			lsw_al_init();
+			lsw_init();
 			
 			if (!physfs_initialized_once) {
 				char myself[1024];

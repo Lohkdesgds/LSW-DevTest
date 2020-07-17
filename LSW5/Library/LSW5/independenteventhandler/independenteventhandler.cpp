@@ -28,13 +28,13 @@ namespace LSW {
 		}
 		IndependentEventHandler::IndependentEventHandler()
 		{
-			lsw_al_init();
+			lsw_init();
 			__init_event_handle_custom();
 			add();
 		}
 		IndependentEventHandler::IndependentEventHandler(IndependentEventHandler& ev)
 		{
-			lsw_al_init();
+			lsw_init();
 			event_handle = ev.getInstance();
 			add();
 		}

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <vector>
 // Others
+#include "..\Lower\bitmap\bitmap.h"
 #include "..\supermap\supermap.h"
 #include "..\tools\tools.h"
 #include "..\allegroinitialization\allegroinitialization.h"
@@ -79,7 +80,8 @@ namespace LSW {
 
 			Camera_configuration data;
 
-			ALLEGRO_TRANSFORM transf(ALLEGRO_BITMAP*, const float, const float, const float, const float, const float);
+			std::shared_ptr<Bitmap> reference;
+			ALLEGRO_TRANSFORM transf(std::shared_ptr<Bitmap>, const float, const float, const float, const float, const float);
 		public:
 			Camera();
 			Camera(Camera&);
@@ -118,6 +120,7 @@ namespace LSW {
 			template<typename T, typename V> inline bool ie(const T e, const V v) { return isEq(e, v); };
 
 			void refresh();
+			void refresh(std::shared_ptr<Bitmap>&);
 			void apply();
 
 			ALLEGRO_TRANSFORM getTransform();

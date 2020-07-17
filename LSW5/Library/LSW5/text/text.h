@@ -6,6 +6,7 @@
 #include <numeric>
 #include <functional>
 // Others
+#include "..\lower\bitmap\bitmap.h"
 #include "..\sprite\sprite.h"
 #include "..\superresource\superresource.h"
 #include "..\database\database.h"

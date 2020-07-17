@@ -435,7 +435,7 @@ namespace LSW {
 				},
 				{
 					[&] {
-						SuperResource<ALLEGRO_BITMAP> resource;
+						SuperResource<Bitmap> resource;
 						return Tools::sprintf_a("%zu", resource.size());
 					},
 						CHAR_INIT("%num_images%"), 					(text::e_custom_tags::T_TEXTURES_LOADED)

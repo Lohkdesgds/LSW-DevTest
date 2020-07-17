@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 
 	SuperResource<Camera> cameras;
 	SuperResource<Sprite_Base> sprites;
-	SuperResource<ALLEGRO_BITMAP> bitmaps;
+	SuperResource<Bitmap> bitmaps;
 	SuperResource<ALLEGRO_FONT> fonts;
 
 	db.set(database::e_string::PRINT_PATH, default_print_path);
@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
 
 	fonts.create("_FONT", "font.ttf"); // load main font
 	fonts.setMain("_FONT");
-	bitmaps.create("_ATLAS0", "atlas0.png"); // load big atlas
+	bitmaps.create("_ATLAS0")->load("atlas0.png");
 	bitmaps.setMain("_ATLAS0");
 
 	size_t countgen = 0;
@@ -282,8 +282,8 @@ int main(int argc, char* argv[]) {
 	ref7->set(sprite::e_double::TARG_POSY, 0.0);
 	ref7->set(shinefx::e_double::FRAMES_PER_SECOND_UPDATE, 144.0);
 	ref7->set(sprite::e_integer::LAYER, -1);
-	ref7->set(shinefx::e_color::FOREGROUND, [] {return al_map_rgb(cos(MILLI_NOW.count() / 1000.0) * 128 + 127, cos(MILLI_NOW.count() / 1500.0) * 128 + 127, cos(MILLI_NOW.count() / 800.0) * 128 + 127); });
-	ref7->set(shinefx::e_color::BACKGROUND, al_map_rgb(35, 35, 5));
+	ref7->set(shinefx::e_color::FOREGROUND, [] {return al_map_rgba(cos(MILLI_NOW.count() / 1000.0) * 50 + 100, cos(MILLI_NOW.count() / 1500.0) * 50 + 100, cos(MILLI_NOW.count() / 800.0) * 50 + 100, 150); });
+	ref7->set(shinefx::e_color::BACKGROUND, al_map_rgba(35, 35, 5, 100));
 
 	/*auto ref7_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new BubbleFX()); });
 	BubbleFX* ref7 = (BubbleFX*)&(*ref7_orig);
@@ -421,6 +421,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	logg.flush();
+	bitmaps.clear();
 	db.close();
+	
 	return 0;
 }

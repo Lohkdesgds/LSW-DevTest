@@ -358,7 +358,7 @@ namespace LSW {
 				data.m.unlock();
 				return std::shared_ptr<T>();
 			}
-			// creates new and replace/reset (only works if there's one there with this ID, else return null shared_ptr)
+			// creates new and replace/reset (if none there, creates one)
 			std::shared_ptr<T> swapCustomLoad(const std::string id, std::function<bool(T*&)> f) {
 				data.m.lock();
 				for (auto& i : data.vec) {
@@ -374,7 +374,24 @@ namespace LSW {
 					}
 				}
 				data.m.unlock();
-				return std::shared_ptr<T>();
+				return create(id);
+			}
+			// creates new and replace/reset (if none there, creates one)
+			std::shared_ptr<T> swapNew(const std::string id) {
+				data.m.lock();
+				for (auto& i : data.vec) {
+					if (i == id) {
+						generic_class<T> ret2 = generic_class<T>(data.load, data.unload, id, "");
+
+						if (!ret2.data()) throw Abort::Abort(__FUNCSIG__, "Can't load a resource! id=" + id, Abort::abort_level::FATAL_ERROR);
+
+						i.data().swap(ret2.data());
+						data.m.unlock();
+						return i.data();
+					}
+				}
+				data.m.unlock();
+				return create(id);
 			}
 			void clear() {
 				if (!data.unload) throw Abort::Abort(__FUNCSIG__, "You have to setup load/unload lambdas before using dynamic resource", Abort::abort_level::FATAL_ERROR);
@@ -393,8 +410,8 @@ namespace LSW {
 		template<typename K> const auto lambda_default_unload = [](K*& b) -> void { if (b) delete b; b = nullptr; };
 
 
-		inline const auto lambda_bitmap_load = [](std::string& p, ALLEGRO_BITMAP*& b) -> bool { return (b = al_load_bitmap(p.c_str())); };
-		inline const auto lambda_bitmap_unload = [](ALLEGRO_BITMAP*& b) -> void {if (al_is_system_installed() && b) { al_destroy_bitmap(b); b = nullptr; } };
+		//inline const auto lambda_bitmap_load = [](std::string& p, ALLEGRO_BITMAP*& b) -> bool { return (b = al_load_bitmap(p.c_str())); };
+		//inline const auto lambda_bitmap_unload = [](ALLEGRO_BITMAP*& b) -> void {if (al_is_system_installed() && b) { al_destroy_bitmap(b); b = nullptr; } };
 
 		inline const auto lambda_font_load = [](std::string& p, ALLEGRO_FONT*& b) -> bool { return (b = al_load_ttf_font(p.c_str(), 75.0, 0)); };
 		inline const auto lambda_font_unload = [](ALLEGRO_FONT*& b) -> void { if (al_is_system_installed() && b) { al_destroy_font(b); b = nullptr; } };
@@ -415,7 +432,7 @@ namespace LSW {
 		template<typename T> SuperResource<T>::_data<T> SuperResource<T>::data = { lambda_default_load<T>, lambda_default_unload<T> };
 
 		// type specific
-		template <> SuperResource<ALLEGRO_BITMAP>::_data<ALLEGRO_BITMAP>					SuperResource<ALLEGRO_BITMAP>::data				= { lambda_bitmap_load, lambda_bitmap_unload };
+		//template <> SuperResource<ALLEGRO_BITMAP>::_data<ALLEGRO_BITMAP>					SuperResource<ALLEGRO_BITMAP>::data				= { lambda_bitmap_load, lambda_bitmap_unload };
 		template <> SuperResource<ALLEGRO_FONT>::_data<ALLEGRO_FONT>						SuperResource<ALLEGRO_FONT>::data				= { lambda_font_load, lambda_font_unload };
 		template <> SuperResource<ALLEGRO_SAMPLE>::_data<ALLEGRO_SAMPLE>					SuperResource<ALLEGRO_SAMPLE>::data				= { lambda_sample_load, lambda_sample_unload };
 		template <> SuperResource<ALLEGRO_SAMPLE_INSTANCE>::_data<ALLEGRO_SAMPLE_INSTANCE>	SuperResource<ALLEGRO_SAMPLE_INSTANCE>::data	= { lambda_sampleinst_load, lambda_sampleinst_unload };

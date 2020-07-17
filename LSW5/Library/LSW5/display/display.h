@@ -10,11 +10,14 @@
 #include <thread>
 // Others
 #include "..\Abort\abort.h"
+#include "..\Lower\bitmap\bitmap.h"
 #include "..\superthread\superthread.h"
 #include "..\allegroinitialization\allegroinitialization.h"
 #include "..\supermutex\supermutex.h"
 #include "..\tools\tools.h"
 #include "..\supermap\supermap.h"
+#include "..\superresource\superresource.h"
+
 
 namespace LSW {
 	namespace v5 {
@@ -86,7 +89,11 @@ namespace LSW {
 			//int latest_display_flags = display::display_minimum_flags;
 
 			ALLEGRO_DISPLAY* display_itself = nullptr;
-			ALLEGRO_BITMAP* display_buffer = nullptr;
+			std::shared_ptr<Bitmap> display_itself_follower;
+
+			std::shared_ptr<Bitmap> display_buffer;
+			const std::string display_buffer_name = Tools::generateRandomUniqueStringN();
+			
 			bool use_doublebuffer = false;
 
 			std::chrono::microseconds time_last_draw = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
@@ -182,76 +189,5 @@ namespace LSW {
 		};
 
 
-
-
-
-
-
-
-		/*
-		namespace display {
-
-			//constexpr int display_default_flags = ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL; // exists on Database default value for FLAGS known as "d_mode"
-			constexpr int display_minimum_flags = ALLEGRO_RESIZABLE | ALLEGRO_OPENGL | ALLEGRO_OPENGL_3_0 | ALLEGRO_FULLSCREEN_WINDOW;
-			constexpr int bitmap_default_mode = ALLEGRO_VIDEO_BITMAP | ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_MIPMAP;
-			
-			constexpr int display_reference_size[] = { 1280,720 };
-
-			constexpr double display_fixed_acknowledge_delta_t = 1.5;
-		}
-
-		bool isDisplayModeEq(ALLEGRO_DISPLAY_MODE, ALLEGRO_DISPLAY_MODE);
-
-		class Display {
-			class modes {
-				std::vector<ALLEGRO_DISPLAY_MODE> options;
-				int lastmode = ALLEGRO_OPENGL;
-			public:
-				void loadOptions(const int);
-
-				// last optional: format
-				bool checkExistance(const int, const int, const int);
-
-				const auto& getAvailableResolutions();
-			};
-
-			ALLEGRO_DISPLAY* display = nullptr;
-			ALLEGRO_BITMAP* display_buffer = nullptr;
-			double last_draw_tick = 0;
-			double last_acknowledge = 0;
-
-			bool print_pending = false;
-
-			// linked directly to a config entry
-			double*			ref_fx_amount		= nullptr;
-			double*			ref_buffer_prop		= nullptr;
-			int*			ref_fps_limit		= nullptr;
-			std::string*	ref_print_path		= nullptr;
-			bool*			ref_doublebuffer	= nullptr;
-
-			modes display_modes;
-			Threads::CustomThread<int> print_thread;
-
-			void _print();
-			void checkAcknowledge();
-		public:
-			Display(); // CALLS DATABASE! CREATE IT BEFORE CREATING A DISPLAY!
-			~Display();
-
-			void init();
-			void restart();
-			void deinit();
-
-			void refreshBitmaps();
-			void flip();
-
-			void acknowledgeDisplay();
-
-			void print();
-			
-			ALLEGRO_EVENT_SOURCE* getEvent() const;
-			ALLEGRO_DISPLAY* getRawDisplay() const;
-		};
-		*/
 	}
 }

@@ -6,6 +6,7 @@
 #include <numeric>
 #include <functional>
 // Others
+#include "..\lower\bitmap\bitmap.h"
 #include "..\sprite\sprite.h"
 #include "..\superresource\superresource.h"
 #include "..\database\database.h"
@@ -48,7 +49,7 @@ namespace LSW {
 
 		class Block : public Sprite_Base {
 			struct _bitmap {
-				std::shared_ptr<ALLEGRO_BITMAP> ref;
+				std::shared_ptr<Bitmap> ref;
 				std::string source, id;
 				bool is_sub_bitmap = false; // if true, source is source's id, else source is path
 			};
@@ -65,8 +66,9 @@ namespace LSW {
 			std::vector<_bitmap> bitmaps;
 
 
-			//ALLEGRO_BITMAP* bmp = nullptr;
+			//Bitmap* bmp = nullptr;
 
+			std::shared_ptr<Bitmap> reference;
 			void draw_self();
 		public:
 			using Sprite_Base::set;

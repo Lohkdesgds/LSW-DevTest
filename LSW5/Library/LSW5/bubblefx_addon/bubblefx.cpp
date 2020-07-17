@@ -5,22 +5,32 @@ namespace LSW {
 
 		void BubbleFX::createSwap(const int x, const int y)
 		{
-			ALLEGRO_BITMAP* trg = al_get_target_bitmap();
-			SuperResource<ALLEGRO_BITMAP> bmps;
+			auto& trg = reference;
+			SuperResource<Bitmap> bmps;
 
-			auto nww = bmps.swapCustomLoad(bmp.id, [&](ALLEGRO_BITMAP*& b) {return b = al_create_bitmap(x, y); });
-			if (!nww) nww = bmps.customLoad(bmp.id, [&](ALLEGRO_BITMAP*& b) {return b = al_create_bitmap(x, y); });
-			al_set_target_bitmap(&(*nww));
-			if (bmp.ref) al_draw_scaled_bitmap(&(*bmp.ref), 0, 0, al_get_bitmap_width(&(*bmp.ref)), al_get_bitmap_height(&(*bmp.ref)), 0, 0, al_get_bitmap_width(&(*nww)), al_get_bitmap_height(&(*nww)), 0);
-			//else al_draw_filled_rectangle(0, 0, al_get_bitmap_width(&(*nww)), al_get_bitmap_height(&(*nww)), al_map_rgb(0, 255, 0));
-			bmp.ref = nww;
+			auto old = bmp.ref;
+			bmp.ref = bmps.swapNew(bmp.id);
+			bmp.ref->create(x, y);
+			bmp.ref->set_as_target();
+			if (old) old->draw(0, 0, x, y);
+			trg->set_as_target();
 
-			if (trg) al_set_target_bitmap(trg);
+			///ALLEGRO_BITMAP* trg = al_get_target_bitmap();
+			///SuperResource<ALLEGRO_BITMAP> bmps;
+
+			///auto nww = bmps.swapCustomLoad(bmp.id, [&](ALLEGRO_BITMAP*& b) {return b = al_create_bitmap(x, y); });
+			///if (!nww) nww = bmps.customLoad(bmp.id, [&](ALLEGRO_BITMAP*& b) {return b = al_create_bitmap(x, y); });
+			///al_set_target_bitmap(&(*nww));
+			///if (bmp.ref) al_draw_scaled_bitmap(&(*bmp.ref), 0, 0, al_get_bitmap_width(&(*bmp.ref)), al_get_bitmap_height(&(*bmp.ref)), 0, 0, al_get_bitmap_width(&(*nww)), al_get_bitmap_height(&(*nww)), 0);
+			/////else al_draw_filled_rectangle(0, 0, al_get_bitmap_width(&(*nww)), al_get_bitmap_height(&(*nww)), al_map_rgb(0, 255, 0));
+			///bmp.ref = nww;
+
+			///if (trg) al_set_target_bitmap(trg);
 		}
 
 		void BubbleFX::_checkInternalBMP()
 		{
-			ALLEGRO_BITMAP* trg = al_get_target_bitmap();
+			auto& trg = reference;
 
 			const double _dd = 0.8;
 			auto& delta_t = *data_bubblefx->chronomillis_readonly_data[bubblefx::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION];
@@ -29,8 +39,8 @@ namespace LSW {
 				delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + bubblefx::default_delta_t_frame_delay);
 
 				if (trg) {
-					siz[0] = al_get_bitmap_width(trg) * _dd;
-					siz[1] = al_get_bitmap_height(trg) * _dd;
+					siz[0] = trg->get_width() * _dd;
+					siz[1] = trg->get_height() * _dd;
 				}
 
 				if (siz[0] < 1280) siz[0] = 1280;
@@ -38,8 +48,8 @@ namespace LSW {
 
 				int _w = 0, _h = 0;
 				if (bmp.ref) {
-					_w = al_get_bitmap_width(&(*bmp.ref));
-					_h = al_get_bitmap_height(&(*bmp.ref));
+					_w = bmp.ref->get_width();
+					_h = bmp.ref->get_height();
 				}
 
 				if (_w != siz[0] || _h != siz[1]) {
@@ -53,10 +63,10 @@ namespace LSW {
 			if (*data_bubblefx->boolean_readonly_data[bubblefx::e_boolean_readonly::SHOULD_UPDATE_SCREEN]) {
 				*data_bubblefx->boolean_readonly_data[bubblefx::e_boolean_readonly::SHOULD_UPDATE_SCREEN] = false;
 
-				ALLEGRO_BITMAP* trg = al_get_target_bitmap();
+				auto& trg = reference;
 
 				if (bmp.ref) { // just to be sure
-					al_set_target_bitmap(&(*bmp.ref));
+					bmp.ref->set_as_target();
 
 					const float blur_intensity = static_cast<float>((*data_bubblefx->double_data[bubblefx::e_double::BLUR_INTENSITY])());
 					size_t& p_assist = *data_bubblefx->sizet_readonly_data[bubblefx::e_sizet_readonly::VECTOR_POSITION_DRAWING];
@@ -79,7 +89,7 @@ namespace LSW {
 					if (p_assist + bubblefx::default_bubbles_amount_draw_per_tick_max >= positions.size()) p_assist = 0;
 					else p_assist += bubblefx::default_bubbles_amount_draw_per_tick_max;
 
-					al_set_target_bitmap(trg);
+					trg->set_as_target();
 				}
 				else throw Abort::Abort(__FUNCSIG__, "Cannot draw BubbleFX because it couldn't get a valid bitmap somehow!", Abort::abort_level::GIVEUP);
 			}
@@ -125,14 +135,14 @@ namespace LSW {
 			_checkUpdateBMP();
 
 			// same as Block
-			ALLEGRO_BITMAP* rn = &(*bmp.ref);
-			if (!rn) throw Abort::Abort(__FUNCSIG__, "Unexpected NULL on draw!");
+			auto& rnn = bmp.ref;
+			if (!rnn || !*rnn) throw Abort::Abort(__FUNCSIG__, "Unexpected NULL on draw!");
 
 
 			float cx, cy, px, py, dsx, dsy, rot_rad;
 			int bmpx, bmpy;
-			bmpx = al_get_bitmap_width(rn);
-			bmpy = al_get_bitmap_height(rn);
+			bmpx = rnn->get_width();
+			bmpy = rnn->get_height();
 			if (bmpx <= 0 || bmpy <= 0) {
 				throw Abort::Abort(__FUNCSIG__, "Somehow the texture have < 0 width / height!");
 			}
@@ -140,8 +150,6 @@ namespace LSW {
 			cx = 1.0f * bmpx * (((*getRef(sprite::e_double::CENTER_X))() + 1.0) * 0.5);
 			cy = 1.0f * bmpy * (((*getRef(sprite::e_double::CENTER_Y))() + 1.0) * 0.5);
 			rot_rad = 1.0f * *getRef(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
-			/*px = 1.0f * data.dval[+Constants::io__sprite_double::POSX] * cos(rot_rad) + data.dval[+Constants::io__sprite_double::POSY] * sin(rot_rad);
-			py = 1.0f * data.dval[+Constants::io__sprite_double::POSY] * cos(rot_rad) - data.dval[+Constants::io__sprite_double::POSX] * sin(rot_rad);*/
 			px = *getRef(sprite::e_double_readonly::POSX);
 			py = *getRef(sprite::e_double_readonly::POSY);
 			dsx = 1.0f * (*getRef(sprite::e_double::SCALE_X))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpx);
@@ -149,10 +157,19 @@ namespace LSW {
 
 
 			if ((*getRef(sprite::e_boolean::USE_COLOR))()) {
-				al_draw_tinted_scaled_rotated_bitmap(rn, (*getRef(sprite::e_color::COLOR))(), cx, cy, px, py, dsx, dsy, rot_rad, 0);
+				rnn->draw(
+					(*getRef(sprite::e_color::COLOR))(),
+					cx, cy,
+					px, py,
+					dsx, dsy,
+					rot_rad);
 			}
 			else {
-				al_draw_scaled_rotated_bitmap(rn, cx, cy, px, py, dsx, dsy, rot_rad, 0);
+				rnn->draw(
+					cx, cy,
+					px, py,
+					dsx, dsy,
+					rot_rad);
 			}
 		}
 
@@ -170,6 +187,9 @@ namespace LSW {
 			custom_draw_task = [&] {think();  draw_self(); };
 
 			reset(amount);
+
+			reference = std::make_shared<Bitmap>();
+			reference->be_reference_to_target(true);
 		}
 
 		BubbleFX::BubbleFX(BubbleFX& o) : Sprite_Base(o)
@@ -181,6 +201,9 @@ namespace LSW {
 
 			//custom_think_task = [&] {think(); };
 			custom_draw_task = [&] {think(); draw_self(); };
+
+			reference = std::make_shared<Bitmap>();
+			reference->be_reference_to_target(true);
 		}
 
 		void BubbleFX::twinUpAttributes(const std::shared_ptr<bubblefx_data> oth)

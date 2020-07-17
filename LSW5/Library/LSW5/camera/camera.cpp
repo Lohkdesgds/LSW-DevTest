@@ -41,9 +41,10 @@ namespace LSW {
 
 
 
-		ALLEGRO_TRANSFORM Camera::transf(ALLEGRO_BITMAP* d, const float x, const float y, const float sx, const float sy, const float r)
+		ALLEGRO_TRANSFORM Camera::transf(std::shared_ptr<Bitmap> dt, const float x, const float y, const float sx, const float sy, const float r)
 		{
 			ALLEGRO_TRANSFORM& t = data.transformation;
+			ALLEGRO_BITMAP* d = **dt;
 
 			al_identity_transform(&t);
 
@@ -61,9 +62,12 @@ namespace LSW {
 		}
 		Camera::Camera()
 		{
-			lsw_al_init();
+			lsw_init();
 
 			reset(); // refresh(); auto
+
+			reference = std::make_shared<Bitmap>();
+			reference->be_reference_to_target(true);
 		}
 
 		Camera::Camera(Camera& other)
@@ -75,6 +79,9 @@ namespace LSW {
 			data.integer_data = j.integer_data;
 			data.layers = j.layers;
 			data.transformation = j.transformation;
+
+			reference = std::make_shared<Bitmap>();
+			reference->be_reference_to_target(true);
 		}
 
 		void Camera::reset()
@@ -241,9 +248,12 @@ namespace LSW {
 
 		void Camera::refresh()
 		{
-			ALLEGRO_BITMAP* d = al_get_target_bitmap();
+			refresh(reference);
+		}
 
-			if (!d) return;
+		void Camera::refresh(std::shared_ptr<Bitmap>& d)
+		{
+			if (!d || !*d) return;
 
 			// return is optional here
 			transf(d,

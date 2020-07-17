@@ -6,6 +6,7 @@
 #include <numeric>
 #include <functional>
 // Others
+#include "..\lower\bitmap\bitmap.h"
 #include "..\sprite\sprite.h"
 #include "..\superresource\superresource.h"
 #include "..\database\database.h"
@@ -52,7 +53,7 @@ namespace LSW {
 			};
 
 			struct _bitmap {
-				std::shared_ptr<ALLEGRO_BITMAP> ref;
+				std::shared_ptr<Bitmap> ref;
 				std::string id;
 			} bmp;
 
@@ -76,6 +77,9 @@ namespace LSW {
 			// checks update if it has to redraw internally or not
 			void _checkUpdateBMP();
 			void think();
+
+
+			std::shared_ptr<Bitmap> reference;
 			void draw_self();
 		public:
 			using Sprite_Base::set;

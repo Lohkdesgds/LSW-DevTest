@@ -109,6 +109,12 @@
     <Filter Include="LSW5\Library\shinefx_addon">
       <UniqueIdentifier>{f01020ba-bb68-41bb-8950-d8473807cdbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW5\Library\lower">
+      <UniqueIdentifier>{bc40d8fe-b509-424b-abc0-faef9b4d0af9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW5\Library\lower\bitmap">
+      <UniqueIdentifier>{6346864c-d09d-46ab-b05c-f4948124a840}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -199,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="Library\LSW5\shinefx_addon\shinefx.cpp">
       <Filter>LSW5\Library\shinefx_addon</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LSW5\Lower\bitmap\bitmap.cpp">
+      <Filter>LSW5\Library\lower\bitmap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +312,9 @@
     </ClInclude>
     <ClInclude Include="Library\LSW5\shinefx_addon\shinefx.h">
       <Filter>LSW5\Library\shinefx_addon</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\Lower\bitmap\bitmap.h">
+      <Filter>LSW5\Library\lower\bitmap</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

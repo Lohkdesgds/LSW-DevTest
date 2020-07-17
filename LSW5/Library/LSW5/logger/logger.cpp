@@ -56,7 +56,7 @@ namespace LSW {
 					return;
 				}
 
-				/*lsw_al_init();
+				/*lsw_init();
 				al_init_user_event_source(&g.evsrc);*/
 			}
 

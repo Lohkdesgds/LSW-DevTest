@@ -264,18 +264,21 @@ namespace LSW {
 
 
 					// draw?
+
 					if (auto main_cam = cameras.getMain(); main_cam) {
-#ifdef LSW_DEBUG
+#ifdef _DEBUG
 						main_cam->matrix_debug();
 #endif
 						main_cam->apply();
 						auto& con = main_cam->getAttributes();
 
 						for (auto& c : con.layers) {
+							//al_hold_bitmap_drawing(true);
 							for (auto& i : sprites)
 							{
 								i->draw(&(*main_cam), c.getLayerID());
 							}
+							//al_hold_bitmap_drawing(false);
 						}
 					}
 					else {
@@ -286,6 +289,7 @@ namespace LSW {
 
 					disp.flip();
 					al_clear_to_color(al_map_rgb(0, 0, 0));
+
 				}
 				catch (Abort::Abort err) {
 					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "&4SOMETHING WENT WRONG [LSW], but this beta version won't handle any of this yet lmao." << L::ELF;
@@ -741,7 +745,7 @@ namespace LSW {
 			data.funcs.clear();
 			data.gmute.lock();
 			if (!data.has_init_once) {
-				lsw_al_init_all();
+				lsw_init_all();
 
 				al_init_user_event_source(&data.evsrc);
 

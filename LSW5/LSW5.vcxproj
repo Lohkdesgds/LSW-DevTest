@@ -219,6 +219,7 @@
     <ClCompile Include="Library\LSW5\independenteventhandler\independenteventhandler.cpp" />
     <ClCompile Include="Library\LSW5\launcher\launcher.cpp" />
     <ClCompile Include="Library\LSW5\logger\logger.cpp" />
+    <ClCompile Include="Library\LSW5\Lower\bitmap\bitmap.cpp" />
     <ClCompile Include="Library\LSW5\mixer\mixer.cpp" />
     <ClCompile Include="Library\LSW5\printer\printer.cpp" />
     <ClCompile Include="Library\LSW5\sample\sample.cpp" />
@@ -250,6 +251,7 @@
     <ClInclude Include="Library\LSW5\independenteventhandler\independenteventhandler.h" />
     <ClInclude Include="Library\LSW5\launcher\launcher.h" />
     <ClInclude Include="Library\LSW5\logger\logger.h" />
+    <ClInclude Include="Library\LSW5\Lower\bitmap\bitmap.h" />
     <ClInclude Include="Library\LSW5\mixer\mixer.h" />
     <ClInclude Include="Library\LSW5\printer\printer.h" />
     <ClInclude Include="Library\LSW5\sample\sample.h" />

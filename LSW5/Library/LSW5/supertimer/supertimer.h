@@ -47,7 +47,7 @@ namespace LSW {
 		public:
 			SuperTimer()
 			{
-				lsw_al_init();
+				lsw_init();
 
 				queue = al_create_event_queue();
 

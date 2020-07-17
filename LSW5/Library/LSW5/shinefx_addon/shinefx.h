@@ -6,6 +6,7 @@
 #include <numeric>
 #include <functional>
 // Others
+#include "..\lower\bitmap\bitmap.h"
 #include "..\sprite\sprite.h"
 #include "..\superresource\superresource.h"
 #include "..\database\database.h"
@@ -42,7 +43,7 @@ namespace LSW {
 		class ShineFX : public Sprite_Base {
 
 			struct _bitmap {
-				std::shared_ptr<ALLEGRO_BITMAP> ref;
+				std::shared_ptr<Bitmap> ref;
 				std::string id;
 			} bmp;
 
@@ -60,6 +61,9 @@ namespace LSW {
 			void createSwap(const int, const int);
 			// checks resolution match with screen
 			void _checkInternalBMP();
+
+
+			std::shared_ptr<Bitmap> reference;
 			void draw_self();
 		public:
 			using Sprite_Base::set;

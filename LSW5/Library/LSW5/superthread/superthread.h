@@ -42,7 +42,7 @@ namespace LSW {
 					return false;
 				}
 				void checkSys() {
-					lsw_al_init();
+					lsw_init();
 				}
 			public:
 				CustomThread() {

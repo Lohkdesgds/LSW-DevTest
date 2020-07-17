@@ -5,9 +5,9 @@ namespace LSW {
 
 		Sample::Sample()
 		{
-			lsw_al_init();
-			lsw_al_init_acodec_addon();
-			lsw_al_install_audio();
+			lsw_init();
+			lsw_init_acodec_addon();
+			lsw_install_audio();
 		}
 
 		Sample::~Sample()
