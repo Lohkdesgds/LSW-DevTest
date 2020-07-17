@@ -220,9 +220,10 @@
     <ClCompile Include="Library\LSW5\launcher\launcher.cpp" />
     <ClCompile Include="Library\LSW5\logger\logger.cpp" />
     <ClCompile Include="Library\LSW5\Lower\bitmap\bitmap.cpp" />
+    <ClCompile Include="Library\LSW5\Lower\font\font.cpp" />
+    <ClCompile Include="Library\LSW5\Lower\sample\sample.cpp" />
     <ClCompile Include="Library\LSW5\mixer\mixer.cpp" />
     <ClCompile Include="Library\LSW5\printer\printer.cpp" />
-    <ClCompile Include="Library\LSW5\sample\sample.cpp" />
     <ClCompile Include="Library\LSW5\shinefx_addon\shinefx.cpp" />
     <ClCompile Include="Library\LSW5\socketsystem\socketsystem.cpp" />
     <ClCompile Include="Library\LSW5\sprite\sprite.cpp" />
@@ -252,9 +253,10 @@
     <ClInclude Include="Library\LSW5\launcher\launcher.h" />
     <ClInclude Include="Library\LSW5\logger\logger.h" />
     <ClInclude Include="Library\LSW5\Lower\bitmap\bitmap.h" />
+    <ClInclude Include="Library\LSW5\Lower\font\font.h" />
+    <ClInclude Include="Library\LSW5\Lower\sample\sample.h" />
     <ClInclude Include="Library\LSW5\mixer\mixer.h" />
     <ClInclude Include="Library\LSW5\printer\printer.h" />
-    <ClInclude Include="Library\LSW5\sample\sample.h" />
     <ClInclude Include="Library\LSW5\shared\shared.h" />
     <ClInclude Include="Library\LSW5\shinefx_addon\shinefx.h" />
     <ClInclude Include="Library\LSW5\socketsystem\socketsystem.h" />

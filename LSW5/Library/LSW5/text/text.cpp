@@ -442,7 +442,7 @@ namespace LSW {
 				},
 				{
 					[&] {
-						SuperResource<ALLEGRO_FONT> resource;
+						SuperResource<Font> resource;
 						return Tools::sprintf_a("%zu", resource.size());
 					},
 						CHAR_INIT("%num_fonts%"), 					(text::e_custom_tags::T_FONTS_LOADED)
@@ -559,43 +559,6 @@ namespace LSW {
 			//s = fina;
 		}
 
-		ALLEGRO_COLOR Text::hex(const int hx)
-		{
-			switch (hx) {
-			case 0x0:
-				return al_map_rgb(0, 0, 0);
-			case 0x1:
-				return al_map_rgb(0, 0, 170);
-			case 0x2:
-				return al_map_rgb(0, 170, 0);
-			case 0x3:
-				return al_map_rgb(0, 170, 170);
-			case 0x4:
-				return al_map_rgb(170, 0, 0);
-			case 0x5:
-				return al_map_rgb(170, 0, 170);
-			case 0x6:
-				return al_map_rgb(170, 170, 0);
-			case 0x7:
-				return al_map_rgb(170, 170, 170);
-			case 0x8:
-				return al_map_rgb(84, 84, 84);
-			case 0x9:
-				return al_map_rgb(84, 84, 255);
-			case 0xA:
-				return al_map_rgb(84, 255, 84);
-			case 0xB:
-				return al_map_rgb(84, 255, 255);
-			case 0xC:
-				return al_map_rgb(255, 84, 84);
-			case 0xD:
-				return al_map_rgb(255, 84, 255);
-			case 0xE:
-				return al_map_rgb(255, 255, 84);
-			default:
-				return al_map_rgb(255, 255, 255);
-			}
-		}
 
 
 		void Text::draw_self()
@@ -705,35 +668,15 @@ namespace LSW {
 			preset.refresh();
 			preset.apply();
 
+
+
 			if (s_dist_x != 0.0 || s_dist_y != 0.0) {
-				al_draw_text(&(*fontt), s_col, 0.0, 0.0, mode, p_str.s_str().c_str());
+				fontt->draw(s_col, 0.0, 0.0, mode, p_str.s_str().c_str());
 			}
 			if (per_char) {
-				//char minibuf[2] = { 0 };
-				std::string thebuff;
-				int offset_x_f = 0;
-				char_c* data_ = p_str.data();
-
-				for (size_t p = 0; p < p_str.size(); p++) {
-
-					auto clr_now = hex(static_cast<int>(data_->cr));
-
-					for (auto _ref = data_->cr; _ref == data_->cr && p < p_str.size();) {
-						thebuff += data_->ch;
-						data_++;
-						p++;
-					}
-
-					al_draw_text(&(*fontt), clr_now,
-						offset_x_f/* * cos(t_rotation_rad + p_rotation_rad)*/,
-						/*- offset_x_f * sin(t_rotation_rad + p_rotation_rad)*/ 0.0,
-						mode, thebuff.c_str());
-
-					offset_x_f += al_get_text_width(&(*fontt), thebuff.c_str());
-					thebuff.clear();
-				}
+				fontt->draw(0.0, 0.0, 0, p_str);
 			}
-			else al_draw_text(&(*fontt), n_col, 0.0, 0.0, mode, p_str.s_str().c_str());
+			else fontt->draw(n_col, 0.0, 0.0, mode, p_str.s_str().c_str());
 
 			if (isEq(sprite::e_boolean::SHOWDOT, true)) {
 				al_draw_filled_circle(
@@ -758,22 +701,15 @@ namespace LSW {
 			__link_hard_task();
 		}
 
-		void Text::load(const std::string id, const std::string str)
+		void Text::load(const std::string id)
 		{
-			SuperResource<ALLEGRO_FONT> bmps;
-
-			/*font.ref = bmps.load(id, str);
-			font.source = str;
-			font.id = id;*/
-			fontt = bmps.load(id, str);
-
-			if (!fontt) throw Abort::Abort(__FUNCSIG__, "Cannot load '" + id + "'!");
-
+			SuperResource<Font> bmps;
+			if (!bmps.get(id, fontt)) throw Abort::Abort(__FUNCSIG__, "Could not find font '" + id + "' in fonts!", Abort::abort_level::GIVEUP);
 		}
 
 		void Text::load()
 		{
-			SuperResource<ALLEGRO_FONT> fonts;
+			SuperResource<Font> fonts;
 			fontt = fonts.getMain();
 			if (!fontt) throw Abort::Abort(__FUNCSIG__, "There's no MAIN FONT set! (See SuperResource.setMain(...))");
 		}

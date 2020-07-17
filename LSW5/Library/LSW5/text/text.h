@@ -6,6 +6,7 @@
 #include <numeric>
 #include <functional>
 // Others
+#include "..\Lower\font\font.h"
 #include "..\lower\bitmap\bitmap.h"
 #include "..\sprite\sprite.h"
 #include "..\superresource\superresource.h"
@@ -97,13 +98,12 @@ namespace LSW {
 			std::shared_ptr<text_data> data_text = std::make_shared<text_data>();
 
 			//_text font;
-			std::shared_ptr<ALLEGRO_FONT> fontt;
+			std::shared_ptr<Font> fontt;
 
 			// call on Text() build
 			void __link_hard_task();
 
 			void interpretTags(coloured_string&);
-			ALLEGRO_COLOR hex(const int);
 
 			void draw_self();
 		public:
@@ -114,8 +114,8 @@ namespace LSW {
 			Text();
 			Text(Text&);
 
-			// from what id, path (can be "null" if you know the file is indeed loaded as id)
-			void load(const std::string, const std::string = "");
+			// gets specific font from SuperResource
+			void load(const std::string);
 			// gets from main font (SuperResource.setMain(...))
 			void load();
 			// removes font

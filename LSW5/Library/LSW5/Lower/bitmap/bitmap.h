@@ -1,12 +1,11 @@
 #pragma once
 
-// C
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
 // C++
 #include <string>
+#include <functional>
 // Others
-#include "..\..\superresource\superresource.h"
+#include "..\..\allegroinitialization\allegroinitialization.h"
+
 
 namespace LSW {
 	namespace v5 {
@@ -23,6 +22,8 @@ namespace LSW {
 			// need it quick?
 			ALLEGRO_BITMAP* quick();
 		public:
+			Bitmap();
+
 			// if custom destructor is needed, can do nothing if not defined
 			bool custom(ALLEGRO_BITMAP*, std::function<void(ALLEGRO_BITMAP*&)> = std::function<void(ALLEGRO_BITMAP*&)>());
 			// custom for display, just add, no function /// TODO: later when class Display is created, change this to work with that.
@@ -86,7 +87,5 @@ namespace LSW {
 			void set_as_target();
 			void set_as_reference_target();
 		};
-
-		//std::shared_ptr<Bitmap> getTarget();
 	}
 }

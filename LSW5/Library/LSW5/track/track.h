@@ -10,7 +10,7 @@
 #include "..\superresource\superresource.h"
 #include "..\allegroinitialization\allegroinitialization.h"
 #include "..\mixer\mixer.h"
-#include "..\sample\sample.h"
+#include "..\Lower\sample\sample.h"
 #include "..\supermap\supermap.h"
 #include "..\tools\tools.h"
 

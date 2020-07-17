@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 	SuperResource<Camera> cameras;
 	SuperResource<Sprite_Base> sprites;
 	SuperResource<Bitmap> bitmaps;
-	SuperResource<ALLEGRO_FONT> fonts;
+	SuperResource<Font> fonts;
 
 	db.set(database::e_string::PRINT_PATH, default_print_path);
 	db.set(database::e_string::DATA_PATH, start_zip_default_extract_path);
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 	logg << L::SLF << fsr(__FUNCSIG__, E::DEBUG) << "&5 - - - Initializing resources - - -" << L::ELF;
 
 
-	fonts.create("_FONT", "font.ttf"); // load main font
+	fonts.create("_FONT")->load_ttf("font.ttf"); // load main font
 	fonts.setMain("_FONT");
 	bitmaps.create("_ATLAS0")->load("atlas0.png");
 	bitmaps.setMain("_ATLAS0");

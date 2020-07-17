@@ -26,6 +26,12 @@ namespace LSW {
 			return nullptr;
 		}
 
+		Bitmap::Bitmap()
+		{
+			lsw_init();
+			lsw_init_image_addon();
+		}
+
 		bool Bitmap::custom(ALLEGRO_BITMAP* nptr, std::function<void(ALLEGRO_BITMAP*&)> f)
 		{
 			if (!nptr) return false;
@@ -225,14 +231,5 @@ namespace LSW {
 				target = bitmap;
 			}
 		}
-		
-		/*
-		std::shared_ptr<Bitmap> getTarget()
-		{
-			std::shared_ptr<Bitmap> whatever = std::make_shared<Bitmap>(); // lonely shared_ptr
-			whatever->be_reference_to_target(true);
-			return whatever;
-		}*/
-
 	}
 }
