@@ -138,8 +138,6 @@ namespace LSW {
 				binfo.source = str;
 				binfo.id = id;
 
-				if (!binfo.ref->load(str.c_str())) throw Abort::Abort(__FUNCSIG__, "Cannot load '" + id + "'!");
-
 				bitmaps.push_back(binfo);
 				return;
 			}

@@ -66,6 +66,14 @@ namespace LSW {
 			return false;
 		}
 
+		bool Bitmap::create_sub(Bitmap& o, const int x, const int y, const int w, const int h)
+		{
+			if (!bitmap) {
+				return set(al_create_sub_bitmap(*o, x, y, w, h));
+			}
+			return false;
+		}
+
 		Bitmap::operator bool() const
 		{
 			return !(use_target_as_it ? !target : !bitmap); // ikr but visual studio doesnt
@@ -116,6 +124,14 @@ namespace LSW {
 		{
 			if (!bitmap) {
 				return set(al_clone_bitmap(o));
+			}
+			return false;
+		}
+
+		bool Bitmap::clone(Bitmap& o)
+		{
+			if (!bitmap) {
+				return set(al_clone_bitmap(*o));
 			}
 			return false;
 		}

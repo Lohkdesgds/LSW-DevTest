@@ -33,6 +33,8 @@ namespace LSW {
 			bool create(const int, const int);
 			// from, posx, posy, width, height
 			bool create_sub(ALLEGRO_BITMAP*, const int, const int, const int, const int);
+			// from, posx, posy, width, height
+			bool create_sub(Bitmap&, const int, const int, const int, const int);
 
 			operator bool() const;
 			const bool operator!() const;
@@ -50,6 +52,8 @@ namespace LSW {
 
 			// from
 			bool clone(ALLEGRO_BITMAP*);
+			// from
+			bool clone(Bitmap&);
 				
 			const int get_flags() const;
 			const int get_format() const;

@@ -566,7 +566,7 @@ namespace LSW {
 			if (!fontt) {
 #ifdef _DEBUG
 				throw Abort::Abort(__FUNCSIG__, "No font texture, but called draw anyway!", Abort::abort_level::GIVEUP);
-#elif
+#else
 				load(); // assume you have default texture set up (main)
 #endif
 			}
