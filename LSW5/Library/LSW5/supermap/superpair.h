@@ -508,7 +508,7 @@ namespace LSW {
 					//	if (i.first == typeid(copyin)) return true;
 					//}
 					//else {
-						if (i.first == typeid(*copyin)) return true;
+					if (i.first == typeid(*copyin)) return true;
 					//}
 				}
 				return false;

@@ -21,7 +21,7 @@ namespace LSW {
 
 		namespace text {
 
-			enum class e_string_readonly { PROCESSED_STRING };
+			enum class e_cstring_readonly { PROCESSED_STRING };
 			enum class e_chronomillis_readonly { LAST_UPDATE_STRING };
 
 			enum class e_cstring { STRING };
@@ -31,18 +31,16 @@ namespace LSW {
 			enum class e_sprite_ptr { FOLLOWING };
 			enum class e_boolean { USE_FOLLOWING_COLOR_INSTEAD, NO_AUTO_STRING_INTERPRETATION, USE_PER_CHAR_COLORING };
 
-			const SuperMap<coloured_string>										e_string_readonly_defaults = {
-				{"",																														(e_string_readonly::PROCESSED_STRING),					CHAR_INIT("processed_string")}
-			};
-			const SuperMap<std::chrono::milliseconds>							e_chronomillis_readonly_defaults = {
-				{std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()),				(e_chronomillis_readonly::LAST_UPDATE_STRING),			CHAR_INIT("last_update_string")}
+			const SuperMap< std::function<std::chrono::milliseconds(void)>>		e_chronomillis_readonly_defaults = {
+				{[]{return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());},	(e_chronomillis_readonly::LAST_UPDATE_STRING),			CHAR_INIT("last_update_string")}
 			};
 			const SuperMap<std::function<coloured_string(void)>>				e_string_defaults = {
-				{[] {return coloured_string(); },																							(e_cstring::STRING),									CHAR_INIT("string")}
+				{[] {return coloured_string(); },																							(e_cstring::STRING),									CHAR_INIT("string")},
+				{[] {return coloured_string(); },																							(e_cstring_readonly::PROCESSED_STRING),					CHAR_INIT("processed_string")}
 			};
 			const SuperMap<std::function<double(void)>>							e_double_defaults = {
-				{[] {return 0.0; } ,																											(e_double::SHADOW_DISTANCE_X),							CHAR_INIT("shadow_distance_x")},
-				{[] {return 0.0; } ,																											(e_double::SHADOW_DISTANCE_Y),							CHAR_INIT("shadow_distance_y")}
+				{[] {return 0.0; } ,																										(e_double::SHADOW_DISTANCE_X),							CHAR_INIT("shadow_distance_x")},
+				{[] {return 0.0; } ,																										(e_double::SHADOW_DISTANCE_Y),							CHAR_INIT("shadow_distance_y")}
 			};
 			const SuperMap<std::function<ALLEGRO_COLOR(void)>>					e_color_defaults = {
 				{[] {return ALLEGRO_COLOR(); },																								(e_color::SHADOW_COLOR),								CHAR_INIT("shadow_color")}
@@ -51,7 +49,7 @@ namespace LSW {
 				{[] {return 0; },																											(e_integer::STRING_MODE),								CHAR_INIT("string_mode")}
 			};
 			const SuperMap<std::function<std::weak_ptr<Sprite_Base>(void)>>		e_sprite_ptr_defaults = {
-				{[] {return std::weak_ptr<Sprite_Base>(); },																					(e_sprite_ptr::FOLLOWING),								CHAR_INIT("following")}
+				{[] {return std::weak_ptr<Sprite_Base>(); },																				(e_sprite_ptr::FOLLOWING),								CHAR_INIT("following")}
 			};
 			const SuperMap<std::function<bool(void)>>							e_boolean_defaults = {
 				{[] {return false; },																										(e_boolean::USE_FOLLOWING_COLOR_INSTEAD),				CHAR_INIT("use_following_color_instead")},
@@ -69,6 +67,8 @@ namespace LSW {
 				T_FONTS_LOADED, T_SPRITES_LOADED,/* T_TEXTS_LOADED,*/ T_TRACKS_LOADED,/* T_SPRITE_STATE,*/ T_VOLUME, T_VERSION, T_RESOLUTION_PROPORTION, T_CHROMA_FX, T_FPS_CAP, size
 			};
 
+			enum class e_custom_tags_tag { CUSTOM_TAG };
+
 
 			constexpr auto timeout_interpret = std::chrono::milliseconds(500);		// milliseconds!
 			constexpr auto timeout_interpret_debugging = std::chrono::seconds(300); // SECONDS!
@@ -76,26 +76,21 @@ namespace LSW {
 			constexpr auto default_delta_t_text_update_delay = std::chrono::seconds(1); // don't need to be fast
 		}
 
-		class Text : public Sprite_Base {
+		class Text : public Sprite_Base, public Workaround<std::chrono::milliseconds>, public Workaround<coloured_string>, public Workaround<std::weak_ptr<Sprite_Base>> {
 			/*struct _text {
 				std::shared_ptr<ALLEGRO_FONT> ref;
 				std::string source, id;
 			};*/
 
-			struct text_data {
-				SuperMap<coloured_string>												string_readonly_data = text::e_string_readonly_defaults;
-				SuperMap<std::chrono::milliseconds>										chronomillis_readonly_data = text::e_chronomillis_readonly_defaults;
-				SuperMap<std::function<coloured_string(void)>>							string_data = text::e_string_defaults;
-				SuperMap<std::function<double(void)>>									double_data = text::e_double_defaults;
-				SuperMap<std::function<ALLEGRO_COLOR(void)>>							color_data = text::e_color_defaults;
-				SuperMap<std::function<int(void)>>										integer_data = text::e_integer_defaults;
-				SuperMap<std::function<std::weak_ptr<Sprite_Base>(void)>>				sprite_ptr_data = text::e_sprite_ptr_defaults;
-				SuperMap<std::function<bool(void)>>										boolean_data = text::e_boolean_defaults;
-
-				SuperMap<std::function<std::string(void)>>								custom_tags; // has to initialize defaults in constructor to link functions to itself
+			struct text_data : Sprite_Base::sprite_base_data {
+				std::shared_ptr<SuperMap<std::function<std::chrono::milliseconds(void)>>>				chronomillis_readonly_data;
+				std::shared_ptr<SuperMap<std::function<coloured_string(void)>>>							cstring_data;
+				std::shared_ptr<SuperMap<std::function<std::weak_ptr<Sprite_Base>(void)>>>				sprite_ptr_data;
 			};
 
-			std::shared_ptr<text_data> data_text = std::make_shared<text_data>();
+			//SuperMap<std::function<std::string(void)>>								custom_tags; // has to initialize defaults in constructor to link functions to itself
+
+			//std::shared_ptr<text_data> data_text = std::make_shared<text_data>();
 
 			//_text font;
 			std::shared_ptr<Font> fontt;
@@ -109,7 +104,16 @@ namespace LSW {
 		public:
 			using Sprite_Base::set;
 			using Sprite_Base::get;
-			using Sprite_Base::getRef;
+			using Sprite_Base::getDirect;
+			using Workaround<std::chrono::milliseconds>::set;
+			using Workaround<std::chrono::milliseconds>::get;
+			using Workaround<std::chrono::milliseconds>::getDirect;
+			using Workaround<coloured_string>::set;
+			using Workaround<coloured_string>::get;
+			using Workaround<coloured_string>::getDirect;
+			using Workaround<std::weak_ptr<Sprite_Base>>::set;
+			using Workaround<std::weak_ptr<Sprite_Base>>::get;
+			using Workaround<std::weak_ptr<Sprite_Base>>::getDirect;
 
 			Text();
 			Text(Text&);
@@ -128,69 +132,6 @@ namespace LSW {
 
 			void addNewEntry(const std::string, std::function<std::string(void)>);
 			void removeEntry(const std::string);
-
-			void set(const text::e_cstring, coloured_string);
-			void set(const text::e_double, double);
-			void set(const text::e_color, ALLEGRO_COLOR);
-			void set(const text::e_integer, int);
-			void set(const text::e_sprite_ptr, std::shared_ptr<Sprite_Base>);
-			void set(const text::e_boolean, bool);
-			void set(const std::string, coloured_string);
-			void set(const std::string, double);
-			void set(const std::string, ALLEGRO_COLOR);
-			void set(const std::string, int);
-			void set(const std::string, std::shared_ptr<Sprite_Base>);
-			void set(const std::string, bool);
-
-			void set(const text::e_cstring, std::function<coloured_string(void)>);
-			void set(const text::e_double, std::function<double(void)>);
-			void set(const text::e_color, std::function<ALLEGRO_COLOR(void)>);
-			void set(const text::e_integer, std::function<int(void)>);
-			void set(const text::e_sprite_ptr, std::function<std::shared_ptr<Sprite_Base>(void)>);
-			void set(const text::e_boolean, std::function<bool(void)>);
-			void set(const std::string, std::function<coloured_string(void)>);
-			void set(const std::string, std::function<double(void)>);
-			void set(const std::string, std::function<ALLEGRO_COLOR(void)>);
-			void set(const std::string, std::function<int(void)>);
-			void set(const std::string, std::function<std::shared_ptr<Sprite_Base>(void)>);
-			void set(const std::string, std::function<bool(void)>);
-
-
-			bool get(const text::e_string_readonly, coloured_string&);
-			bool get(const text::e_cstring, coloured_string&);
-			bool get(const text::e_double, double&);
-			bool get(const text::e_color, ALLEGRO_COLOR&);
-			bool get(const text::e_integer, int&);
-			bool get(const text::e_sprite_ptr, std::shared_ptr<Sprite_Base>&);
-			bool get(const text::e_boolean, bool&);
-			bool get(const std::string, coloured_string&);
-			bool get(const std::string, double&);
-			bool get(const std::string, ALLEGRO_COLOR&);
-			bool get(const std::string, int&);
-			bool get(const std::string, std::shared_ptr<Sprite_Base>&);
-			bool get(const std::string, bool&);
-
-			bool get(const text::e_cstring, std::function<coloured_string(void)>&);
-			bool get(const text::e_double, std::function<double(void)>&);
-			bool get(const text::e_color, std::function<ALLEGRO_COLOR(void)>&);
-			bool get(const text::e_integer, std::function<int(void)>&);
-			bool get(const text::e_sprite_ptr, std::function<std::weak_ptr<Sprite_Base>(void)>&);
-			bool get(const text::e_boolean, std::function<bool(void)>&);
-			bool get(const std::string, std::function<coloured_string(void)>&);
-			bool get(const std::string, std::function<double(void)>&);
-			bool get(const std::string, std::function<ALLEGRO_COLOR(void)>&);
-			bool get(const std::string, std::function<int(void)>&);
-			bool get(const std::string, std::function<std::weak_ptr<Sprite_Base>(void)>&);
-			bool get(const std::string, std::function<bool(void)>&);
-
-			std::function<coloured_string(void)>* getRef(const text::e_cstring);
-			std::function<double(void)>* getRef(const text::e_double);
-			std::function<ALLEGRO_COLOR(void)>* getRef(const text::e_color);
-			std::function<int(void)>* getRef(const text::e_integer);
-			std::function<std::weak_ptr<Sprite_Base>(void)>* getRef(const text::e_sprite_ptr);
-			std::function<bool(void)>* getRef(const text::e_boolean);
-			const coloured_string* getRef(const text::e_string_readonly) const;
-			const std::chrono::milliseconds* getRef(const text::e_chronomillis_readonly) const;
 
 		};
 	}

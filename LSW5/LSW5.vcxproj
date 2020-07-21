@@ -238,6 +238,7 @@
     <ClInclude Include="Library\LSW5\abort\abort.h" />
     <ClInclude Include="Library\LSW5\allegroinitialization\allegroinitialization.h" />
     <ClInclude Include="Library\LSW5\autocaster\autocaster.h" />
+    <ClInclude Include="Library\LSW5\base\base.h" />
     <ClInclude Include="Library\LSW5\block\block.h" />
     <ClInclude Include="Library\LSW5\bubblefx_addon\bubblefx.h" />
     <ClInclude Include="Library\LSW5\button\button.h" />

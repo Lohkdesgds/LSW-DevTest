@@ -118,6 +118,9 @@
     <Filter Include="LSW5\Library\lower\sample">
       <UniqueIdentifier>{d65c8b44-5f17-4011-b75e-ae74ef9ad098}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW5\Library\base">
+      <UniqueIdentifier>{d627ec03-0253-4b0d-9144-a4f6f210470f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -324,6 +327,9 @@
     </ClInclude>
     <ClInclude Include="Library\LSW5\Lower\sample\sample.h">
       <Filter>LSW5\Library\lower\sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LSW5\base\base.h">
+      <Filter>LSW5\Library\base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

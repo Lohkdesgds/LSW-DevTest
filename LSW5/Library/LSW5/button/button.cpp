@@ -20,10 +20,13 @@ namespace LSW {
 			}
 			sprites.unlock();
 
-			block = sprites.customLoad(my_id + "_b&" + sign + "+", [](Sprite_Base*& b) {return (b = new Block()); });
-			text = sprites.customLoad(my_id + "_t&" + sign + "+", [](Sprite_Base*& b) {return (b = new Text()); });
+			block = sprites.customLoad(my_id + "_b&" + sign + "+", [](Sprite_Base*& b) {return (b = (Sprite_Base*)new Block()); });
+			text = sprites.customLoad(my_id + "_t&" + sign + "+", [](Sprite_Base*& b) {return (b = (Sprite_Base*)new Text()); });
 
-			getText()->set(text::e_sprite_ptr::FOLLOWING, block);
+			std::weak_ptr<Sprite_Base> wblock = block;
+
+
+			getText()->set(text::e_sprite_ptr::FOLLOWING, wblock);
 			getText()->set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 
 			reinterpret_cast<Sprite_Base*>(getBlock())->twinUpAttributes(reinterpret_cast<Sprite_Base*>(this)->getAttributes()); // b() attributes now are this attributes (spritewise)

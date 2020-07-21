@@ -110,9 +110,9 @@ namespace LSW {
 			bool get(const std::string, bool&);
 			bool get(const std::string, int&);
 
-			double*	getRef(const camera::e_double);		// Direct reference to the value
-			bool*	getRef(const camera::e_boolean);	// Direct reference to the value
-			int*	getRef(const camera::e_integer);	// Direct reference to the value
+			double*	getDirect(const camera::e_double);		// Direct reference to the value
+			bool*	getDirect(const camera::e_boolean);	// Direct reference to the value
+			int*	getDirect(const camera::e_integer);	// Direct reference to the value
 
 			template<typename T, typename V> inline bool g(const T a, V& b) { return get(a, b); };
 			template<typename T, typename V> inline bool s(const T a, V& b) { return set(a, b); };

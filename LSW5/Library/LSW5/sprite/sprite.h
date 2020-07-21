@@ -13,6 +13,7 @@
 #include "..\camera\camera.h"
 #include "..\shared\shared.h"
 #include "..\database\database.h"
+#include "..\base\base.h"
 
 
 namespace LSW {
@@ -31,6 +32,7 @@ namespace LSW {
 			enum class e_boolean { DRAW, USE_COLOR, AFFECTED_BY_CAM, SHOWDOT, SHOWBOX, RESPECT_CAMERA_LIMITS, FOLLOW_MOUSE, FOLLOW_KEYBOARD, SET_TARG_POS_VALUE_READONLY /*Readonly means no collision or acceleration, just f()*/ };
 			enum class e_integer { LAYER, COLLISION_MODE };
 			enum class e_color { COLOR };
+			enum class e_uintptrt { DATA_FROM };
 
 			enum class e_collision_mode_cast {
 				COLLISION_BOTH, // collide and move if colliding
@@ -47,7 +49,7 @@ namespace LSW {
 
 			constexpr double minimum_sprite_accel_collision = 1e-6;
 
-			const SuperMap<double> e_double_readonly_defaults = {
+			/*const SuperMap<double> e_double_readonly_defaults = {
 				{0.0,																		(e_double_readonly::SPEED_X),						CHAR_INIT("speed_x")},
 				{0.0,																		(e_double_readonly::SPEED_Y),						CHAR_INIT("speed_y")},
 				{0.0,																		(e_double_readonly::LAST_COLLISION_TIME),			CHAR_INIT("last_collision_time")},
@@ -57,19 +59,29 @@ namespace LSW {
 				{0.0,																		(e_double_readonly::ROTATION),						CHAR_INIT("rotation")}, // drawing ROTATION
 				{0.0,																		(e_double_readonly::COL_MINDIST_X),					CHAR_INIT("collision_min_distance_x")},
 				{0.0,																		(e_double_readonly::COL_MINDIST_Y),					CHAR_INIT("collision_min_distance_y")}
-			};
+			};*/
 
-			const SuperMap<bool> e_boolean_readonly_defaults = {
+			/*const SuperMap<bool> e_boolean_readonly_defaults = {
 				{false,																		(e_boolean_readonly::COLLISION_MOUSE_ON),			CHAR_INIT("collision_mouse_on")},
 				{false,																		(e_boolean_readonly::COLLISION_MOUSE_CLICK),		CHAR_INIT("collision_mouse_click")},
 				{false,																		(e_boolean_readonly::COLLISION_COLLIDED),			CHAR_INIT("collision_collided")}
-			};
+			};*/
 
 			const SuperMap<std::function<std::string(void)>> e_string_defaults = {
 				{[] {return "";},															(e_string::ID),										CHAR_INIT("id")}
 			};
 
 			const SuperMap<std::function<double(void)>> e_double_defaults = {
+				{[] {return 0.0;},															(e_double_readonly::SPEED_X),						CHAR_INIT("speed_x")},
+				{[] {return 0.0;},															(e_double_readonly::SPEED_Y),						CHAR_INIT("speed_y")},
+				{[] {return 0.0;},															(e_double_readonly::LAST_COLLISION_TIME),			CHAR_INIT("last_collision_time")},
+				{[] {return 0.0;},															(e_double_readonly::LAST_DRAW),						CHAR_INIT("last_draw")},
+				{[] {return 0.0;},															(e_double_readonly::POSX),							CHAR_INIT("pos_x")}, // drawing POSX
+				{[] {return 0.0;},															(e_double_readonly::POSY),							CHAR_INIT("pos_y")}, // drawing POSY
+				{[] {return 0.0;},															(e_double_readonly::ROTATION),						CHAR_INIT("rotation")}, // drawing ROTATION
+				{[] {return 0.0;},															(e_double_readonly::COL_MINDIST_X),					CHAR_INIT("collision_min_distance_x")},
+				{[] {return 0.0;},															(e_double_readonly::COL_MINDIST_Y),					CHAR_INIT("collision_min_distance_y")},
+
 				{[] {return 0.0;},															(e_double::TARG_POSX),								CHAR_INIT("target_pos_x")},
 				{[] {return 0.0;},															(e_double::TARG_POSY),								CHAR_INIT("target_pos_y")},
 				{[] {return 1.0;},															(e_double::SCALE_X),								CHAR_INIT("scale_x")},
@@ -86,6 +98,9 @@ namespace LSW {
 			};
 
 			const SuperMap<std::function<bool(void)>> e_boolean_defaults = {
+				{[] {return false;},														(e_boolean_readonly::COLLISION_MOUSE_ON),			CHAR_INIT("collision_mouse_on")},
+				{[] {return false;},														(e_boolean_readonly::COLLISION_MOUSE_CLICK),		CHAR_INIT("collision_mouse_click")},
+				{[] {return false;},														(e_boolean_readonly::COLLISION_COLLIDED),			CHAR_INIT("collision_collided")},
 				{[] {return true;},															(e_boolean::DRAW),									CHAR_INIT("draw")},
 				{[] {return false;},														(e_boolean::USE_COLOR),								CHAR_INIT("use_color")},
 				{[] {return true;},															(e_boolean::AFFECTED_BY_CAM),						CHAR_INIT("affected_by_camera")},
@@ -105,6 +120,10 @@ namespace LSW {
 			const SuperMap<std::function<ALLEGRO_COLOR(void)>> e_color_defaults = {
 				{[] {return ALLEGRO_COLOR();},												(e_color::COLOR),									CHAR_INIT("color")}
 			};
+
+			const SuperMap<std::function<uintptr_t(void)>> e_uintptrt_defaults = {
+				{[] {return (uintptr_t)0;},													(e_uintptrt::DATA_FROM),							CHAR_INIT("data_from")}
+			};
 		}
 
 		/*
@@ -113,7 +132,10 @@ namespace LSW {
 		- Texto pode ter um tamanho definido como uma imagem, mas desenhar como texto mesmo assim ( [ área sem nada ] + texto desenhado normalmente sem problemas )
 		*/
 
-		class Sprite_Base {
+		// HAS: double, bool, std::string, int, ALLEGRO_COLOR, uintptr_t
+		class Sprite_Base :
+			public Workaround<double>,public Workaround<bool>,public Workaround<std::string>,public Workaround<int>,public Workaround<ALLEGRO_COLOR>,public Workaround<uintptr_t>
+		{
 			struct easier_collision_handle {
 				double	posx = 0.0,
 						posy = 0.0,
@@ -135,8 +157,7 @@ namespace LSW {
 				// X, Y, SX, SY
 				void setup(const double, const double, const double, const double);
 			} easy_collision;
-
-			struct sprite_base_data {
+			/*struct sprite_base_data {
 				SuperMap<double>								double_readonly_data = sprite::e_double_readonly_defaults;
 				SuperMap<bool>									boolean_readonly_data = sprite::e_boolean_readonly_defaults;
 				SuperMap<std::function<std::string(void)>>		string_data = sprite::e_string_defaults;
@@ -147,16 +168,45 @@ namespace LSW {
 				void* original_this = nullptr;
 			};
 
-			std::shared_ptr<sprite_base_data> data_sprite_base = std::make_shared<sprite_base_data>();
+			std::shared_ptr<sprite_base_data> data_sprite_base = std::make_shared<sprite_base_data>();*/
 
 			std::function<void(void)> pair_tied[sprite::tie_functional_size];
 			sprite::e_tie_functional new_state = sprite::e_tie_functional::COLLISION_NONE;
 			sprite::e_tie_functional last_state = sprite::e_tie_functional::COLLISION_NONE;
 
 		protected:
+			struct sprite_base_data {
+				std::shared_ptr<SuperMap<std::function<std::string(void)>>>		string_data;
+				std::shared_ptr<SuperMap<std::function<double(void)>>>			double_data;
+				std::shared_ptr<SuperMap<std::function<bool(void)>>>			boolean_data;
+				std::shared_ptr<SuperMap<std::function<int(void)>>>				integer_data;
+				std::shared_ptr<SuperMap<std::function<ALLEGRO_COLOR(void)>>>	color_data;
+				std::shared_ptr<SuperMap<std::function<uintptr_t(void)>>>		uintptrt_data;
+			};
+
+
 			std::function<void(void)> custom_draw_task; // set this as draw() of new children (so the draw() calls this if exists for further drawing scheme)
 			std::function<void(void)> custom_think_task; // set this as a collision / every tick function (so update() calls this if exists for further tasking)
 		public:
+			using Workaround<double>::set;
+			using Workaround<double>::get;
+			using Workaround<double>::getDirect;
+			using Workaround<int>::set;
+			using Workaround<int>::get;
+			using Workaround<int>::getDirect;
+			using Workaround<ALLEGRO_COLOR>::set;
+			using Workaround<ALLEGRO_COLOR>::get;
+			using Workaround<ALLEGRO_COLOR>::getDirect;
+			using Workaround<std::string>::set;
+			using Workaround<std::string>::get;
+			using Workaround<std::string>::getDirect;
+			using Workaround<bool>::set;
+			using Workaround<bool>::get;
+			using Workaround<bool>::getDirect;
+			using Workaround<uintptr_t>::set;
+			using Workaround<uintptr_t>::get;
+			using Workaround<uintptr_t>::getDirect;
+
 			Sprite_Base();
 			Sprite_Base(Sprite_Base&);
 
@@ -168,60 +218,8 @@ namespace LSW {
 			// actually copy a strong "reference" to its data somewhere else (share)
 			std::shared_ptr<sprite_base_data> getAttributes();
 
-			void set(const sprite::e_string, std::string);
-			void set(const sprite::e_double, double);
-			void set(const sprite::e_boolean, bool);
-			void set(const sprite::e_integer, int);
-			void set(const sprite::e_color, ALLEGRO_COLOR);
-			void set(const sprite::e_string, std::function<std::string(void)>);
-			void set(const sprite::e_double, std::function<double(void)>);
-			void set(const sprite::e_boolean, std::function<bool(void)>);
-			void set(const sprite::e_integer, std::function<int(void)>);
-			void set(const sprite::e_color, std::function<ALLEGRO_COLOR(void)>);
-			void set(const std::string, std::string);
-			void set(const std::string, double);
-			void set(const std::string, bool);
-			void set(const std::string, int);
-			void set(const std::string, ALLEGRO_COLOR);
-			void set(const std::string, std::function<std::string(void)>);
-			void set(const std::string, std::function< double(void)>);
-			void set(const std::string, std::function<bool(void)>);
-			void set(const std::string, std::function<int(void)>);
-			void set(const std::string, std::function<ALLEGRO_COLOR(void)>);
-
-			bool get(const sprite::e_double_readonly, double&);
-			bool get(const sprite::e_boolean_readonly, bool&);
-			bool get(const sprite::e_string, std::string&);
-			bool get(const sprite::e_double, double&);
-			bool get(const sprite::e_boolean, bool&);
-			bool get(const sprite::e_integer, int&);
-			bool get(const sprite::e_color, ALLEGRO_COLOR&);
-			bool get(const sprite::e_string, std::function<std::string(void)>&);
-			bool get(const sprite::e_double, std::function<double(void)>&);
-			bool get(const sprite::e_boolean, std::function<bool(void)>&);
-			bool get(const sprite::e_integer, std::function<int(void)>&);
-			bool get(const sprite::e_color, std::function<ALLEGRO_COLOR(void)>&);
-			bool get(const std::string, std::string&);
-			bool get(const std::string, double&);
-			bool get(const std::string, bool&);
-			bool get(const std::string, int&);
-			bool get(const std::string, ALLEGRO_COLOR&);
-			bool get(const std::string, std::function<std::string(void)>&);
-			bool get(const std::string, std::function<double(void)>&);
-			bool get(const std::string, std::function<bool(void)>&);
-			bool get(const std::string, std::function<int(void)>&);
-			bool get(const std::string, std::function<ALLEGRO_COLOR(void)>&);
-
-			const double*								getRef(const sprite::e_double_readonly) const;
-			const bool*									getRef(const sprite::e_boolean_readonly) const;
-			std::function<std::string(void)>*			getRef(const sprite::e_string);
-			std::function<double(void)>*				getRef(const sprite::e_double);
-			std::function<bool(void)>*					getRef(const sprite::e_boolean);
-			std::function<int(void)>*					getRef(const sprite::e_integer);
-			std::function<ALLEGRO_COLOR(void)>*			getRef(const sprite::e_color);
-
-			template<typename T, typename V> inline bool isEq(const T e, const std::function<V(void)> v) { V k; if (get(e, k)) return v() == k; return false; }
-			template<typename T, typename V> inline bool isEq(const T e, const V v) { V k; if (get(e, k)) return v == k; return false; }
+			template<typename T, typename V> inline bool isEq(const T e, const std::function<V(void)> v) { V k; if (get<V>(e, k)) return v() == k; return false; }
+			template<typename T, typename V> inline bool isEq(const T e, const V v) { V k; if (get<V>(e, k)) return v == k; return false; }
 
 			// ALWAYS CALL NATIVE DRAW FROM SPRITE_BASE! | Camera is useful to make it consistent (has to be in layer size_t)
 			bool draw(Camera*, int);

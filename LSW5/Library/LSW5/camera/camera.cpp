@@ -152,21 +152,21 @@ namespace LSW {
 		void Camera::set(const std::string e, double v)
 		{
 			auto* ptr = data.double_data(e.c_str(), e.length());
-			if (!ptr) data.double_data.add({ v, e.c_str(), e.length() });
+			if (!ptr) data.double_data.add(SuperPair<double>(v, e.c_str(), e.length()));
 			else *ptr = v;
 		}
 
 		void Camera::set(const std::string e, bool v)
 		{
 			auto* ptr = data.boolean_data(e.c_str(), e.length());
-			if (!ptr) data.boolean_data.add({ v, e.c_str(), e.length() });
+			if (!ptr) data.boolean_data.add(SuperPair<bool>(v, e.c_str(), e.length()));
 			else *ptr = v;
 		}
 
 		void Camera::set(const std::string e, int v)
 		{
 			auto* ptr = data.integer_data(e.c_str(), e.length());
-			if (!ptr) data.integer_data.add({ v, e.c_str(), e.length() });
+			if (!ptr) data.integer_data.add(SuperPair<int>(v, e.c_str(), e.length()));
 			else *ptr = v;
 		}
 
@@ -225,21 +225,21 @@ namespace LSW {
 			return false;
 		}
 
-		double* Camera::getRef(const camera::e_double e)
+		double* Camera::getDirect(const camera::e_double e)
 		{
 			if (auto* ptr = data.double_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		bool* Camera::getRef(const camera::e_boolean e)
+		bool* Camera::getDirect(const camera::e_boolean e)
 		{
 			if (auto* ptr = data.boolean_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		int* Camera::getRef(const camera::e_integer e)
+		int* Camera::getDirect(const camera::e_integer e)
 		{
 			if (auto* ptr = data.integer_data(e); ptr)
 				return ptr;

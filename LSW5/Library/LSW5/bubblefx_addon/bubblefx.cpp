@@ -33,10 +33,10 @@ namespace LSW {
 			auto& trg = reference;
 
 			const double _dd = 0.8;
-			auto& delta_t = *data_bubblefx->chronomillis_readonly_data[bubblefx::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION];
+			const auto delta_t = getDirect<std::chrono::milliseconds>(bubblefx::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION);
 
 			if (std::chrono::system_clock::now().time_since_epoch() > delta_t || !bmp.ref) {
-				delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + bubblefx::default_delta_t_frame_delay);
+				set<std::chrono::milliseconds>(bubblefx::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + bubblefx::default_delta_t_frame_delay));
 
 				if (trg) {
 					siz[0] = trg->get_width() * _dd;
@@ -60,16 +60,16 @@ namespace LSW {
 
 		void BubbleFX::_checkUpdateBMP()
 		{
-			if (*data_bubblefx->boolean_readonly_data[bubblefx::e_boolean_readonly::SHOULD_UPDATE_SCREEN]) {
-				*data_bubblefx->boolean_readonly_data[bubblefx::e_boolean_readonly::SHOULD_UPDATE_SCREEN] = false;
+			if (getDirect<bool>(bubblefx::e_boolean_readonly::SHOULD_UPDATE_SCREEN)) {
+				set<bool>(bubblefx::e_boolean_readonly::SHOULD_UPDATE_SCREEN, false);
 
 				auto& trg = reference;
 
 				if (bmp.ref) { // just to be sure
 					bmp.ref->set_as_target();
 
-					const float blur_intensity = static_cast<float>((*data_bubblefx->double_data[bubblefx::e_double::BLUR_INTENSITY])());
-					size_t& p_assist = *data_bubblefx->sizet_readonly_data[bubblefx::e_sizet_readonly::VECTOR_POSITION_DRAWING];
+					const float blur_intensity = static_cast<float>(getDirect<double>(bubblefx::e_double::BLUR_INTENSITY));
+					const size_t p_assist = getDirect<size_t>(bubblefx::e_sizet_readonly::VECTOR_POSITION_DRAWING);
 
 					ALLEGRO_TRANSFORM clean;
 					al_identity_transform(&clean);
@@ -86,8 +86,9 @@ namespace LSW {
 							+(1.0f - (blur_intensity))));
 					}
 
-					if (p_assist + bubblefx::default_bubbles_amount_draw_per_tick_max >= positions.size()) p_assist = 0;
-					else p_assist += bubblefx::default_bubbles_amount_draw_per_tick_max;
+					if (p_assist + bubblefx::default_bubbles_amount_draw_per_tick_max >= positions.size())
+						set<size_t>(bubblefx::e_sizet_readonly::VECTOR_POSITION_DRAWING, 0ULL);
+					else set<size_t>(bubblefx::e_sizet_readonly::VECTOR_POSITION_DRAWING, p_assist + bubblefx::default_bubbles_amount_draw_per_tick_max);
 
 					trg->set_as_target();
 				}
@@ -97,14 +98,14 @@ namespace LSW {
 
 		void BubbleFX::think()
 		{
-			const double delta = (*data_bubblefx->double_data[bubblefx::e_double::FRAMES_PER_SECOND])(); // delta t, 1/t = sec
-			std::chrono::milliseconds& last_time = *data_bubblefx->chronomillis_readonly_data[bubblefx::e_chronomillis_readonly::LAST_FRAME];
+			const double delta = getDirect<double>(bubblefx::e_double::FRAMES_PER_SECOND); // delta t, 1/t = sec
+			const std::chrono::milliseconds last_time = getDirect<std::chrono::milliseconds>(bubblefx::e_chronomillis_readonly::LAST_FRAME);
 
 			if (delta > 0.0) { // if delta <= 0, inf
 				std::chrono::milliseconds delta_tr = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(1.0 / delta));
 
 				if (MILLI_NOW - last_time > delta_tr) {
-					last_time = MILLI_NOW;
+					set<std::chrono::milliseconds>(bubblefx::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				}
 				else return; // no task
 			}
@@ -123,7 +124,7 @@ namespace LSW {
 				i.lastpositionscalculated[1] = ((i.posy + 1.0) / 2.0) * siz[1];
 			}
 
-			*data_bubblefx->boolean_readonly_data[bubblefx::e_boolean_readonly::SHOULD_UPDATE_SCREEN] = true;
+			set<bool>(bubblefx::e_boolean_readonly::SHOULD_UPDATE_SCREEN, true);
 		}
 
 		void BubbleFX::draw_self()
@@ -147,18 +148,18 @@ namespace LSW {
 				throw Abort::Abort(__FUNCSIG__, "Somehow the texture have < 0 width / height!");
 			}
 
-			cx = 1.0f * bmpx * (((*getRef(sprite::e_double::CENTER_X))() + 1.0) * 0.5);
-			cy = 1.0f * bmpy * (((*getRef(sprite::e_double::CENTER_Y))() + 1.0) * 0.5);
-			rot_rad = 1.0f * *getRef(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
-			px = *getRef(sprite::e_double_readonly::POSX);
-			py = *getRef(sprite::e_double_readonly::POSY);
-			dsx = 1.0f * (*getRef(sprite::e_double::SCALE_X))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpx);
-			dsy = 1.0f * (*getRef(sprite::e_double::SCALE_Y))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpy);
+			cx = 1.0f * bmpx * ((getDirect<double>(sprite::e_double::CENTER_X) + 1.0) * 0.5);
+			cy = 1.0f * bmpy * ((getDirect<double>(sprite::e_double::CENTER_Y) + 1.0) * 0.5);
+			rot_rad = 1.0f * getDirect<double>(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
+			px = getDirect<double>(sprite::e_double_readonly::POSX);
+			py = getDirect<double>(sprite::e_double_readonly::POSY);
+			dsx = 1.0f * (getDirect<double>(sprite::e_double::SCALE_X)) * (getDirect<double>(sprite::e_double::SCALE_G)) * (1.0 / bmpx);
+			dsy = 1.0f * (getDirect<double>(sprite::e_double::SCALE_Y)) * (getDirect<double>(sprite::e_double::SCALE_G)) * (1.0 / bmpy);
 
 
-			if ((*getRef(sprite::e_boolean::USE_COLOR))()) {
+			if (getDirect<bool>(sprite::e_boolean::USE_COLOR)) {
 				rnn->draw(
-					(*getRef(sprite::e_color::COLOR))(),
+					getDirect<ALLEGRO_COLOR>(sprite::e_color::COLOR),
 					cx, cy,
 					px, py,
 					dsx, dsy,
@@ -179,6 +180,12 @@ namespace LSW {
 			set(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
 			set(bubblefx::e_double::FRAMES_PER_SECOND, fps);
 
+			set<double>(bubblefx::e_double_defaults);
+			set<bool>(bubblefx::e_boolean_readonly_defaults);
+			set<size_t>(bubblefx::e_sizet_readonly_defaults); // UINTPTR_T
+			set<std::chrono::milliseconds>(bubblefx::e_chronomillis_readonly_defaults);
+
+
 			bmp.id = "BUBBLE_UNIQUE_" + Tools::generateRandomUniqueStringN();
 
 			createSwap(1280, 720);
@@ -197,6 +204,11 @@ namespace LSW {
 			set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 			set(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
 
+			set<double>(bubblefx::e_double_defaults);
+			set<bool>(bubblefx::e_boolean_readonly_defaults);
+			set<size_t>(bubblefx::e_sizet_readonly_defaults); // UINTPTR_T
+			set<std::chrono::milliseconds>(bubblefx::e_chronomillis_readonly_defaults);
+
 			bmp.id = "BUBBLE_UNIQUE_" + Tools::generateRandomUniqueStringN();
 
 			//custom_think_task = [&] {think(); };
@@ -208,12 +220,27 @@ namespace LSW {
 
 		void BubbleFX::twinUpAttributes(const std::shared_ptr<bubblefx_data> oth)
 		{
-			data_bubblefx = oth;
+			set<double>(oth->double_data);
+			set<bool>(oth->boolean_data);
+			set<std::string>(oth->string_data);
+			set<int>(oth->integer_data);
+			set<ALLEGRO_COLOR>(oth->color_data);
+			set<uintptr_t>(oth->uintptrt_data);
+			set<std::chrono::milliseconds>(oth->chronomillis_readonly_data);
 		}
 
 		std::shared_ptr<BubbleFX::bubblefx_data> BubbleFX::getAttributes()
 		{
-			return data_bubblefx;
+			std::shared_ptr<BubbleFX::bubblefx_data> oth = std::make_shared<BubbleFX::bubblefx_data>();
+
+			oth->double_data = get<double>();
+			oth->boolean_data = get<bool>();
+			oth->string_data = get<std::string>();
+			oth->integer_data = get<int>();
+			oth->color_data = get<ALLEGRO_COLOR>();
+			oth->uintptrt_data = get<uintptr_t>();
+			oth->chronomillis_readonly_data = get<std::chrono::milliseconds>();
+			return oth;
 		}
 
 		void BubbleFX::reset(const size_t amount)
@@ -233,128 +260,5 @@ namespace LSW {
 				positions.push_back(poss);
 			}
 		}
-
-		void BubbleFX::set(const bubblefx::e_double e, double v)
-		{
-			if (auto* ptr = data_bubblefx->double_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void BubbleFX::set(const bubblefx::e_double e, std::function<double(void)> v)
-		{
-			if (auto* ptr = data_bubblefx->double_data(e); ptr)
-				*ptr = v;
-		}
-
-		void BubbleFX::set(const std::string e, double v)
-		{
-			auto* ptr = data_bubblefx->double_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-
-		void BubbleFX::set(const std::string e, std::function<double(void)> v)
-		{
-			auto* ptr = data_bubblefx->double_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-
-		bool BubbleFX::get(const bubblefx::e_double e, double& v)
-		{
-			if (auto* ptr = data_bubblefx->double_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool BubbleFX::get(const bubblefx::e_double e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_bubblefx->double_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool BubbleFX::get(const std::string e, double& v)
-		{
-			if (auto* ptr = data_bubblefx->double_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool BubbleFX::get(const std::string e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_bubblefx->double_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool BubbleFX::get(const bubblefx::e_chronomillis_readonly e, std::chrono::milliseconds& v)
-		{
-			if (auto* ptr = data_bubblefx->chronomillis_readonly_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool BubbleFX::get(const bubblefx::e_boolean_readonly e, bool& v)
-		{
-			if (auto* ptr = data_bubblefx->boolean_readonly_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool BubbleFX::get(const bubblefx::e_sizet_readonly e, size_t& v)
-		{
-			if (auto* ptr = data_bubblefx->sizet_readonly_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		std::function<double(void)>* BubbleFX::getRef(const bubblefx::e_double e)
-		{
-			if (auto* ptr = data_bubblefx->double_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		const std::chrono::milliseconds* BubbleFX::getRef(const bubblefx::e_chronomillis_readonly e) const
-		{
-			if (auto* ptr = data_bubblefx->chronomillis_readonly_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		const bool* BubbleFX::getRef(const bubblefx::e_boolean_readonly e) const
-		{
-			if (auto* ptr = data_bubblefx->boolean_readonly_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		const size_t* BubbleFX::getRef(const bubblefx::e_sizet_readonly e) const
-		{
-			if (auto* ptr = data_bubblefx->sizet_readonly_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
 	}
 }

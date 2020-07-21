@@ -95,9 +95,9 @@ namespace LSW {
 			bool get(const std::string, std::function<double(void)>&);
 			bool get(const std::string, std::function<int(void)>&);
 
-			std::function<bool(void)>*		getRef(const track::e_boolean);
-			std::function<double(void)>*	getRef(const track::e_double);
-			std::function<int(void)>*		getRef(const track::e_integer);
+			std::function<bool(void)>*		getDirect(const track::e_boolean);
+			std::function<double(void)>*	getDirect(const track::e_double);
+			std::function<int(void)>*		getDirect(const track::e_integer);
 
 
 			std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE> getInstance();

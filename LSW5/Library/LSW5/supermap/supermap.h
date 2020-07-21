@@ -51,18 +51,11 @@ namespace LSW {
 
 			SuperMap(std::initializer_list<SuperPair<T>> spTi)
 			{
-				for (auto& i : spTi) {
-					SuperPair<T> spp;
-					spp = i;
-					add(spp);
-				}
+				add(spTi);
 			}
-			SuperMap(const SuperMap& mp) {
-				for (auto& i : *mp.__getcopy()) {
-					SuperPair<T> spp;
-					spp = i;
-					add(spp);
-				}
+			SuperMap(const SuperMap& mp)
+			{
+				add(mp);
 			}
 
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -72,6 +65,21 @@ namespace LSW {
 			* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
+			void add(const SuperMap& mp)
+			{
+				for (auto& i : *mp.__getcopy()) {
+					SuperPair<T> spp;
+					spp = i;
+					add(spp);
+				}
+			}
+			void add(std::initializer_list<SuperPair<T>> spTi) {
+				for (auto& i : spTi) {
+					SuperPair<T> spp;
+					spp = i;
+					add(spp);
+				}
+			}
 			void add(const SuperPair<T>& sp) {
 				sps.push_back(sp);
 			}
@@ -88,6 +96,30 @@ namespace LSW {
 
 			void erase(const size_t start) { sps.erase(sps.begin() + start); }
 			void erase(const size_t start, const size_t end) { sps.erase(sps.begin() + start, sps.begin() + end); }
+
+
+			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+			GetPair (non constant)
+
+			* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+			template<typename K>
+			SuperPair<T>* getPair(K key) {
+				for (auto& i : sps) if (T* ptr; ptr = i[key]) return &i;
+				return nullptr;
+			}
+			template<typename K, size_t size_o>
+			SuperPair<T>* getPair(K(&key)[size_o]) {
+				for (auto& i : sps) if (T* ptr; ptr = i(key, size_o)) return &i;
+				return nullptr;
+			}
+			template<typename K>
+			SuperPair<T>* getPair(K* key, size_t size) {
+				for (auto& i : sps) if (T* ptr; ptr = i(key, size)) return &i;
+				return nullptr;
+			}
 
 
 			/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

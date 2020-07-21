@@ -12,8 +12,10 @@ namespace LSW {
 			//template<typename K, typename T>
 			//inline K s_cast(T val) noexcept { return static_cast<K>(val); } // not hard, static_cast<> is easy
 
+			template<typename T> using r_cast_t = std::conditional_t<std::is_pointer<T>::value || std::is_array<T>::value, std::add_pointer_t<std::remove_all_extents_t<std::remove_cvref_t<std::remove_pointer_t<T>>>>, std::remove_all_extents_t<std::remove_cvref_t<std::remove_pointer_t<T>>>>;
+
 			// regress (go back to main) cast
-			template<typename Base, typename Cust = std::remove_all_extents_t<std::remove_const_t<Base>>>
+			template<typename Base, typename Cust = r_cast_t<Base>>
 			inline Cust r_cast(Base b) noexcept { if (std::is_pointer_v<Base> || std::is_array_v<Base>) return s_cast<Cust*>(b); return s_cast<Cust>(b); }
 
 			// force cast
@@ -24,8 +26,6 @@ namespace LSW {
 			template <typename T>
 			constexpr auto a_cast(T e) noexcept -> std::enable_if_t<std::is_enum<T>::value, std::underlying_type_t<T>> { return static_cast<std::underlying_type_t<T>>(e); }
 
-
-			template<typename T> using r_cast_t = std::remove_all_extents_t<std::remove_const_t<T>>;
 		}
 	}
 }

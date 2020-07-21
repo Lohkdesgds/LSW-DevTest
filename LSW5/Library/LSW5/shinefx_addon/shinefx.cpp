@@ -29,10 +29,10 @@ namespace LSW {
 
 			int siz[2] = { 0,0 };
 			const double _dd = 0.8;
-			auto& delta_t = *data_shinefx->chronomillis_readonly_data[shinefx::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION];
+			const auto delta_t = getDirect<std::chrono::milliseconds>(shinefx::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION);
 
 			if (std::chrono::system_clock::now().time_since_epoch() > delta_t || !bmp.ref) {
-				delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + shinefx::default_delta_t_frame_delay);
+				set<std::chrono::milliseconds>(shinefx::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + shinefx::default_delta_t_frame_delay));
 
 				if (trg) {
 					siz[0] = trg->get_width() * _dd;
@@ -59,21 +59,21 @@ namespace LSW {
 		{
 			_checkInternalBMP();
 
-			const double delta = (*data_shinefx->double_data[shinefx::e_double::FRAMES_PER_SECOND_UPDATE])(); // delta t, 1/t = sec
-			std::chrono::milliseconds& last_time = *data_shinefx->chronomillis_readonly_data[shinefx::e_chronomillis_readonly::LAST_DRAW];
+			const double delta = getDirect<double>(shinefx::e_double::FRAMES_PER_SECOND_UPDATE); // delta t, 1/t = sec
+			const std::chrono::milliseconds last_time = getDirect<std::chrono::milliseconds>(shinefx::e_chronomillis_readonly::LAST_DRAW);
 
 			if (delta > 0.0) { // if delta <= 0, inf
 				std::chrono::milliseconds delta_tr = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(1.0 / delta));
 
 				if (MILLI_NOW - last_time > delta_tr) {
-					last_time = MILLI_NOW;
+					set(shinefx::e_chronomillis_readonly::LAST_DRAW, MILLI_NOW);
 
 					// update bitmap
 					auto& trg = reference;
-					const double delta_rad = (*data_shinefx->double_data[shinefx::e_double::EACH_SIZE_RAD])();
-					const double time_now = al_get_time() * (*data_shinefx->double_data[shinefx::e_double::SPEED_ROTATION_T])();
-					const ALLEGRO_COLOR foreground_color = (*data_shinefx->color_data[shinefx::e_color::FOREGROUND])();
-					const ALLEGRO_COLOR background_color = (*data_shinefx->color_data[shinefx::e_color::BACKGROUND])();
+					const double delta_rad = getDirect<double>(shinefx::e_double::EACH_SIZE_RAD);
+					const double time_now = al_get_time() * getDirect<double>(shinefx::e_double::SPEED_ROTATION_T);
+					const ALLEGRO_COLOR foreground_color = getDirect<ALLEGRO_COLOR>(shinefx::e_color::FOREGROUND);
+					const ALLEGRO_COLOR background_color = getDirect<ALLEGRO_COLOR>(shinefx::e_color::BACKGROUND);
 
 					if (bmp.ref) { // just to be sure
 						bmp.ref->set_as_target();
@@ -117,18 +117,18 @@ namespace LSW {
 				throw Abort::Abort(__FUNCSIG__, "Somehow the texture have < 0 width / height!");
 			}
 
-			cx = 1.0f * bmpx * (((*getRef(sprite::e_double::CENTER_X))() + 1.0) * 0.5);
-			cy = 1.0f * bmpy * (((*getRef(sprite::e_double::CENTER_Y))() + 1.0) * 0.5);
-			rot_rad = 1.0f * *getRef(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
-			px = *getRef(sprite::e_double_readonly::POSX);
-			py = *getRef(sprite::e_double_readonly::POSY);
-			dsx = 1.0f * (*getRef(sprite::e_double::SCALE_X))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpx);
-			dsy = 1.0f * (*getRef(sprite::e_double::SCALE_Y))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpy);
+			cx = 1.0f * bmpx * ((getDirect<double>(sprite::e_double::CENTER_X) + 1.0) * 0.5);
+			cy = 1.0f * bmpy * ((getDirect<double>(sprite::e_double::CENTER_Y) + 1.0) * 0.5);
+			rot_rad = 1.0f * getDirect<double>(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
+			px = getDirect<double>(sprite::e_double_readonly::POSX);
+			py = getDirect<double>(sprite::e_double_readonly::POSY);
+			dsx = 1.0f * (getDirect<double>(sprite::e_double::SCALE_X)) * (getDirect<double>(sprite::e_double::SCALE_G)) * (1.0 / bmpx);
+			dsy = 1.0f * (getDirect<double>(sprite::e_double::SCALE_Y)) * (getDirect<double>(sprite::e_double::SCALE_G)) * (1.0 / bmpy);
 
 
-			if ((*getRef(sprite::e_boolean::USE_COLOR))()) {
+			if (getDirect<bool>(sprite::e_boolean::USE_COLOR)) {
 				rnn->draw(
-					(*getRef(sprite::e_color::COLOR))(),
+					getDirect<ALLEGRO_COLOR>(sprite::e_color::COLOR),
 					cx, cy,
 					px, py,
 					dsx, dsy,
@@ -143,8 +143,12 @@ namespace LSW {
 			}
 		}
 
-		ShineFX::ShineFX()
+		ShineFX::ShineFX() : Sprite_Base()
 		{
+			set<double>(shinefx::e_double_defaults);
+			set<ALLEGRO_COLOR>(shinefx::e_color_defaults);
+			set<std::chrono::milliseconds>(shinefx::e_chronomillis_readonly_defaults);
+
 			custom_draw_task = [&] {draw_self(); };
 			set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
 			set(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
@@ -155,9 +159,13 @@ namespace LSW {
 
 		ShineFX::ShineFX(ShineFX& o) : Sprite_Base(o)
 		{
+			set<double>(shinefx::e_double_defaults);
+			set<ALLEGRO_COLOR>(shinefx::e_color_defaults);
+			set<std::chrono::milliseconds>(shinefx::e_chronomillis_readonly_defaults);
+
 			custom_draw_task = [&] {draw_self(); };
 			set(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE));
-			set(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
+			set<bool>(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
 
 			reference = std::make_shared<Bitmap>();
 			reference->be_reference_to_target(true);
@@ -165,155 +173,27 @@ namespace LSW {
 
 		void ShineFX::twinUpAttributes(const std::shared_ptr<shinefx_data> oth)
 		{
-			data_shinefx = oth;
+			set<double>(oth->double_data);
+			set<bool>(oth->boolean_data);
+			set<std::string>(oth->string_data);
+			set<int>(oth->integer_data);
+			set<ALLEGRO_COLOR>(oth->color_data);
+			set<uintptr_t>(oth->uintptrt_data);
+			set<std::chrono::milliseconds>(oth->chronomillis_readonly_data);
 		}
 
 		std::shared_ptr<ShineFX::shinefx_data> ShineFX::getAttributes()
 		{
-			return data_shinefx;
-		}
+			std::shared_ptr<ShineFX::shinefx_data> oth = std::make_shared<ShineFX::shinefx_data>();
 
-		void ShineFX::set(const shinefx::e_double e, double v)
-		{
-			if (auto* ptr = data_shinefx->double_data(e); ptr)
-				*ptr = [=] {return v; };
+			oth->double_data = get<double>();
+			oth->boolean_data = get<bool>();
+			oth->string_data = get<std::string>();
+			oth->integer_data = get<int>();
+			oth->color_data = get<ALLEGRO_COLOR>();
+			oth->uintptrt_data = get<uintptr_t>();
+			oth->chronomillis_readonly_data = get<std::chrono::milliseconds>();
+			return oth;
 		}
-
-		void ShineFX::set(const shinefx::e_color e, ALLEGRO_COLOR v)
-		{
-			if (auto* ptr = data_shinefx->color_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void ShineFX::set(const shinefx::e_double e, std::function<double(void)> v)
-		{
-			if (auto* ptr = data_shinefx->double_data(e); ptr)
-				*ptr = v;
-		}
-
-		void ShineFX::set(const shinefx::e_color e, std::function<ALLEGRO_COLOR(void)> v)
-		{
-			if (auto* ptr = data_shinefx->color_data(e); ptr)
-				*ptr = v;
-		}
-
-		void ShineFX::set(const std::string e, double v)
-		{
-			auto* ptr = data_shinefx->double_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-
-		void ShineFX::set(const std::string e, ALLEGRO_COLOR v)
-		{
-			auto* ptr = data_shinefx->color_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-
-		void ShineFX::set(const std::string e, std::function<double(void)> v)
-		{
-			auto* ptr = data_shinefx->double_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-
-		void ShineFX::set(const std::string e, std::function<ALLEGRO_COLOR(void)> v)
-		{
-			auto* ptr = data_shinefx->color_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-
-		bool ShineFX::get(const shinefx::e_double e, double& v)
-		{
-			if (auto* ptr = data_shinefx->double_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool ShineFX::get(const shinefx::e_color e, ALLEGRO_COLOR& v)
-		{
-			if (auto* ptr = data_shinefx->color_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool ShineFX::get(const shinefx::e_double e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_shinefx->double_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool ShineFX::get(const shinefx::e_color e, std::function<ALLEGRO_COLOR(void)>& v)
-		{
-			if (auto* ptr = data_shinefx->color_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool ShineFX::get(const std::string e, double& v)
-		{
-			if (auto* ptr = data_shinefx->double_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool ShineFX::get(const std::string e, ALLEGRO_COLOR& v)
-		{
-			if (auto* ptr = data_shinefx->color_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool ShineFX::get(const std::string e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_shinefx->double_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool ShineFX::get(const std::string e, std::function<ALLEGRO_COLOR(void)>& v)
-		{
-			if (auto* ptr = data_shinefx->color_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		std::function<double(void)>* ShineFX::getRef(const shinefx::e_double e)
-		{
-			if (auto* ptr = data_shinefx->double_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<ALLEGRO_COLOR(void)>* ShineFX::getRef(const shinefx::e_color e)
-		{
-			if (auto* ptr = data_shinefx->color_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
 	}
 }

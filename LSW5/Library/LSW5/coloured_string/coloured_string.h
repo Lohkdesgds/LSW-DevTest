@@ -37,10 +37,10 @@ namespace LSW {
 			// one day rfind, dunno
 
 
-			coloured_string substr(const size_t, const size_t = static_cast<size_t>(-1));
+			coloured_string substr(const size_t, const size_t = static_cast<size_t>(-1)) const;
 
 			// clean STD::STRING with NO color information
-			std::string s_str();
+			std::string s_str() const;
 
 			char_c pop();
 			size_t size() const;

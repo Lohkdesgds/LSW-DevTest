@@ -187,13 +187,13 @@ namespace LSW {
 			bool get(const std::string, std::string&);
 			bool get(const std::string, ALLEGRO_COLOR&);
 
-			const std::chrono::milliseconds*			getRef(const database::e_chronomillis_readonly) const;	// Direct reference to the value
-			double*										getRef(const database::e_double);	// Direct reference to the value
-			bool*										getRef(const database::e_boolean);	// Direct reference to the value
-			int*										getRef(const database::e_integer);	// Direct reference to the value
-			size_t*										getRef(const database::e_sizet);	// Direct reference to the value
-			std::string*								getRef(const database::e_string);	// Direct reference to the value
-			ALLEGRO_COLOR* 								getRef(const database::e_color);	// Direct reference to the value
+			const std::chrono::milliseconds*			getDirect(const database::e_chronomillis_readonly) const;	// Direct reference to the value
+			double*										getDirect(const database::e_double);	// Direct reference to the value
+			bool*										getDirect(const database::e_boolean);	// Direct reference to the value
+			int*										getDirect(const database::e_integer);	// Direct reference to the value
+			size_t*										getDirect(const database::e_sizet);	// Direct reference to the value
+			std::string*								getDirect(const database::e_string);	// Direct reference to the value
+			ALLEGRO_COLOR* 								getDirect(const database::e_color);	// Direct reference to the value
 			
 			template<typename T, typename V> inline bool g(const T a, V& b) { return get(a, b); };
 			template<typename T, typename V> inline bool isEq(const T e, const V v) { V k; if (get(e, k)) return v == k; return false; }

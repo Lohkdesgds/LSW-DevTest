@@ -15,7 +15,7 @@ namespace LSW {
 		public:
 			using Sprite_Base::set;
 			using Sprite_Base::get;
-			using Sprite_Base::getRef;
+			using Sprite_Base::getDirect;
 
 			Button();
 

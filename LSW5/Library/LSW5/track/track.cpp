@@ -263,21 +263,21 @@ namespace LSW {
 			return false;
 		}
 
-		std::function<bool(void)>* Track::getRef(const track::e_boolean e)
+		std::function<bool(void)>* Track::getDirect(const track::e_boolean e)
 		{
 			if (auto* ptr = data_track->boolean_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		std::function<double(void)>* Track::getRef(const track::e_double e)
+		std::function<double(void)>* Track::getDirect(const track::e_double e)
 		{
 			if (auto* ptr = data_track->double_data(e); ptr)
 				return ptr;
 			return nullptr;
 		}
 
-		std::function<int(void)>* Track::getRef(const track::e_integer e)
+		std::function<int(void)>* Track::getDirect(const track::e_integer e)
 		{
 			if (auto* ptr = data_track->integer_data(e); ptr)
 				return ptr;

@@ -135,11 +135,11 @@ namespace LSW {
 
 				/*				
 				// initializing references later:
-				ref_fx_amount		= (db.getRef(database::e_double::FX_AMOUNT));
-				ref_buffer_prop		= (db.getRef(database::e_double::RESOLUTION_BUFFER_PROPORTION));
-				ref_fps_limit		= (db.getRef(database::e_integer::LIMIT_FPS));
-				ref_print_path		= (db.getRef(database::e_string::PRINT_PATH));
-				ref_doublebuffer	= (db.getRef(database::e_boolean::DOUBLE_BUFFERING));
+				ref_fx_amount		= (db.getDirect(database::e_double::FX_AMOUNT));
+				ref_buffer_prop		= (db.getDirect(database::e_double::RESOLUTION_BUFFER_PROPORTION));
+				ref_fps_limit		= (db.getDirect(database::e_integer::LIMIT_FPS));
+				ref_print_path		= (db.getDirect(database::e_string::PRINT_PATH));
+				ref_doublebuffer	= (db.getDirect(database::e_boolean::DOUBLE_BUFFERING));
 
 				ALLEGRO_DISPLAY_MODE dm{};
 
@@ -149,11 +149,11 @@ namespace LSW {
 				db.get(database::e_integer::SCREEN_FLAGS, dm.format);
 				*/
 
-				disp.set(display::e_double::FX_AMOUNT,						[&] {double d;		db.get(database::e_double::FX_AMOUNT, d);						return d; });
-				disp.set(display::e_double::RESOLUTION_BUFFER_PROPORTION,	[&] {double d;		db.get(database::e_double::RESOLUTION_BUFFER_PROPORTION, d);	return d; });
-				disp.set(display::e_integer::LIMIT_FPS,						[&] {int d;			db.get(database::e_integer::LIMIT_FPS, d);						return d; });
-				disp.set(display::e_string::PRINT_PATH,						[&] {std::string d; db.get(database::e_string::PRINT_PATH, d);						return d; });
-				disp.set(display::e_boolean::DOUBLE_BUFFERING,				[&] {bool d;		db.get(database::e_boolean::DOUBLE_BUFFERING, d);				return d; });
+				disp.set<double>(display::e_double::FX_AMOUNT,							[&] {double d;		db.get(database::e_double::FX_AMOUNT, d);						return d; });
+				disp.set<double>(display::e_double::RESOLUTION_BUFFER_PROPORTION,		[&] {double d;		db.get(database::e_double::RESOLUTION_BUFFER_PROPORTION, d);	return d; });
+				disp.set<int>(display::e_integer::LIMIT_FPS,							[&] {int d;			db.get(database::e_integer::LIMIT_FPS, d);						return d; });
+				disp.set<std::string>(display::e_string::PRINT_PATH,					[&] {std::string d; db.get(database::e_string::PRINT_PATH, d);						return d; });
+				disp.set<bool>(display::e_boolean::DOUBLE_BUFFERING,					[&] {bool d;		db.get(database::e_boolean::DOUBLE_BUFFERING, d);				return d; });
 
 				int d_width, d_height, d_refresh_rate, d_flags;
 				db.get(database::e_integer::SCREEN_X, d_width);
@@ -327,11 +327,11 @@ namespace LSW {
 				data.display_routine.routines.remove(disp.getEvent());
 				//data.display_routine.routines.remove(logg.getEvent());
 
-				db.set(database::e_double::FX_AMOUNT,						(*disp.getRef(display::e_double::FX_AMOUNT))());
-				db.set(database::e_double::RESOLUTION_BUFFER_PROPORTION,	(*disp.getRef(display::e_double::RESOLUTION_BUFFER_PROPORTION))());
-				db.set(database::e_integer::LIMIT_FPS,						(*disp.getRef(display::e_integer::LIMIT_FPS))());
-				db.set(database::e_string::PRINT_PATH,						(*disp.getRef(display::e_string::PRINT_PATH))());
-				db.set(database::e_boolean::DOUBLE_BUFFERING,				(*disp.getRef(display::e_boolean::DOUBLE_BUFFERING))());
+				db.set(database::e_double::FX_AMOUNT,						(disp.getDirect<double>(display::e_double::FX_AMOUNT)));
+				db.set(database::e_double::RESOLUTION_BUFFER_PROPORTION,	(disp.getDirect<double>(display::e_double::RESOLUTION_BUFFER_PROPORTION)));
+				db.set(database::e_integer::LIMIT_FPS,						(disp.getDirect<int>(display::e_integer::LIMIT_FPS)));
+				db.set(database::e_string::PRINT_PATH,						(disp.getDirect<std::string>(display::e_string::PRINT_PATH)));
+				db.set(database::e_boolean::DOUBLE_BUFFERING,				(disp.getDirect<bool>(display::e_boolean::DOUBLE_BUFFERING)));
 
 				auto d_info = disp.getLatest();
 				db.set(database::e_integer::SCREEN_X, d_info.chosen_mode.width);
@@ -548,8 +548,8 @@ namespace LSW {
 									char v = (char)strlen(multibyte);
 									if (v > 4) throw Abort::Abort(__FUNCSIG__, "Got an exception on user input: invalid key code, couldn't translate to a valid string", Abort::abort_level::GIVEUP);
 
-									auto& max_str_len = *db.getRef(database::e_sizet::MAXIMUM_STRING_INPUT_LEN);
-									auto& strr = *db.getRef(database::e_string::CURRENT_STRING);
+									auto& max_str_len = *db.getDirect(database::e_sizet::MAXIMUM_STRING_INPUT_LEN);
+									auto& strr = *db.getDirect(database::e_string::CURRENT_STRING);
 
 									for (auto& i : multibyte) {
 										if (i) {
@@ -559,7 +559,7 @@ namespace LSW {
 								}
 								else if (ev.keyboard.keycode == ALLEGRO_KEY_BACKSPACE)
 								{
-									auto& strr = *db.getRef(database::e_string::CURRENT_STRING);
+									auto& strr = *db.getDirect(database::e_string::CURRENT_STRING);
 									auto str_c = Tools::wideUp(strr);
 
 									if (str_c.length() > 1) {
@@ -572,8 +572,8 @@ namespace LSW {
 								}
 								else if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER || ev.keyboard.keycode == ALLEGRO_KEY_PAD_ENTER)
 								{
-									auto& strr = *db.getRef(database::e_string::CURRENT_STRING);
-									auto& lstr = *db.getRef(database::e_string::LAST_STRING);
+									auto& strr = *db.getDirect(database::e_string::CURRENT_STRING);
+									auto& lstr = *db.getDirect(database::e_string::LAST_STRING);
 									lstr = strr;
 									strr.clear();
 								}

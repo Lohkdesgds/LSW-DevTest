@@ -8,10 +8,10 @@ namespace LSW {
 			if (bitmaps.empty()) return;
 
 			{
-				auto& delta_t = *data_block->chronomillis_readonly_data[block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION];
+				const auto delta_t = getDirect<std::chrono::milliseconds>(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION);
 
-				if (const double _dd = (*data_block->double_data[block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION])(); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
-					delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + block::default_delta_t_frame_delay);
+				if (const double _dd = getDirect<double>(block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
+					set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + block::default_delta_t_frame_delay));
 					SuperResource<Bitmap> bmps;
 					auto& trg = reference;
 					if (trg && *trg) {
@@ -34,11 +34,11 @@ namespace LSW {
 				}
 			}
 
-			int frame = (*data_block->integer_data[block::e_integer::FRAME])();
+			int frame = getDirect<int>(block::e_integer::FRAME);
 
 			{
-				const double delta = (*data_block->double_data[block::e_double::FRAMES_PER_SECOND])(); // delta t, 1/t = sec
-				std::chrono::milliseconds& last_time = *data_block->chronomillis_readonly_data[block::e_chronomillis_readonly::LAST_FRAME];
+				const double delta = getDirect<double>(block::e_double::FRAMES_PER_SECOND); // delta t, 1/t = sec
+				std::chrono::milliseconds last_time = getDirect<std::chrono::milliseconds>(block::e_chronomillis_readonly::LAST_FRAME);
 
 				if (delta > 0.0 && frame >= 0) { // if delta <= 0 or frame < 0, static
 					std::chrono::milliseconds delta_tr = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(1.0 / delta));
@@ -53,10 +53,12 @@ namespace LSW {
 					frame = frame > 0 ? frame : -frame;
 					if (frame >= bitmaps.size()) frame = static_cast<int>(bitmaps.size() - 1);
 				}
+
+				set<std::chrono::milliseconds>(block::e_chronomillis_readonly::LAST_FRAME, last_time);
 			}
 
-			if (!(*data_block->boolean_data[block::e_boolean::SET_FRAME_VALUE_READONLY])()) {
-				*data_block->integer_data[block::e_integer::FRAME] = [=] {return frame; };
+			if (!getDirect<bool>(block::e_boolean::SET_FRAME_VALUE_READONLY)) {
+				set<int>(block::e_integer::FRAME, frame);
 			}
 
 			auto rnn = bitmaps[frame].ref;
@@ -71,18 +73,18 @@ namespace LSW {
 				throw Abort::Abort(__FUNCSIG__, "Somehow the texture have < 0 width / height!");
 			}
 
-			cx = 1.0f * bmpx * (((*getRef(sprite::e_double::CENTER_X))() + 1.0) * 0.5);
-			cy = 1.0f * bmpy * (((*getRef(sprite::e_double::CENTER_Y))() + 1.0) * 0.5);
-			rot_rad = 1.0f * *getRef(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
-			px = *getRef(sprite::e_double_readonly::POSX);
-			py = *getRef(sprite::e_double_readonly::POSY);
-			dsx = 1.0f * (*getRef(sprite::e_double::SCALE_X))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpx);
-			dsy = 1.0f * (*getRef(sprite::e_double::SCALE_Y))() * (*getRef(sprite::e_double::SCALE_G))() * (1.0 / bmpy);
+			cx = 1.0f * bmpx * ((getDirect<double>(sprite::e_double::CENTER_X) + 1.0) * 0.5);
+			cy = 1.0f * bmpy * ((getDirect<double>(sprite::e_double::CENTER_Y) + 1.0) * 0.5);
+			rot_rad = 1.0f * getDirect<double>(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
+			px = getDirect<double>(sprite::e_double_readonly::POSX);
+			py = getDirect<double>(sprite::e_double_readonly::POSY);
+			dsx = 1.0f * (getDirect<double>(sprite::e_double::SCALE_X)) * (getDirect<double>(sprite::e_double::SCALE_G)) * (1.0 / bmpx);
+			dsy = 1.0f * (getDirect<double>(sprite::e_double::SCALE_Y)) * (getDirect<double>(sprite::e_double::SCALE_G)) * (1.0 / bmpy);
 
 
-			if ((*getRef(sprite::e_boolean::USE_COLOR))()) {
+			if (getDirect<bool>(sprite::e_boolean::USE_COLOR)) {
 				rnn->draw(
-					(*getRef(sprite::e_color::COLOR))(),
+					getDirect<ALLEGRO_COLOR>(sprite::e_color::COLOR),
 					cx, cy,
 					px, py,
 					dsx, dsy,
@@ -99,27 +101,52 @@ namespace LSW {
 		}
 		Block::Block() : Sprite_Base()
 		{
-			if (!data_block) throw Abort::Abort(__FUNCSIG__, "Failed to create Block's data!");
+			//if (!data_block) throw Abort::Abort(__FUNCSIG__, "Failed to create Block's data!");
 			custom_draw_task = [&] {draw_self(); };
 
 			reference = std::make_shared<Bitmap>();
 			reference->be_reference_to_target(true);
+
+			set<double>(block::e_double_defaults);
+			set<bool>(block::e_boolean_defaults);
+			set<int>(block::e_integer_defaults);
+			set<std::chrono::milliseconds>(block::e_chronomillis_readonly_defaults);
 		}
 		Block::Block(Block& o) : Sprite_Base(o)
 		{
-			if (!data_block) throw Abort::Abort(__FUNCSIG__, "Failed to create Block's data!");
+			//if (!data_block) throw Abort::Abort(__FUNCSIG__, "Failed to create Block's data!");
 			custom_draw_task = [&] {draw_self(); };
 
 			reference = std::make_shared<Bitmap>();
 			reference->be_reference_to_target(true);
+
+			set<double>(block::e_double_defaults);
+			set<bool>(block::e_boolean_defaults);
+			set<int>(block::e_integer_defaults);
+			set<std::chrono::milliseconds>(block::e_chronomillis_readonly_defaults);
 		}
 		void Block::twinUpAttributes(const std::shared_ptr<block_data> oth)
 		{
-			data_block = oth; // now they're the same
+			set<double>(oth->double_data);
+			set<bool>(oth->boolean_data);
+			set<std::string>(oth->string_data);
+			set<int>(oth->integer_data);
+			set<ALLEGRO_COLOR>(oth->color_data);
+			set<uintptr_t>(oth->uintptrt_data);
+			set<std::chrono::milliseconds>(oth->chronomillis_readonly_data);
 		}
 		std::shared_ptr<Block::block_data> Block::getAttributes()
 		{
-			return data_block;
+			std::shared_ptr<Block::block_data> oth = std::make_shared<Block::block_data>();
+
+			oth->double_data = get<double>();
+			oth->boolean_data = get<bool>();
+			oth->string_data = get<std::string>();
+			oth->integer_data = get<int>();
+			oth->color_data = get<ALLEGRO_COLOR>();
+			oth->uintptrt_data = get<uintptr_t>();
+			oth->chronomillis_readonly_data = get<std::chrono::milliseconds>();
+			return oth;
 		}
 		/*Block::~Block()
 		{
@@ -210,229 +237,6 @@ namespace LSW {
 					bitmaps.erase(bitmaps.begin() + p);
 				}
 			}
-		}
-		void Block::set(const block::e_integer e, int v)
-		{
-			if (auto* ptr = data_block->integer_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-		void Block::set(const block::e_double e, double v)
-		{
-			if (auto* ptr = data_block->double_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Block::set(const block::e_boolean e, bool v)
-		{
-			if (auto* ptr = data_block->boolean_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Block::set(const block::e_integer e, std::function<int(void)> v)
-		{
-			if (auto* ptr = data_block->integer_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Block::set(const block::e_double e, std::function<double(void)> v)
-		{
-			if (auto* ptr = data_block->double_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Block::set(const block::e_boolean e, std::function<bool(void)> v)
-		{
-			if (auto* ptr = data_block->boolean_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Block::set(const std::string e, int v)
-		{
-			auto* ptr = data_block->integer_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-		void Block::set(const std::string e, double v)
-		{
-			auto* ptr = data_block->double_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-
-		void Block::set(const std::string e, bool v)
-		{
-			auto* ptr = data_block->boolean_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-
-		void Block::set(const std::string e, std::function<int(void)> v)
-		{
-			auto* ptr = data_block->integer_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-		void Block::set(const std::string e, std::function<double(void)> v)
-		{
-			auto* ptr = data_block->double_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-		void Block::set(const std::string e, std::function<bool(void)> v)
-		{
-			auto* ptr = data_block->boolean_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-
-		bool Block::get(const block::e_integer e, int& v)
-		{
-			if (auto* ptr = data_block->integer_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-		bool Block::get(const block::e_double e, double& v)
-		{
-			if (auto* ptr = data_block->double_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Block::get(const block::e_boolean e, bool& v)
-		{
-			if (auto* ptr = data_block->boolean_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Block::get(const block::e_integer e, std::function<int(void)>& v)
-		{
-			if (auto* ptr = data_block->integer_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Block::get(const block::e_double e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_block->double_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Block::get(const block::e_boolean e, std::function<bool(void)>& v)
-		{
-			if (auto* ptr = data_block->boolean_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Block::get(const std::string e, int& v)
-		{
-			if (auto* ptr = data_block->integer_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-		bool Block::get(const std::string e, double& v)
-		{
-			if (auto* ptr = data_block->double_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool Block::get(const std::string e, bool& v)
-		{
-			if (auto* ptr = data_block->boolean_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool LSW::v5::Block::get(const std::string e, std::function<int(void)>& v)
-		{
-			if (auto* ptr = data_block->integer_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool LSW::v5::Block::get(const std::string e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_block->double_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool LSW::v5::Block::get(const std::string e, std::function<bool(void)>& v)
-		{
-			if (auto* ptr = data_block->boolean_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool Block::get(const block::e_chronomillis_readonly e, std::chrono::milliseconds& v)
-		{
-			if (auto* ptr = data_block->chronomillis_readonly_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		std::function<int(void)>* Block::getRef(const block::e_integer e)
-		{
-			if (auto* ptr = data_block->integer_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<double(void)>* Block::getRef(const block::e_double e)
-		{
-			if (auto* ptr = data_block->double_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<bool(void)>* Block::getRef(const block::e_boolean e)
-		{
-			if (auto* ptr = data_block->boolean_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		const std::chrono::milliseconds* Block::getRef(const block::e_chronomillis_readonly e) const
-		{
-			if (auto* ptr = data_block->chronomillis_readonly_data(e); ptr)
-				return ptr;
-			return nullptr;
 		}
 	}
 }

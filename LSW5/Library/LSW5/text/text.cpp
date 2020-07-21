@@ -6,98 +6,98 @@ namespace LSW {
 
 		void Text::__link_hard_task()
 		{
-			data_text->custom_tags = {
+			SuperMap<std::function<std::string(void)>> tempmap = {
 				{
 					[&] {
-						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
+						std::shared_ptr<Sprite_Base> follow = getDirect<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr::FOLLOWING).lock();
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (*getRef(sprite::e_double_readonly::POSX) + (follow ? *follow->getRef(sprite::e_double_readonly::POSX) : 0.0) + (cam ? *cam->getRef(camera::e_double::OFFSET_X) : 0.0)));
+						return Tools::sprintf_a("%.3lf", (getDirect<double>(sprite::e_double_readonly::POSX) + (follow ? follow->getDirect<double>(sprite::e_double_readonly::POSX) : 0.0) + (cam ? *cam->getDirect(camera::e_double::OFFSET_X) : 0.0)));
 					},
-						CHAR_INIT("%pos_x%"), 						(text::e_custom_tags::T_POSX)
+						CHAR_INIT("%pos_x%"), 						(text::e_custom_tags::T_POSX),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
+						std::shared_ptr<Sprite_Base> follow = getDirect<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr::FOLLOWING).lock();
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (*getRef(sprite::e_double_readonly::POSY) + (follow ? *follow->getRef(sprite::e_double_readonly::POSY) : 0.0) + (cam ? *cam->getRef(camera::e_double::OFFSET_Y) : 0.0)));
+						return Tools::sprintf_a("%.3lf", (getDirect<double>(sprite::e_double_readonly::POSY) + (follow ? follow->getDirect<double>(sprite::e_double_readonly::POSY) : 0.0) + (cam ? *cam->getDirect(camera::e_double::OFFSET_Y) : 0.0)));
 					},
-						CHAR_INIT("%pos_y%"), 						(text::e_custom_tags::T_POSY)
+						CHAR_INIT("%pos_y%"), 						(text::e_custom_tags::T_POSY),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
+						std::shared_ptr<Sprite_Base> follow = getDirect<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr::FOLLOWING).lock();
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (*getRef(sprite::e_double_readonly::POSX) * (*getRef(sprite::e_boolean::AFFECTED_BY_CAM) ? (cam ? (*cam->getRef(camera::e_double::SCALE_G) * *cam->getRef(camera::e_double::SCALE_X)) : 1.0) : 1.0) + (follow ? *follow->getRef(sprite::e_double_readonly::POSX) : 0.0) * (cam ? (*cam->getRef(camera::e_double::SCALE_G) * *cam->getRef(camera::e_double::SCALE_X)) : 1.0)));
+						return Tools::sprintf_a("%.3lf", (getDirect<double>(sprite::e_double_readonly::POSX) * (getDirect<double>(sprite::e_boolean::AFFECTED_BY_CAM) ? (cam ? (*cam->getDirect(camera::e_double::SCALE_G) * *cam->getDirect(camera::e_double::SCALE_X)) : 1.0) : 1.0) + (follow ? follow->getDirect<double>(sprite::e_double_readonly::POSX) : 0.0) * (cam ? (*cam->getDirect(camera::e_double::SCALE_G) * *cam->getDirect(camera::e_double::SCALE_X)) : 1.0)));
 					},
-						CHAR_INIT("%screen_pos_x%"), 				(text::e_custom_tags::T_SCREEN_POSX)
+						CHAR_INIT("%screen_pos_x%"), 				(text::e_custom_tags::T_SCREEN_POSX),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
+						std::shared_ptr<Sprite_Base> follow = getDirect<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr::FOLLOWING).lock();
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (*getRef(sprite::e_double_readonly::POSY) * (*getRef(sprite::e_boolean::AFFECTED_BY_CAM) ? (cam ? (*cam->getRef(camera::e_double::SCALE_G) * *cam->getRef(camera::e_double::SCALE_Y)) : 1.0) : 1.0) + (follow ? *follow->getRef(sprite::e_double_readonly::POSY) : 0.0) * (cam ? (*cam->getRef(camera::e_double::SCALE_G) * *cam->getRef(camera::e_double::SCALE_Y)) : 1.0)));
+						return Tools::sprintf_a("%.3lf", (getDirect<double>(sprite::e_double_readonly::POSY) * (getDirect<double>(sprite::e_boolean::AFFECTED_BY_CAM) ? (cam ? (*cam->getDirect(camera::e_double::SCALE_G) * *cam->getDirect(camera::e_double::SCALE_Y)) : 1.0) : 1.0) + (follow ? follow->getDirect<double>(sprite::e_double_readonly::POSY) : 0.0) * (cam ? (*cam->getDirect(camera::e_double::SCALE_G) * *cam->getDirect(camera::e_double::SCALE_Y)) : 1.0)));
 
 					},
-						CHAR_INIT("%screen_pos_y%"), 				(text::e_custom_tags::T_SCREEN_POSY)
+						CHAR_INIT("%screen_pos_y%"), 				(text::e_custom_tags::T_SCREEN_POSY),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
+						std::shared_ptr<Sprite_Base> follow = getDirect<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr::FOLLOWING).lock();
 						return Tools::sprintf_a("%s", (follow ? "Y" : "N"));
 					},
-						CHAR_INIT("%is_following%"), 				(text::e_custom_tags::T_ISFOLLOWING)
+						CHAR_INIT("%is_following%"), 				(text::e_custom_tags::T_ISFOLLOWING),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						return Tools::sprintf_a("%.3f", (*getRef(sprite::e_color::COLOR))().r);
+						return Tools::sprintf_a("%.3f", (getDirect<ALLEGRO_COLOR>(sprite::e_color::COLOR)).r);
 					},
-						CHAR_INIT("%color_r%"), 					(text::e_custom_tags::T_COLOR_R)
+						CHAR_INIT("%color_r%"), 					(text::e_custom_tags::T_COLOR_R),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						return Tools::sprintf_a("%.3f", (*getRef(sprite::e_color::COLOR))().g);
+						return Tools::sprintf_a("%.3f", (getDirect<ALLEGRO_COLOR>(sprite::e_color::COLOR)).g);
 					},
-						CHAR_INIT("%color_g%"), 					(text::e_custom_tags::T_COLOR_G)
+						CHAR_INIT("%color_g%"), 					(text::e_custom_tags::T_COLOR_G),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						return Tools::sprintf_a("%.3f", (*getRef(sprite::e_color::COLOR))().b);
+						return Tools::sprintf_a("%.3f", (getDirect<ALLEGRO_COLOR>(sprite::e_color::COLOR)).b);
 					},
-						CHAR_INIT("%color_b%"), 					(text::e_custom_tags::T_COLOR_B)
+						CHAR_INIT("%color_b%"), 					(text::e_custom_tags::T_COLOR_B),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						return Tools::sprintf_a("%.3f", (*getRef(sprite::e_color::COLOR))().a);
+						return Tools::sprintf_a("%.3f", (getDirect<ALLEGRO_COLOR>(sprite::e_color::COLOR)).a);
 					},
-						CHAR_INIT("%color_a%"), 					(text::e_custom_tags::T_COLOR_A)
+						CHAR_INIT("%color_a%"), 					(text::e_custom_tags::T_COLOR_A),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						return Tools::sprintf_a("%d", (*data_text->integer_data[text::e_integer::STRING_MODE])());
+						return Tools::sprintf_a("%d", (getDirect<int>(text::e_integer::STRING_MODE)));
 					},
-						CHAR_INIT("%mode%"), 						(text::e_custom_tags::T_MODE)
-				},
-				{
-					[&] {
-						Database conf;
-						return Tools::sprintf_a("%.3lf", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() - *conf.getRef(database::e_chronomillis_readonly::STARTED_APP_TIME)).count() / 1000.0);
-					},
-						CHAR_INIT("%time%"), 						(text::e_custom_tags::T_TIME)
+						CHAR_INIT("%mode%"), 						(text::e_custom_tags::T_MODE),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						Database conf;
-						return Tools::sprintf_a("%s", *conf.getRef(database::e_boolean::DOUBLE_BUFFERING) ? "Y" : "N");
+						return Tools::sprintf_a("%.3lf", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() - *conf.getDirect(database::e_chronomillis_readonly::STARTED_APP_TIME)).count() / 1000.0);
 					},
-						CHAR_INIT("%is_using_buf%"), 				(text::e_custom_tags::T_ISUSINGBUF)
+						CHAR_INIT("%time%"), 						(text::e_custom_tags::T_TIME),				text::e_custom_tags_tag::CUSTOM_TAG
+				},
+				{
+					[&] {
+						Database conf;
+						return Tools::sprintf_a("%s", *conf.getDirect(database::e_boolean::DOUBLE_BUFFERING) ? "Y" : "N");
+					},
+						CHAR_INIT("%is_using_buf%"), 				(text::e_custom_tags::T_ISUSINGBUF),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -105,21 +105,21 @@ namespace LSW {
 						return Tools::sprintf_a("%d", (d ? al_get_display_width(d) : -1));
 
 					},
-						CHAR_INIT("%curr_res_x%"), 					(text::e_custom_tags::T_GB_RESX)
+						CHAR_INIT("%curr_res_x%"), 					(text::e_custom_tags::T_GB_RESX),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						ALLEGRO_DISPLAY* d = al_get_current_display();
 						return Tools::sprintf_a("%d", (d ? al_get_display_height(d) : -1));
 					},
-						CHAR_INIT("%curr_res_y%"), 					(text::e_custom_tags::T_GB_RESY)
+						CHAR_INIT("%curr_res_y%"), 					(text::e_custom_tags::T_GB_RESY),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						ALLEGRO_DISPLAY* d = al_get_current_display();
 						return Tools::sprintf_a("%d", (d ? al_get_display_refresh_rate(d) : -1));
 					},
-						CHAR_INIT("%curr_refresh_rate%"), 			(text::e_custom_tags::T_REFRESHRATE)
+						CHAR_INIT("%curr_refresh_rate%"), 			(text::e_custom_tags::T_REFRESHRATE),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -128,7 +128,7 @@ namespace LSW {
 						conf.get(database::e_sizet::FRAMESPERSECOND, t);
 						return Tools::sprintf_a("%zu", t);
 					},
-						CHAR_INIT("%int_fps%"), 					(text::e_custom_tags::T_FPS)
+						CHAR_INIT("%int_fps%"), 					(text::e_custom_tags::T_FPS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -138,7 +138,7 @@ namespace LSW {
 						return Tools::sprintf_a("%zu", t);
 
 					},
-						CHAR_INIT("%int_tps%"), 					(text::e_custom_tags::T_TPS)
+						CHAR_INIT("%int_tps%"), 					(text::e_custom_tags::T_TPS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -147,7 +147,7 @@ namespace LSW {
 						conf.get(database::e_sizet::USEREVENTSPERSECOND, t);
 						return Tools::sprintf_a("%zu", t);
 					},
-						CHAR_INIT("%int_ups%"), 					(text::e_custom_tags::T_UPS)
+						CHAR_INIT("%int_ups%"), 					(text::e_custom_tags::T_UPS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -156,7 +156,7 @@ namespace LSW {
 						conf.get(database::e_sizet::ADVANCEDFUNCSPERSECOND, t);
 						return Tools::sprintf_a("%zu", t);
 					},
-						CHAR_INIT("%int_aps%"), 					(text::e_custom_tags::T_APS)
+						CHAR_INIT("%int_aps%"), 					(text::e_custom_tags::T_APS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -165,7 +165,7 @@ namespace LSW {
 						conf.get(database::e_sizet::MUSICSPERSECOND, t);
 						return Tools::sprintf_a("%zu", t);
 					},
-						CHAR_INIT("%int_mps%"), 					(text::e_custom_tags::T_MPS)
+						CHAR_INIT("%int_mps%"), 					(text::e_custom_tags::T_MPS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -174,7 +174,7 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_FRAMESPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1.0 / dt : -1);
 					},
-						CHAR_INIT("%instant_fps%"), 				(text::e_custom_tags::T_I_FPS)
+						CHAR_INIT("%instant_fps%"), 				(text::e_custom_tags::T_I_FPS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -183,7 +183,7 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_COLLISIONSPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1.0 / dt : -1);
 					},
-						CHAR_INIT("%instant_tps%"), 				(text::e_custom_tags::T_I_TPS)
+						CHAR_INIT("%instant_tps%"), 				(text::e_custom_tags::T_I_TPS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -192,7 +192,7 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_USEREVENTSPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1.0 / dt : -1);
 					},
-						CHAR_INIT("%instant_ups%"), 				(text::e_custom_tags::T_I_UPS)
+						CHAR_INIT("%instant_ups%"), 				(text::e_custom_tags::T_I_UPS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -201,7 +201,7 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_ADVANCEDFUNCSPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1.0 / dt : -1);
 					},
-						CHAR_INIT("%instant_aps%"), 				(text::e_custom_tags::T_I_APS)
+						CHAR_INIT("%instant_aps%"), 				(text::e_custom_tags::T_I_APS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -210,7 +210,7 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_MUSICSPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1.0 / dt : -1);
 					},
-						CHAR_INIT("%instant_mps%"), 				(text::e_custom_tags::T_I_MPS)
+						CHAR_INIT("%instant_mps%"), 				(text::e_custom_tags::T_I_MPS),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -219,7 +219,7 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_FRAMESPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1000.0 * dt : -1);
 					},
-						CHAR_INIT("%ms_fps%"), 						(text::e_custom_tags::T_MS_FPS)
+						CHAR_INIT("%ms_fps%"), 						(text::e_custom_tags::T_MS_FPS),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -228,7 +228,7 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_COLLISIONSPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1000.0 * dt : -1);
 					},
-						CHAR_INIT("%ms_tps%"), 						(text::e_custom_tags::T_MS_TPS)
+						CHAR_INIT("%ms_tps%"), 						(text::e_custom_tags::T_MS_TPS),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -237,7 +237,7 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_USEREVENTSPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1000.0 * dt : -1);
 					},
-						CHAR_INIT("%ms_ups%"), 						(text::e_custom_tags::T_MS_UPS)
+						CHAR_INIT("%ms_ups%"), 						(text::e_custom_tags::T_MS_UPS),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -246,7 +246,7 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_ADVANCEDFUNCSPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1000.0 * dt : -1);
 					},
-						CHAR_INIT("%ms_aps%"), 						(text::e_custom_tags::T_MS_APS)
+						CHAR_INIT("%ms_aps%"), 						(text::e_custom_tags::T_MS_APS),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -255,61 +255,61 @@ namespace LSW {
 						conf.get(database::e_double::INSTANT_MUSICSPERSECOND, dt);
 						return Tools::sprintf_a("%05.1lf", dt ? 1000.0 * dt : -1);
 					},
-						CHAR_INIT("%ms_aps%"), 						(text::e_custom_tags::T_MS_MPS)
+						CHAR_INIT("%ms_aps%"), 						(text::e_custom_tags::T_MS_MPS),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::OFFSET_X) : 0.0));
+						return Tools::sprintf_a("%.3lf", (cam ? *cam->getDirect(camera::e_double::OFFSET_X) : 0.0));
 					},
-						CHAR_INIT("%cam_x%"), 						(text::e_custom_tags::T_CAM_X)
+						CHAR_INIT("%cam_x%"), 						(text::e_custom_tags::T_CAM_X),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::OFFSET_Y) : 0.0));
+						return Tools::sprintf_a("%.3lf", (cam ? *cam->getDirect(camera::e_double::OFFSET_Y) : 0.0));
 					},
-						CHAR_INIT("%cam_y%"), 						(text::e_custom_tags::T_CAM_Y)
+						CHAR_INIT("%cam_y%"), 						(text::e_custom_tags::T_CAM_Y),				text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (cam ? (*cam->getRef(camera::e_double::SCALE_G) * sqrt(*cam->getRef(camera::e_double::SCALE_X) * *cam->getRef(camera::e_double::SCALE_Y))) : 0.0));
+						return Tools::sprintf_a("%.3lf", (cam ? (*cam->getDirect(camera::e_double::SCALE_G) * sqrt(*cam->getDirect(camera::e_double::SCALE_X) * *cam->getDirect(camera::e_double::SCALE_Y))) : 0.0));
 					},
-						CHAR_INIT("%cam_zoom_combined%"), 			(text::e_custom_tags::T_CAM_ZOOM)
+						CHAR_INIT("%cam_zoom_combined%"), 			(text::e_custom_tags::T_CAM_ZOOM),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::SCALE_G) : 0.0));
+						return Tools::sprintf_a("%.3lf", (cam ? *cam->getDirect(camera::e_double::SCALE_G) : 0.0));
 					},
-						CHAR_INIT("%cam_zoom_g%"), 					(text::e_custom_tags::T_CAM_ZOOMG)
+						CHAR_INIT("%cam_zoom_g%"), 					(text::e_custom_tags::T_CAM_ZOOMG),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::SCALE_X) : 0.0));
+						return Tools::sprintf_a("%.3lf", (cam ? *cam->getDirect(camera::e_double::SCALE_X) : 0.0));
 					},
-						CHAR_INIT("%cam_zoom_x%"), 					(text::e_custom_tags::T_CAM_ZOOMX)
+						CHAR_INIT("%cam_zoom_x%"), 					(text::e_custom_tags::T_CAM_ZOOMX),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						SuperResource<Camera> cameras;
 						if (cameras.size() == 0) return std::string("No camera set"); // cannot proceed
 						std::shared_ptr<Camera> cam = cameras.getMain(); // get first cam as main camera
-						return Tools::sprintf_a("%.3lf", (cam ? *cam->getRef(camera::e_double::SCALE_Y) : 0.0));
+						return Tools::sprintf_a("%.3lf", (cam ? *cam->getDirect(camera::e_double::SCALE_Y) : 0.0));
 					},
-						CHAR_INIT("%cam_zoom_y%"), 					(text::e_custom_tags::T_CAM_ZOOMY)
+						CHAR_INIT("%cam_zoom_y%"), 					(text::e_custom_tags::T_CAM_ZOOMY),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -318,7 +318,7 @@ namespace LSW {
 						conf.get(database::e_string::CURRENT_STRING, str);
 						return str;
 					},
-						CHAR_INIT("%curr_string%"), 				(text::e_custom_tags::T_CURRSTRING)
+						CHAR_INIT("%curr_string%"), 				(text::e_custom_tags::T_CURRSTRING),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -327,7 +327,7 @@ namespace LSW {
 						conf.get(database::e_string::LAST_STRING, str);
 						return str;
 					},
-						CHAR_INIT("%last_string%"), 				(text::e_custom_tags::T_LASTSTRING)
+						CHAR_INIT("%last_string%"), 				(text::e_custom_tags::T_LASTSTRING),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -336,7 +336,7 @@ namespace LSW {
 						conf.get(database::e_double::MOUSE_X, x);
 						return Tools::sprintf_a("%.3lf", x);
 					},
-						CHAR_INIT("%mouse_x%"), 					(text::e_custom_tags::T_MOUSE_X)
+						CHAR_INIT("%mouse_x%"), 					(text::e_custom_tags::T_MOUSE_X),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -345,11 +345,11 @@ namespace LSW {
 						conf.get(database::e_double::MOUSE_Y, x);
 						return Tools::sprintf_a("%.3lf", x);
 					},
-						CHAR_INIT("%mouse_y%"), 					(text::e_custom_tags::T_MOUSE_Y)
+						CHAR_INIT("%mouse_y%"), 					(text::e_custom_tags::T_MOUSE_Y),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
+						std::shared_ptr<Sprite_Base> follow = getDirect<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr::FOLLOWING).lock();
 						if (follow) {
 							double val;
 							follow->get(sprite::e_double_readonly::SPEED_X, val);
@@ -357,11 +357,11 @@ namespace LSW {
 						}
 						return std::string("NULL");
 					},
-						CHAR_INIT("%sprite_speed_x%"), 				(text::e_custom_tags::T_SPRITE_SPEEDX)
+						CHAR_INIT("%sprite_speed_x%"), 				(text::e_custom_tags::T_SPRITE_SPEEDX),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
+						std::shared_ptr<Sprite_Base> follow = getDirect<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr::FOLLOWING).lock();
 						if (follow) {
 							double val;
 							follow->get(sprite::e_double_readonly::SPEED_Y, val);
@@ -369,11 +369,11 @@ namespace LSW {
 						}
 						return std::string("NULL");
 					},
-						CHAR_INIT("%sprite_speed_y%"), 				(text::e_custom_tags::T_SPRITE_SPEEDY)
+						CHAR_INIT("%sprite_speed_y%"), 				(text::e_custom_tags::T_SPRITE_SPEEDY),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
-						std::shared_ptr<Sprite_Base> follow = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock();
+						std::shared_ptr<Sprite_Base> follow = getDirect<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr::FOLLOWING).lock();
 						if (follow) {
 							std::string val;
 							follow->get(sprite::e_string::ID, val);
@@ -381,7 +381,7 @@ namespace LSW {
 						}
 						return std::string("NULL");
 					},
-						CHAR_INIT("%sprite_name%"), 				(text::e_custom_tags::T_SPRITE_NAME)
+						CHAR_INIT("%sprite_name%"), 				(text::e_custom_tags::T_SPRITE_NAME),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -398,7 +398,7 @@ namespace LSW {
 						}
 						else sprintf_s(tempstr_c, "NULL");*/
 					},
-						CHAR_INIT("%entity_name%"), 				(text::e_custom_tags::T_SPRITE_ENTITY_NAME)
+						CHAR_INIT("%entity_name%"), 				(text::e_custom_tags::T_SPRITE_ENTITY_NAME),text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -415,7 +415,7 @@ namespace LSW {
 						}
 						else sprintf_s(tempstr_c, "NULL");*/
 					},
-						CHAR_INIT("%entity_health%"), 				(text::e_custom_tags::T_SPRITE_ENTITY_HEALTH)
+						CHAR_INIT("%entity_health%"), 				(text::e_custom_tags::T_SPRITE_ENTITY_HEALTH),text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -431,28 +431,28 @@ namespace LSW {
 						}
 						else sprintf_s(tempstr_c, "NOT_IMPLEMENTED");*/
 					},
-						CHAR_INIT("%sprite_debug%"), 				(text::e_custom_tags::_T_SPRITE_DEBUG)
+						CHAR_INIT("%sprite_debug%"), 				(text::e_custom_tags::_T_SPRITE_DEBUG),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						SuperResource<Bitmap> resource;
 						return Tools::sprintf_a("%zu", resource.size());
 					},
-						CHAR_INIT("%num_images%"), 					(text::e_custom_tags::T_TEXTURES_LOADED)
+						CHAR_INIT("%num_images%"), 					(text::e_custom_tags::T_TEXTURES_LOADED),	text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						SuperResource<Font> resource;
 						return Tools::sprintf_a("%zu", resource.size());
 					},
-						CHAR_INIT("%num_fonts%"), 					(text::e_custom_tags::T_FONTS_LOADED)
+						CHAR_INIT("%num_fonts%"), 					(text::e_custom_tags::T_FONTS_LOADED),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						SuperResource<Sprite_Base> resource;
 						return Tools::sprintf_a("%zu", resource.size());
 					},
-						CHAR_INIT("%num_sprites%"), 				(text::e_custom_tags::T_SPRITES_LOADED)
+						CHAR_INIT("%num_sprites%"), 				(text::e_custom_tags::T_SPRITES_LOADED),	text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -460,7 +460,7 @@ namespace LSW {
 						sprintf_s(tempstr_c, "%zu", tracks.size());*/
 						return std::string("NOT_AVAILABLE");
 					},
-						CHAR_INIT("%num_tracks%"), 					(text::e_custom_tags::T_TRACKS_LOADED)
+						CHAR_INIT("%num_tracks%"), 					(text::e_custom_tags::T_TRACKS_LOADED),		text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -468,13 +468,13 @@ namespace LSW {
 						sprintf_s(tempstr_c, "%.0lf", mixer.getVolume() * 100.0);*/
 						return std::string("NOT_AVAILABLE");
 					},
-						CHAR_INIT("%volume_perc%"), 				(text::e_custom_tags::T_VOLUME)
+						CHAR_INIT("%volume_perc%"), 				(text::e_custom_tags::T_VOLUME),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
 						return Shared::version_app;
 					},
-						CHAR_INIT("%version%"), 					(text::e_custom_tags::T_VERSION)
+						CHAR_INIT("%version%"), 					(text::e_custom_tags::T_VERSION),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -487,7 +487,7 @@ namespace LSW {
 						}
 						return std::string("Disabled");
 					},
-						CHAR_INIT("%screen_buf_proportion%"), 		(text::e_custom_tags::T_RESOLUTION_PROPORTION)
+						CHAR_INIT("%screen_buf_proportion%"), 		(text::e_custom_tags::T_RESOLUTION_PROPORTION),	text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -500,7 +500,7 @@ namespace LSW {
 						}
 						return std::string("Disabled");
 					},
-						CHAR_INIT("%screen_chroma_fx%"), 			(text::e_custom_tags::T_CHROMA_FX)
+						CHAR_INIT("%screen_chroma_fx%"), 			(text::e_custom_tags::T_CHROMA_FX),			text::e_custom_tags_tag::CUSTOM_TAG
 				},
 				{
 					[&] {
@@ -510,13 +510,16 @@ namespace LSW {
 						if (fpp > 0) return Tools::sprintf_a("%d", fpp);
 						return std::string("Unlimited");
 					},
-						CHAR_INIT("%fps_cap%"), 					(text::e_custom_tags::T_FPS_CAP)
+						CHAR_INIT("%fps_cap%"), 					(text::e_custom_tags::T_FPS_CAP),			text::e_custom_tags_tag::CUSTOM_TAG
 				}
 			};
+
+			set<std::string>(tempmap);
 		}
 
 		void Text::interpretTags(coloured_string& s)
 		{
+			
 			size_t ref_p = 0;
 #ifdef _DEBUG
 			for (auto now_t = MILLI_NOW; MILLI_NOW - now_t < text::timeout_interpret_debugging;)
@@ -546,7 +549,7 @@ namespace LSW {
 
 				std::string the_substr = s.substr(in_p, en_l).s_str();
 
-				if (auto res = data_text->custom_tags(the_substr.c_str(), the_substr.length()); res) {
+				if (auto res = getDirect<std::string*>(the_substr); res) {
 					std::string sec_res = (*res)();
 					s = s.substr(0, in_p) + sec_res + s.substr(en_l + in_p);
 					ref_p = in_p + 1;
@@ -573,38 +576,39 @@ namespace LSW {
 
 			double off_x = 0.0;
 			double off_y = 0.0;
-			bool use_following_color = (*data_text->boolean_data[text::e_boolean::USE_FOLLOWING_COLOR_INSTEAD])();
+			bool use_following_color = getDirect<bool>(text::e_boolean::USE_FOLLOWING_COLOR_INSTEAD);
 
 			// auto looks smaller, maybe good?
-			auto& posx = *getRef(sprite::e_double_readonly::POSX);
-			auto& posy = *getRef(sprite::e_double_readonly::POSY);
-			const auto s_dist_x = (*data_text->double_data[text::e_double::SHADOW_DISTANCE_X])();
-			const auto s_dist_y = (*data_text->double_data[text::e_double::SHADOW_DISTANCE_Y])();
-			const auto s_col = (*data_text->color_data[text::e_color::SHADOW_COLOR])();
-			auto n_col = (*getRef(sprite::e_color::COLOR))();
-			auto& p_str = *data_text->string_readonly_data[text::e_string_readonly::PROCESSED_STRING];
-			const auto mode = (*data_text->integer_data[text::e_integer::STRING_MODE])();
-			const auto scale_g = (*getRef(sprite::e_double::SCALE_G))();
-			const auto scale_x = (*getRef(sprite::e_double::SCALE_X))();
-			const auto scale_y = (*getRef(sprite::e_double::SCALE_Y))();
-			auto& delta_t = *data_text->chronomillis_readonly_data[text::e_chronomillis_readonly::LAST_UPDATE_STRING];
-			const auto per_char = (*data_text->boolean_data[text::e_boolean::USE_PER_CHAR_COLORING])();
+			const auto s_dist_x = getDirect<double>(text::e_double::SHADOW_DISTANCE_X);
+			const auto s_dist_y = getDirect<double>(text::e_double::SHADOW_DISTANCE_Y);
+			const auto s_col = getDirect<ALLEGRO_COLOR>(text::e_color::SHADOW_COLOR);
+			auto n_col = getDirect<ALLEGRO_COLOR>(sprite::e_color::COLOR);
+			const auto mode = getDirect<int>(text::e_integer::STRING_MODE);
+			const auto scale_g = getDirect<double>(sprite::e_double::SCALE_G);
+			const auto scale_x = getDirect<double>(sprite::e_double::SCALE_X);
+			const auto scale_y = getDirect<double>(sprite::e_double::SCALE_Y);
+			const auto per_char = getDirect<bool>(text::e_boolean::USE_PER_CHAR_COLORING);
+			// era ref
+			const auto posx = getDirect<double>(sprite::e_double_readonly::POSX);
+			const auto posy = getDirect<double>(sprite::e_double_readonly::POSY);
+			const auto delta_t = getDirect<std::chrono::milliseconds>(text::e_chronomillis_readonly::LAST_UPDATE_STRING);
 
-			double t_rotation_rad = *getRef(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
+			double t_rotation_rad = getDirect<double>(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
 			double p_rotation_rad = 0.0;
 
 			// STRING
 			if (std::chrono::system_clock::now().time_since_epoch() > delta_t) // do update string
 			{
-				delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + text::default_delta_t_text_update_delay);
+				set(text::e_chronomillis_readonly::LAST_UPDATE_STRING, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + text::default_delta_t_text_update_delay));
 
-				p_str = (*data_text->string_data[text::e_cstring::STRING])();
-				if (!(*data_text->boolean_data[text::e_boolean::NO_AUTO_STRING_INTERPRETATION])()) interpretTags(p_str);
+				coloured_string p_str = getDirect<coloured_string>(text::e_cstring::STRING);
+				if (!getDirect<bool>(text::e_boolean::NO_AUTO_STRING_INTERPRETATION)) interpretTags(p_str);
+				set(text::e_cstring_readonly::PROCESSED_STRING, p_str);
 			}
 
 
 
-			if (std::shared_ptr<Sprite_Base> fl = (*data_text->sprite_ptr_data[text::e_sprite_ptr::FOLLOWING])().lock(); fl)
+			if (std::shared_ptr<Sprite_Base> fl = getDirect<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr::FOLLOWING).lock(); fl)
 			{
 				fl->get(sprite::e_double_readonly::POSX, off_x);
 				fl->get(sprite::e_double_readonly::POSY, off_y);
@@ -622,7 +626,7 @@ namespace LSW {
 			Camera preset;
 
 			//double camx, camy, camg;
-			if (*getRef(sprite::e_boolean::AFFECTED_BY_CAM)) preset = *ruler; // copy
+			if (getDirect<bool>(sprite::e_boolean::AFFECTED_BY_CAM)) preset = *ruler; // copy
 
 			double rotation_rad = t_rotation_rad + p_rotation_rad;
 
@@ -658,17 +662,17 @@ namespace LSW {
 				targ_draw_xy_shadow[1] /= scale_y;
 			}*/
 
-			preset.set(camera::e_double::SCALE_G, *preset.getRef(camera::e_double::SCALE_G) * scale_g * 1.0 / text::default_sharpness_font);
-			preset.set(camera::e_double::SCALE_X, *preset.getRef(camera::e_double::SCALE_X) * scale_x);
-			preset.set(camera::e_double::SCALE_Y, *preset.getRef(camera::e_double::SCALE_Y) * scale_y);
-			preset.set(camera::e_double::OFFSET_X, (*preset.getRef(camera::e_double::OFFSET_X) * text::default_sharpness_font / scale_g) - (pos_now[0] / (scale_x * scale_g))); // offset of current cam + move center to its pos
-			preset.set(camera::e_double::OFFSET_Y, (*preset.getRef(camera::e_double::OFFSET_Y) * text::default_sharpness_font / scale_g) - (pos_now[1] / (scale_y * scale_g))); // offset of current cam + move center to its pos
+			preset.set(camera::e_double::SCALE_G, *preset.getDirect(camera::e_double::SCALE_G) * scale_g * 1.0 / text::default_sharpness_font);
+			preset.set(camera::e_double::SCALE_X, *preset.getDirect(camera::e_double::SCALE_X) * scale_x);
+			preset.set(camera::e_double::SCALE_Y, *preset.getDirect(camera::e_double::SCALE_Y) * scale_y);
+			preset.set(camera::e_double::OFFSET_X, (*preset.getDirect(camera::e_double::OFFSET_X) * text::default_sharpness_font / scale_g) - (pos_now[0] / (scale_x * scale_g))); // offset of current cam + move center to its pos
+			preset.set(camera::e_double::OFFSET_Y, (*preset.getDirect(camera::e_double::OFFSET_Y) * text::default_sharpness_font / scale_g) - (pos_now[1] / (scale_y * scale_g))); // offset of current cam + move center to its pos
 
-			preset.set(camera::e_double::ROTATION_RAD, *preset.getRef(camera::e_double::ROTATION_RAD) + rotation_rad); // now it rotates based on center
+			preset.set(camera::e_double::ROTATION_RAD, *preset.getDirect(camera::e_double::ROTATION_RAD) + rotation_rad); // now it rotates based on center
 			preset.refresh();
 			preset.apply();
 
-
+			const auto p_str = getDirect<coloured_string>(text::e_cstring_readonly::PROCESSED_STRING);
 
 			if (s_dist_x != 0.0 || s_dist_y != 0.0) {
 				fontt->draw(s_col, 0.0, 0.0, mode, p_str.s_str().c_str());
@@ -691,12 +695,28 @@ namespace LSW {
 
 		Text::Text() : Sprite_Base()
 		{
+			set<bool>(text::e_boolean_defaults);
+			set<int>(text::e_integer_defaults);
+			set<ALLEGRO_COLOR>(text::e_color_defaults);
+			set<double>(text::e_double_defaults);
+			set<coloured_string>(text::e_string_defaults);
+			set<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr_defaults);
+			set<std::chrono::milliseconds>(text::e_chronomillis_readonly_defaults);
+
 			custom_draw_task = [&] {draw_self(); };
 			__link_hard_task();
 		}
 
 		Text::Text(Text& o) : Sprite_Base(o)
 		{
+			set<bool>(text::e_boolean_defaults);
+			set<int>(text::e_integer_defaults);
+			set<ALLEGRO_COLOR>(text::e_color_defaults);
+			set<double>(text::e_double_defaults);
+			set<coloured_string>(text::e_string_defaults);
+			set<std::weak_ptr<Sprite_Base>>(text::e_sprite_ptr_defaults);
+			set<std::chrono::milliseconds>(text::e_chronomillis_readonly_defaults);
+
 			custom_draw_task = [&] {draw_self(); };
 			__link_hard_task();
 		}
@@ -724,489 +744,55 @@ namespace LSW {
 
 		void Text::twinUpAttributes(const std::shared_ptr<text_data> oth)
 		{
-			data_text = oth;
+			set<double>(oth->double_data);
+			set<bool>(oth->boolean_data);
+			set<std::string>(oth->string_data);
+			set<int>(oth->integer_data);
+			set<ALLEGRO_COLOR>(oth->color_data);
+			set<uintptr_t>(oth->uintptrt_data);
+			set<std::chrono::milliseconds>(oth->chronomillis_readonly_data);
+			set<coloured_string>(oth->cstring_data);
+			set<std::weak_ptr<Sprite_Base>>(oth->sprite_ptr_data);
 		}
 
 		std::shared_ptr<Text::text_data> Text::getAttributes()
 		{
-			return data_text;
+			std::shared_ptr<Text::text_data> oth = std::make_shared<Text::text_data>();
+
+			oth->double_data = get<double>();
+			oth->boolean_data = get<bool>();
+			oth->string_data = get<std::string>();
+			oth->integer_data = get<int>();
+			oth->color_data = get<ALLEGRO_COLOR>();
+			oth->uintptrt_data = get<uintptr_t>();
+			oth->chronomillis_readonly_data = get<std::chrono::milliseconds>();
+			oth->cstring_data = get<coloured_string>();
+			oth->sprite_ptr_data = get<std::weak_ptr<Sprite_Base>>();
+			return oth;
 		}
 
 		void Text::addNewEntry(const std::string id, std::function<std::string(void)> f)
 		{
 			removeEntry(id);
-			data_text->custom_tags.add({ f, CHAR_INIT(('%' + id + '%').c_str()) });
+			get<std::string>()->add({ f, text::e_custom_tags_tag::CUSTOM_TAG, CHAR_INIT(('%' + id + '%').c_str()) });
 		}
 
 		void Text::removeEntry(const std::string rid)
 		{
 			const std::string id = ('%' + rid + '%');
-			for (size_t p = 0; p < data_text->custom_tags.size(); p++) {
-				auto& u = (*(data_text->custom_tags.begin() + p));
+			auto& mapp = *get<std::string>();
+
+			for (size_t p = 0; p < mapp.size(); p++) {
+				auto& u = (*(mapp.begin() + p));
 				if (u(id.c_str(), id.length())) {
-					if (u.hasType<text::e_custom_tags>()) {
+					if (u.hasType<text::e_custom_tags>() || u.hasType<text::e_custom_tags_tag>()) {
 						throw Abort::Abort(__FUNCSIG__, "User tried to replace/delete internal tag!", Abort::abort_level::FATAL_ERROR);
 						return;
 					}
-					data_text->custom_tags.erase(p);
+					mapp.erase(p);
 					break;
 				}
 			}
 		}
-
-		void Text::set(const text::e_cstring e, coloured_string v)
-		{
-			if (auto* ptr = data_text->string_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Text::set(const text::e_double e, double v)
-		{
-			if (auto* ptr = data_text->double_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Text::set(const text::e_color e, ALLEGRO_COLOR v)
-		{
-			if (auto* ptr = data_text->color_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Text::set(const text::e_integer e, int v)
-		{
-			if (auto* ptr = data_text->integer_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Text::set(const text::e_sprite_ptr e, std::shared_ptr<Sprite_Base> v)
-		{
-			if (auto* ptr = data_text->sprite_ptr_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Text::set(const text::e_boolean e, bool v)
-		{
-			if (auto* ptr = data_text->boolean_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Text::set(const std::string e, coloured_string v)
-		{
-			auto* ptr = data_text->string_data(e.c_str(), e.length());
-			if (!ptr) data_text->string_data.add({ [=] {return v; }, e.c_str(), e.length() });
-			else *ptr = [=] {return v; };
-		}
-
-		void Text::set(const std::string e, double v)
-		{
-			auto* ptr = data_text->double_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-
-		void Text::set(const std::string e, ALLEGRO_COLOR v)
-		{
-			auto* ptr = data_text->color_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-
-		void Text::set(const std::string e, int v)
-		{
-			auto* ptr = data_text->integer_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-
-		void Text::set(const std::string e, std::shared_ptr<Sprite_Base> v)
-		{
-			auto* ptr = data_text->sprite_ptr_data(e.c_str(), e.length());
-			if (!ptr) data_text->sprite_ptr_data.add({ [=] {return v; }, e.c_str(), e.length() });
-			else *ptr = [=] {return v; };
-		}
-
-		void Text::set(const std::string e, bool v)
-		{
-			auto* ptr = data_text->boolean_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = [=] {return v; };
-		}
-
-
-
-		void Text::set(const text::e_cstring e, std::function<coloured_string(void)> v)
-		{
-			if (auto* ptr = data_text->string_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Text::set(const text::e_double e, std::function<double(void)> v)
-		{
-			if (auto* ptr = data_text->double_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Text::set(const text::e_color e, std::function<ALLEGRO_COLOR(void)> v)
-		{
-			if (auto* ptr = data_text->color_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Text::set(const text::e_integer e, std::function<int(void)> v)
-		{
-			if (auto* ptr = data_text->integer_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Text::set(const text::e_sprite_ptr e, std::function<std::shared_ptr<Sprite_Base>(void)> v)
-		{
-			if (auto* ptr = data_text->sprite_ptr_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Text::set(const text::e_boolean e, std::function<bool(void)> v)
-		{
-			if (auto* ptr = data_text->boolean_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Text::set(const std::string e, std::function<coloured_string(void)> v)
-		{
-			auto* ptr = data_text->string_data(e.c_str(), e.length());
-			if (!ptr) data_text->string_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		void Text::set(const std::string e, std::function<double(void)> v)
-		{
-			auto* ptr = data_text->double_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-
-		void Text::set(const std::string e, std::function<ALLEGRO_COLOR(void)> v)
-		{
-			auto* ptr = data_text->color_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-
-		void Text::set(const std::string e, std::function<int(void)> v)
-		{
-			auto* ptr = data_text->integer_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-
-		void Text::set(const std::string e, std::function<std::shared_ptr<Sprite_Base>(void)> v)
-		{
-			auto* ptr = data_text->sprite_ptr_data(e.c_str(), e.length());
-			if (!ptr) data_text->sprite_ptr_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		void Text::set(const std::string e, std::function<bool(void)> v)
-		{
-			auto* ptr = data_text->boolean_data(e.c_str(), e.length());
-			if (!ptr) static_cast<Sprite_Base*>(this)->set(e, v);
-			else *ptr = v;
-		}
-
-		bool Text::get(const text::e_string_readonly e, coloured_string& v)
-		{
-			if (auto* ptr = data_text->string_readonly_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_cstring e, coloured_string& v)
-		{
-			if (auto* ptr = data_text->string_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_double e, double& v)
-		{
-			if (auto* ptr = data_text->double_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_color e, ALLEGRO_COLOR& v)
-		{
-			if (auto* ptr = data_text->color_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_integer e, int& v)
-		{
-			if (auto* ptr = data_text->integer_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_sprite_ptr e, std::shared_ptr<Sprite_Base>& v)
-		{
-			if (auto* ptr = data_text->sprite_ptr_data[e]; ptr)
-			{
-				v = (*ptr)().lock();
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_boolean e, bool& v)
-		{
-			if (auto* ptr = data_text->boolean_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const std::string e, coloured_string& v)
-		{
-			if (auto* ptr = data_text->string_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const std::string e, double& v)
-		{
-			if (auto* ptr = data_text->double_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool Text::get(const std::string e, ALLEGRO_COLOR& v)
-		{
-			if (auto* ptr = data_text->color_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool Text::get(const std::string e, int& v)
-		{
-			if (auto* ptr = data_text->integer_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool Text::get(const std::string e, std::shared_ptr<Sprite_Base>& v)
-		{
-			if (auto* ptr = data_text->sprite_ptr_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)().lock();
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const std::string e, bool& v)
-		{
-			if (auto* ptr = data_text->boolean_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-
-
-		bool Text::get(const text::e_cstring e, std::function<coloured_string(void)>& v)
-		{
-			if (auto* ptr = data_text->string_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_double e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_text->double_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_color e, std::function<ALLEGRO_COLOR(void)>& v)
-		{
-			if (auto* ptr = data_text->color_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_integer e, std::function<int(void)>& v)
-		{
-			if (auto* ptr = data_text->integer_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_sprite_ptr e, std::function<std::weak_ptr<Sprite_Base>(void)>& v)
-		{
-			if (auto* ptr = data_text->sprite_ptr_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const text::e_boolean e, std::function<bool(void)>& v)
-		{
-			if (auto* ptr = data_text->boolean_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const std::string e, std::function<coloured_string(void)>& v)
-		{
-			if (auto* ptr = data_text->string_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const std::string e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_text->double_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool Text::get(const std::string e, std::function<ALLEGRO_COLOR(void)>& v)
-		{
-			if (auto* ptr = data_text->color_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool Text::get(const std::string e, std::function<int(void)>& v)
-		{
-			if (auto* ptr = data_text->integer_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		bool Text::get(const std::string e, std::function<std::weak_ptr<Sprite_Base>(void)>& v)
-		{
-			if (auto* ptr = data_text->sprite_ptr_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Text::get(const std::string e, std::function<bool(void)>& v)
-		{
-			if (auto* ptr = data_text->boolean_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return static_cast<Sprite_Base*>(this)->get(e, v);
-		}
-
-		std::function<coloured_string(void)>* Text::getRef(const text::e_cstring e)
-		{
-			if (auto* ptr = data_text->string_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<double(void)>* Text::getRef(const text::e_double e)
-		{
-			if (auto* ptr = data_text->double_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<ALLEGRO_COLOR(void)>* Text::getRef(const text::e_color e)
-		{
-			if (auto* ptr = data_text->color_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<int(void)>* Text::getRef(const text::e_integer e)
-		{
-			if (auto* ptr = data_text->integer_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<std::weak_ptr<Sprite_Base>(void)>* Text::getRef(const text::e_sprite_ptr e)
-		{
-			if (auto* ptr = data_text->sprite_ptr_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<bool(void)>* Text::getRef(const text::e_boolean e)
-		{
-			if (auto* ptr = data_text->boolean_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		const coloured_string* Text::getRef(const text::e_string_readonly e) const
-		{
-			if (auto* ptr = data_text->string_readonly_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		const std::chrono::milliseconds* Text::getRef(const text::e_chronomillis_readonly e) const
-		{
-			if (auto* ptr = data_text->chronomillis_readonly_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
 	}
 }

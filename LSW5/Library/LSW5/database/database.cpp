@@ -389,42 +389,42 @@ namespace LSW {
 		void Database::set(const std::string e, const double v)
 		{
 			auto* ptr = data.double_data(e.c_str(), e.length());
-			if (!ptr) data.double_data.add({ v, e.c_str(), e.length() });
+			if (!ptr) data.double_data.add(SuperPair<double>(v, e.c_str(), e.length()));
 			else *ptr = v;
 		}
 
 		void Database::set(const std::string e, const bool v)
 		{
 			auto* ptr = data.boolean_data(e.c_str(), e.length());
-			if (!ptr) data.boolean_data.add({ v, e.c_str(), e.length() });
+			if (!ptr) data.boolean_data.add(SuperPair<bool>(v, e.c_str(), e.length()));
 			else *ptr = v;
 		}
 
 		void Database::set(const std::string e, const int v)
 		{
 			auto* ptr = data.integer_data(e.c_str(), e.length());
-			if (!ptr) data.integer_data.add({ v, e.c_str(), e.length() });
+			if (!ptr) data.integer_data.add(SuperPair<int>(v, e.c_str(), e.length()));
 			else *ptr = v;
 		}
 
 		void Database::set(const std::string e, const size_t v)
 		{
 			auto* ptr = data.sizet_data(e.c_str(), e.length());
-			if (!ptr) data.sizet_data.add({ v, e.c_str(), e.length() });
+			if (!ptr) data.sizet_data.add(SuperPair<size_t>(v, e.c_str(), e.length()));
 			else *ptr = v;
 		}
 
 		void Database::set(const std::string e, const std::string v)
 		{
 			auto* ptr = data.string_data(e.c_str(), e.length());
-			if (!ptr) data.string_data.add({ v, e.c_str(), e.length() });
+			if (!ptr) data.string_data.add(SuperPair<std::string>(v, e.c_str(), e.length()));
 			else *ptr = v;
 		}
 
 		void Database::set(const std::string e, const ALLEGRO_COLOR v)
 		{
 			auto* ptr = data.color_data(e.c_str(), e.length());
-			if (!ptr) data.color_data.add({ v, e.c_str(), e.length() });
+			if (!ptr) data.color_data.add(SuperPair<ALLEGRO_COLOR>(v, e.c_str(), e.length()));
 			else *ptr = v;
 		}
 
@@ -512,43 +512,43 @@ namespace LSW {
 			return false;
 		}
 
-		const std::chrono::milliseconds* Database::getRef(const database::e_chronomillis_readonly e) const
+		const std::chrono::milliseconds* Database::getDirect(const database::e_chronomillis_readonly e) const
 		{
 			if (auto* ptr = data.chronomillis_readonly_data(e); ptr) return ptr;
 			return nullptr;
 		}
 
-		double* Database::getRef(const database::e_double e)
+		double* Database::getDirect(const database::e_double e)
 		{
 			if (auto* ptr = data.double_data(e); ptr) return ptr;
 			return nullptr;
 		}
 
-		bool* Database::getRef(const database::e_boolean e)
+		bool* Database::getDirect(const database::e_boolean e)
 		{
 			if (auto* ptr = data.boolean_data(e); ptr) return ptr;
 			return nullptr;
 		}
 
-		int* Database::getRef(const database::e_integer e)
+		int* Database::getDirect(const database::e_integer e)
 		{
 			if (auto* ptr = data.integer_data(e); ptr) return ptr;
 			return nullptr;
 		}
 
-		size_t* Database::getRef(const database::e_sizet e)
+		size_t* Database::getDirect(const database::e_sizet e)
 		{
 			if (auto* ptr = data.sizet_data(e); ptr) return ptr;
 			return nullptr;;
 		}
 
-		std::string* Database::getRef(const database::e_string e)
+		std::string* Database::getDirect(const database::e_string e)
 		{
 			if (auto* ptr = data.string_data(e); ptr) return ptr;
 			return nullptr;
 		}
 
-		ALLEGRO_COLOR* Database::getRef(const database::e_color e)
+		ALLEGRO_COLOR* Database::getDirect(const database::e_color e)
 		{
 			if (auto* ptr = data.color_data(e); ptr) return ptr;
 			return nullptr;

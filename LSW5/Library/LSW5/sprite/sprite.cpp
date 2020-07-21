@@ -130,21 +130,36 @@ namespace LSW {
 
 		Sprite_Base::Sprite_Base()
 		{
-			if (!data_sprite_base) throw Abort::Abort(__FUNCSIG__, "Failed to create Sprite base's data!");
-			data_sprite_base->original_this = (void*)this;
+			/*if (!data_sprite_base) throw Abort::Abort(__FUNCSIG__, "Failed to create Sprite base's data!");
+			data_sprite_base->original_this = (void*)this;*/
+
+			set<double>(sprite::e_double_defaults);
+			set<bool>(sprite::e_boolean_defaults);
+			set<std::string>(sprite::e_string_defaults);
+			set<int>(sprite::e_integer_defaults);
+			set<ALLEGRO_COLOR>(sprite::e_color_defaults);
+			set(sprite::e_uintptrt::DATA_FROM, (uintptr_t)this);
 		}
 
 		Sprite_Base::Sprite_Base(Sprite_Base& other)
 		{
-			if (!data_sprite_base) throw Abort::Abort(__FUNCSIG__, "Failed to create Sprite base's data!");
+			//if (!data_sprite_base) throw Abort::Abort(__FUNCSIG__, "Failed to create Sprite base's data!");
 			auto oth = other.getAttributes(); // yes, but it will copy, not "replace"
-			data_sprite_base->double_readonly_data		= oth->double_readonly_data;
+
+			set<double>(*oth->double_data);
+			set<bool>(*oth->boolean_data);
+			set<std::string>(*oth->string_data);
+			set<int>(*oth->integer_data);
+			set<ALLEGRO_COLOR>(*oth->color_data);
+			set<uintptr_t>(*oth->uintptrt_data);
+
+			/*data_sprite_base->double_readonly_data		= oth->double_readonly_data;
 			data_sprite_base->boolean_readonly_data		= oth->boolean_readonly_data;
 			data_sprite_base->string_data				= oth->string_data;
 			data_sprite_base->double_data				= oth->double_data;
 			data_sprite_base->boolean_data				= oth->boolean_data;
 			data_sprite_base->integer_data				= oth->integer_data;
-			data_sprite_base->color_data				= oth->color_data;
+			data_sprite_base->color_data				= oth->color_data;*/
 		}
 
 		void Sprite_Base::hook(const sprite::e_tie_functional e, const std::function<void(void)> f)
@@ -159,404 +174,31 @@ namespace LSW {
 
  		void Sprite_Base::twinUpAttributes(const std::shared_ptr<sprite_base_data> oth)
 		{
-			data_sprite_base = oth; // now they share
+			//data_sprite_base = oth; // now they share
+
+			set<double>(oth->double_data);
+			set<bool>(oth->boolean_data);
+			set<std::string>(oth->string_data);
+			set<int>(oth->integer_data);
+			set<ALLEGRO_COLOR>(oth->color_data);
+			set<uintptr_t>(oth->uintptrt_data);
 		}
 
 		std::shared_ptr<Sprite_Base::sprite_base_data> Sprite_Base::getAttributes()
 		{
-			return data_sprite_base;
+			std::shared_ptr<Sprite_Base::sprite_base_data> oth = std::make_shared<Sprite_Base::sprite_base_data>();
+
+			oth->double_data = get<double>();
+			oth->boolean_data = get<bool>();
+			oth->string_data = get<std::string>();
+			oth->integer_data = get<int>();
+			oth->color_data = get<ALLEGRO_COLOR>();
+			oth->uintptrt_data = get<uintptr_t>();
+			return oth;
 		}
 
-		void Sprite_Base::set(const sprite::e_string e, std::string v)
-		{
-			if (auto* ptr = data_sprite_base->string_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const sprite::e_double e, double v)
-		{
-			if (auto* ptr = data_sprite_base->double_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const sprite::e_boolean e, bool v)
-		{
-			if (auto* ptr = data_sprite_base->boolean_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const sprite::e_integer e, int v)
-		{
-			if (auto* ptr = data_sprite_base->integer_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const sprite::e_color e, ALLEGRO_COLOR v)
-		{
-			if (auto* ptr = data_sprite_base->color_data(e); ptr)
-				*ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const sprite::e_string e, std::function<std::string(void)> v)
-		{
-			if (auto* ptr = data_sprite_base->string_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Sprite_Base::set(const sprite::e_double e, std::function<double(void)> v)
-		{
-			if (auto* ptr = data_sprite_base->double_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Sprite_Base::set(const sprite::e_boolean e, std::function<bool(void)> v)
-		{
-			if (auto* ptr = data_sprite_base->boolean_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Sprite_Base::set(const sprite::e_integer e, std::function<int(void)> v)
-		{
-			if (auto* ptr = data_sprite_base->integer_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Sprite_Base::set(const sprite::e_color e, std::function<ALLEGRO_COLOR(void)> v)
-		{
-			if (auto* ptr = data_sprite_base->color_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Sprite_Base::set(const std::string e, std::string v)
-		{
-			auto* ptr = data_sprite_base->string_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->string_data.add({ [=] {return v; }, e.c_str(), e.length() });
-			else *ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const std::string e, double v)
-		{
-			auto* ptr = data_sprite_base->double_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->double_data.add({ [=] {return v; }, e.c_str(), e.length() });
-			else *ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const std::string e, bool v)
-		{
-			auto* ptr = data_sprite_base->boolean_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->boolean_data.add({ [=] {return v; }, e.c_str(), e.length() });
-			else *ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const std::string e, int v)
-		{
-			auto* ptr = data_sprite_base->integer_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->integer_data.add({ [=] {return v; }, e.c_str(), e.length() });
-			else *ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const std::string e, ALLEGRO_COLOR v)
-		{
-			auto* ptr = data_sprite_base->color_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->color_data.add({ [=] {return v; } , e.c_str(), e.length() });
-			else *ptr = [=] {return v; };
-		}
-
-		void Sprite_Base::set(const std::string e, std::function<std::string(void)> v)
-		{
-			auto* ptr = data_sprite_base->string_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->string_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		void Sprite_Base::set(const std::string e, std::function<double(void)> v)
-		{
-			auto* ptr = data_sprite_base->double_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->double_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		void Sprite_Base::set(const std::string e, std::function<bool(void)> v)
-		{
-			auto* ptr = data_sprite_base->boolean_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->boolean_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		void Sprite_Base::set(const std::string e, std::function<int(void)> v)
-		{
-			auto* ptr = data_sprite_base->integer_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->integer_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		void Sprite_Base::set(const std::string e, std::function<ALLEGRO_COLOR(void)> v)
-		{
-			auto* ptr = data_sprite_base->color_data(e.c_str(), e.length());
-			if (!ptr) data_sprite_base->color_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		bool Sprite_Base::get(const sprite::e_double_readonly e, double& v)
-		{
-			if (auto* ptr = data_sprite_base->double_readonly_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_boolean_readonly e, bool& v)
-		{
-			if (auto* ptr = data_sprite_base->boolean_readonly_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_string e, std::string& v)
-		{
-			if (auto* ptr = data_sprite_base->string_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_double e, double& v)
-		{
-			if (auto* ptr = data_sprite_base->double_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_boolean e, bool& v)
-		{
-			if (auto* ptr = data_sprite_base->boolean_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_integer e, int& v)
-		{
-			if (auto* ptr = data_sprite_base->integer_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_color e, ALLEGRO_COLOR& v)
-		{
-			if (auto* ptr = data_sprite_base->color_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_string e, std::function<std::string(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->string_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_double e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->double_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_boolean e, std::function<bool(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->boolean_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_integer e, std::function<int(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->integer_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const sprite::e_color e, std::function<ALLEGRO_COLOR(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->color_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, std::string& v)
-		{
-			if (auto* ptr = data_sprite_base->string_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, double& v)
-		{
-			if (auto* ptr = data_sprite_base->double_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, bool& v)
-		{
-			if (auto* ptr = data_sprite_base->boolean_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, int& v)
-		{
-			if (auto* ptr = data_sprite_base->integer_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, ALLEGRO_COLOR& v)
-		{
-			if (auto* ptr = data_sprite_base->color_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, std::function<std::string(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->string_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->double_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, std::function<bool(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->boolean_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, std::function<int(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->integer_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Sprite_Base::get(const std::string e, std::function<ALLEGRO_COLOR(void)>& v)
-		{
-			if (auto* ptr = data_sprite_base->color_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		const double* Sprite_Base::getRef(const sprite::e_double_readonly e) const
-		{
-			if (auto* ptr = data_sprite_base->double_readonly_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		const bool* Sprite_Base::getRef(const sprite::e_boolean_readonly e) const
-		{
-			if (auto* ptr = data_sprite_base->boolean_readonly_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<std::string(void)>* Sprite_Base::getRef(const sprite::e_string e)
-		{
-			if (auto* ptr = data_sprite_base->string_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<double(void)>* Sprite_Base::getRef(const sprite::e_double e)
-		{
-			if (auto* ptr = data_sprite_base->double_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<bool(void)>* Sprite_Base::getRef(const sprite::e_boolean e)
-		{
-			if (auto* ptr = data_sprite_base->boolean_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<int(void)>* Sprite_Base::getRef(const sprite::e_integer e)
-		{
-			if (auto* ptr = data_sprite_base->integer_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<ALLEGRO_COLOR(void)>* Sprite_Base::getRef(const sprite::e_color e)
-		{
-			if (auto* ptr = data_sprite_base->color_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
 		bool Sprite_Base::draw(Camera* cam, int layer) {
-			if (layer == (*getRef(sprite::e_integer::LAYER))()) return draw(cam, false);
+			if (layer == getDirect<int>(sprite::e_integer::LAYER)) return draw(cam, false);
 			return false;
 		}
 
@@ -565,24 +207,28 @@ namespace LSW {
 			if (!cam) throw Abort::Abort(__FUNCSIG__, "Invalid camera at Sprite's draw!", Abort::abort_level::GIVEUP);
 
 			if (checkcam) {
-				if (auto* ptr = cam->getLayerConfig((*getRef(sprite::e_integer::LAYER))()); !ptr) return false; // check layer
+				if (auto* ptr = cam->getLayerConfig(getDirect<int>(sprite::e_integer::LAYER)); !ptr) return false; // check layer
 			}
 
-			if (data_sprite_base->original_this == this) { // only original copy should update parameters
+			if (getDirect<uintptr_t>(sprite::e_uintptrt::DATA_FROM) == (uintptr_t)this) { // only original copy should update parameters
 				//if (isEq(sprite::e_boolean::SHOWBOX, true) || isEq(sprite::e_boolean::SHOWDOT, true)) {
 					Camera clean_camera;
 
-					const auto affected_by_cam = (*data_sprite_base->boolean_data[sprite::e_boolean::AFFECTED_BY_CAM])();
-					const auto targ_rotation = (*data_sprite_base->double_data[sprite::e_double::TARG_ROTATION])();
-					const auto targ_posx = (*data_sprite_base->double_data[sprite::e_double::TARG_POSX])();
-					const auto targ_posy = (*data_sprite_base->double_data[sprite::e_double::TARG_POSY])();
-					const auto scale_g = (*data_sprite_base->double_data[sprite::e_double::SCALE_G])();
-					const auto scale_x = (*data_sprite_base->double_data[sprite::e_double::SCALE_X])();
-					const auto scale_y = (*data_sprite_base->double_data[sprite::e_double::SCALE_Y])();
-					auto& last_draw = *data_sprite_base->double_readonly_data[sprite::e_double_readonly::LAST_DRAW];
-					auto& rotation = *data_sprite_base->double_readonly_data[sprite::e_double_readonly::ROTATION];
-					auto& posx = *data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSX];
-					auto& posy = *data_sprite_base->double_readonly_data[sprite::e_double_readonly::POSY];
+					const auto affected_by_cam = getDirect<bool>(sprite::e_boolean::AFFECTED_BY_CAM);
+					const auto targ_rotation = getDirect<double>(sprite::e_double::TARG_ROTATION);
+					const auto targ_posx = getDirect<double>(sprite::e_double::TARG_POSX);
+					const auto targ_posy = getDirect<double>(sprite::e_double::TARG_POSY);
+					const auto scale_g = getDirect<double>(sprite::e_double::SCALE_G);
+					const auto scale_x = getDirect<double>(sprite::e_double::SCALE_X);
+					const auto scale_y = getDirect<double>(sprite::e_double::SCALE_Y);
+					auto& last_draw = *getDirect<double*>(sprite::e_double_readonly::LAST_DRAW);
+					auto& rotation = *getDirect<double*>(sprite::e_double_readonly::ROTATION);
+					auto& posx = *getDirect<double*>(sprite::e_double_readonly::POSX);
+					auto& posy = *getDirect<double*>(sprite::e_double_readonly::POSY);
+					const auto last_draw_v = last_draw();
+					const auto rotation_v = rotation();
+					const auto posx_v = posx();
+					const auto posy_v = posy();
 
 
 					if (affected_by_cam) {
@@ -595,8 +241,8 @@ namespace LSW {
 					// delta T calculation
 
 					double timee = al_get_time();
-					double dt = timee - last_draw;
-					last_draw = timee;
+					double dt = timee - last_draw();
+					last_draw = [=] {return timee; };
 
 					double perc_run = Shared::game_timing_tps * dt;		// ex: 5 per sec * 0.2 (1/5 sec) = 1, so posx = actual posx...
 					if (perc_run > 1.0) perc_run = 1.0;					// 1.0 is "set value"
@@ -604,9 +250,9 @@ namespace LSW {
 
 					// new position calculation
 
-					rotation = (1.0 - perc_run) * rotation + perc_run * targ_rotation;
-					posx = (1.0 - perc_run) * posx + perc_run * targ_posx;
-					posy = (1.0 - perc_run) * posy + perc_run * targ_posy;
+					rotation = [=] {return (1.0 - perc_run) * rotation_v + perc_run * targ_rotation; };
+					posx = [=] {return (1.0 - perc_run) * posx_v + perc_run * targ_posx; };
+					posy = [=] {return (1.0 - perc_run) * posy_v + perc_run * targ_posy; };
 
 					if (isEq(sprite::e_boolean::SHOWBOX, true)) {
 
@@ -623,8 +269,8 @@ namespace LSW {
 
 					if (isEq(sprite::e_boolean::SHOWDOT, true)) {
 						al_draw_filled_circle(
-							/* X1: */ posx,
-							/* X1: */ posy,
+							/* X1: */ posx(),
+							/* X1: */ posy(),
 							/* SCL */ 0.1f * (fabs(0.30f) + 0.12f),
 							al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
 					}
@@ -638,15 +284,15 @@ namespace LSW {
 
 		void Sprite_Base::collide(Camera* cam, Sprite_Base& oth) // if colliding, do not accept speed entry (keyboard player moving)
 		{
-			if (data_sprite_base->original_this != (void*)this) return; // this is a copy following attrbutes from somewhere else, no duplication in collision
+			if (getDirect<uintptr_t>(sprite::e_uintptrt::DATA_FROM) == (uintptr_t)this) return; // this is a copy following attrbutes from somewhere else, no duplication in collision
 			if (!cam) throw Abort::Abort(__FUNCSIG__, "Invalid camera at Sprite's collision!", Abort::abort_level::GIVEUP);
 
-			if (!oth.isEq(sprite::e_integer::LAYER, *getRef(sprite::e_integer::LAYER))) return; // not same layer
+			if (!oth.isEq(sprite::e_integer::LAYER, getDirect<int>(sprite::e_integer::LAYER))) return; // not same layer
 			if (oth.isEq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE))) return; // no collision
 			if (isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
 			if (oth.isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
 
-			if (auto* ptr = cam->getLayerConfig((*getRef(sprite::e_integer::LAYER))()); ptr) {
+			if (auto* ptr = cam->getLayerConfig(getDirect<int>(sprite::e_integer::LAYER)); ptr) {
 				if (!ptr->hasCollision()) return;
 
 				double elasticity = ptr->getElasticity();
@@ -667,11 +313,11 @@ namespace LSW {
 				f = std::function<void(void)>();
 			}
 
-			if (data_sprite_base->original_this != this) return; // this is a copy following attrbutes from somewhere else, no duplication in update
+			if (getDirect<uintptr_t>(sprite::e_uintptrt::DATA_FROM) == (uintptr_t)this) return; // this is a copy following attrbutes from somewhere else, no duplication in update
 			if (!cam) throw Abort::Abort(__FUNCSIG__, "Invalid camera at Sprite's update!", Abort::abort_level::GIVEUP);
 
 
-			if (auto* ptr = cam->getLayerConfig((*getRef(sprite::e_integer::LAYER))()); ptr && isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, false)) {
+			if (auto* ptr = cam->getLayerConfig(getDirect<int>(sprite::e_integer::LAYER)); ptr && isEq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, false)) {
 
 				// task to be done (no auto-clean, internal, only if layer (as above))
 				if (custom_think_task) custom_think_task();
@@ -682,53 +328,51 @@ namespace LSW {
 
 				switch (nogo) {
 				case sprite::e_direction::SOUTH:
-					if (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] < 0.0) {
-						*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] = (-roughness * (*data_sprite_base->double_data[sprite::e_double::ELASTICITY_Y])() * (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y]));
-						//*data_sprite_base->double_data[sprite::e_double::ACCELERATION_Y] = sprite::minimum_sprite_accel_collision;
+					if (getDirect<double>(sprite::e_double_readonly::SPEED_Y) < 0.0) {
+						set(sprite::e_double_readonly::SPEED_Y, -roughness * getDirect<double>(sprite::e_double::ELASTICITY_Y) * getDirect<double>(sprite::e_double_readonly::SPEED_Y));
+						//getDirect<double>(sprite::e_double::ACCELERATION_Y] = sprite::minimum_sprite_accel_collision;
 					}
 					break;
 				case sprite::e_direction::NORTH:
-					if (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] > 0.0) {
-						*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] = (-roughness * (*data_sprite_base->double_data[sprite::e_double::ELASTICITY_Y])() * (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y]));
-						//*data_sprite_base->double_data[sprite::e_double::ACCELERATION_Y] = -sprite::minimum_sprite_accel_collision;
+					if (getDirect<double>(sprite::e_double_readonly::SPEED_Y) > 0.0) {
+						set(sprite::e_double_readonly::SPEED_Y, -roughness * getDirect<double>(sprite::e_double::ELASTICITY_Y) * getDirect<double>(sprite::e_double_readonly::SPEED_Y));
+						//getDirect<double>(sprite::e_double::ACCELERATION_Y] = -sprite::minimum_sprite_accel_collision;
 					}
 					break;
 				case sprite::e_direction::EAST:
-					if (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X] < 0.0) {
-						*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X] = (-roughness * (*data_sprite_base->double_data[sprite::e_double::ELASTICITY_X])() * (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X]));
-						//*data_sprite_base->double_data[sprite::e_double::ACCELERATION_X] = sprite::minimum_sprite_accel_collision;
+					if (getDirect<double>(sprite::e_double_readonly::SPEED_X) < 0.0) {
+						set(sprite::e_double_readonly::SPEED_X, -roughness * getDirect<double>(sprite::e_double::ELASTICITY_X) * getDirect<double>(sprite::e_double_readonly::SPEED_X));
+						//getDirect<double>(sprite::e_double::ACCELERATION_X] = sprite::minimum_sprite_accel_collision;
 					}
 					break;
 				case sprite::e_direction::WEST:
-					if (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X] > 0.0) {
-						*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X] = (-roughness * (*data_sprite_base->double_data[sprite::e_double::ELASTICITY_X])() * (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X]));
-						//*data_sprite_base->double_data[sprite::e_double::ACCELERATION_X] = -sprite::minimum_sprite_accel_collision;
+					if (getDirect<double>(sprite::e_double_readonly::SPEED_X) > 0.0) {
+						set(sprite::e_double_readonly::SPEED_X, -roughness * getDirect<double>(sprite::e_double::ELASTICITY_X) * getDirect<double>(sprite::e_double_readonly::SPEED_X));
+						//getDirect<double>(sprite::e_double::ACCELERATION_X] = -sprite::minimum_sprite_accel_collision;
 					}
 					break;
 				}
 				
-				const auto targ_posx_c = (*data_sprite_base->double_data[sprite::e_double::TARG_POSX])();
-				const auto targ_posy_c = (*data_sprite_base->double_data[sprite::e_double::TARG_POSY])();
-				const auto speed_x_c   = (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X]);
-				const auto speed_y_c   = (*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y]);
+				const auto targ_posx_c = getDirect<double>(sprite::e_double::TARG_POSX);
+				const auto targ_posy_c = getDirect<double>(sprite::e_double::TARG_POSY);
+				const auto speed_x_c   = getDirect<double>(sprite::e_double_readonly::SPEED_X);
+				const auto speed_y_c   = getDirect<double>(sprite::e_double_readonly::SPEED_Y);
 			
 
-				*data_sprite_base->double_data[sprite::e_double::TARG_POSX] = [targ_posx_c,speed_x_c] { return targ_posx_c + speed_x_c; };
-				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X] += (*data_sprite_base->double_data[sprite::e_double::ACCELERATION_X])();
-				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_X] *= roughness;
+				set<double>(sprite::e_double::TARG_POSX, [targ_posx_c,speed_x_c] { return targ_posx_c + speed_x_c; });
+				set(sprite::e_double_readonly::SPEED_X, (getDirect<double>(sprite::e_double_readonly::SPEED_X) + getDirect<double>(sprite::e_double::ACCELERATION_X)) * roughness);
 
-				*data_sprite_base->double_data[sprite::e_double::TARG_POSY] = [targ_posy_c, speed_y_c] { return targ_posy_c + speed_y_c; };
-				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] += (*data_sprite_base->double_data[sprite::e_double::ACCELERATION_Y])();
-				*data_sprite_base->double_readonly_data[sprite::e_double_readonly::SPEED_Y] *= roughness;
+				set<double>(sprite::e_double::TARG_POSY, [targ_posy_c, speed_y_c] { return targ_posy_c + speed_y_c; });
+				set(sprite::e_double_readonly::SPEED_Y, (getDirect<double>(sprite::e_double_readonly::SPEED_Y) + getDirect<double>(sprite::e_double::ACCELERATION_Y)) * roughness);
 
-				/*if (auto spr = (*data_sprite_base->double_data[sprite::e_double::SPEED_ROTATION])(); spr != 0.0) {
-					double act = (*data_sprite_base->double_data[sprite::e_double::TARG_ROTATION])();
-					*data_sprite_base->double_data[sprite::e_double::TARG_ROTATION] = [spr,act] {return act + spr; };
+				/*if (auto spr = (getDirect<double>(sprite::e_double::SPEED_ROTATION])(); spr != 0.0) {
+					double act = (getDirect<double>(sprite::e_double::TARG_ROTATION])();
+					getDirect<double>(sprite::e_double::TARG_ROTATION] = [spr,act] {return act + spr; };
 				}*/
 			}
 
 
-			if (!*data_sprite_base->boolean_data[sprite::e_boolean::FOLLOW_MOUSE]) {
+			if (!getDirect<bool>(sprite::e_boolean::FOLLOW_MOUSE)) {
 				double m[2] = { 0.0 };
 				bool is_mouse_pressed = false;
 
@@ -740,12 +384,12 @@ namespace LSW {
 				for (size_t u = static_cast<size_t>(database::e_boolean::MOUSE_0); !is_mouse_pressed && u <= static_cast<size_t>(database::e_boolean::MOUSE_7); u++)
 					is_mouse_pressed |= db.isEq(static_cast<database::e_boolean>(u), true);
 
-				double dist_x = (*data_sprite_base->double_data[sprite::e_double::TARG_POSX])() - m[0];
-				double dist_y = (*data_sprite_base->double_data[sprite::e_double::TARG_POSY])() - m[1];
+				const double dist_x = getDirect<double>(sprite::e_double::TARG_POSX) - m[0];
+				const double dist_y = getDirect<double>(sprite::e_double::TARG_POSY) - m[1];
 
 				bool mouse_collide = (
-					(fabs(dist_x) < 0.5 * (*data_sprite_base->double_data[sprite::e_double::SCALE_X])() * (*data_sprite_base->double_data[sprite::e_double::SCALE_G])()) &&
-					(fabs(dist_y) < 0.5 * (*data_sprite_base->double_data[sprite::e_double::SCALE_X])() * (*data_sprite_base->double_data[sprite::e_double::SCALE_G])())
+					(fabs(dist_x) < 0.5 * getDirect<double>(sprite::e_double::SCALE_X) * getDirect<double>(sprite::e_double::SCALE_G)) &&
+					(fabs(dist_y) < 0.5 * getDirect<double>(sprite::e_double::SCALE_X) * getDirect<double>(sprite::e_double::SCALE_G))
 					);
 
 
@@ -771,10 +415,10 @@ namespace LSW {
 
 			double scale_x, scale_y;
 
-			scale_x = (*data_sprite_base->double_data[sprite::e_double::SCALE_G])() * (*data_sprite_base->double_data[sprite::e_double::SCALE_X])();
-			scale_y = (*data_sprite_base->double_data[sprite::e_double::SCALE_G])() * (*data_sprite_base->double_data[sprite::e_double::SCALE_Y])();
+			scale_x = getDirect<double>(sprite::e_double::SCALE_G) * getDirect<double>(sprite::e_double::SCALE_X);
+			scale_y = getDirect<double>(sprite::e_double::SCALE_G) * getDirect<double>(sprite::e_double::SCALE_Y);
 
-			easy_collision.setup((*data_sprite_base->double_data[sprite::e_double::TARG_POSX])(), (*data_sprite_base->double_data[sprite::e_double::TARG_POSY])(), scale_x, scale_y);
+			easy_collision.setup(getDirect<double>(sprite::e_double::TARG_POSX), getDirect<double>(sprite::e_double::TARG_POSY), scale_x, scale_y);
 		}
 
 

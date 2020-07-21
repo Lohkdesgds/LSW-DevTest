@@ -17,7 +17,7 @@
 #include "..\tools\tools.h"
 #include "..\supermap\supermap.h"
 #include "..\superresource\superresource.h"
-
+#include "..\base\base.h"
 
 namespace LSW {
 	namespace v5 {
@@ -60,7 +60,7 @@ namespace LSW {
 
 		}
 
-		class Display {
+		class Display : public Workaround<double>, public Workaround<int>, public Workaround<std::string>, public Workaround<bool> {
 			struct display_managing {
 				std::vector<ALLEGRO_DISPLAY_MODE> display_modes;
 				size_t last_display_mode = 0;
@@ -78,12 +78,12 @@ namespace LSW {
 
 			std::function<void(std::string)> function_events;
 
-			struct display_base_data {
+			/*struct display_base_data {
 				SuperMap<std::function<double(void)>>			double_data = display::e_double_defaults;
 				SuperMap<std::function<int(void)>>				integer_data = display::e_integer_defaults;
 				SuperMap<std::function<std::string(void)>>		string_data = display::e_string_defaults;
 				SuperMap<std::function<bool(void)>>				boolean_data = display::e_boolean_defaults;
-			} data;
+			} data;*/
 
 			//ALLEGRO_DISPLAY_MODE chosen_mode{}; // DO NOT USE .FORMAT AS MODE! NOT THE SAME! .FORMAT IS PIXEL FORMAT AKA RGB STUFF
 			//int latest_display_flags = display::display_minimum_flags;
@@ -113,6 +113,20 @@ namespace LSW {
 			void __print(const std::string&&);
 			void __printscreen();
 		public:
+			using Workaround<double>::set;
+			using Workaround<double>::get;
+			using Workaround<double>::getDirect;
+			using Workaround<int>::set;
+			using Workaround<int>::get;
+			using Workaround<int>::getDirect;
+			using Workaround<std::string>::set;
+			using Workaround<std::string>::get;
+			using Workaround<std::string>::getDirect;
+			using Workaround<bool>::set;
+			using Workaround<bool>::get;
+			using Workaround<bool>::getDirect;
+
+
 			Display();
 			Display(const int);
 			~Display();
@@ -130,52 +144,6 @@ namespace LSW {
 			void printscreen();
 			void refreshMemoryBitmaps();
 			void acknowledgeDisplay();
-
-			void set(const display::e_double, double);
-			void set(const display::e_integer, int);
-			void set(const display::e_string, std::string);
-			void set(const display::e_boolean, bool);
-
-			void set(const display::e_double,  std::function<double(void)>);
-			void set(const display::e_integer, std::function<int(void)>);
-			void set(const display::e_string,  std::function<std::string(void)>);
-			void set(const display::e_boolean, std::function<bool(void)>);
-
-			void set(const std::string, double);
-			void set(const std::string, int);
-			void set(const std::string, std::string);
-			void set(const std::string, bool);
-
-			void set(const std::string, std::function<double(void)>);
-			void set(const std::string, std::function<int(void)>);
-			void set(const std::string, std::function<std::string(void)>);
-			void set(const std::string, std::function<bool(void)>);
-
-
-			bool get(const display::e_double, double&);
-			bool get(const display::e_integer, int&);
-			bool get(const display::e_string, std::string&);
-			bool get(const display::e_boolean, bool&);
-
-			bool get(const display::e_double, std::function<double(void)>&);
-			bool get(const display::e_integer, std::function<int(void)>&);
-			bool get(const display::e_string, std::function<std::string(void)>&);
-			bool get(const display::e_boolean, std::function<bool(void)>&);
-
-			bool get(const std::string, double&);
-			bool get(const std::string, int&);
-			bool get(const std::string, std::string&);
-			bool get(const std::string, bool&);
-
-			bool get(const std::string, std::function<double(void)>&);
-			bool get(const std::string, std::function<int(void)>&);
-			bool get(const std::string, std::function<std::string(void)>&);
-			bool get(const std::string, std::function<bool(void)>&);
-
-			std::function<double(void)>*		getRef(const display::e_double);
-			std::function<int(void)>*			getRef(const display::e_integer);
-			std::function<std::string(void)>*	getRef(const display::e_string);
-			std::function<bool(void)>*			getRef(const display::e_boolean);
 
 
 			const std::vector<ALLEGRO_DISPLAY_MODE>& configurations() const;

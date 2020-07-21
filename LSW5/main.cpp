@@ -16,6 +16,8 @@
 #include "Library\LSW5\filesystem\filesystem.h"
 #include "Library\LSW5\independenteventhandler\independenteventhandler.h"
 
+#include "Library\LSW5\base\base.h"
+
 using namespace LSW::v5;
 
 // nvidia stuff
@@ -47,7 +49,8 @@ int main(int argc, char* argv[]) {
 	PhysFS fs;
 	fs.hookPrint([&](std::string s) { logg << L::SLF << fsr(__FUNCSIG__, E::INFO) << "&5[PhysFS]&8 " << s << L::ELF; });
 
-
+	/*FunctionalMap<int> mapppp;
+	auto what = mapppp.getDirect<int*>('a');*/
 
 	SuperResource<Camera> cameras;
 	SuperResource<Sprite_Base> sprites;
@@ -106,9 +109,10 @@ int main(int argc, char* argv[]) {
 
 	size_t countgen = 0;
 
+	//auto value = Cast::r_cast("let's gooo");
 
 
-	auto ref_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); }); // sprites.create("test" + std::to_string(countgen++));
+	auto ref_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = (Sprite_Base*)new Block()); }); // sprites.create("test" + std::to_string(countgen++));
 	Block* ref = (Block*)&(*ref_orig);
 	//ref->set("show_box", true);
 	//ref->set("show_dot", true);
@@ -121,7 +125,7 @@ int main(int argc, char* argv[]) {
 	ref->set(block::e_double::FRAMES_PER_SECOND, 2.0);
 
 
-	auto ref2_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); }); // sprites.create("test" + std::to_string(countgen++));
+	auto ref2_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = (Sprite_Base*)new Block()); }); // sprites.create("test" + std::to_string(countgen++));
 	Block* ref2 = (Block*)&(*ref2_orig);
 	//ref->set("show_box", true);
 	//ref->set("show_dot", true);
@@ -133,7 +137,7 @@ int main(int argc, char* argv[]) {
 	ref2->loadCut(0, 1024, 512, 512);
 	ref2->set(block::e_double::FRAMES_PER_SECOND, 6.0);
 
-	auto ref3_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); }); // sprites.create("test" + std::to_string(countgen++));
+	auto ref3_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = (Sprite_Base*)new Block()); }); // sprites.create("test" + std::to_string(countgen++));
 	Block* ref3 = (Block*)&(*ref3_orig);
 	//ref->set("show_box", true);
 	//ref->set("show_dot", true);
@@ -145,7 +149,7 @@ int main(int argc, char* argv[]) {
 	ref3->loadCut(0, 1024, 512, 512);
 	ref3->set(block::e_double::FRAMES_PER_SECOND, 10.0);
 
-	auto ref4_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new Block()); });
+	auto ref4_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = (Sprite_Base*)new Block()); });
 	Block* ref4 = (Block*)&(*ref4_orig);
 	//ref4->set(sprite::e_boolean::SHOWBOX, true);
 	//ref4->set(sprite::e_boolean::SHOWDOT, true);
@@ -196,8 +200,8 @@ int main(int argc, char* argv[]) {
 	ref5->set(sprite::e_boolean::SHOWDOT, true);
 	ref5->set(sprite::e_double::SCALE_G, 0.32);
 	ref5->set(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
-	ref5->set(sprite::e_double::TARG_POSX, [] {return cos(al_get_time()) * 0.5; });
-	ref5->set(sprite::e_double::TARG_POSY, [] {return sin(al_get_time()) * 0.5; });
+	ref5->set<double>(sprite::e_double::TARG_POSX, [] {return cos(al_get_time()) * 0.5; });
+	ref5->set<double>(sprite::e_double::TARG_POSY, [] {return sin(al_get_time()) * 0.5; });
 	// text
 	ref5->getText()->set(sprite::e_color::COLOR, al_map_rgb(255, 255, 255));
 	ref5->getText()->set(sprite::e_double::SCALE_G, 0.1);
@@ -212,7 +216,7 @@ int main(int argc, char* argv[]) {
 
 	ref5->getText()->addNewEntry(just_a_test_id, just_a_test);
 
-	ref5->getText()->set(text::e_cstring::STRING, "RELOU FPS=%int_fps% %testingg%");
+	ref5->getText()->set(text::e_cstring::STRING, coloured_string("RELOU FPS=%int_fps% %testingg%"));
 	ref5->getText()->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::CENTER));
 
 
@@ -232,7 +236,7 @@ int main(int argc, char* argv[]) {
 	ref6->load();
 	//ref6->set(text::e_cstring::STRING, [ref6] {int lala = 0; ref6->get("customcounter", lala); lala++; ref6->set("customcounter", lala); return coloured_string("%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites% | LALA=") + lala; });
 	ref6->addNewEntry("lala_lmao", [ref6] {int lala = 0; ref6->get("customcounter", lala); return std::to_string(lala); });
-	ref6->set(text::e_cstring::STRING, "%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites% | LALA=%lala_lmao%");
+	ref6->set(text::e_cstring::STRING, coloured_string("%int_fps% qps, %int_tps% tps, %int_ups% ups, %int_aps% aps | Mouse: %mouse_x%,%mouse_y% | STR: curr= %curr_string%, last= %last_string% | Sprites=%num_sprites% | LALA=%lala_lmao%"));
 	ref6->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
 
 	core.addFunction(0, 2.0, [ref6_orig](ALLEGRO_EVENT&) {Text* ref6 = (Text*)&(*ref6_orig); int lala = 0; ref6->get("customcounter", lala); lala++; ref6->set("customcounter", lala); });
@@ -282,7 +286,7 @@ int main(int argc, char* argv[]) {
 	ref7->set(sprite::e_double::TARG_POSY, 0.0);
 	ref7->set(shinefx::e_double::FRAMES_PER_SECOND_UPDATE, 144.0);
 	ref7->set(sprite::e_integer::LAYER, -1);
-	ref7->set(shinefx::e_color::FOREGROUND, [] {return al_map_rgba(cos(MILLI_NOW.count() / 1000.0) * 50 + 100, cos(MILLI_NOW.count() / 1500.0) * 50 + 100, cos(MILLI_NOW.count() / 800.0) * 50 + 100, 150); });
+	ref7->set<ALLEGRO_COLOR>(shinefx::e_color::FOREGROUND, [] {return al_map_rgba(cos(MILLI_NOW.count() / 1000.0) * 50 + 100, cos(MILLI_NOW.count() / 1500.0) * 50 + 100, cos(MILLI_NOW.count() / 800.0) * 50 + 100, 150); });
 	ref7->set(shinefx::e_color::BACKGROUND, al_map_rgba(35, 35, 5, 100));
 
 	/*auto ref7_orig = sprites.customLoad("test" + std::to_string(countgen++), [](Sprite_Base*& b) {return (b = new BubbleFX()); });
@@ -312,7 +316,7 @@ int main(int argc, char* argv[]) {
 		mtt->set(sprite::e_double::SCALE_G, 0.065);
 		mtt->set(sprite::e_double::SCALE_X, 0.4);
 		mtt->load();
-		mtt->set(text::e_cstring::STRING, "REPOLHO");
+		mtt->set(text::e_cstring::STRING, coloured_string("REPOLHO"));
 		mtt->set(text::e_integer::STRING_MODE, static_cast<int>(text::e_text_modes::LEFT));
 		mtt->set(sprite::e_integer::LAYER, 100);
 		logg.hook([=](coloured_string str) {mtt->set(text::e_cstring::STRING, str); });

@@ -74,7 +74,8 @@ namespace LSW {
 
 				if (use_doublebuffer) {
 
-					auto buffer_prop = (*data.double_data[display::e_double::RESOLUTION_BUFFER_PROPORTION])();
+					double buffer_prop;
+					get(display::e_double::RESOLUTION_BUFFER_PROPORTION, buffer_prop);
 
 					std::shared_ptr<Bitmap> newbmp = bmps.swapNew("__display_b_" + display_buffer_name);
 					newbmp->create(al_get_display_width(display_itself) * buffer_prop, al_get_display_height(display_itself) * buffer_prop);
@@ -134,8 +135,7 @@ namespace LSW {
 			}
 
 			std::string path;
-			if (auto i = data.string_data[display::e_string::PRINT_PATH]; i) {
-				path = (*i)(); // copy the newest value always; // copy the newest value always)
+			if (get<std::string>(display::e_string::PRINT_PATH, path)) {
 				Tools::handlePath(path);
 			}
 
@@ -167,11 +167,21 @@ namespace LSW {
 		Display::Display()
 		{
 			__init(display::display_default_flags);
+
+			set<int>(display::e_integer_defaults);
+			set<double>(display::e_double_defaults);
+			set<bool>(display::e_boolean_defaults);
+			set<std::string>(display::e_string_defaults);
 		}
 
 		Display::Display(const int flags)
 		{
 			__init(flags | display::display_minimum_flags);
+
+			set<int>(display::e_integer_defaults);
+			set<double>(display::e_double_defaults);
+			set<bool>(display::e_boolean_defaults);
+			set<std::string>(display::e_string_defaults);
 		}
 
 		Display::~Display()
@@ -312,7 +322,8 @@ namespace LSW {
 				al_identity_transform(&defaul);
 				al_use_transform(&defaul);
 
-				auto ref_fx_amount = (*data.double_data[display::e_double::FX_AMOUNT])();
+				double ref_fx_amount;// = (*data.double_data[display::e_double::FX_AMOUNT])();
+				get(display::e_double::FX_AMOUNT, ref_fx_amount);
 
 				if (ref_fx_amount == 0.0) {
 					al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -347,7 +358,9 @@ namespace LSW {
 
 			__printscreen(); // check and printscreen
 
-			if (auto ret_fps_limit = (*data.integer_data[display::e_integer::LIMIT_FPS])(); ret_fps_limit > 1.0) {
+			//if (int ret_fps_limit = (*data.integer_data[display::e_integer::LIMIT_FPS])(); ret_fps_limit > 1.0) {
+			
+			if (int ret_fps_limit; get<int>(display::e_integer::LIMIT_FPS, ret_fps_limit) && ret_fps_limit > 1.0) {
 
 				al_flip_display();
 
@@ -386,277 +399,6 @@ namespace LSW {
 			__setacknowledge();
 		}
 
-		void Display::set(const display::e_double e, double v)
-		{
-			set(e, [=] {return v; });
-		}
-
-		void Display::set(const display::e_integer e, int v)
-		{
-			set(e, [=] {return v; });
-		}
-
-		void Display::set(const display::e_string e, std::string v)
-		{
-			set(e, [=] {return v; });
-		}
-
-		void Display::set(const display::e_boolean e, bool v)
-		{
-			set(e, [=] {return v; });
-		}
-
-		void Display::set(const display::e_double e, std::function<double(void)> v)
-		{
-			if (auto* ptr = data.double_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Display::set(const display::e_integer e, std::function<int(void)> v)
-		{
-			if (auto* ptr = data.integer_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Display::set(const display::e_string e, std::function<std::string(void)> v)
-		{
-			if (auto* ptr = data.string_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Display::set(const display::e_boolean e, std::function<bool(void)> v)
-		{
-			if (auto* ptr = data.boolean_data(e); ptr)
-				*ptr = v;
-		}
-
-		void Display::set(const std::string e, double v)
-		{
-			set(e, std::function<double(void)>([=] {return v; }));
-		}
-
-		void Display::set(const std::string e, int v)
-		{
-			set(e, std::function<int(void)>([=] {return v; }));
-		}
-
-		void Display::set(const std::string e, std::string v)
-		{
-			set(e, std::function<std::string(void)>([=] {return v; }));
-		}
-
-		void Display::set(const std::string e, bool v)
-		{
-			set(e, std::function<bool(void)>([=] {return v; }));
-		}
-
-		void Display::set(const std::string e, std::function<double(void)> v)
-		{
-			auto* ptr = data.double_data(e.c_str(), e.length());
-			if (!ptr) data.double_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		void Display::set(const std::string e, std::function<int(void)> v)
-		{
-			auto* ptr = data.integer_data(e.c_str(), e.length());
-			if (!ptr) data.integer_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		void Display::set(const std::string e, std::function<std::string(void)> v)
-		{
-			auto* ptr = data.string_data(e.c_str(), e.length());
-			if (!ptr) data.string_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		void Display::set(const std::string e, std::function<bool(void)> v)
-		{
-			auto* ptr = data.boolean_data(e.c_str(), e.length());
-			if (!ptr) data.boolean_data.add({ v, e.c_str(), e.length() });
-			else *ptr = v;
-		}
-
-		bool Display::get(const display::e_double e, double& v)
-		{
-			if (auto* ptr = data.double_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const display::e_integer e, int& v)
-		{
-			if (auto* ptr = data.integer_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const display::e_string e, std::string& v)
-		{
-			if (auto* ptr = data.string_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const display::e_boolean e, bool& v)
-		{
-			if (auto* ptr = data.boolean_data[e]; ptr)
-			{
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const display::e_double e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data.double_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const display::e_integer e, std::function<int(void)>& v)
-		{
-			if (auto* ptr = data.integer_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const display::e_string e, std::function<std::string(void)>& v)
-		{
-			if (auto* ptr = data.string_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const display::e_boolean e, std::function<bool(void)>& v)
-		{
-			if (auto* ptr = data.boolean_data[e]; ptr)
-			{
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const std::string e, double& v)
-		{
-			if (auto* ptr = data.double_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const std::string e, int& v)
-		{
-			if (auto* ptr = data.integer_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const std::string e, std::string& v)
-		{
-			if (auto* ptr = data.string_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const std::string e, bool& v)
-		{
-			if (auto* ptr = data.boolean_data(e.c_str(), e.length()); ptr) {
-				v = (*ptr)();
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const std::string e, std::function<double(void)>& v)
-		{
-			if (auto* ptr = data.double_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const std::string e, std::function<int(void)>& v)
-		{
-			if (auto* ptr = data.integer_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const std::string e, std::function<std::string(void)>& v)
-		{
-			if (auto* ptr = data.string_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		bool Display::get(const std::string e, std::function<bool(void)>& v)
-		{
-			if (auto* ptr = data.boolean_data(e.c_str(), e.length()); ptr) {
-				v = *ptr;
-				return true;
-			}
-			return false;
-		}
-
-		std::function<double(void)>* Display::getRef(const display::e_double e)
-		{
-			if (auto* ptr = data.double_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<int(void)>* Display::getRef(const display::e_integer e)
-		{
-			if (auto* ptr = data.integer_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<std::string(void)>* Display::getRef(const display::e_string e)
-		{
-			if (auto* ptr = data.string_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
-
-		std::function<bool(void)>* Display::getRef(const display::e_boolean e)
-		{
-			if (auto* ptr = data.boolean_data(e); ptr)
-				return ptr;
-			return nullptr;
-		}
 
 		const std::vector<ALLEGRO_DISPLAY_MODE>& Display::configurations() const
 		{

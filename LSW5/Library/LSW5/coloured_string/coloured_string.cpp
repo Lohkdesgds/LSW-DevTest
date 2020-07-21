@@ -80,7 +80,7 @@ namespace LSW {
 			return static_cast<size_t>(-1);
 		}
 
-		coloured_string coloured_string::substr(const size_t start, const size_t len)
+		coloured_string coloured_string::substr(const size_t start, const size_t len) const
 		{
 			coloured_string cpy;
 			
@@ -92,7 +92,7 @@ namespace LSW {
 			return cpy;
 		}
 
-		std::string coloured_string::s_str()
+		std::string coloured_string::s_str() const
 		{
 			std::string cpy;
 			for (auto& i : str) cpy += i.ch;
