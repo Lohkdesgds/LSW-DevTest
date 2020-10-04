@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="LSW">
+      <UniqueIdentifier>{291f2a1f-7798-4884-ac41-1c223b6f2337}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\0. Handling">
+      <UniqueIdentifier>{e87355b4-769f-4e54-985f-800926c19098}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\0. Handling\Abort">
+      <UniqueIdentifier>{34755889-917b-4d4f-a4ca-eac11326b0c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\0. Handling\Initialize">
+      <UniqueIdentifier>{2790c7b2-5242-4a05-b1cf-7fe8fb86b7c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\0. Handling\Path">
+      <UniqueIdentifier>{52888e95-a61b-49bd-a2c2-2afa23f1635f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools">
+      <UniqueIdentifier>{d58e93d2-1185-4f75-a3ee-76c323a4c0c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\SuperMap">
+      <UniqueIdentifier>{3054a474-82e6-46b6-bc2c-d241808f6e9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\SuperMutex">
+      <UniqueIdentifier>{fa915b77-fc76-4436-bb06-53b060c79610}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\SuperResource">
+      <UniqueIdentifier>{667bc0d5-0651-4415-bb8e-f6ae11efad3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\SuperThread">
+      <UniqueIdentifier>{06306b83-3bad-44bc-a4be-0b72801eee69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\SuperTimer">
+      <UniqueIdentifier>{df83b913-e843-4d5b-bb34-c423da712ec6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\CString">
+      <UniqueIdentifier>{c6681046-74b9-4286-8b08-21bb70693757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\Launcher">
+      <UniqueIdentifier>{9a3b4024-e144-428d-aac1-a7018812f982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\Hash">
+      <UniqueIdentifier>{8eb315b1-923c-4ff7-a1e8-bd2427d43fad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\Common">
+      <UniqueIdentifier>{39066882-f742-4fb7-b187-5b5d7bfb9dd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\_include">
+      <UniqueIdentifier>{a2313bf0-4d2a-4016-b04a-1250387b6a17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface">
+      <UniqueIdentifier>{797fb24c-a80c-4354-84ba-5179500ba533}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Logger">
+      <UniqueIdentifier>{9fc861a0-9532-4b51-a186-cd55fe86ab19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\SuperPair">
+      <UniqueIdentifier>{4f52892b-759d-4619-954b-42b20cd77da4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\_include">
+      <UniqueIdentifier>{d27cd441-c28b-425b-83a3-8a2e31a1156d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\0. Handling\_include">
+      <UniqueIdentifier>{12f71dd9-28e3-4b89-a013-e7beceeb4406}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\SuperFunctionalMap">
+      <UniqueIdentifier>{07cc8d64-a8d5-49ae-9dcb-c56ec7643198}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\Future">
+      <UniqueIdentifier>{1a0b86c4-af67-4f67-abf3-f318246e38a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Display">
+      <UniqueIdentifier>{f6962b53-eb40-4776-9e4f-29e971d6b927}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Bitmap">
+      <UniqueIdentifier>{f925bd56-6bba-48dc-adb7-4acf23f8808a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Color">
+      <UniqueIdentifier>{8996b561-b7ae-432e-ab59-02453f204c0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Font">
+      <UniqueIdentifier>{40350a80-74fc-4899-9e4e-ea396b8b7972}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\Any">
+      <UniqueIdentifier>{db314f80-fa68-491f-9c18-6a22c5f3db4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Events">
+      <UniqueIdentifier>{f435bed8-3dd0-4d51-9327-6cc1e64d16d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\TimedMemory">
+      <UniqueIdentifier>{8d8e1cca-b812-48b0-9748-3649e5280006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Camera">
+      <UniqueIdentifier>{8307b553-e313-4642-8e03-d24722d93ebc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Config">
+      <UniqueIdentifier>{bca319e0-d7d4-4dfb-8048-4b74d912f898}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Handling\Abort\abort.cpp">
+      <Filter>LSW\0. Handling\Abort</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Handling\Initialize\initialize.cpp">
+      <Filter>LSW\0. Handling\Initialize</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Tools\CString\cstring.cpp">
+      <Filter>LSW\1. Tools\CString</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Handling\Path\path.cpp">
+      <Filter>LSW\0. Handling\Path</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Tools\Common\common.cpp">
+      <Filter>LSW\1. Tools\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Tools\Hash\hash.cpp">
+      <Filter>LSW\1. Tools\Hash</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Tools\Launcher\launcher.cpp">
+      <Filter>LSW\1. Tools\Launcher</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Logger\logger.cpp">
+      <Filter>LSW\2. Interface\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Tools\SuperMutex\supermutex.cpp">
+      <Filter>LSW\1. Tools\SuperMutex</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Display\display.cpp">
+      <Filter>LSW\2. Interface\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Bitmap\bitmap.cpp">
+      <Filter>LSW\2. Interface\Bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Color\color.cpp">
+      <Filter>LSW\2. Interface\Color</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Tools\SuperThread\superthread.cpp">
+      <Filter>LSW\1. Tools\SuperThread</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Font\font.cpp">
+      <Filter>LSW\2. Interface\Font</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Events\events.cpp">
+      <Filter>LSW\2. Interface\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Camera\camera.cpp">
+      <Filter>LSW\2. Interface\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Config\config.cpp">
+      <Filter>LSW\2. Interface\Config</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="older_tests.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LSW\Handling\Abort\abort.h">
+      <Filter>LSW\0. Handling\Abort</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Handling\Initialize\initialize.h">
+      <Filter>LSW\0. Handling\Initialize</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\CString\cstring.h">
+      <Filter>LSW\1. Tools\CString</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Handling\Path\path.h">
+      <Filter>LSW\0. Handling\Path</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Common\common.h">
+      <Filter>LSW\1. Tools\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Tools.h">
+      <Filter>LSW\1. Tools\_include</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Hash\hash.h">
+      <Filter>LSW\1. Tools\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Launcher\launcher.h">
+      <Filter>LSW\1. Tools\Launcher</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperTimer\supertimer.h">
+      <Filter>LSW\1. Tools\SuperTimer</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Logger\logger.h">
+      <Filter>LSW\2. Interface\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperThread\superthread.h">
+      <Filter>LSW\1. Tools\SuperThread</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperResource\superresource.h">
+      <Filter>LSW\1. Tools\SuperResource</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperMutex\supermutex.h">
+      <Filter>LSW\1. Tools\SuperMutex</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperMap\supermap.h">
+      <Filter>LSW\1. Tools\SuperMap</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperPair\superpair.h">
+      <Filter>LSW\1. Tools\SuperPair</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Interface.h">
+      <Filter>LSW\2. Interface\_include</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\LSWv5.h">
+      <Filter>LSW</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Handling\Handling.h">
+      <Filter>LSW\0. Handling\_include</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperFunctionalMap\superfunctionalmap.h">
+      <Filter>LSW\1. Tools\SuperFunctionalMap</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Future\future.h">
+      <Filter>LSW\1. Tools\Future</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Display\display.h">
+      <Filter>LSW\2. Interface\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Bitmap\bitmap.h">
+      <Filter>LSW\2. Interface\Bitmap</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Color\color.h">
+      <Filter>LSW\2. Interface\Color</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Font\font.h">
+      <Filter>LSW\2. Interface\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Any\any.h">
+      <Filter>LSW\1. Tools\Any</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Events\events.h">
+      <Filter>LSW\2. Interface\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\TimedMemory\timedmemory.h">
+      <Filter>LSW\1. Tools\TimedMemory</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Camera\camera.h">
+      <Filter>LSW\2. Interface\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Config\config.h">
+      <Filter>LSW\2. Interface\Config</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

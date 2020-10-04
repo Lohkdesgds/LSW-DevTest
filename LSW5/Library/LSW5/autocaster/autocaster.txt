@@ -1,1 +1,0 @@
-Autocaster casts pointers and variables to its base, like, `const char[]` to `char*`.
