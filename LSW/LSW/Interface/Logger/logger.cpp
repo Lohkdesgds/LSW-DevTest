@@ -17,10 +17,10 @@ namespace LSW {
 
 			FormatAs::FormatAs(FormatAs& fa)
 			{
-				format = fa.getFormat();
+				format = fa.get_format();
 			}
 
-			const std::string& FormatAs::getFormat()
+			const std::string& FormatAs::get_format()
 			{
 				return format;
 			}
@@ -30,7 +30,7 @@ namespace LSW {
 				format.clear();
 			}
 
-			bool FormatAs::hasCustomFormat()
+			bool FormatAs::has_custom_format()
 			{
 				return !format.empty();
 			}
@@ -300,9 +300,9 @@ namespace LSW {
 			{
 				std::string buf;
 
-				if (latestFormat.hasCustomFormat()) {
-					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.getFormat().c_str(), o)));
-					sprintf_s(buf.data(), buf.size(), latestFormat.getFormat().c_str(), o);
+				if (latestFormat.has_custom_format()) {
+					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.get_format().c_str(), o)));
+					sprintf_s(buf.data(), buf.size(), latestFormat.get_format().c_str(), o);
 					latestFormat.clear();
 				}
 				else {
@@ -316,9 +316,9 @@ namespace LSW {
 			{
 				std::string buf;
 
-				if (latestFormat.hasCustomFormat()) {
-					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.getFormat().c_str(), o)));
-					sprintf_s(buf.data(), buf.size(), latestFormat.getFormat().c_str(), o);
+				if (latestFormat.has_custom_format()) {
+					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.get_format().c_str(), o)));
+					sprintf_s(buf.data(), buf.size(), latestFormat.get_format().c_str(), o);
 					latestFormat.clear();
 				}
 				else {
@@ -332,9 +332,9 @@ namespace LSW {
 			{
 				std::string buf;
 
-				if (latestFormat.hasCustomFormat()) {
-					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.getFormat().c_str(), o)));
-					sprintf_s(buf.data(), buf.size(), latestFormat.getFormat().c_str(), o);
+				if (latestFormat.has_custom_format()) {
+					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.get_format().c_str(), o)));
+					sprintf_s(buf.data(), buf.size(), latestFormat.get_format().c_str(), o);
 					latestFormat.clear();
 				}
 				else {
@@ -348,9 +348,9 @@ namespace LSW {
 			{
 				std::string buf;
 
-				if (latestFormat.hasCustomFormat()) {
-					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.getFormat().c_str(), o)));
-					sprintf_s(buf.data(), buf.size(), latestFormat.getFormat().c_str(), o);
+				if (latestFormat.has_custom_format()) {
+					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.get_format().c_str(), o)));
+					sprintf_s(buf.data(), buf.size(), latestFormat.get_format().c_str(), o);
 					latestFormat.clear();
 				}
 				else {
@@ -364,9 +364,9 @@ namespace LSW {
 			{
 				std::string buf;
 
-				if (latestFormat.hasCustomFormat()) {
-					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.getFormat().c_str(), o)));
-					sprintf_s(buf.data(), buf.size(), latestFormat.getFormat().c_str(), o);
+				if (latestFormat.has_custom_format()) {
+					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.get_format().c_str(), o)));
+					sprintf_s(buf.data(), buf.size(), latestFormat.get_format().c_str(), o);
 					latestFormat.clear();
 				}
 				else {
@@ -380,9 +380,9 @@ namespace LSW {
 			{
 				std::string buf;
 
-				if (latestFormat.hasCustomFormat()) {
-					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.getFormat().c_str(), o)));
-					sprintf_s(buf.data(), buf.size(), latestFormat.getFormat().c_str(), o);
+				if (latestFormat.has_custom_format()) {
+					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.get_format().c_str(), o)));
+					sprintf_s(buf.data(), buf.size(), latestFormat.get_format().c_str(), o);
 					latestFormat.clear();
 				}
 				else {
@@ -396,9 +396,9 @@ namespace LSW {
 			{
 				std::string buf;
 
-				if (latestFormat.hasCustomFormat()) {
-					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.getFormat().c_str(), o)));
-					sprintf_s(buf.data(), buf.size(), latestFormat.getFormat().c_str(), o);
+				if (latestFormat.has_custom_format()) {
+					buf.resize(1 + static_cast<size_t>(snprintf(nullptr, 0, latestFormat.get_format().c_str(), o)));
+					sprintf_s(buf.data(), buf.size(), latestFormat.get_format().c_str(), o);
 					latestFormat.clear();
 				}
 				else {

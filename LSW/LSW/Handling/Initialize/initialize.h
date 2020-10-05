@@ -16,7 +16,7 @@ namespace LSW {
 		namespace Handling {
 
 			bool init_basic();
-			bool init_audio();
+			bool init_audio(const unsigned short = 4);
 			bool init_font();
 			bool init_graphics();
 			bool init_keyboard();

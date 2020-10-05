@@ -101,6 +101,21 @@
     <Filter Include="LSW\2. Interface\Config">
       <UniqueIdentifier>{bca319e0-d7d4-4dfb-8048-4b74d912f898}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\2. Interface\Downloader">
+      <UniqueIdentifier>{ce563381-6fbb-4563-8d58-d7f67919b612}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Voice">
+      <UniqueIdentifier>{c6edcc9b-ca19-4cfc-8980-bebb4c677cde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Mixer">
+      <UniqueIdentifier>{b4348587-f02a-459f-ad2a-49b5e0c981d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Track">
+      <UniqueIdentifier>{571035bf-f9c1-4dca-aedd-85670b4e5718}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Sample">
+      <UniqueIdentifier>{533db11d-95f2-427f-8ae2-4a6db3735bb2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -156,6 +171,21 @@
     </ClCompile>
     <ClCompile Include="LSW\Interface\Config\config.cpp">
       <Filter>LSW\2. Interface\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Downloader\downloader.cpp">
+      <Filter>LSW\2. Interface\Downloader</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Voice\voice.cpp">
+      <Filter>LSW\2. Interface\Voice</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Mixer\mixer.cpp">
+      <Filter>LSW\2. Interface\Mixer</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Track\track.cpp">
+      <Filter>LSW\2. Interface\Track</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Sample\sample.cpp">
+      <Filter>LSW\2. Interface\Sample</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -253,6 +283,21 @@
     </ClInclude>
     <ClInclude Include="LSW\Interface\Config\config.h">
       <Filter>LSW\2. Interface\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Downloader\downloader.h">
+      <Filter>LSW\2. Interface\Downloader</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Voice\voice.h">
+      <Filter>LSW\2. Interface\Voice</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Mixer\mixer.h">
+      <Filter>LSW\2. Interface\Mixer</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Track\track.h">
+      <Filter>LSW\2. Interface\Track</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Sample\sample.h">
+      <Filter>LSW\2. Interface\Sample</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

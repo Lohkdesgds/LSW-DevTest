@@ -8,9 +8,9 @@ namespace LSW {
 				if (!al_is_system_installed()) return al_init();
 				return true;
 			}
-			bool init_audio() {
+			bool init_audio(const unsigned short samples) {
 				if (!al_is_acodec_addon_initialized()) {
-					return init_basic() && al_init_acodec_addon() && al_install_audio() && al_reserve_samples(4);
+					return init_basic() && al_init_acodec_addon() && al_install_audio() && al_reserve_samples(samples);
 				}
 				return true;
 			}

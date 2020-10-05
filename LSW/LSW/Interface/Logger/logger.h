@@ -33,9 +33,9 @@ namespace LSW {
 				FormatAs() = default;
 				FormatAs(std::string&&);
 				FormatAs(FormatAs&);
-				const std::string& getFormat();
+				const std::string& get_format();
 				void clear();
-				bool hasCustomFormat();
+				bool has_custom_format();
 			};
 
 			class Logger {
