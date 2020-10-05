@@ -139,9 +139,28 @@ namespace LSW {
 					g.m.unlock();
 				}
 			}
-			void Logger::debug(const std::string& str)
+			void Logger::debug(const std::string& str, E situation)
 			{
-				OutputDebugString((_generate_date() + "\t" + str + "\n").c_str());
+				// https://docs.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-outputdebugstringw
+				// "Applications should send very minimal debug output and provide a way for the user to enable or disable its use." -> it disables the feature if in release mode then.
+#ifdef _DEBUG
+				std::string back_str;
+				switch (situation) {
+				case E::INFO:
+					back_str = "[INFO]";
+					break;
+				case E::WARN:
+					back_str = "[WARN]";
+					break;
+				case E::ERRR:
+					back_str = "[ERRR]";
+					break;
+				case E::DEBUG:
+					back_str = "[DEBG]";
+					break;
+				}
+				OutputDebugString(("@LSWv5>" + back_str + _generate_date() + "\t" + str + "\n").c_str());
+#endif
 			}
 			void Logger::hook(std::function<void(Tools::Cstring)> f)
 			{

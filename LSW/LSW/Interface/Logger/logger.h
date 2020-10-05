@@ -78,7 +78,7 @@ namespace LSW {
 				void init(const std::string); // path, once
 				void flush();
 
-				void debug(const std::string&);
+				void debug(const std::string&, const E = E::INFO);
 
 				void hook(std::function<void(Tools::Cstring)>);
 				void unhook();
@@ -100,7 +100,7 @@ namespace LSW {
 			};
 
 
-			const std::string fsr(std::string fname_pretty, const E situation = E::INFO); // Function class, function name, type
+			const std::string fsr(std::string, const E = E::INFO); // Function class, function name, type
 
 		}
 	}

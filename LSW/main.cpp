@@ -45,8 +45,40 @@ int main() {
 
 	auto conf = configs.create("DEFAULT");
 	conf->load(testpath);
-	conf->comment("config", "This is the main config stuff.");
+
+	auto vector_lol1 = conf->get_array<float>("config", "playercolor");
+	for (auto& i : vector_lol1) {
+		logg << L::SL << "ARR B4: " << i << L::EL;
+	}
+
+	conf->comment("config", "This is a new version of myself");
+	conf->set("config", "was_osd_on", false);
+	conf->set("config", "second_screen_debug", false);
+	conf->set("config", "ultradebug", false);
+	conf->set("config", "double_buffering_screen", true);
+	conf->set("config", "last_volume", 0.200218);
+	conf->set("config", "resolution_proportion", 2.000000);
+	conf->set("config", "fx_amount", 0.280000);
+	conf->set("config", "screen_width", 1920);
+	conf->set("config", "screen_height", 1080);
+	conf->set("config", "last_display_flags", 21);
+	conf->set("config", "pref_refresh_rate", 144);
+	conf->set("config", "times_open", 6);
+	conf->set("config", "playername", "Lohk");
+	conf->set("config", "last_version", "B202002113719");
+	conf->set("config", "playercolor", { 0.4023f, 0.5307f, 0.2331f });
+	conf->set("config", "hidemouse", true);
+	conf->set("config", "limit_framerate_to", 0);
+	conf->set("config", "prints_path", "%win_photos_path%/Lohk's Studios Screenshots/");
+	conf->set("private", config::config_section_mode::MEMORY_ONLY);
+	conf->set("private", "yo config", 10);
 	conf->flush();
+
+	auto vector_lol = conf->get_array<float>("config", "playercolor");
+	for (auto& i : vector_lol) {
+		logg << L::SL << "ARR AFT: " << i << L::EL;
+	}
+	logg << L::SL << "Only in memory: " << conf->get_as<int>("private", "yo config") << L::EL;
 
 	Tools::SuperResource<Camera> cameras;
 

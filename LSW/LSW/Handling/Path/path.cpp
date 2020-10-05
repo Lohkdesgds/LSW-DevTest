@@ -126,8 +126,6 @@ namespace LSW {
 				if (min_pos < cpy.length()) endresult += cpy.substr(min_pos);
 				//if (min_pos < cpy.length()) printf_s("PL > %s\n", cpy.substr(min_pos).c_str());
 
-				printf_s("END =  %s\n", endresult.c_str());
-
 				cpy = std::move(endresult);
 			}
 
