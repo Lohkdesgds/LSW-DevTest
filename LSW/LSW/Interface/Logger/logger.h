@@ -46,6 +46,9 @@ namespace LSW {
 					FILE* fp = nullptr;
 					std::string path = "log.log";
 					std::mutex m;
+#ifdef _DEBUG
+					std::mutex dbgm;
+#endif
 					bool m_b = false;
 					bool file_write_enabled = false;
 

@@ -116,6 +116,9 @@
     <Filter Include="LSW\2. Interface\Sample">
       <UniqueIdentifier>{533db11d-95f2-427f-8ae2-4a6db3735bb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\2. Interface\Connection">
+      <UniqueIdentifier>{e509ee28-e9fc-4325-8cd0-23ebe82b3fad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -186,6 +189,9 @@
     </ClCompile>
     <ClCompile Include="LSW\Interface\Sample\sample.cpp">
       <Filter>LSW\2. Interface\Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Connection\connection.cpp">
+      <Filter>LSW\2. Interface\Connection</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -298,6 +304,9 @@
     </ClInclude>
     <ClInclude Include="LSW\Interface\Sample\sample.h">
       <Filter>LSW\2. Interface\Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Connection\connection.h">
+      <Filter>LSW\2. Interface\Connection</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

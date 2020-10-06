@@ -205,6 +205,7 @@
     <ClCompile Include="LSW\Interface\Camera\camera.cpp" />
     <ClCompile Include="LSW\Interface\Color\color.cpp" />
     <ClCompile Include="LSW\Interface\Config\config.cpp" />
+    <ClCompile Include="LSW\Interface\Connection\connection.cpp" />
     <ClCompile Include="LSW\Interface\Display\display.cpp" />
     <ClCompile Include="LSW\Interface\Downloader\downloader.cpp" />
     <ClCompile Include="LSW\Interface\Events\events.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="LSW\Interface\Camera\camera.h" />
     <ClInclude Include="LSW\Interface\Color\color.h" />
     <ClInclude Include="LSW\Interface\Config\config.h" />
+    <ClInclude Include="LSW\Interface\Connection\connection.h" />
     <ClInclude Include="LSW\Interface\Display\display.h" />
     <ClInclude Include="LSW\Interface\Downloader\downloader.h" />
     <ClInclude Include="LSW\Interface\Events\events.h" />

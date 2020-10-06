@@ -159,7 +159,9 @@ namespace LSW {
 					back_str = "[DEBG]";
 					break;
 				}
-				OutputDebugString(("@LSWv5>" + back_str + _generate_date() + "\t" + str + "\n").c_str());
+				g.dbgm.lock();
+				OutputDebugString(("@\tLSWv5\t>\t" + back_str + _generate_date() + "\t\t\t\t\t\t  " + str + "\n").c_str());
+				g.dbgm.unlock();
 #endif
 			}
 			void Logger::hook(std::function<void(Tools::Cstring)> f)
@@ -239,46 +241,6 @@ namespace LSW {
 				}
 				g.memline_s += clstr;
 				return *this;
-			}
-
-			const std::string fsr(std::string fname_pretty, const E situation)
-			{
-				if (fname_pretty.length() < logger::len_class) {
-					for (size_t p = fname_pretty.length(); p < logger::len_class; p++)
-					{
-						fname_pretty += '_';
-					}
-				}
-				else {
-					for (size_t p = fname_pretty.length(); p > logger::len_class; p--)
-					{
-						fname_pretty.pop_back();
-					}
-				}
-
-				for (auto& i : fname_pretty) i = ::toupper(i);
-
-				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-				std::string back_str;
-
-				switch (situation) {
-				case E::INFO:
-					back_str = "&7[INFO]";
-					break;
-				case E::WARN:
-					back_str = "&c[WARN]";
-					break;
-				case E::ERRR:
-					back_str = "&4[ERRR]";
-					break;
-				case E::DEBUG:
-					back_str = "&5[DEBG]";
-					break;
-				}
-
-				back_str += "&8[" + fname_pretty + "]&f ";
-
-				return back_str;
 			}
 			Logger& Logger::operator<<(const std::string& o) // don't forget template lmao
 			{
@@ -407,6 +369,46 @@ namespace LSW {
 				}
 
 				return (this->operator<<(buf));
+			}
+
+			const std::string fsr(std::string fname_pretty, const E situation)
+			{
+				if (fname_pretty.length() < logger::len_class) {
+					for (size_t p = fname_pretty.length(); p < logger::len_class; p++)
+					{
+						fname_pretty += '_';
+					}
+				}
+				else {
+					for (size_t p = fname_pretty.length(); p > logger::len_class; p--)
+					{
+						fname_pretty.pop_back();
+					}
+				}
+
+				for (auto& i : fname_pretty) i = ::toupper(i);
+
+				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+				std::string back_str;
+
+				switch (situation) {
+				case E::INFO:
+					back_str = "&2[INFO]";
+					break;
+				case E::WARN:
+					back_str = "&c[WARN]";
+					break;
+				case E::ERRR:
+					back_str = "&4[ERRR]";
+					break;
+				case E::DEBUG:
+					back_str = "&5[DEBG]";
+					break;
+				}
+
+				back_str += "&8[" + fname_pretty + "]&f ";
+
+				return back_str;
 			}
 		}
 	}

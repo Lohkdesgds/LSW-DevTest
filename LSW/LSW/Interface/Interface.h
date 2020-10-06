@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Connection/connection.h"
 #include "Logger/logger.h"
 #include "Downloader/downloader.h"
 #include "Color/color.h"

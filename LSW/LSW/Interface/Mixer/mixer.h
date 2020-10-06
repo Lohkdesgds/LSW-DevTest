@@ -21,6 +21,9 @@ namespace LSW {
 				std::shared_ptr<ALLEGRO_MIXER> mixer;
 
 				bool set(ALLEGRO_MIXER*);
+
+				// not a good idea
+				//static void update(void*, unsigned, void*);
 			public:
 				Mixer();
 
@@ -35,7 +38,13 @@ namespace LSW {
 				// attach Voice to mixer
 				bool attach_to(std::shared_ptr<Voice>);
 
+				float get_gain();
+				void set_gain(const float);
+
 				bool exists() const;
+
+				// not a good idea
+				//bool postprocess_callback(std::function<void(float*, unsigned)>);
 				// attach to a Voice (master voice) (see SuperResource.setMain(...))
 				//bool auto_attach();
 

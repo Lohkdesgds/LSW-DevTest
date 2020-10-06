@@ -19,8 +19,61 @@ int main() {
 		std::cout << "AutoMemory: " << [&] {auto c = testmemory.get(); if (c.use_count()) return std::to_string(*c.get()); return std::string("not alloc"); }() << std::endl;
 	}*/
 
-
 	Logger logg;
+
+	logg << L::SL << fsr(__FUNCSIG__) << "> > > > > SOCKET TEST < < < < <" << L::EL;
+	{
+		logg << L::SL << fsr(__FUNCSIG__) << "Initializing host..." << L::EL;
+
+		Hosting host;
+
+		logg << L::SL << fsr(__FUNCSIG__) << "Initialized. Trying to create a client to connect to this host..." << L::EL;
+
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+
+		Connection client;
+		if (!client.connect()) {
+			logg << L::SL << fsr(__FUNCSIG__) << "Deu ruim" << L::EL;
+		}
+		else {
+			logg << L::SL << fsr(__FUNCSIG__) << "Yay success. Waiting a sec to send stuff to the host." << L::EL;
+
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+
+			std::shared_ptr<Connection> host_c = host.get_connection(0);
+
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+
+			const char* first_msg = "hello there my friend my name is Jonas and I'm here to test this thing out. If it has problems, it will show them now!";
+			const char* second_msg = "bananas de pijamas are nice tho. Just testing a little bit of code with some huge messages, as you can see. This is bigger than min buf for sure.";
+
+
+			logg << L::SL << fsr(__FUNCSIG__) << "Trying to send from client to server..." << L::EL;
+
+			client.send_package(first_msg);
+
+			logg << L::SL << fsr(__FUNCSIG__) << "Recovering data sent on server..." << L::EL;
+
+			while (!host_c->has_package()) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+			auto res = host_c->get_next();
+
+			logg << L::SL << fsr(__FUNCSIG__) << "Did they match? " << ((res == first_msg) ? "YES" : "NO") << L::EL;
+
+			logg << L::SL << fsr(__FUNCSIG__) << "Sending from server to client..." << L::EL;
+
+			host_c->send_package(second_msg);
+
+			while (!client.has_package()) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+			res = client.get_next();
+
+			logg << L::SL << fsr(__FUNCSIG__) << "Did they match? " << ((res == second_msg) ? "YES" : "NO") << L::EL;
+		}
+	}
+	logg << L::SL << fsr(__FUNCSIG__) << "> > > > > END OF SOCKET TEST < < < < <" << L::EL;
+
+
 
 	logg << L::SL << fsr(__FUNCSIG__) << "Creating display..." << L::EL;
 
@@ -46,7 +99,7 @@ int main() {
 	auto conf = configs.create("DEFAULT");
 	conf->load(testpath);
 
-	auto vector_lol1 = conf->get_array<float>("config", "playercolor");
+	/*auto vector_lol1 = conf->get_array<float>("config", "playercolor");
 	for (auto& i : vector_lol1) {
 		logg << L::SL << fsr(__FUNCSIG__) << "ARR B4: " << i << L::EL;
 	}
@@ -79,6 +132,7 @@ int main() {
 		logg << L::SL << fsr(__FUNCSIG__) << "ARR AFT: " << i << L::EL;
 	}
 	logg << L::SL << fsr(__FUNCSIG__) << "Only in memory: " << conf->get_as<int>("private", "yo config") << L::EL;
+	*/
 
 	Tools::SuperResource<Camera> cameras;
 
@@ -102,6 +156,7 @@ int main() {
 	main_voice->load();
 	main_mixer->load();
 	main_mixer->attach_to(main_voice);
+	main_mixer->set_gain(conf->get_as<float>("config", "last_volume"));
 
 	auto a_music = samples.create("ONE_SAMPLE");
 	auto track = tracks.create("MY_TRACK");
@@ -144,32 +199,48 @@ int main() {
 				logg << L::SL << fsr(__FUNCSIG__) << "Toggle Fullscreen called" << L::EL;
 				disp.toggle_fullscreen();
 			}
-			if (ev.keyboard_event().keycode == ALLEGRO_KEY_P) {
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_P) {
 				logg << L::SL << fsr(__FUNCSIG__) << "Play/Pause button called" << L::EL;
 				if (track->exists()) {
 					if (track->is_playing()) track->pause();
 					else track->play();
 				}
 			}
-			if (ev.keyboard_event().keycode == ALLEGRO_KEY_R) {
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_R) {
 				logg << L::SL << fsr(__FUNCSIG__) << "Reverse/Continuous button called" << L::EL;
 				if (track->exists()) {
 					track->set_speed(-track->get_speed());
 				}
 			}
-			if (ev.keyboard_event().keycode == ALLEGRO_KEY_MINUS) {
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_MINUS) {
 				logg << L::SL << fsr(__FUNCSIG__) << "SlowDown button called" << L::EL;
 				if (track->exists()) {
 					if (fabs(track->get_speed()) > 0.1) track->set_speed(track->get_speed() > 0.0 ? track->get_speed() - 0.05 : track->get_speed() + 0.05);
 					logg << L::SL << fsr(__FUNCSIG__) << "Now speed = " << track->get_speed() << "x" << L::EL;
 				}
 			}
-			if (ev.keyboard_event().keycode == ALLEGRO_KEY_EQUALS) {
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_EQUALS) {
 				logg << L::SL << fsr(__FUNCSIG__) << "Accel button called" << L::EL;
 				if (track->exists()) {
 					track->set_speed(track->get_speed() > 0.0 ? track->get_speed() + 0.05 : track->get_speed() - 0.05);
 					logg << L::SL << fsr(__FUNCSIG__) << "Now speed = " << track->get_speed() << "x" << L::EL;
 				}
+			}
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_PAD_MINUS) {
+				logg << L::SL << fsr(__FUNCSIG__) << "PAD- button called" << L::EL;
+				float vol = main_mixer->get_gain();
+				if (vol > 0.02) vol -= 0.02;
+				main_mixer->set_gain(vol);
+				conf->set("config", "last_volume", vol);
+				logg << L::SL << fsr(__FUNCSIG__) << "Now volume = " << vol << "." << L::EL;
+			}
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_PAD_PLUS) {
+				logg << L::SL << fsr(__FUNCSIG__) << "PAD+ button called" << L::EL;
+				float vol = main_mixer->get_gain();
+				if (vol < 1.0) vol += 0.02;
+				main_mixer->set_gain(vol);
+				conf->set("config", "last_volume", vol);
+				logg << L::SL << fsr(__FUNCSIG__) << "Now volume = " << vol << "." << L::EL;
 			}
 			break;
 		case ALLEGRO_EVENT_DISPLAY_CLOSE:
