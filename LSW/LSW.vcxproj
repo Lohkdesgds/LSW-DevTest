@@ -212,7 +212,9 @@
     <ClCompile Include="LSW\Interface\Font\font.cpp" />
     <ClCompile Include="LSW\Interface\Logger\logger.cpp" />
     <ClCompile Include="LSW\Interface\Mixer\mixer.cpp" />
+    <ClCompile Include="LSW\Interface\PathManager\pathmanager.cpp" />
     <ClCompile Include="LSW\Interface\Sample\sample.cpp" />
+    <ClCompile Include="LSW\Interface\SmartFile\smartfile.cpp" />
     <ClCompile Include="LSW\Interface\Track\track.cpp" />
     <ClCompile Include="LSW\Interface\Voice\voice.cpp" />
     <ClCompile Include="LSW\Tools\Common\common.cpp" />
@@ -246,7 +248,9 @@
     <ClInclude Include="LSW\Interface\Interface.h" />
     <ClInclude Include="LSW\Interface\Logger\logger.h" />
     <ClInclude Include="LSW\Interface\Mixer\mixer.h" />
+    <ClInclude Include="LSW\Interface\PathManager\pathmanager.h" />
     <ClInclude Include="LSW\Interface\Sample\sample.h" />
+    <ClInclude Include="LSW\Interface\SmartFile\smartfile.h" />
     <ClInclude Include="LSW\Interface\Track\track.h" />
     <ClInclude Include="LSW\Interface\Voice\voice.h" />
     <ClInclude Include="LSW\LSWv5.h" />

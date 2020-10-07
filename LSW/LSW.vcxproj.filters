@@ -119,6 +119,12 @@
     <Filter Include="LSW\2. Interface\Connection">
       <UniqueIdentifier>{e509ee28-e9fc-4325-8cd0-23ebe82b3fad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\2. Interface\SmartFile">
+      <UniqueIdentifier>{4c576ab5-c94c-4290-86b7-5a7a00d539e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\PathManager">
+      <UniqueIdentifier>{f55c6376-a18b-4d68-9aff-160dd9d2ea0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -192,6 +198,12 @@
     </ClCompile>
     <ClCompile Include="LSW\Interface\Connection\connection.cpp">
       <Filter>LSW\2. Interface\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\SmartFile\smartfile.cpp">
+      <Filter>LSW\2. Interface\SmartFile</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\PathManager\pathmanager.cpp">
+      <Filter>LSW\2. Interface\PathManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -307,6 +319,12 @@
     </ClInclude>
     <ClInclude Include="LSW\Interface\Connection\connection.h">
       <Filter>LSW\2. Interface\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\SmartFile\smartfile.h">
+      <Filter>LSW\2. Interface\SmartFile</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\PathManager\pathmanager.h">
+      <Filter>LSW\2. Interface\PathManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

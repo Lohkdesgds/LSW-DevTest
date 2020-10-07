@@ -81,6 +81,10 @@ namespace LSW {
 				return classic_refresh();
 			}
 
+			const classic_2d& Camera::get_classic() const
+			{
+				return cl_2d;
+			}
 			classic_2d& Camera::get_classic()
 			{
 				return cl_2d;
@@ -121,7 +125,7 @@ namespace LSW {
 				al_translate_transform_3d(&t, x, y, z);
 			}
 
-			void Camera::apply()
+			void Camera::apply() const
 			{
 				al_use_transform(&t);
 			}

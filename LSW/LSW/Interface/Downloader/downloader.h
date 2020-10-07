@@ -26,13 +26,15 @@ namespace LSW {
 				bool threadend = true;
 				size_t TotalBytesRead = 0;
 			public:
+				~Downloader();
+
 				bool get(const std::string&);
 
 				bool get_async(const std::string&);
-				bool ended();
-				size_t bytes_read();
+				bool ended() const;
+				size_t bytes_read() const;
 
-				std::string& read();
+				const std::string& read() const;
 			};
 		}
 	}

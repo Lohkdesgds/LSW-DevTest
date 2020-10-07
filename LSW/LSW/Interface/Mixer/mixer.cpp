@@ -44,7 +44,7 @@ namespace LSW {
 				//return al_attach_sample_instance_to_mixer(&(*s->get_instance()), &(*mixer));
 			}
 
-			float Mixer::get_gain()
+			float Mixer::get_gain() const
 			{
 				return al_get_mixer_gain(mixer.get());
 			}

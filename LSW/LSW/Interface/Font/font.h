@@ -18,7 +18,7 @@ namespace LSW {
 				bool set(ALLEGRO_FONT*);
 				ALLEGRO_FONT* quick() const;
 				ALLEGRO_FONT* quick();
-				Color hex(const int);
+				Color hex(const int) const;
 			public:
 				Font();
 
@@ -34,21 +34,21 @@ namespace LSW {
 				ALLEGRO_FONT* operator*();
 
 				// top part of font height
-				int get_line_ascent();
+				int get_line_ascent() const;
 				// bottom part of font height
-				int get_line_descent();
+				int get_line_descent() const;
 				// sum of ascent and descent basically
-				int get_line_height();
+				int get_line_height() const;
 
 				// gets width of the string
-				int get_width(const char*);
+				int get_width(const char*) const;
 				// gets width of the string
-				int get_width(Tools::Cstring);
+				int get_width(Tools::Cstring) const;
 
 				// faster direct drawing one color
-				void draw(Color, const float, const float, const int, const char*);
+				void draw(Color, const float, const float, const int, const char*) const;
 				// slower, Cstring has colors itself, so no need to tell the color. It knows.
-				void draw(const float, const float, const int, Tools::Cstring);
+				void draw(const float, const float, const int, Tools::Cstring) const;
 
 				// todo
 				//void draw(ALLEGRO_COLOR, const float, const float, const float, const int, Cstring);

@@ -38,7 +38,7 @@ namespace LSW {
 				// attach Voice to mixer
 				bool attach_to(std::shared_ptr<Voice>);
 
-				float get_gain();
+				float get_gain() const;
 				void set_gain(const float);
 
 				bool exists() const;

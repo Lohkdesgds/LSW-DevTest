@@ -23,7 +23,7 @@ namespace LSW {
 				return nullptr;
 			}
 
-			Color Font::hex(const int hx)
+			Color Font::hex(const int hx) const
 			{
 				switch (hx) {
 				case 0x0:
@@ -102,41 +102,41 @@ namespace LSW {
 				return quick();
 			}
 
-			int Font::get_line_ascent()
+			int Font::get_line_ascent() const
 			{
 				if (auto q = quick(); q) return al_get_font_ascent(q);
 				return -1;
 			}
 
-			int Font::get_line_descent()
+			int Font::get_line_descent() const
 			{
 				if (auto q = quick(); q) return al_get_font_descent(q);
 				return -1;
 			}
 
-			int Font::get_line_height()
+			int Font::get_line_height() const
 			{
 				if (auto q = quick(); q) return al_get_font_line_height(q);
 				return -1;
 			}
 
-			int Font::get_width(const char* str)
+			int Font::get_width(const char* str) const
 			{
 				if (auto q = quick(); q) return al_get_text_width(q, str);
 				return -1;
 			}
-			int Font::get_width(Tools::Cstring str)
+			int Font::get_width(Tools::Cstring str) const
 			{
 				if (auto q = quick(); q) return al_get_text_width(q, str.s_str().c_str());
 				return -1;
 			}
 
-			void Font::draw(Color c, const float x, const float y, const int f, const char* s)
+			void Font::draw(Color c, const float x, const float y, const int f, const char* s) const
 			{
 				if (auto q = quick(); q) al_draw_text(q, c, x, y, f, s);
 			}
 
-			void Font::draw(const float x, const float y, const int f, Tools::Cstring s)
+			void Font::draw(const float x, const float y, const int f, Tools::Cstring s) const
 			{
 				if (auto q = quick(); q) {
 					std::string thebuff;

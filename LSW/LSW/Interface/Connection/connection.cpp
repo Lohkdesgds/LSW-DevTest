@@ -239,12 +239,12 @@ namespace LSW {
 				}
 			}
 
-			bool Connection::is_connected()
+			bool Connection::is_connected() const
 			{
 				return connected != INVALID_SOCKET && keep_connection;
 			}
 
-			bool Connection::has_package()
+			bool Connection::has_package() const
 			{
 				std::lock_guard<std::mutex> luck(packs_received_m);
 				return packs_received.size();
@@ -268,12 +268,12 @@ namespace LSW {
 				packs_sending.push_back(std::move(pack));
 			}
 
-			size_t Connection::get_packages_sent()
+			size_t Connection::get_packages_sent() const
 			{
 				return packages_sent;
 			}
 
-			size_t Connection::get_packages_recv()
+			size_t Connection::get_packages_recv() const
 			{
 				return packages_recv;
 			}
@@ -359,7 +359,7 @@ namespace LSW {
 				close();
 			}
 
-			size_t Hosting::size()
+			size_t Hosting::size() const
 			{
 				std::lock_guard<std::mutex> safe(connections_m);
 				return connections.size();
@@ -377,7 +377,7 @@ namespace LSW {
 				}
 			}
 
-			bool Hosting::is_connected()
+			bool Hosting::is_connected() const
 			{
 				return keep_connection && Listening != INVALID_SOCKET;
 			}

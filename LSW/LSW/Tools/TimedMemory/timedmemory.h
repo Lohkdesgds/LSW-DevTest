@@ -63,6 +63,9 @@ namespace LSW {
 				std::shared_ptr<T> get() {
 					return mem;
 				}
+				const std::shared_ptr<T> get() const {
+					return mem;
+				}
 
 			};
 		}

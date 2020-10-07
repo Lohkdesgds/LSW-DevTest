@@ -5,7 +5,8 @@
 using namespace LSW::v5;
 using namespace LSW::v5::Interface;
 
-const std::string testpath = "%appdata%\\Lohk's Studios\\TheBlast\\config\\config.lohk";
+const std::string configpath = "%appdata%\\Lohk's Studios\\TheBlast\\config\\config.lohk";
+const std::string datapath = "%appdata%\\Lohk's Studios\\TheBlast\\data\\data.zip";
 
 int main() {
 	/*{
@@ -21,7 +22,7 @@ int main() {
 
 	Logger logg;
 
-	logg << L::SL << fsr(__FUNCSIG__) << "> > > > > SOCKET TEST < < < < <" << L::EL;
+	logg << L::SL << fsr(__FUNCSIG__) << "&e> > > > > SOCKET TEST < < < < <" << L::EL;
 	{
 		logg << L::SL << fsr(__FUNCSIG__) << "Initializing host..." << L::EL;
 
@@ -71,25 +72,117 @@ int main() {
 			logg << L::SL << fsr(__FUNCSIG__) << "Did they match? " << ((res == second_msg) ? "YES" : "NO") << L::EL;
 		}
 	}
-	logg << L::SL << fsr(__FUNCSIG__) << "> > > > > END OF SOCKET TEST < < < < <" << L::EL;
+	logg << L::SL << fsr(__FUNCSIG__) << "&e> > > > > END OF SOCKET TEST < < < < <" << L::EL;
 
+
+	logg << L::SL << fsr(__FUNCSIG__) << "&e> > > > > FILE TEST < < < < <" << L::EL;
+	{
+		Interface::SmartFile file;
+
+		logg << L::SL << fsr(__FUNCSIG__) << "Opening &9test_example.txt&f..." << L::EL;
+
+		if (file.open("test_example.txt", smartfile::file_modes::READ_WRITE_KEEP))
+		{
+			logg << L::SL << fsr(__FUNCSIG__) << "Opened in READ_WRITE_KEEP." << L::EL;
+
+		}
+		else {
+			if (file.open("test_example.txt", smartfile::file_modes::READ_WRITE_OVERWRITE)) {
+				logg << L::SL << fsr(__FUNCSIG__) << "Opened in READ_WRITE_OVERWRITE." << L::EL;
+			}
+			else {
+				logg << L::SL << fsr(__FUNCSIG__, E::ERRR) << "Cannot open file." << L::EL;
+			}
+		}
+
+		if (file.is_open()) {
+			std::string buf;
+			
+			if (file.read(buf, 256)) {
+				logg << L::SL << fsr(__FUNCSIG__) << "Got this from file: " << buf << L::EL;
+			}
+			else {
+				logg << L::SL << fsr(__FUNCSIG__) << "Cannot read from file." << L::EL;
+			}
+
+			file.seek(0, smartfile::file_seek::BEGIN);
+			
+			file.write("this is a huge test.");
+			logg << L::SL << fsr(__FUNCSIG__) << "Set file value." << L::EL;
+
+			file.close();
+		}
+
+	}
+	logg << L::SL << fsr(__FUNCSIG__) << "&e> > > > > END OF FILE TEST < < < < <" << L::EL;
+
+
+	logg << L::SL << fsr(__FUNCSIG__) << "&e> > > > > PATHMANAGER TEST < < < < <" << L::EL;
+
+	Interface::PathManager pather;
+	pather.add_path(datapath);
+	pather.apply();
+
+	logg << L::SL << fsr(__FUNCSIG__) << "Paths found there:" << L::EL;
+
+	for (auto& i : pather.paths_set()) {
+		logg << L::SL << fsr(__FUNCSIG__) << "> &9" << i << L::EL;
+	}
+	logg << L::SL << fsr(__FUNCSIG__) << "Files found there:" << L::EL;
+
+	for (auto& i : pather.files_in_paths()) {
+		logg << L::SL << fsr(__FUNCSIG__) << "> &5" << i.path << " [" << i.size_str << "]" << L::EL;
+	}
+
+	pather.unapply();
+
+	logg << L::SL << fsr(__FUNCSIG__) << "&e> > > > > ENDED SETUP OF PATHMANAGER < < < < <" << L::EL;
 
 
 	logg << L::SL << fsr(__FUNCSIG__) << "Creating display..." << L::EL;
 
 	Display disp;
 
-	Tools::Future<> disp_fut = disp.init();
+	Tools::Future<bool> disp_fut = disp.init();
 
 	logg << L::SL << fsr(__FUNCSIG__) << "Created display." << L::EL;
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
-	auto working_on = disp.add_once_task([] {
+	auto working_on = disp.add_once_task([pather] {		
+		Logger logg;
 		Tools::SuperResource<Bitmap> source;
+
+		auto atlas = source.create("ATLAS_GLOBAL");
 		auto lmao = source.create("_test");
-		lmao->create(300, 300);
-		lmao->clear_to_color(Color(255, 255, 255));
+
+		pather.apply();
+		atlas->load("atlas0.png");
+		bool gud = *atlas;
+
+		if (!gud) logg << L::SL << fsr(__FUNCSIG__, E::WARN) << "Failed to load atlas." << L::EL;
+
+		if (gud) {
+			gud = lmao->create_sub(*atlas, 0, 1536, 512, 512);
+			if (!gud) {
+				logg << L::SL << fsr(__FUNCSIG__, E::WARN) << "Failed to load sub bitmap from atlas." << L::EL;
+			}
+			else {
+				logg << L::SL << fsr(__FUNCSIG__) << "Loaded a bitmap from atlas SUCESSFULLY" << L::EL;
+			}
+		}
+		if (!gud) {
+			lmao->create(300, 300);
+			lmao->clear_to_color(Color(255, 255, 255));
+			if (*lmao) {
+				logg << L::SL << fsr(__FUNCSIG__) << "Successfully created a bitmap to show." << L::EL;
+			}
+			else {
+				logg << L::SL << fsr(__FUNCSIG__, E::ERRR) << "Failed to create a bitmap." << L::EL;
+			}
+		}
+		pather.unapply();
+
 		return lmao;
 	});
 	auto got = working_on.get().get<std::shared_ptr<Bitmap>>();
@@ -97,7 +190,7 @@ int main() {
 	Tools::SuperResource<Config> configs;
 
 	auto conf = configs.create("DEFAULT");
-	conf->load(testpath);
+	conf->load(configpath);
 
 	/*auto vector_lol1 = conf->get_array<float>("config", "playercolor");
 	for (auto& i : vector_lol1) {
@@ -246,12 +339,13 @@ int main() {
 		case ALLEGRO_EVENT_DISPLAY_CLOSE:
 			logg << L::SL << fsr(__FUNCSIG__) << "Close app called" << L::EL;
 			if (track->exists()) track->stop();
-			disp.stop();
+			disp.set_stop();
 			break;
 		}
 	});
 
-	disp_fut.then([&] {
+	disp_fut.then<void>([&](bool good) {
+		logg << L::SL << fsr(__FUNCSIG__) << "Display closed with SUCCESS=" << good << L::EL;
 		logg.debug("disp_fut.then() called.");
 	});
 

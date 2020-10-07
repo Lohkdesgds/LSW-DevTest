@@ -3,7 +3,10 @@
 namespace LSW {
 	namespace v5 {
 		namespace Interface {
-
+			Downloader::~Downloader()
+			{
+				if (thr.joinable()) thr.join();
+			}
 			bool Downloader::get(const std::string& url)
 			{
 #ifdef UNICODE
@@ -37,22 +40,20 @@ namespace LSW {
 			bool Downloader::get_async(const std::string& url)
 			{
 				if (!threadend) return false;
+				else if (thr.joinable()) thr.join();
 				threadend = false;
 				thr = std::thread([&, url] { get(url); threadend = true; });
 				return true;
 			}
-			bool Downloader::ended()
+			bool Downloader::ended() const
 			{
-				if (threadend) {
-					if (thr.joinable()) thr.join();
-				}
 				return threadend;
 			}
-			size_t Downloader::bytes_read()
+			size_t Downloader::bytes_read() const
 			{
 				return TotalBytesRead;
 			}
-			std::string& Downloader::read()
+			const std::string& Downloader::read() const
 			{
 				return buf;
 			}

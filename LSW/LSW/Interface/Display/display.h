@@ -38,7 +38,7 @@ namespace LSW {
 				DisplayStrongPtr display;
 				EventHandler display_events;
 				
-				Tools::SuperThread thr;				
+				Tools::SuperThreadT<bool> thr;				
 
 				size_t draw_tasks_count = 0;
 				std::vector<std::pair<size_t, DisplayTask>> draw_tasks;
@@ -63,17 +63,17 @@ namespace LSW {
 				~Display();
 
 				// Starts the display thread and starts refresing screen
-				Tools::Future<> init();
+				Tools::Future<bool> init();
 				// Stops tasks and closes screen
 				void deinit();
 				// Just sets to stop (do not close fully)
-				void stop();
+				void set_stop();
 
 				// set a camera to be applied every time
 				void set_camera(std::shared_ptr<Camera>);
 
 				// if display exists, thread is running, so true
-				bool is_running();
+				bool is_running() const;
 
 				// set new display flags
 				void set_new_display_flags(const int);
@@ -99,7 +99,7 @@ namespace LSW {
 				void remove_draw_task(const size_t);
 
 				// get Display event source (resize, close, and so on)
-				Event get_event_source();
+				Event get_event_source() const;
 
 				//DisplayWeakPtr _get_raw_display() const;
 			};

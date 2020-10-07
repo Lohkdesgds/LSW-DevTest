@@ -54,7 +54,7 @@ namespace LSW {
 				ConnectionCore core;
 				Logger logg;
 
-				std::mutex packs_received_m;
+				mutable std::mutex packs_received_m;
 				std::vector<std::string> packs_received;
 				std::mutex packs_sending_m;
 				std::vector<std::string> packs_sending;
@@ -88,15 +88,15 @@ namespace LSW {
 				// close the communication and threads.
 				void close();
 
-				bool is_connected();
+				bool is_connected() const;
 
-				bool has_package();
+				bool has_package() const;
 				std::string get_next();
 
 				void send_package(std::string);
 
-				size_t get_packages_sent();
-				size_t get_packages_recv();
+				size_t get_packages_sent() const;
+				size_t get_packages_recv() const;
 
 				// ALL reads (recv) goes to this instead of internal management
 				// DO NOT SET A FUNCTION THAT LOCKS FOR TOO LONG! IT MIGHT BREAK THE APP!
@@ -123,7 +123,7 @@ namespace LSW {
 
 				Tools::Waiter connection_event;
 				std::vector<std::shared_ptr<Connection>> connections;
-				std::mutex connections_m;
+				mutable std::mutex connections_m;
 
 				void handle_queue();
 
@@ -135,11 +135,11 @@ namespace LSW {
 				Hosting(const bool = false);
 				~Hosting();
 
-				size_t size();
+				size_t size() const;
 
 				void close();
 
-				bool is_connected();
+				bool is_connected() const;
 
 				void set_connections_limit(const size_t);
 

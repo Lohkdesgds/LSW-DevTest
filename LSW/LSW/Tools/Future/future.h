@@ -203,7 +203,6 @@ namespace LSW {
 					if (next->has_future_task()) next->run_if_not_yet(*later_value.var, false);
 					got_value_already = true;
 				}
-				return *later_value.var;
 			}
 			template<typename T>
 			template<typename Q, std::enable_if_t<std::is_void_v<Q>, int>>

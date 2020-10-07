@@ -12,40 +12,48 @@ namespace LSW {
 			}
 			bool Display::thread_run(Tools::boolThreadF keep)
 			{
-				thread_init();
 
-				while (keep()) {
+				bool verynice = true;
 
-					if (refresh_camera) {
-						cam_m.lock();
-						auto cam_cpy = camera;
-						if (refresh_camera && cam_cpy) {
-							if (refresh_camera) refresh_camera = !cam_cpy->classic_update(get_buffer_ref());
-							//refresh_camera = false;
-							cam_cpy->classic_refresh();
-							cam_cpy->apply();
+				try {
+					thread_init();
+
+					while (keep()) {
+
+						if (refresh_camera) {
+							cam_m.lock();
+							auto cam_cpy = camera;
+							if (refresh_camera && cam_cpy) {
+								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(get_buffer_ref());
+								//refresh_camera = false;
+								cam_cpy->classic_refresh();
+								cam_cpy->apply();
+							}
+							cam_m.unlock();
 						}
-						cam_m.unlock();
+
+						once_tasks_m.lock();
+						for (auto& i : once_tasks) i.work(); //i.set_value(10);
+						once_tasks.clear();
+						once_tasks_m.unlock();
+
+
+						al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
+
+						draw_tasks_m.lock();
+						for (auto& i : draw_tasks) i.second();
+						draw_tasks_m.unlock();
+
+						al_flip_display();
 					}
-
-					once_tasks_m.lock();
-					for (auto& i : once_tasks) i.work(); //i.set_value(10);
-					once_tasks.clear();
-					once_tasks_m.unlock();
-
-
-					al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
-
-					draw_tasks_m.lock();
-					for (auto& i : draw_tasks) i.second();
-					draw_tasks_m.unlock();
-
-					al_flip_display();
+				}
+				catch (...) { // enhance later
+					verynice = false;
 				}
 
 				thread_deinit();
 
-				return true;
+				return verynice;
 			}
 			void Display::thread_init()
 			{
@@ -86,7 +94,7 @@ namespace LSW {
 			{
 				deinit();
 			}
-			Tools::Future<> Display::init()
+			Tools::Future<bool> Display::init()
 			{
 				thr.join();
 				thr.set([&](Tools::boolThreadF f) {return thread_run(f); });
@@ -97,7 +105,7 @@ namespace LSW {
 				thr.stop();
 				thr.join();
 			}
-			void Display::stop()
+			void Display::set_stop()
 			{
 				thr.stop();
 			}
@@ -108,7 +116,7 @@ namespace LSW {
 				cam_m.unlock();
 				refresh_camera = true;
 			}
-			bool Display::is_running()
+			bool Display::is_running() const
 			{
 				return display.operator bool();
 			}
@@ -163,7 +171,7 @@ namespace LSW {
 				}
 				draw_tasks_m.unlock();
 			}
-			Event Display::get_event_source()
+			Event Display::get_event_source() const
 			{
 				if (display) {
 					return Event(al_get_display_event_source(display.get()));

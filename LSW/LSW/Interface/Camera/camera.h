@@ -52,6 +52,8 @@ namespace LSW {
 				bool classic_update(std::shared_ptr<Bitmap>);
 
 				// get reference to classic data (saved via classic_ commands)
+				const classic_2d& get_classic() const;
+				// get reference to classic data (saved via classic_ commands)
 				classic_2d& get_classic();
 
 				// rotate the matrix
@@ -72,8 +74,8 @@ namespace LSW {
 				// translate matrix 3d
 				void translate_3d(const float, const float, const float);
 
-				// apply transform to current thread display
-				void apply();
+				// apply transform to current thread display (const because it doesn't change itself)
+				void apply() const;
 			};
 
 		}
