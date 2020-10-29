@@ -9,18 +9,18 @@ namespace LSW {
 
 
 
-			FormatAs::FormatAs(std::string&& form)
+			FormatAs::FormatAs(const std::string& form)
 			{
 				if (form.find('%') == std::string::npos) throw Handling::Abort(__FUNCSIG__, "Invalid FORMAT! You have to use something like %d or %05.3lf as on a printf!");
 				format = form;
 			}
 
-			FormatAs::FormatAs(FormatAs& fa)
+			FormatAs::FormatAs(const FormatAs& fa)
 			{
-				format = fa.get_format();
+				format = fa.format;
 			}
 
-			const std::string& FormatAs::get_format()
+			const std::string& FormatAs::get_format() const
 			{
 				return format;
 			}
@@ -30,7 +30,7 @@ namespace LSW {
 				format.clear();
 			}
 
-			bool FormatAs::has_custom_format()
+			bool FormatAs::has_custom_format() const
 			{
 				return !format.empty();
 			}
@@ -81,7 +81,7 @@ namespace LSW {
 				if (!g.fp && g.file_write_enabled) {
 					str.append("&4[&eFILEERRR&4]");
 				}
-				str.__change_last_color(Tools::cstring::C::GOLD);
+				str += Tools::cstring::C::GOLD;
 				str.append(_generate_date());
 				/*for (size_t pp = 0; pp < ss; pp++) {
 					str.push_back({ temp[pp], cstring::C::GOLD });
@@ -89,10 +89,11 @@ namespace LSW {
 				print(str);
 			}
 
-			void Logger::send_last()
+			void Logger::send_last_and_cleanup()
 			{
-				if (g.sendd) g.sendd(g.memline_s);
-				g.memline_s.clear();
+				g.last_str = std::move(g.memline_s);
+				if (g.sendd) g.sendd(g.last_str);
+				//g.memline_s.clear();
 			}
 			void Logger::print(const Tools::Cstring& cstr) {
 				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -113,10 +114,10 @@ namespace LSW {
 				}
 			}
 
-			void Logger::init(const std::string path)
+			void Logger::init(std::string path)
 			{
 				g.m.lock();
-				g.path = path;
+				g.path = std::move(path);
 
 				Handling::handle_path(g.path);
 
@@ -124,7 +125,7 @@ namespace LSW {
 					auto err = fopen_s(&g.fp, g.path.c_str(), "wb");
 					if (err) {
 						g.m.unlock();
-						throw Handling::Abort(__FUNCSIG__, "Failed to open log: '" + path + "'", Handling::abort::abort_level::GIVEUP);
+						throw Handling::Abort(__FUNCSIG__, "Failed to open log: '" + g.path + "'", Handling::abort::abort_level::GIVEUP);
 						return;
 					}
 				}
@@ -164,13 +165,17 @@ namespace LSW {
 				g.dbgm.unlock();
 #endif
 			}
-			void Logger::hook(std::function<void(Tools::Cstring)> f)
+			void Logger::hook(std::function<void(const Tools::Cstring&)> f)
 			{
 				g.sendd = f;
 			}
 			void Logger::unhook()
 			{
-				hook(std::function<void(Tools::Cstring)>());
+				hook(std::function<void(const Tools::Cstring&)>());
+			}
+			const Tools::Cstring& Logger::get_last_line() const
+			{
+				return g.last_str;
 			}
 			Logger& Logger::operator<<(const L& u)
 			{
@@ -190,7 +195,7 @@ namespace LSW {
 					}
 					g.m_b = false;
 					g.m.unlock();	/// yes, visual studio thinks this is an epic WARN, but it will never fail if you use gfile << L::SL(F) << fsr(__FUNCSIG__) << ... << L::EL(F)
-					send_last(); // send last coloured string to event
+					send_last_and_cleanup(); // send last coloured string to event and clear
 					break;
 				case L::SLF: // START LINE AND SAVE ON FILE
 					g.m.lock();
@@ -208,36 +213,25 @@ namespace LSW {
 					g.file_write_enabled = false;
 					g.m.unlock();	/// yes, visual studio thinks this is an epic WARN, but it will never fail if you use gfile << L::SL(F) << fsr(__FUNCSIG__) << ... << L::EL(F)
 					flush();
-					send_last(); // send last coloured string to event
+					send_last_and_cleanup(); // send last coloured string to event and clear
 					break;
 				}
 				return *this;
 			}
 
-			Logger& Logger::operator<<(FormatAs&& nfa)
+			Logger& Logger::operator<<(const FormatAs& nfa)
 			{
 				latestFormat = nfa;
 				return *this;
 			}
 
-			Logger& Logger::operator<<(Tools::Cstring&& clstr)
+			Logger& Logger::operator<<(const Tools::Cstring& clstr)
 			{
 				print(clstr);
 				if (g.file_write_enabled) fprint(g.fp, clstr);
 				if (clstr.size()) {
 					//g.last_c = clstr[clstr.size() - 1].cr;
-					g.last_c = clstr.__last_color();
-				}
-				g.memline_s += clstr;
-				return *this;
-			}
-			Logger& Logger::operator<<(Tools::Cstring& clstr)
-			{
-				print(clstr);
-				if (g.file_write_enabled) fprint(g.fp, clstr);
-				if (clstr.size()) {
-					//g.last_c = clstr[clstr.size() - 1].cr;
-					g.last_c = clstr.__last_color();
+					g.last_c = clstr.next_color();
 				}
 				g.memline_s += clstr;
 				return *this;
@@ -371,7 +365,7 @@ namespace LSW {
 				return (this->operator<<(buf));
 			}
 
-			const std::string fsr(std::string fname_pretty, const E situation)
+			const Tools::Cstring fsr(std::string fname_pretty, const E situation)
 			{
 				if (fname_pretty.length() < logger::len_class) {
 					for (size_t p = fname_pretty.length(); p < logger::len_class; p++)
@@ -408,7 +402,7 @@ namespace LSW {
 
 				back_str += "&8[" + fname_pretty + "]&f ";
 
-				return back_str;
+				return back_str; // convert
 			}
 		}
 	}

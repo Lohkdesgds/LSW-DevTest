@@ -252,7 +252,7 @@ namespace LSW {
 
 			std::string Connection::get_next()
 			{
-				if (alt_generate_auto) throw Handling::Abort(__FUNCSIG__, "Recvs are overrwriten by a function! You cannot recv package when function is set!");
+				if (alt_receive_autodiscard) throw Handling::Abort(__FUNCSIG__, "Recvs are overrwriten by a function! You cannot recv package when function is set!");
 				std::lock_guard<std::mutex> luck(packs_received_m);
 				if (packs_received.size() == 0) return "";
 				std::string cpy = std::move(packs_received.front());
@@ -262,7 +262,7 @@ namespace LSW {
 
 			void Connection::send_package(std::string pack)
 			{
-				if (alt_receive_autodiscard) throw Handling::Abort(__FUNCSIG__, "Sends are overrwriten by a function! You cannot send package when function is set!");
+				if (alt_generate_auto) throw Handling::Abort(__FUNCSIG__, "Sends are overrwriten by a function! You cannot send package when function is set!");
 				std::lock_guard<std::mutex> luck(packs_sending_m);
 
 				packs_sending.push_back(std::move(pack));

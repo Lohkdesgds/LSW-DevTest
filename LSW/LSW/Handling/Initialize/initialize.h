@@ -15,13 +15,61 @@ namespace LSW {
 	namespace v5 {
 		namespace Handling {
 
+			/// <summary>
+			/// <para>Initializes basic and audio parts.</para>
+			/// <para>[al_init]</para>
+			/// </summary>
+			/// <returns>{bool} Success</returns>
 			bool init_basic();
+
+			/// <summary>
+			/// <para>Initializes the basic part of the Allegro library.</para>
+			/// <para>[init_basic;al_init_acodec_addon;al_install_audio;al_reserve_samples]</para>
+			/// </summary>
+			/// <param name="{unsigned short}">Amount of samples</param>
+			/// <returns>{bool} Success</returns>
 			bool init_audio(const unsigned short = 4);
+
+			/// <summary>
+			/// <para>Initializes font (normal and ttf) parts.</para>
+			/// <para>[init_basic;al_init_font_addon;al_init_ttf_addon]</para>
+			/// </summary>
+			/// <returns>{bool} Success</returns>
 			bool init_font();
+
+			/// <summary>
+			/// <para>Initializes image and primitives parts.</para>
+			/// <para>[init_basic;al_init_image_addon;al_init_primitives_addon]</para>
+			/// </summary>
+			/// <returns>{bool} Success</returns>
 			bool init_graphics();
+
+			/// <summary>
+			/// <para>Installs keyboard part.</para>
+			/// <para>[init_basic;al_install_keyboard]</para>
+			/// </summary>
+			/// <returns>{bool} Success</returns>
 			bool init_keyboard();
+
+			/// <summary>
+			/// <para>Installs mouse part.</para>
+			/// <para>[init_basic;al_install_mouse]</para>
+			/// </summary>
+			/// <returns>{bool} Success</returns>
 			bool init_mouse();
+
+			/// <summary>
+			/// <para>Installs joypad/joystick/controller part.</para>
+			/// <para>[init_basic;al_install_joystick]</para>
+			/// </summary>
+			/// <returns>{bool} Success</returns>
 			bool init_joypad();
+
+			/// <summary>
+			/// <para>Installs touchscreen part.</para>
+			/// <para>[init_basic;al_install_touch_input]</para>
+			/// </summary>
+			/// <returns>{bool} Success</returns>
 			bool init_touch();
 		}
 

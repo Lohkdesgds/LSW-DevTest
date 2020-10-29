@@ -8,6 +8,8 @@
 // C++
 #include <string>
 
+#include "..\..\Handling\Path\path.h"
+
 namespace LSW {
     namespace v5 {
         namespace Tools {
@@ -64,9 +66,21 @@ namespace LSW {
            | ((uint32) *((str) + 0) << 24);   \
 }
 
-                std::string sha256(std::string input); // any string
-                std::string sha256_f(std::string fpath); // FILE
             }
+
+            /// <summary>
+            /// <para>Gets the string and generates a SHA256 code based on it.</para>
+            /// </summary>
+            /// <param name="{std::string}">The data itself.</param>
+            /// <returns>{std::string} The hash.</returns>
+            std::string sha256(const std::string& input);
+
+            /// <summary>
+            /// <para>Generates a SHA256 based on content in a file.</para>
+            /// </summary>
+            /// <param name="{std::string}">The path to the file (can contain %tags%).</param>
+            /// <returns>{std::string} The hash.</returns>
+            std::string sha256_f(std::string fpath);
         }
     }
 }

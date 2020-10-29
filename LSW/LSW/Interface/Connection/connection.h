@@ -32,12 +32,17 @@ namespace LSW {
 				constexpr int default_port = 42069;
 				constexpr unsigned package_size = 1 << 8;
 			}
+
 			struct _pack {
 				char data[connection::package_size] = { 0 };
 				unsigned data_len = 0;
 				unsigned sum_with_n_more = 0;
 			};
 
+			/// <summary>
+			/// <para>This is the WinSock base.</para>
+			/// <para>You won't use this directly.</para>
+			/// </summary>
 			class ConnectionCore {
 				WSADATA wsaData = WSADATA();
 				addrinfo* result = nullptr;
@@ -49,7 +54,9 @@ namespace LSW {
 				bool as_host(SOCKET&);
 			};
 
-
+			/// <summary>
+			/// <para>A connection itself (one to one).</para>
+			/// </summary>
 			class Connection {
 				ConnectionCore core;
 				Logger logg;
@@ -80,36 +87,96 @@ namespace LSW {
 			public:
 				Connection(const Connection&) = delete;
 				Connection(Connection&&) = delete;
+
+				/// <summary>
+				/// <para>FOR DIRECT HOST SET ONLY. This is not meant to be used if SOCKET is not valid.</para>
+				/// <para>Use at your own risk.</para>
+				/// </summary>
+				/// <param name="{SOCKET}">The RAW SOCKET (winsock) connection.</param>
 				Connection(SOCKET = INVALID_SOCKET);
 				~Connection();
 
-				// normally client call this one
+				/// <summary>
+				/// <para>Connects to a URL/IP.</para>
+				/// </summary>
+				/// <param name="{char*}">The URL/IP.</param>
+				/// <param name="{int}">Port number.</param>
+				/// <returns>{bool} True if connected successfully.</returns>
 				bool connect(const char* = "127.0.0.1", const int = connection::default_port);
-				// close the communication and threads.
+
+				/// <summary>
+				/// <para>Close communication and aux threads.</para>
+				/// </summary>
 				void close();
 
+				/// <summary>
+				/// <para>Is this connected to something?</para>
+				/// </summary>
+				/// <returns>{bool} True if connected.</returns>
 				bool is_connected() const;
 
+				/// <summary>
+				/// <para>Is there something for me?</para>
+				/// </summary>
+				/// <returns>{bool} True if has something to get.</returns>
 				bool has_package() const;
+
+				/// <summary>
+				/// <para>Get next package.</para>
+				/// </summary>
+				/// <returns>{std::string} The package received.</returns>
 				std::string get_next();
 
+				/// <summary>
+				/// <para>Send a package of bytes.</para>
+				/// </summary>
+				/// <param name="{std::string}">The bytes you want to send.</param>
 				void send_package(std::string);
 
+				/// <summary>
+				/// <para>Total small packages sent (not package itself, the small ones).</para>
+				/// <para>You can get total bytes by doing this * connection::package_size. Total bytes may be bigger than actual data sent (because of fixed size).</para>
+				/// </summary>
+				/// <returns>{size_t} Small packages sent.</returns>
 				size_t get_packages_sent() const;
+
+				/// <summary>
+				/// <para>Total small packages received (not package itself, the small ones).</para>
+				/// <para>You can get total bytes by doing this * connection::package_size. Total bytes may be bigger than actual data sent (because of fixed size).</para>
+				/// </summary>
+				/// <returns>{size_t} Small packages received.</returns>
 				size_t get_packages_recv() const;
 
-				// ALL reads (recv) goes to this instead of internal management
-				// DO NOT SET A FUNCTION THAT LOCKS FOR TOO LONG! IT MIGHT BREAK THE APP!
+				/// <summary>
+				/// <para>Set a function to handle RECV RAW data.</para>
+				/// <para>WARN: All data from RECV will be handled exclusively by your custom function if you set one!</para>
+				/// <para>PS: DO NOT SET A FUNCTION THAT CAN POTENTIALLY LOCK!</para>
+				/// </summary>
+				/// <param name="{std::function}">The function to handle small package reading.</param>
 				void overwrite_reads_to(std::function<void(const std::string&)>);
 
-				// ALL sends HAS TO COME from this function
-				// DO NOT SET A FUNCTION THAT LOCKS FOR TOO LONG! IT MIGHT BREAK THE APP!
+				/// <summary>
+				/// <para>Set a function to handle SEND RAW data.</para>
+				/// <para>WARN: All data has to be SENT by this. This has to be the one generating strings. Send_package won't work.</para>
+				/// <para>PS: DO NOT SET A FUNCTION THAT CAN POTENTIALLY LOCK!</para>
+				/// </summary>
+				/// <param name="{std::function}">The function to generate strings somehow. This should return empty string so it won't lock for much longer.</param>
 				void overwrite_sends_to(std::function<std::string(void)>);
 
+				/// <summary>
+				/// <para>Resets to default way of handling packages.</para>
+				/// </summary>
 				void reset_overwrite_reads();
+
+				/// <summary>
+				/// <para>Resets to default way of handling packages.</para>
+				/// </summary>
 				void reset_overwrite_sends();
 			};
 
+			/// <summary>
+			/// <para>This handles host. It will connect and create Connection smart pointers that you can handle later.</para>
+			/// </summary>
 			class Hosting {
 				ConnectionCore core;
 				Logger logg;
@@ -131,19 +198,56 @@ namespace LSW {
 			public:
 				Hosting(const Hosting&) = delete;
 				Hosting(Hosting&&) = delete;
+
+				/// <summary>
+				/// <para>Initialize a Host.</para>
+				/// </summary>
+				/// <param name="{int}">Port.</param>
+				/// <param name="{bool}">IPV6?</param>
 				Hosting(const int, const bool = false);
+
+				/// <summary>
+				/// <para>Initialize a Host using default port.</para>
+				/// </summary>
+				/// <param name="{bool}">IPV6?</param>
 				Hosting(const bool = false);
 				~Hosting();
 
+				/// <summary>
+				/// <para>How many clients are connected?</para>
+				/// </summary>
+				/// <returns>{size_t} The amount of connected clients.</returns>
 				size_t size() const;
 
+				/// <summary>
+				/// <para>Close all connections.</para>
+				/// </summary>
 				void close();
 
+				/// <summary>
+				/// <para>Is host online?</para>
+				/// </summary>
+				/// <returns>{bool} True if listening and ready.</returns>
 				bool is_connected() const;
 
+				/// <summary>
+				/// <para>Sets a limit of connections (won't disconnect if amount connected right now is bigger than this value).</para>
+				/// <para>New connections will connect and disconnect instantly.</para>
+				/// </summary>
+				/// <param name="{size_t}">Maximum amount of connections allowed.</param>
 				void set_connections_limit(const size_t);
 
+				/// <summary>
+				/// <para>Gets a specific connected client connection [0..size()-1].</para>
+				/// </summary>
+				/// <param name="{size_t}">The connection position in vector.</param>
+				/// <returns>{std::shared_ptr} The connection smart pointer.</returns>
 				std::shared_ptr<Connection> get_connection(const size_t);
+
+				/// <summary>
+				/// <para>Gets latest connected client connection.</para>
+				/// </summary>
+				/// <returns>{std::shared_ptr} The connection smart pointer.</returns>
 				std::shared_ptr<Connection> get_latest_connection();
 			};
 

@@ -16,24 +16,24 @@ namespace LSW {
 				Handling::init_audio();
 			}
 
-			bool Track::load(const std::shared_ptr<Sample> sample)
+			bool Track::load(const Sample& sample)
 			{
 				paused_at = 0;
 				if (!playing) {
 					if (!set(al_create_sample_instance(nullptr))) return false;
 
-					al_set_sample_instance_playing(&(*playing), false);
+					al_set_sample_instance_playing(playing.get(), false);
 				}
 
 				if (sample) {
-					return al_set_sample(playing.get(), sample->file_sample.get());
+					return al_set_sample(playing.get(), sample.file_sample.get());
 				}
 				return false;
 			}
 
-			bool Track::attach_to(const std::shared_ptr<Mixer> s)
+			bool Track::attach_to(const Mixer& s)
 			{
-				return al_attach_sample_instance_to_mixer(playing.get(), s->mixer.get());
+				return al_attach_sample_instance_to_mixer(playing.get(), s.mixer.get());
 			}
 
 			bool Track::exists() const

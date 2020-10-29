@@ -72,10 +72,11 @@ namespace LSW {
 				return set(al_load_font(p, s, f));
 			}
 
-			bool Font::load_ttf(const char* p, const int s, const int f)
+			// default load calls the right one
+			/*bool Font::load_ttf(const char* p, const int s, const int f)
 			{
 				return set(al_load_ttf_font(p, s, f));
-			}
+			}*/
 
 			Font::operator bool() const
 			{
@@ -87,20 +88,20 @@ namespace LSW {
 				return !font;
 			}
 
-			const bool Font::operator==(Font& o) const
+			const bool Font::operator==(const Font& o) const
 			{
-				return quick() == *o;
+				return quick() == o.quick();
 			}
 
-			const bool Font::operator==(ALLEGRO_FONT*& o) const
+			/*
+			const bool Font::operator==(const ALLEGRO_FONT*& o) const
 			{
 				return quick() == o;
 			}
-
 			ALLEGRO_FONT* Font::operator*()
 			{
 				return quick();
-			}
+			}*/
 
 			int Font::get_line_ascent() const
 			{
@@ -143,7 +144,7 @@ namespace LSW {
 					int offset_x_f = 0;
 					Tools::char_c* data_ = s.data();
 
-					for (size_t p = 0; p < s.size(); p++) {
+					for (size_t p = 0; p < s.size();/* p++*/) { // p++ there
 
 						auto clr_now = hex(static_cast<int>(data_->cr));
 
@@ -153,7 +154,7 @@ namespace LSW {
 							p++;
 						}
 
-						al_draw_text(q, clr_now, offset_x_f, 0.0, f, thebuff.c_str());
+						al_draw_text(q, clr_now, offset_x_f + x, y, f, thebuff.c_str());
 
 						offset_x_f += al_get_text_width(q, thebuff.c_str());
 						thebuff.clear();

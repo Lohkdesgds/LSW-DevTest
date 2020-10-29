@@ -64,7 +64,8 @@ namespace LSW {
 			{
 				if (str.empty()) {
 					logg.debug("A configuration could not be loaded because path was null!", E::ERRR);
-					throw Handling::Abort(__FUNCSIG__, "A configuration could not be loaded because path was null!");
+					//throw Handling::Abort(__FUNCSIG__, "A configuration could not be loaded because path was null!");
+					return false;
 				}
 
 				Handling::handle_path(str);
@@ -72,7 +73,8 @@ namespace LSW {
 				conf = al_load_config_file(str.c_str());
 				if (!conf) {
 					logg.debug("Failed to load configuration file: " + str, E::ERRR);
-					throw Handling::Abort(__FUNCSIG__, "Failed to open config '" + str + "'!");
+					//throw Handling::Abort(__FUNCSIG__, "Failed to open config '" + str + "'!");
+					return false;
 				}
 
 				path = str;

@@ -13,167 +13,176 @@ namespace LSW {
 	namespace v5 {
 		namespace Tools {
 
+			// function that returns TRUE if you should KEEP RUNNING.
 			using boolThreadF = std::function<bool(void)>;
 
 			template<typename T>
 			class SuperThreadT {
-				std::thread* thr = nullptr;
+				std::thread thr;
 				bool should_stop = false;
-				bool thread_done = true;
-				std::function<T(std::function<bool(void)>)> work;
+				bool _thread_done_flag = true;
+				Promise<T> promise;
 
-				Promise<T>* ree = nullptr;
+				// if you have to set after kill, easy way
+				template<typename Q = T, std::enable_if_t<!std::is_void_v<Q>, int> = 0>
+				void _set_promise_forced();
 
+				// if you have to set after kill, easy way
+				template<typename Q = T, std::enable_if_t<std::is_void_v<Q>, int> = 0>
+				void _set_promise_forced();
 			public:
 				SuperThreadT() = default;
-				SuperThreadT(const std::function<T(boolThreadF)> f) {
-					work = f;
-				}
-				~SuperThreadT() {
-					kill();
-				}
-				// set a function to be run (if running, kill, then set)
-				void set(const std::function<T(std::function<bool(void)>)> f) {
-					if (!thread_done) kill();
-					work = f;
-				}
-				// starts the thread. If there was one, kills and then starts new. arg: TRUE if you want to run DETACHED
 
-				Future<T> start(const bool detached = false) {
-					if (!thread_done) kill();
-					if (ree) {
-						ree->set_value(T{});
-						delete ree;
-					}
-					ree = new Promise<T>([&] { return work([&] {return !should_stop; });});
-					should_stop = false;
-					thread_done = false;
-					thr = new std::thread([&]()->void { ree->work(); thread_done = true; });
-					if (detached) thr->detach();
+				/// <summary>
+				/// <para>Constructor that sets directly the function.</para>
+				/// </summary>
+				/// <param name="{std::function}">The function loop based on bool function argument.</param>
+				SuperThreadT(const std::function<T(boolThreadF)>);
+				~SuperThreadT();
 
-					return std::move(ree->get_future());
-				}
-				// signal to the thread that it should stop running (from boolThreadF argument)
-				void stop() {
-					should_stop = true;
-				}
-				// calls stop(), joins and do kill() to cleanup (IF THREAD IS DEADLOCKED OR SOMETHING IT WILL FREEZE HERE)
-				void join() {
-					if (!thread_done && thr) {
-						stop();
-						if (thr->joinable()) {
-							thr->join(); // not detached, so it can join
-							delete thr;
-							thr = nullptr;
-							thread_done = true; // just to be sure
-						}
-						else kill(); // clear / kill
-					}
-					thread_done = true; // just to be sure
-					should_stop = false;
-				}
-				// if joinable, terminates thread, else just clean up
-				void kill() {
-					if (thr) {
-						if (thr->joinable()) {
-							thr->detach();
-						}
-						auto handlr = thr->native_handle();
-						::TerminateThread(handlr, 1);
-						delete thr;
-						thr = nullptr;
-						ree->set_value(T{});
-						thread_done = true;
-					}
-					should_stop = false;
-				}
-				// if there's a thread, true
-				bool running() {
-					return !thread_done;
-				}
+
+				/// <summary>
+				/// <para>Sets the function that this thread will run (loop or not).</para>
+				/// </summary>
+				/// <param name="{std::function}">The function loop based on bool function argument.</param>
+				template<typename Q = T, std::enable_if_t<!std::is_void_v<Q>, int> = 0>
+				void set(const std::function<T(boolThreadF)>);
+
+				/// <summary>
+				/// <para>Sets the function that this thread will run (loop or not).</para>
+				/// </summary>
+				/// <param name="{std::function}">The function loop based on bool function argument.</param>
+				template<typename Q = T, std::enable_if_t<std::is_void_v<Q>, int> = 0>
+				void set(const std::function<T(boolThreadF)>);
+
+				/// <summary>
+				/// <para>Starts the thread and gives you a Future if you need the response later of type T.</para>
+				/// </summary>
+				/// <returns>{Future} The Future that will hold the value the function you've set returns.</returns>
+				Future<T> start();
+
+				/// <summary>
+				/// <para>Sets internal bool to say stop.</para>
+				/// </summary>
+				void stop();
+
+				/// <summary>
+				/// <para>Tries to join the thread (if possible) (can lock).</para>
+				/// <para>PS: It will set to stop before actually trying to join.</para>
+				/// </summary>
+				void join();
+
+				/// <summary>
+				/// <para>Kills the thread via terminate.</para>
+				/// </summary>
+				void kill();
+
+				/// <summary>
+				/// <para>Returns true if there's a thread running right now.</para>
+				/// </summary>
+				/// <returns>{bool} Running?</returns>
+				bool running() const;
 			};
 
-			template<>
-			class SuperThreadT<void> {
-				std::thread* thr = nullptr;
-				bool should_stop = false;
-				bool thread_done = true;
-				std::function<void(std::function<bool(void)>)> work;
 
-				Promise<void>* ree = nullptr;
+			// IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION //
 
-			public:
-				SuperThreadT() = default;
-				SuperThreadT(const std::function<void(boolThreadF)> f) {
-					work = f;
-				}
-				~SuperThreadT() {
-					kill();
-				}
-				// set a function to be run (if running, kill, then set)
-				void set(const std::function<void(std::function<bool(void)>)> f) {
-					if (!thread_done) kill();
-					work = f;
-				}
-				// starts the thread. If there was one, kills and then starts new. arg: TRUE if you want to run DETACHED
 
-				Future<void> start(const bool detached = false) {
-					if (!thread_done) kill();
-					if (ree) {
-						ree->set_value();
-						delete ree;
+			template<typename T>
+			template<typename Q, std::enable_if_t<!std::is_void_v<Q>, int>>
+			void SuperThreadT<T>::_set_promise_forced()
+			{
+				promise.set_value(T{});
+			}
+
+
+			template<typename T>
+			template<typename Q, std::enable_if_t<std::is_void_v<Q>, int>>
+			void SuperThreadT<T>::_set_promise_forced()
+			{
+				promise.set_value();
+
+			}
+
+
+			template<typename T>
+			SuperThreadT<T>::SuperThreadT(const std::function<T(boolThreadF)> f)
+			{
+				set(f);
+			}
+
+			template<typename T>
+			SuperThreadT<T>::~SuperThreadT()
+			{
+				kill();
+			}
+
+
+			template<typename T>
+			template<typename Q, std::enable_if_t<!std::is_void_v<Q>, int>>
+			void SuperThreadT<T>::set(const std::function<T(boolThreadF)> f)
+			{
+				promise = std::move(Promise<T>([&,f] {
+					return f([&] {return !should_stop; });
+				}));
+			}
+
+			template<typename T>
+			template<typename Q, std::enable_if_t<std::is_void_v<Q>, int>>
+			void SuperThreadT<T>::set(const std::function<T(boolThreadF)> f)
+			{
+				promise = std::move(Promise<T>([&,f] {					
+					f([&] {return !should_stop; });
+				}));
+			}
+
+			template<typename T>
+			Future<T> SuperThreadT<T>::start()
+			{
+				Future<T> fut = promise.get_future();
+				should_stop = false;
+				thr = std::thread([&] { _thread_done_flag = false; promise.work(); _thread_done_flag = true; });
+				return fut;
+			}
+
+			template<typename T>
+			void SuperThreadT<T>::stop()
+			{
+				should_stop = true;
+			}
+
+			template<typename T>
+			void SuperThreadT<T>::join()
+			{
+				should_stop = true;
+				if (thr.joinable()) thr.join();
+				else kill();
+			}
+
+			template<typename T>
+			void SuperThreadT<T>::kill()
+			{
+				should_stop = true;
+				if (_thread_done_flag) {
+					if (!promise.has_set()) _set_promise_forced();
+					if (thr.joinable()) thr.join(); // thread done flag up, it should not lock here.
+				}
+				else { // might be internally blocked or the user is crazy and wants to kill it anyways.
+					if (thr.joinable()) {
+						thr.detach();
 					}
-					ree = new Promise<void>([&] { work([&] {return !should_stop; });});
-					should_stop = false;
-					thread_done = false;
-					thr = new std::thread([&]()->void { ree->work(); thread_done = true; });
-					if (detached) thr->detach();
+					auto handlr = thr.native_handle();
+					::TerminateThread(handlr, 1);
+					if (!promise.has_set()) _set_promise_forced();
+					_thread_done_flag = true;
+				}
+			}
 
-					return std::move(ree->get_future());
-				}
-				// signal to the thread that it should stop running (from boolThreadF argument)
-				void stop() {
-					should_stop = true;
-				}
-				// calls stop(), joins and do kill() to cleanup (IF THREAD IS DEADLOCKED OR SOMETHING IT WILL FREEZE HERE)
-				void join() {
-					if (!thread_done && thr) {
-						stop();
-						if (thr->joinable()) {
-							thr->join(); // not detached, so it can join
-							delete thr;
-							thr = nullptr;
-							thread_done = true; // just to be sure
-						}
-						else kill(); // clear / kill
-					}
-					thread_done = true; // just to be sure
-					should_stop = false;
-				}
-				// if joinable, terminates thread, else just clean up
-				void kill() {
-					if (thr) {
-						if (thr->joinable()) {
-							thr->detach();
-						}
-						auto handlr = thr->native_handle();
-						::TerminateThread(handlr, 1);
-						delete thr;
-						thr = nullptr;
-						if (ree) {
-							if (!ree->has_set()) {
-								ree->set_value();
-							}
-						}
-						thread_done = true;
-					}
-					should_stop = false;
-				}
-				// if there's a thread, true
-				bool running() {
-					return !thread_done;
-				}
-			};
+			template<typename T>
+			bool SuperThreadT<T>::running() const
+			{
+				return !_thread_done_flag;
+			}
 
 			using SuperThread = SuperThreadT<void>;
 		}

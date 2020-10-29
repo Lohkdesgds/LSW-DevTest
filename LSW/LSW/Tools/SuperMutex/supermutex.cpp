@@ -42,27 +42,36 @@ namespace LSW {
 				}
 			}
 
-			AutoLock::AutoLock(SuperMutex& m)
+			bool SuperMutex::is_locked() const
 			{
-				m.lock();
-				you = &m;
+				return mu.is_locked();
+			}
+
+			AutoLock::AutoLock(SuperMutex& m, const bool autolock)
+				: you(m)
+			{
+				if (autolock) {
+					you.lock();
+					hasunlocked = false;
+				}
+				else hasunlocked = true;
 			}
 			AutoLock::~AutoLock()
 			{
-				if (!hasunlocked) you->unlock();
+				if (!hasunlocked) you.unlock();
 			}
 			void AutoLock::unlock()
 			{
 				if (!hasunlocked) {
 					hasunlocked = true;
-					you->unlock();
+					you.unlock();
 				}
 			}
 			void AutoLock::lock()
 			{
 				if (hasunlocked) {
 					hasunlocked = false;
-					you->lock();
+					you.lock();
 				}
 			}
 

@@ -10,12 +10,15 @@ namespace LSW {
 			Camera::Camera(const Camera& c)
 			{
 				t = c.t;
+				last_targ = c.last_targ;
+				cl_2d = c.cl_2d;
 			}
 
-			Camera& Camera::operator=(const Camera& c)
+			void Camera::operator=(const Camera& c)
 			{
 				t = c.t;
-				return *this;
+				last_targ = c.last_targ;
+				cl_2d = c.cl_2d;
 			}
 
 			void Camera::invert()

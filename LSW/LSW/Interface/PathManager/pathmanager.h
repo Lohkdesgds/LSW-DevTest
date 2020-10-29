@@ -21,6 +21,13 @@ namespace LSW {
 				std::string size_str;
 			};
 
+			// Has to use / instead of \\
+
+			/// <summary>
+			/// <para>PathManager can change the way internal path works.</para>
+			/// <para>You can set the thread's path relative to one or multiple compacted files using this.</para>
+			/// <para>The effects are set per thread while this variable exists or while apply() is valid (before unapply()).</para>
+			/// </summary>
 			class PathManager {
 				static bool physfs_initialized_once;
 
@@ -31,23 +38,42 @@ namespace LSW {
 
 				// disable PathManager everywhere
 				//void disable_all() const;
-
-				// add new path
+				
+				/// <summary>
+				/// <para>Add a new file (like a zip) or directory to relative path.</para>
+				/// </summary>
+				/// <param name="{std::string}">Path/File.</param>
 				void add_path(std::string);
-				// remove this path
+				
+				/// <summary>
+				/// <para>Remove once added path or file.</para>
+				/// </summary>
+				/// <param name="{std::string}">Path/File.</param>
 				void del_path(const std::string);
 
-				// apply the paths interface to thread
+				/// <summary>
+				/// <para>Applies this settings to current thread.</para>
+				/// </summary>
 				void apply() const;
-				// cancel apply
+				
+				/// <summary>
+				/// <para>Cancel and go back to default way.</para>
+				/// </summary>
 				void unapply() const;
 
 				// dir like cmd dir
 				//void dir();
 
-				// paths in interface
+				/// <summary>
+				/// <para>All paths set and ready.</para>
+				/// </summary>
+				/// <returns>{std::string} All paths set.</returns>
 				std::vector<std::string> paths_set() const;
-				// files available
+				
+				/// <summary>
+				/// <para>Shows all files in paths.</para>
+				/// </summary>
+				/// <returns></returns>
 				std::vector<file_info> files_in_paths() const;
 			};
 

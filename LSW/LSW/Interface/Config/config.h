@@ -16,6 +16,10 @@ namespace LSW {
 				enum class config_section_mode{ SAVE, MEMORY_ONLY };
 			}
 
+			/// <summary>
+			/// <para>Config handles both saved configurations and temporary (while running) settings.</para>
+			/// <para>The type of data is set by section.</para>
+			/// </summary>
 			class Config {
 				struct section {
 					config::config_section_mode mode;
@@ -40,86 +44,385 @@ namespace LSW {
 			public:
 				Config() = default;
 				Config(const Config&) = delete;
+
+				/// <summary>
+				/// <para>Move constructor.</para>
+				/// </summary>
+				/// <param name="{Config}">Config to move from.</param>
 				Config(Config&&) noexcept;
 				~Config();
 
-				// default: true | should it save if destroyed?
+				/// <summary>
+				/// <para>Sets if it should save when destroyed or not (defaults: true).</para>
+				/// </summary>
+				/// <param name="{bool}">Autosave?</param>
 				void auto_save(bool);
 
-				// automatically sets path to save at
+				/// <summary>
+				/// <para>Loads a config file (automatically will save to this path later).</para>
+				/// <para>It does interpret/create the path.</para>
+				/// </summary>
+				/// <param name="{std::string}">Path.</param>
+				/// <returns>{bool} True if success.</returns>
 				bool load(std::string);
 
-				// update path to save
+				/// <summary>
+				/// <para>Sets a path to save at.</para>
+				/// </summary>
+				/// <param name="{std::string}">Path.</param>
 				void save_path(std::string);
 
-				// save
+				/// <summary>
+				/// <para>Flushes the config to file.</para>
+				/// </summary>
 				void flush();
 
-				// change SECTION's MODE. if it doesn't exist, creates it.
+				/// <summary>
+				/// <para>Change a existing section's mode.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section name.</param>
+				/// <param name="{config::config_section_mode}">The new mode.</param>
 				void set(const std::string&, const config::config_section_mode);
 
-
-				// - - - - - - - > set full with section mode (you shouldn't really set this way, but you can, but you won't change all the time) < - - - - - - - //
-
-
-				//void set(const std::string&, const std::string&, const std::string&, const config::config_section_mode);
-
-				//void set(const std::string&, const std::string&, const std::initializer_list<std::string>&, const config::config_section_mode);
-
-				// - - - - - - - > default ways to set (without setting up mode every time...) < - - - - - - - //
-
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::string}">Value.</param>
 				void set(const std::string&, const std::string&, const std::string&);
+
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{bool}">Value.</param>
 				void set(const std::string&, const std::string&, const bool&);
+
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{char}">Value.</param>
 				void set(const std::string&, const std::string&, const char&);
+
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{int}">Value.</param>
 				void set(const std::string&, const std::string&, const int&);
+
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{float}">Value.</param>
 				void set(const std::string&, const std::string&, const float&);
+
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{double}">Value.</param>
 				void set(const std::string&, const std::string&, const double&);
+
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{unsigned}">Value.</param>
 				void set(const std::string&, const std::string&, const unsigned&);
+
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{long}">Value.</param>
 				void set(const std::string&, const std::string&, const long&);
+
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{long long}">Value.</param>
 				void set(const std::string&, const std::string&, const long long&);
+
+				/// <summary>
+				/// <para>Set a config value.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{size_t}">Value.</param>
 				void set(const std::string&, const std::string&, const size_t&);
 
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<std::string>&);
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<bool>&);
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<char>&);
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<int>&);
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<float>&);
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<double>&);
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<unsigned>&);
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<long>&);
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<long long>&);
+
+				/// <summary>
+				/// <para>Set values into a config key at once.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <param name="{std::initializer_list}">Values.</param>
 				void set(const std::string&, const std::string&, const std::initializer_list<size_t>&);
 
+				/// <summary>
+				/// <para>Adds a comment to the config file.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Comment.</param>
 				void comment(const std::string&, std::string);
 
-				// get value in section -> key
+				/// <summary>
+				/// <para>Get a value from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::string} Value.</returns>
 				std::string get(const std::string&, const std::string&) const;
 
 				template<typename T> T get_as(const std::string&, const std::string&) const = delete;
+
+				/// <summary>
+				/// <para>Get a value from config as a type T.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{bool} Value.</returns>
 				template<> bool get_as(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a value from config as a type T.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{char} Value.</returns>
 				template<> char get_as(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a value from config as a type T.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{int} Value.</returns>
 				template<> int get_as(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a value from config as a type T.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{float} Value.</returns>
 				template<> float get_as(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a value from config as a type T.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{double} Value.</returns>
 				template<> double get_as(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a value from config as a type T.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{unsigned} Value.</returns>
 				template<> unsigned get_as(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a value from config as a type T.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{long} Value.</returns>
 				template<> long get_as(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a value from config as a type T.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{long long} Value.</returns>
 				template<> long long get_as(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a value from config as a type T.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{size_t} Value.</returns>
 				template<> size_t get_as(const std::string&, const std::string&) const;
 
 				// if you know (you probably know) that the config has been set with initializer list, this will break down the list to a std::vector<std::string>
 				template<typename T> std::vector<T> get_array(const std::string&, const std::string&) const = delete;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<std::string> get_array(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<bool> get_array(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<char> get_array(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<int> get_array(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<float> get_array(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<double> get_array(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<unsigned> get_array(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<long> get_array(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<long long> get_array(const std::string&, const std::string&) const;
+
+				/// <summary>
+				/// <para>Get a vector of values from config.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section.</param>
+				/// <param name="{std::string}">Key.</param>
+				/// <returns>{std::vector} Vector of values.</returns>
 				template<> std::vector<size_t> get_array(const std::string&, const std::string&) const;
 
 				void operator=(const Config&) = delete;
+
+				/// <summary>
+				/// <para>Move operator.</para>
+				/// </summary>
+				/// <param name="{Config}">Config to move from.</param>
 				void operator=(Config&&) noexcept;
 			};
 

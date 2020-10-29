@@ -17,7 +17,7 @@ namespace LSW {
                     DWORD dwRead;
                     bool bSuccess = false;
 
-                    if (ReadFile(g_hChildStd_OUT_Rd, inter_buf, 8, &dwRead, NULL))
+                    if (ReadFile(g_hChildStd_OUT_Rd, inter_buf, launcher::buf_size, &dwRead, NULL))
                     {
                         for (size_t p = 0; p < dwRead; p++) {
                             block += inter_buf[p];
@@ -44,11 +44,11 @@ namespace LSW {
             {
                 kill();
             }
-            void Launcher::hook_output(const std::function<void(const std::string)> f)
+            void Launcher::hook_output(const std::function<void(const std::string&)> f)
             {
                 prunt = f;
             }
-            bool Launcher::launch(std::string cmd)
+            bool Launcher::launch(const std::string& cmd)
             {
                 saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
                 saAttr.bInheritHandle = TRUE;
@@ -115,7 +115,7 @@ namespace LSW {
             {
                 keep = false;
                 if (autosav) {
-                    autosav->join();
+                    if (autosav->joinable()) autosav->join();
                     delete autosav;
                     autosav = nullptr;
                 }

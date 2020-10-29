@@ -12,7 +12,9 @@ namespace LSW {
 				std::string token;
 				std::vector<std::string> paths;
 
-				while (std::getline(ss, token, '\\'))
+				// Windows likes \\ to paths, / to URLs, so the whole stuff is /, but Windows calls will be \\.
+
+				while (std::getline(ss, token, '/'))
 				{
 					str += token;
 					paths.push_back(str);
@@ -58,6 +60,7 @@ namespace LSW {
 					size_t i;
 					wcstombs_s(&i, str, Folder, 1023);
 					s = str;
+					for (auto& i : s) if (i == '\\') i = '/';
 					return true;
 				}
 				return false;
@@ -68,7 +71,8 @@ namespace LSW {
 				if (cpy.find('%') == std::string::npos) return; // no % found, just skip
 
 				for (auto& i : cpy) {
-					if (i == '/') i = '\\';
+					//if (i == '/') i = '\\';
+					if (i == '\\') i = '/';
 				}
 
 				std::string endresult;

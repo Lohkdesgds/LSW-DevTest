@@ -115,36 +115,37 @@ namespace LSW {
                         SHA2_UNPACK32(m_h[i], &digest[i << 2]);
                     }
                 }
+            }
 
-                std::string sha256(std::string input)
-                {
-                    unsigned char digest[imported::_SHA256::DIGEST_SIZE];
-                    memset(digest, 0, imported::_SHA256::DIGEST_SIZE);
+            std::string sha256(const std::string& input)
+            {
+                unsigned char digest[imported::_SHA256::DIGEST_SIZE];
+                memset(digest, 0, imported::_SHA256::DIGEST_SIZE);
 
-                    std::basic_string<unsigned char> conv;
-                    for (auto& i : input) conv += static_cast<unsigned char>(i);
+                std::basic_string<unsigned char> conv;
+                for (auto& i : input) conv += static_cast<unsigned char>(i);
 
-                    imported::_SHA256 ctx = imported::_SHA256();
-                    ctx.init();
-                    ctx.update(conv.c_str(), static_cast<unsigned int>(conv.length()));
-                    ctx.final(digest);
+                imported::_SHA256 ctx = imported::_SHA256();
+                ctx.init();
+                ctx.update(conv.c_str(), static_cast<unsigned int>(conv.length()));
+                ctx.final(digest);
 
-                    char buf[2 * imported::_SHA256::DIGEST_SIZE + 1];
-                    buf[2 * imported::_SHA256::DIGEST_SIZE] = 0;
-                    for (int i = 0; i < imported::_SHA256::DIGEST_SIZE; i++)
-                        sprintf_s(buf + (long long)i * 2, 2 * imported::_SHA256::DIGEST_SIZE + 1 - ((long long)i * 2), "%02x", digest[i]);
-                    return std::string(buf);
-                }
-                std::string sha256_f(std::string fpath)
-                {
-                    FILE* fp = nullptr;
-                    if (fopen_s(&fp, fpath.c_str(), "rb") != 0) return ""; // failed
-                    std::string myself;
-                    for (char ubuf; fread_s(&ubuf, 1, sizeof(char), 1, fp);) myself += ubuf;
-                    fclose(fp);
-                    return sha256(myself);
+                char buf[2 * imported::_SHA256::DIGEST_SIZE + 1];
+                buf[2 * imported::_SHA256::DIGEST_SIZE] = 0;
+                for (int i = 0; i < imported::_SHA256::DIGEST_SIZE; i++)
+                    sprintf_s(buf + (long long)i * 2, 2 * imported::_SHA256::DIGEST_SIZE + 1 - ((long long)i * 2), "%02x", digest[i]);
+                return std::string(buf);
+            }
+            std::string sha256_f(std::string fpath)
+            {
+                Handling::interpret_path(fpath);
+                FILE* fp = nullptr;
+                if (fopen_s(&fp, fpath.c_str(), "rb") != 0) return ""; // failed
+                std::string myself;
+                for (char ubuf; fread_s(&ubuf, 1, sizeof(char), 1, fp);) myself += ubuf;
+                fclose(fp);
+                return sha256(myself);
 
-                }
             }
         }
     }

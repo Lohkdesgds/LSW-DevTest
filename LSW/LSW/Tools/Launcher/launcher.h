@@ -11,6 +11,10 @@ namespace LSW {
 	namespace v5 {
 		namespace Tools {
 
+			namespace launcher {
+				constexpr size_t buf_size = 1 << 3; // small because if big it will wait too much to flush
+			}
+
 			class Launcher {
 				HANDLE g_hChildStd_OUT_Rd = nullptr;
 				HANDLE g_hChildStd_OUT_Wr = nullptr;
@@ -23,9 +27,9 @@ namespace LSW {
 				STARTUPINFO siStartInfo{};
 #endif
 
-				char inter_buf[8];
+				char inter_buf[launcher::buf_size] = { 0 };
 
-				std::function<void(const std::string)> prunt = std::function<void(const std::string)>();
+				std::function<void(const std::string&)> prunt = std::function<void(const std::string&)>();
 				std::thread* autosav = nullptr;
 				bool keep = false;
 				bool still_running = false;
@@ -34,9 +38,30 @@ namespace LSW {
 			public:
 				~Launcher();
 
-				void hook_output(const std::function<void(const std::string)>);
-				bool launch(std::string);
+				/// <summary>
+				/// <para>Sets a function to handle task output.</para>
+				/// </summary>
+				/// <param name="{std::function}">The function to handle task output.</param>
+				void hook_output(const std::function<void(const std::string&)>);
+
+				/// <summary>
+				/// <para>Launchs a executable.</para>
+				/// <para># WARNING: IT DOESN'T AUTOMATICALLY HANDLE %TAGS%!</para>
+				/// </summary>
+				/// <param name="{std::string}">The path or command to run.</param>
+				/// <returns>{bool} True if successfully launched.</returns>
+				bool launch(const std::string&);
+
+				/// <summary>
+				/// <para>Gets if the task is still up and running.</para>
+				/// </summary>
+				/// <returns>{bool} True if still running.</returns>
 				bool running();
+
+				/// <summary>
+				/// <para>Forces the task to be killed.</para>
+				/// <para>It will set to kill and wait it terminate.</para>
+				/// </summary>
 				void kill();
 			};
 

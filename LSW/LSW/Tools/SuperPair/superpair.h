@@ -34,7 +34,9 @@ namespace LSW {
 
 			**************************************************************************************/
 
-
+			/// <summary>
+			/// <para>SuperPair is something like std::pair, but it holds a value to any multiple keys.</para>
+			/// </summary>
 			template<typename T>
 			class SuperPair {
 				std::vector<std::any> keys;
@@ -56,9 +58,7 @@ namespace LSW {
 
 			public:
 				SuperPair() = default;
-				~SuperPair() {
-					keys.clear();
-				}
+				~SuperPair() { keys.clear(); }
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -68,17 +68,42 @@ namespace LSW {
 				* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
+				/// <summary>
+				/// <para>Copy constructor.</para>
+				/// </summary>
+				/// <param name="{SuperPair}">A SuperPair of the same type to copy.</param>
 				template<typename K>
 				SuperPair(const SuperPair<K>& sp) {
 					keys = sp.keys;
-					holding = sp.get_value();
+					holding = sp.holding;
 				}
+
+				/// <summary>
+				/// <para>Move constructor.</para>
+				/// </summary>
+				/// <param name="{SuperPair}">A SuperPair of the same type to move.</param>
+				template<typename K>
+				SuperPair(SuperPair<K>&& sp) {
+					keys = std::move(sp.keys);
+					holding = std::move(sp.holding);
+				}
+
+				/// <summary>
+				/// <para>A way to set the value and some keys already.</para>
+				/// </summary>
+				/// <param name="{T}">The value it will hold.</param>
+				/// <param name="{Args...}">Keys to the value.</param>
 				template<typename... Args>
 				SuperPair(const T& val, Args... args)
 				{
 					holding = val;
 					handleInput(args...);
 				}
+
+				/// <summary>
+				/// <para>A way to set the value already.</para>
+				/// </summary>
+				/// <param name="{T}">The value it will hold.</param>
 				SuperPair(const T& val)
 				{
 					holding = val;
@@ -92,12 +117,26 @@ namespace LSW {
 				* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-				void set_value(T& nval) {
+				/// <summary>
+				/// <para>Sets the internal value directly.</para>
+				/// </summary>
+				/// <param name="{T}">The value to be set.</param>
+				void set_value(const T& nval) {
 					holding = nval;
 				}
+
+				/// <summary>
+				/// <para>Gets the value it's holding.</para>
+				/// </summary>
+				/// <returns>{T} The value's reference.</returns>
 				T& get_value() {
 					return holding;
 				}
+
+				/// <summary>
+				/// <para>Gets the value it's holding.</para>
+				/// </summary>
+				/// <returns>{T} The value's reference.</returns>
 				const T& get_value() const {
 					return holding;
 				}
@@ -110,6 +149,10 @@ namespace LSW {
 				* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
+				/// <summary>
+				/// <para>Sets or updates a key.</para>
+				/// </summary>
+				/// <param name="{Q}">A key.</param>
 				template<typename Q>
 				void set(Q nkey) {
 					for (auto& i : keys) {
@@ -120,10 +163,20 @@ namespace LSW {
 					std::any lol = r_cast_t<Q>(nkey);
 					keys.push_back(lol);
 				}
+
+				/// <summary>
+				/// <para>Sets or updates a key.</para>
+				/// </summary>
+				/// <param name="{char*}">A key.</param>
 				template<>
 				void set(const char* nkey) {
 					set((char*)nkey);
 				}
+
+				/// <summary>
+				/// <para>Sets or updates a key.</para>
+				/// </summary>
+				/// <param name="{char*}">A key.</param>
 				template<>
 				void set(char* nkey) {
 					for (auto& i : keys) {
@@ -143,6 +196,11 @@ namespace LSW {
 				* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
+				/// <summary>
+				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
+				/// </summary>
+				/// <param name="{Q}">A key.</param>
+				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
 				template<typename Q>
 				T* operator[](Q key)
 				{
@@ -154,10 +212,22 @@ namespace LSW {
 					}
 					return nullptr;
 				}
+
+				/// <summary>
+				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
+				/// </summary>
+				/// <param name="{char*}">A key.</param>
+				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
 				template<>
 				T* operator[](const char* key) {
 					return (*this)[(char*)key];
 				}
+
+				/// <summary>
+				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
+				/// </summary>
+				/// <param name="{char*}">A key.</param>
+				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
 				template<>
 				T* operator[](char* key)
 				{
@@ -178,6 +248,11 @@ namespace LSW {
 				* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
+				/// <summary>
+				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
+				/// </summary>
+				/// <param name="{Q}">A key.</param>
+				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
 				template<typename Q>
 				const T* operator[](Q key) const
 				{
@@ -189,10 +264,22 @@ namespace LSW {
 					}
 					return nullptr;
 				}
+
+				/// <summary>
+				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
+				/// </summary>
+				/// <param name="{char*}">A key.</param>
+				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
 				template<>
 				const T* operator[](const char* key) const {
 					return (*this)[(char*)key];
 				}
+
+				/// <summary>
+				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
+				/// </summary>
+				/// <param name="{char*}">A key.</param>
+				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
 				template<>
 				const T* operator[](char* key) const
 				{
@@ -212,6 +299,11 @@ namespace LSW {
 
 				* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+
+				/// <summary>
+				/// <para>Removes a specific key by type.</para>
+				/// <para># PS: CHAR* and CONST CHAR* are transformed to std::string when they're set. You won't find char* type.</para>
+				/// </summary>
 				template<typename Q>
 				void remove() {
 					for (size_t p = 0; p < keys.size(); p++) {
@@ -231,6 +323,11 @@ namespace LSW {
 				* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
+				/// <summary>
+				/// <para>Gets if a key of a type is set or not.</para>
+				/// <para># PS: CHAR* and CONST CHAR* are transformed to std::string when they're set. You won't find char* type.</para>
+				/// </summary>
+				/// <returns>{bool} True if there is one of this type.</returns>
 				template<typename Q>
 				bool has_type() const
 				{
@@ -246,6 +343,12 @@ namespace LSW {
 				* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
+				/// <summary>
+				/// <para>Gets the key of type K.</para>
+				/// <para># PS: CHAR* and CONST CHAR* are transformed to std::string when they're set. You won't find char* type.</para>
+				/// </summary>
+				/// <param name="{K}">The variable to be set with the value.</param>
+				/// <returns></returns>
 				template<typename K>
 				bool get_type(K& val) const {
 					for (auto& i : keys) {

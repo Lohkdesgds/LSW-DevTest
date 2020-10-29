@@ -12,14 +12,14 @@ namespace LSW {
 			{
 				if (!nptr) return false;
 				auto s = std::shared_ptr<ALLEGRO_BITMAP>(nptr, [](ALLEGRO_BITMAP*& b) { if (al_is_system_installed() && b) { al_destroy_bitmap(b); b = nullptr; } });
-				bitmap = [s] {return &(*s); };
+				bitmap = [s] {return s.get(); };
 				return !(!s);
 			}
 			bool Bitmap::set_nodel(ALLEGRO_BITMAP* nptr)
 			{
 				if (!nptr) return false;
 				auto s = std::shared_ptr<ALLEGRO_BITMAP>(nptr, [](auto*&) { });
-				bitmap = [s] {return &(*s); };
+				bitmap = [s] {return s.get(); };
 				return !(!s);
 			}
 			ALLEGRO_BITMAP* Bitmap::quick() const
@@ -33,6 +33,21 @@ namespace LSW {
 				if (use_target_as_it) return target ? (target)() : nullptr;
 				if (bitmap) return bitmap();
 				return nullptr;
+			}
+
+			int Bitmap::interpret_drawing_mode(const bitmap::drawing_mode e) const
+			{
+				switch (e) {
+				case bitmap::drawing_mode::DEFAULT:
+					return 0;
+				case bitmap::drawing_mode::FLIP_HORIZONTAL:
+					return ALLEGRO_FLIP_HORIZONTAL;
+				case bitmap::drawing_mode::FLIP_VERTICAL:
+					return ALLEGRO_FLIP_VERTICAL;
+				case bitmap::drawing_mode::FLIP_HORIZONTAL_VERTICAL:
+					return ALLEGRO_FLIP_HORIZONTAL | ALLEGRO_FLIP_VERTICAL;
+				}
+				return 0;
 			}
 
 			Bitmap::Bitmap()
@@ -220,6 +235,21 @@ namespace LSW {
 				return Color();
 			}
 
+			ALLEGRO_LOCKED_REGION* Bitmap::lock(const int format, const int flags)
+			{
+				return quick() ? al_lock_bitmap(quick(), format, flags) : nullptr;
+			}
+
+			ALLEGRO_LOCKED_REGION* Bitmap::lock(const int x, const int y, const int w, const int h, const int format, const int flags)
+			{
+				return quick() ? al_lock_bitmap_region(quick(), x, y, w, h, format, flags) : nullptr;
+			}
+
+			void Bitmap::unlock()
+			{
+				if (quick() && is_locked()) al_unlock_bitmap(quick());
+			}
+
 			const bool Bitmap::is_locked() const
 			{
 				if (auto q = quick(); q) return al_is_bitmap_locked(q);
@@ -248,39 +278,39 @@ namespace LSW {
 				}
 			}
 
-			void Bitmap::draw(const float x, const float y, const int f) const
+			void Bitmap::draw(const float x, const float y, const bitmap::drawing_mode f) const
 			{
-				if (auto q = quick(); q) al_draw_bitmap(q, x, y, f);
+				if (auto q = quick(); q) al_draw_bitmap(q, x, y, interpret_drawing_mode(f));
 			}
 
-			void Bitmap::draw(const float x, const float y, const float w, const float h, const int f) const
+			void Bitmap::draw(const float x, const float y, const float w, const float h, const bitmap::drawing_mode f) const
 			{
-				if (auto q = quick(); q) al_draw_scaled_bitmap(q, 0, 0, get_width(), get_height(), x, y, w, h, f);
+				if (auto q = quick(); q) al_draw_scaled_bitmap(q, 0, 0, get_width(), get_height(), x, y, w, h, interpret_drawing_mode(f));
 			}
 
-			void Bitmap::draw(const float x1, const float y1, const float w1, const float h1, const float x2, const float y2, const float w2, const float h2, const int f) const
+			void Bitmap::draw(const float x1, const float y1, const float w1, const float h1, const float x2, const float y2, const float w2, const float h2, const bitmap::drawing_mode f) const
 			{
-				if (auto q = quick(); q) al_draw_scaled_bitmap(q, x1, y1, w1, h1, x2, y2, w2, h2, f);
+				if (auto q = quick(); q) al_draw_scaled_bitmap(q, x1, y1, w1, h1, x2, y2, w2, h2, interpret_drawing_mode(f));
 			}
 
-			void Bitmap::draw(Color c, const float x, const float y, const float w, const float h, const int f) const
+			void Bitmap::draw(Color c, const float x, const float y, const float w, const float h, const bitmap::drawing_mode f) const
 			{
-				if (auto q = quick(); q) al_draw_tinted_scaled_bitmap(q, c, 0, 0, get_width(), get_height(), x, y, w, h, f);
+				if (auto q = quick(); q) al_draw_tinted_scaled_bitmap(q, c, 0, 0, get_width(), get_height(), x, y, w, h, interpret_drawing_mode(f));
 			}
 
-			void Bitmap::draw(Color c, const float x1, const float y1, const float w1, const float h1, const float x2, const float y2, const float w2, const float h2, const int f) const
+			void Bitmap::draw(Color c, const float x1, const float y1, const float w1, const float h1, const float x2, const float y2, const float w2, const float h2, const bitmap::drawing_mode f) const
 			{
-				if (auto q = quick(); q) al_draw_tinted_scaled_bitmap(q, c, x1, y1, w1, h1, x2, y2, w2, h2, f);
+				if (auto q = quick(); q) al_draw_tinted_scaled_bitmap(q, c, x1, y1, w1, h1, x2, y2, w2, h2, interpret_drawing_mode(f));
 			}
 
-			void Bitmap::draw(const float cx, const float cy, const float px, const float py, const float sx, const float sy, const float a, const int f) const
+			void Bitmap::draw(const float cx, const float cy, const float px, const float py, const float sx, const float sy, const float a, const bitmap::drawing_mode f) const
 			{
-				if (auto q = quick(); q) al_draw_scaled_rotated_bitmap(q, cx, cy, px, py, sx, sy, a, f);
+				if (auto q = quick(); q) al_draw_scaled_rotated_bitmap(q, cx, cy, px, py, sx, sy, a, interpret_drawing_mode(f));
 			}
 
-			void Bitmap::draw(Color c, const float cx, const float cy, const float px, const float py, const float sx, const float sy, const float a, const int f) const
+			void Bitmap::draw(Color c, const float cx, const float cy, const float px, const float py, const float sx, const float sy, const float a, const bitmap::drawing_mode f) const
 			{
-				if (auto q = quick(); q) al_draw_tinted_scaled_rotated_bitmap(q, c, cx, cy, px, py, sx, sy, a, f);
+				if (auto q = quick(); q) al_draw_tinted_scaled_rotated_bitmap(q, c, cx, cy, px, py, sx, sy, a, interpret_drawing_mode(f));
 			}
 
 			void Bitmap::mask_off(Color c)
@@ -295,10 +325,27 @@ namespace LSW {
 				}
 			}
 
-			void Bitmap::set_as_reference_target()
+			void Bitmap::set_reference_as_target() const
+			{
+				if (!target) return;
+				if (auto cpy = target(); cpy) al_set_target_bitmap(cpy);
+			}
+
+			bool Bitmap::has_global_reference_set() const
+			{
+				return target ? target() : false;
+			}
+
+			void Bitmap::copy_reference_to_this()
 			{
 				if (auto q = quick(); q) {
 					target = bitmap;
+				}
+			}
+			void Bitmap::set_custom_reference(std::function<ALLEGRO_BITMAP*(void)> f)
+			{
+				if (f()) {
+					target = f;
 				}
 			}
 		}

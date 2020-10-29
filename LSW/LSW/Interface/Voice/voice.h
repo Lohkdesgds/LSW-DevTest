@@ -11,10 +11,9 @@ namespace LSW {
 	namespace v5 {
 		namespace Interface {
 
-			/*
-			A voice is the device itself. You may want to link ONE mixer to it, then have other mixes linked to the main mixer, and them SAMPLE_INSTANCEs into mixers
-			*/
-
+			/// <summary>
+			/// <para>Voice is an audio device. You can attach ONE Mixer to this.</para>
+			/// </summary>
 			class Voice {
 				/*
 				* Friend class Mixer: because Mixer should link to a Voice, and it's better if you just set(Voice). get_instance is just another friend-like.
@@ -27,18 +26,26 @@ namespace LSW {
 			public:
 				Voice();
 
-				// creates/load a mixer (frequency, depth, channel configuration)
+				/// <summary>
+				/// <para>Creates/Load the Voice with those params.</para>
+				/// </summary>
+				/// <param name="{int}">The frequency.</param>
+				/// <param name="{ALLEGRO_AUDIO_DEPTH}">The depth (bits).</param>
+				/// <param name="{ALLEGRO_CHANNEL_CONF}">Channel configuration (surround, 2.0...).</param>
+				/// <returns>{bool} True if success.</returns>
 				bool load(const int = 48000, const ALLEGRO_AUDIO_DEPTH = ALLEGRO_AUDIO_DEPTH_INT16, const ALLEGRO_CHANNEL_CONF = ALLEGRO_CHANNEL_CONF_2);
 
-				// true = muted
+				/// <summary>
+				/// <para>Mute sound.</para>
+				/// </summary>
+				/// <param name="{bool}">If true, mute, else unmute.</param>
 				void mute(const bool);
 
+				/// <summary>
+				/// <para>Is this Voice loaded and ready?</para>
+				/// </summary>
+				/// <returns>{bool} True if exists.</returns>
 				bool exists() const;
-
-				// attaches 
-				//bool attach(std::shared_ptr<Mixer>);
-
-				//std::shared_ptr<ALLEGRO_VOICE> get_instance();
 			};
 
 		}

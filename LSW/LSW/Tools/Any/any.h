@@ -7,7 +7,10 @@ namespace LSW {
 	namespace v5 {
 		namespace Tools {
 
-			// any that works with string transforming it into std::string for easy management
+			/// <summary>
+			/// <para>Custom std::any that works with char arrays (transforming them to std::string)</para>
+			/// <para>operator= and get template changed if T is char* or const char*</para>
+			/// </summary>
 			class Any : public std::any {
 				std::string if_string_buf;
 			public:

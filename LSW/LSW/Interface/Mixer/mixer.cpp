@@ -10,12 +10,7 @@ namespace LSW {
 				mixer = std::shared_ptr<ALLEGRO_MIXER>(s, [](ALLEGRO_MIXER*& b) { if (al_is_system_installed() && b) { al_destroy_mixer(b); b = nullptr; } });
 				return mixer.get();
 			}
-			// not a good idea
-			/*void Mixer::update(void* a, unsigned b, void* c)
-			{
-				Mixer* thus = (Mixer*)c;
 
-			}*/
 			Mixer::Mixer()
 			{
 				Handling::init_basic();
@@ -32,16 +27,14 @@ namespace LSW {
 				al_set_mixer_playing(mixer.get(), m);
 			}
 
-			bool Mixer::attach_to(std::shared_ptr<Mixer> s)
+			bool Mixer::attach_to(const Mixer& s)
 			{
-				return al_attach_mixer_to_mixer(s->mixer.get(), mixer.get());
-				
+				return al_attach_mixer_to_mixer(mixer.get(), s.mixer.get());
 			}
 
-			bool Mixer::attach_to(std::shared_ptr<Voice> s)
+			bool Mixer::attach_to(const Voice& s)
 			{
-				return al_attach_mixer_to_voice(mixer.get(), s->device.get());
-				//return al_attach_sample_instance_to_mixer(&(*s->get_instance()), &(*mixer));
+				return al_attach_mixer_to_voice(mixer.get(), s.device.get());
 			}
 
 			float Mixer::get_gain() const
@@ -58,25 +51,6 @@ namespace LSW {
 			{
 				return mixer.get();
 			}
-
-			/*bool Mixer::postprocess_callback(std::function<void(float*, unsigned)> f)
-			{
-				return al_set_mixer_postprocess_callback(mixer.get(), &update, this);
-			}*/
-
-			/*bool Mixer::auto_attach()
-			{
-				SuperResource<Voice> voices;
-				auto mvoice = voices.getMain();
-				if (mvoice) return attach(mvoice);
-				return false;
-			}*/
-
-			/*std::shared_ptr<ALLEGRO_MIXER> Mixer::get_instance()
-			{
-				return mixer;
-			}*/
-
 		}
 	}
 }

@@ -10,31 +10,31 @@ namespace LSW {
 				ev = evx;
 			}
 
-			ALLEGRO_DISPLAY_EVENT&  RawEvent::display_event() {
-				return ev.display;
-			}
-			ALLEGRO_JOYSTICK_EVENT& RawEvent::joystick_event() {
-				return ev.joystick;
-			}
-			ALLEGRO_KEYBOARD_EVENT& RawEvent::keyboard_event() {
-				return ev.keyboard;
-			}
-			ALLEGRO_MOUSE_EVENT&    RawEvent::mouse_event() {
-				return ev.mouse;
-			}
-			ALLEGRO_TIMER_EVENT&    RawEvent::timer_event() {
-				return ev.timer;
-			}
-			ALLEGRO_TOUCH_EVENT&    RawEvent::touch_event() {
-				return ev.touch;
-			}
-			ALLEGRO_USER_EVENT&     RawEvent::user_event() {
-				return ev.user;
-			}
-
-			int RawEvent::type()
+			int RawEvent::type() const
 			{
 				return ev.type;
+			}
+
+			const ALLEGRO_DISPLAY_EVENT&  RawEvent::display_event() const {
+				return ev.display;
+			}
+			const ALLEGRO_JOYSTICK_EVENT& RawEvent::joystick_event() const {
+				return ev.joystick;
+			}
+			const ALLEGRO_KEYBOARD_EVENT& RawEvent::keyboard_event() const {
+				return ev.keyboard;
+			}
+			const ALLEGRO_MOUSE_EVENT&    RawEvent::mouse_event() const {
+				return ev.mouse;
+			}
+			const ALLEGRO_TIMER_EVENT&    RawEvent::timer_event() const {
+				return ev.timer;
+			}
+			const ALLEGRO_TOUCH_EVENT&    RawEvent::touch_event() const {
+				return ev.touch;
+			}
+			const ALLEGRO_USER_EVENT&     RawEvent::user_event() const {
+				return ev.user;
 			}
 
 			Event::Event(const Event& ev)
@@ -123,14 +123,14 @@ namespace LSW {
 			{
 				deinit();
 			}
-			void EventHandler::add(const Event ev)
+			void EventHandler::add(const Event& ev)
 			{
 				if (!ev.core) return;
 				if (!al_is_event_source_registered(own_queue.get(), ev.core.get())) {
 					al_register_event_source(own_queue.get(), ev.core.get());
 				}
 			}
-			void EventHandler::remove(const Event ev)
+			void EventHandler::remove(const Event& ev)
 			{
 				if (!ev.core) return;
 				if (al_is_event_source_registered(own_queue.get(), ev.core.get())) {
@@ -142,12 +142,11 @@ namespace LSW {
 				thr.stop();
 				thr.join(); // sync and clear (may take up to 1 sec)
 				own_queue.reset();
-				trigger_func = std::function<void(RawEvent&)>();
+				trigger_func = std::function<void(const RawEvent&)>();
 			}
-			void EventHandler::set_run_autostart(const std::function<void(RawEvent&)> f)
+			void EventHandler::set_run_autostart(const std::function<void(const RawEvent&)> f)
 			{
 				if (!thr.running() && f) {
-
 					trigger_func = f;
 					thr.set([=](Tools::boolThreadF keep) {
 						while (keep()) {

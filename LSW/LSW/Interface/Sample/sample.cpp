@@ -31,15 +31,15 @@ namespace LSW {
 				return !file_sample;
 			}
 
-			bool Sample::operator==(Sample& u) const
+			bool Sample::operator==(const Sample& u) const
 			{
 				return file_sample == u.file_sample;
 			}
 
-			bool Sample::operator==(ALLEGRO_SAMPLE*& u) const
+			/*bool Sample::operator==(ALLEGRO_SAMPLE*& u) const
 			{
 				return file_sample.get() == u;
-			}
+			}*/
 
 			bool Sample::exists() const
 			{

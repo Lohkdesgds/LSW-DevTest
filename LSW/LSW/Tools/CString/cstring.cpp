@@ -3,7 +3,14 @@
 namespace LSW {
 	namespace v5 {
 		namespace Tools {
-
+			Cstring::Cstring(const Cstring& c)
+			{
+				*this = c;
+			}
+			Cstring::Cstring(Cstring&& m) noexcept
+			{
+				*this = std::move(m);
+			}
 			const size_t Cstring::find(const char c) const
 			{
 				for (size_t p = 0; p < str.size(); p++) {
@@ -86,8 +93,8 @@ namespace LSW {
 
 				for (size_t p = 0; (p + start) < str.size() && p < len; p++) cpy += str[p + start];
 
-				if (start + len + 1 < str.size()) cpy.__change_last_color(str[start + len + 1].cr);
-				else cpy.__change_last_color(__last_color());
+				if (start + len + 1 < str.size()) cpy.last_added_color = str[start + len + 1].cr;
+				else cpy.last_added_color = last_added_color;
 
 				return cpy;
 			}
@@ -115,7 +122,7 @@ namespace LSW {
 			Cstring& Cstring::append(const Cstring& oth) {
 				//str.clear();
 				for (auto& i : oth) str += i;
-				last_added_color = oth.__last_color();
+				last_added_color = oth.last_added_color;
 
 				return *this;
 			}
@@ -203,6 +210,24 @@ namespace LSW {
 				return this->append(std::string(&a, sizeof(char)));
 			}
 
+			Cstring& Cstring::append(const cstring::C& c)
+			{
+				last_added_color = c;
+				return *this;
+			}
+
+			void Cstring::operator=(const Cstring& c)
+			{
+				str = c.str;
+				last_added_color = c.last_added_color;
+			}
+
+			void Cstring::operator=(Cstring&& m) noexcept
+			{
+				str = std::move(m.str);
+				last_added_color = std::move(last_added_color);
+			}
+
 			void Cstring::push_back(char_c&& u)
 			{
 				append(u);
@@ -216,10 +241,22 @@ namespace LSW {
 			}
 
 			char_c& Cstring::operator[](const size_t p) {
+				if (p >= size()) throw Handling::Abort(__FUNCSIG__, "Out of range");
 				return str[p];
 			}
 			const char_c& Cstring::operator[](const size_t p) const {
+				if (p >= size()) throw Handling::Abort(__FUNCSIG__, "Out of range");
 				return str[p];
+			}
+			const char_c& Cstring::front() const
+			{
+				if (size() == 0) throw Handling::Abort(__FUNCSIG__, "Empty string doesn't have front()!");
+				return (*this)[0];
+			}
+			const char_c& Cstring::back() const
+			{
+				if (size() == 0) throw Handling::Abort(__FUNCSIG__, "Empty string doesn't have back()!");
+				return (*this)[size()-1];
 			}
 			void Cstring::clear()
 			{
@@ -233,13 +270,20 @@ namespace LSW {
 			{
 				return str.data();
 			}
-			cstring::C Cstring::__last_color() const
+			const cstring::C& Cstring::next_color() const
 			{
 				return last_added_color;
 			}
-			void Cstring::__change_last_color(const cstring::C c)
+			Cstring Cstring::filter_ascii_range(const char a, const char b) const
 			{
-				last_added_color = c;
+				Cstring nstr;
+				for (auto& i : str) {
+					if (i.ch >= a && i.ch <= b) {
+						nstr.append(i);
+					}
+				}
+				nstr.last_added_color = last_added_color;
+				return nstr;
 			}
 		}
 	}

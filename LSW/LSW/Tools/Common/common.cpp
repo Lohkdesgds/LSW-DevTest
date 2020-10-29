@@ -114,7 +114,7 @@ namespace LSW {
 			std::string byte_auto_string(double end, const size_t t, const bool space) {
 				int prefix = -1;
 
-				while ((end /= (1e3)) >= 1.0) prefix++;
+				while (prefix < (common::known_size_len - 1) && (end /= (1e3)) >= 1.0) prefix++;
 				end *= 1e3;
 
 				char buf[1 << 7];
@@ -122,6 +122,7 @@ namespace LSW {
 
 				if (space) sprintf_s(format, "%c.%zulf %cs", '%', t, '%');
 				else sprintf_s(format, "%c.%zulf%cs", '%', t, '%');
+
 
 				sprintf_s(buf, format, end, prefix >= 0 ? common::known_size_ends[prefix] : "");
 
@@ -161,39 +162,39 @@ namespace LSW {
 				return sign;
 
 			}
-			std::vector<std::pair<std::string, std::string>> break_lines_config(const std::string a, const std::string spr, const std::string comment, const std::string endline)
+			std::vector<std::pair<std::string, std::string>> break_lines_config(const std::string str, const std::string spr, const std::string comment, const std::string endline)
 			{
 				std::vector<std::pair<std::string, std::string>> vectu;
 				std::pair<std::string, std::string> pair;
 				bool flipswitch = false;
 				bool ignore_now = false;
 
-				for (size_t ii = 0; ii < a.size(); ii++)
+				for (size_t ii = 0; ii < str.size(); ii++)
 				{
-					if (endline.find(a[ii]) != std::string::npos) {
+					if (endline.find(str[ii]) != std::string::npos) {
 						if (pair.first.length() || pair.second.length()) vectu.push_back(pair);
 						pair = std::pair<std::string, std::string>();
 						flipswitch = false;
 						ignore_now = false;
 						continue;
 					}
-					if (comment.find(a[ii]) != std::string::npos) {
+					if (comment.find(str[ii]) != std::string::npos) {
 						ignore_now = true;
 					}
 
 					if (!ignore_now) {
-						if (spr.find(a[ii]) != std::string::npos && !flipswitch) {
-							while (ii < a.size() && spr.find(a[++ii]) != std::string::npos);
+						if (spr.find(str[ii]) != std::string::npos && !flipswitch) {
+							while (ii < str.size() && spr.find(str[++ii]) != std::string::npos);
 							ii--;
 							flipswitch = true;
 							continue;
 						}
 
 						if (!flipswitch) {
-							pair.first += a[ii];
+							pair.first += str[ii];
 						}
 						else {
-							pair.second += a[ii];
+							pair.second += str[ii];
 						}
 					}
 				}
@@ -203,6 +204,24 @@ namespace LSW {
 				}
 
 				return vectu;
+			}
+			std::string sprintf_a(const char* format, ...) {
+				std::string str;
+
+				va_list args;
+				va_start(args, format);
+
+				auto readd = vsnprintf(nullptr, 0, format, args); // str.data(), str.size()
+				if (readd <= 0) throw Handling::Abort(__FUNCSIG__, "Invalid string input");
+
+				str.resize(static_cast<size_t>(readd) + 1);
+				readd = vsnprintf(str.data(), str.size(), format, args);
+
+				va_end(args);
+
+				str.resize(readd); // set what is there
+				str.shrink_to_fit(); // clean up the rest of it (won't clear after it)
+				return str;
 			}
 		}
 	}

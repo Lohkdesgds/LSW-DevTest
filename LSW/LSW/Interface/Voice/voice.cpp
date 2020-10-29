@@ -33,17 +33,6 @@ namespace LSW {
 			{
 				return device.get();
 			}
-
-			/*bool Voice::attach(std::shared_ptr<Mixer> s)
-			{
-				return al_attach_mixer_to_voice(&(*s->get_instance()), &(*device));
-			}*/
-
-			/*std::shared_ptr<ALLEGRO_VOICE> Voice::get_instance()
-			{
-				return device;
-			}*/
-
 		}
 	}
 }

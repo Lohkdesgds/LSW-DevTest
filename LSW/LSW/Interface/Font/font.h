@@ -12,6 +12,9 @@ namespace LSW {
 	namespace v5 {
 		namespace Interface {
 
+			/// <summary>
+			/// <para>Font holds a font to draw text.</para>
+			/// </summary>
 			class Font {
 				std::shared_ptr<ALLEGRO_FONT> font;
 
@@ -22,32 +25,89 @@ namespace LSW {
 			public:
 				Font();
 
+				/// <summary>
+				/// <para>Load a font with specific size (you may want multiple Fonts for multiple sizes).</para>
+				/// </summary>
+				/// <param name="{char*}">Path to font.</param>
+				/// <param name="{int}">Size (1:1 in Camera, in units per EM; use negative for pixels in height).</param>
+				/// <param name="{int}">Flags.</param>
+				/// <returns></returns>
 				// load common font, with size and flags
 				bool load(const char*, const int = 75, const int = 0);
 				// load ttf font, with size and flags
-				bool load_ttf(const char*, const int = 75, const int = 0);
+				//bool load_ttf(const char*, const int = 75, const int = 0);
 
+
+				/// <summary>
+				/// <para>Operator bool.</para>
+				/// </summary>
+				/// <returns>{bool} True if loaded.</returns>
 				operator bool() const;
-				const bool operator!() const;
-				const bool operator==(Font&) const;
-				const bool operator==(ALLEGRO_FONT*&) const;
-				ALLEGRO_FONT* operator*();
 
-				// top part of font height
+				/// <summary>
+				/// <para>Operator bool.</para>
+				/// </summary>
+				/// <returns>{bool} True if not loaded.</returns>
+				const bool operator!() const;
+
+				/// <summary>
+				/// <para>Compare operator.</para>
+				/// </summary>
+				/// <param name="{Font}">Another Font.</param>
+				/// <returns>{bool} True if pointers are the same (Same Font with different sizes are not equal!).</returns>
+				const bool operator==(const Font&) const;
+				//const bool operator==(const ALLEGRO_FONT*&) const;
+				//ALLEGRO_FONT* operator*();
+
+				/// <summary>
+				/// <para>Height of the top part of the font.</para>
+				/// </summary>
+				/// <returns>{int} Height.</returns>
 				int get_line_ascent() const;
-				// bottom part of font height
+
+				/// <summary>
+				/// <para>Height of the bottom part of the font.</para>
+				/// </summary>
+				/// <returns>{int} Height.</returns>
 				int get_line_descent() const;
-				// sum of ascent and descent basically
+
+				/// <summary>
+				/// <para>Full height of the font.</para>
+				/// </summary>
+				/// <returns>{int} Height.</returns>
 				int get_line_height() const;
 
-				// gets width of the string
+				/// <summary>
+				/// <para>Gets the width of a text with current Font.</para>
+				/// </summary>
+				/// <param name="{char*}">String.</param>
+				/// <returns>{int} The length, in pixels.</returns>
 				int get_width(const char*) const;
-				// gets width of the string
+
+				/// <summary>
+				/// <para>Gets the width of a text with current Font.</para>
+				/// </summary>
+				/// <param name="{CString}">String.</param>
+				/// <returns>{int} The length, in pixels.</returns>
 				int get_width(Tools::Cstring) const;
 
-				// faster direct drawing one color
+				/// <summary>
+				/// <para>Direct one color draw of text (faster).</para>
+				/// </summary>
+				/// <param name="{Color}">The color to draw font.</param>
+				/// <param name="{float}">Position X.</param>
+				/// <param name="{float}">Position Y.</param>
+				/// <param name="{int}">Flags.</param>
+				/// <param name="{char*}">String to draw.</param>
 				void draw(Color, const float, const float, const int, const char*) const;
-				// slower, Cstring has colors itself, so no need to tell the color. It knows.
+
+				/// <summary>
+				/// <para>Draw a CString.</para>
+				/// </summary>
+				/// <param name="{float}">Position X.</param>
+				/// <param name="{float}">Position Y.</param>
+				/// <param name="{int}">Flags.</param>
+				/// <param name="{CString*}">Colored String.</param>
 				void draw(const float, const float, const int, Tools::Cstring) const;
 
 				// todo
