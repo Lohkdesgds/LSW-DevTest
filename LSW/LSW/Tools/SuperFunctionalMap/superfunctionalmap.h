@@ -4,8 +4,8 @@
 #include <functional>
 #include <type_traits>
 
-#include "..\SuperMap\supermap.h"
-#include "..\Common\common.h"
+#include "../SuperMap/supermap.h"
+#include "../Common/common.h"
 
 namespace LSW {
 	namespace v5 {

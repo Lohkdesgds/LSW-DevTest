@@ -4,15 +4,13 @@ namespace LSW {
     namespace v5 {
         namespace Tools {
 
-            void Launcher::keep_reading()
+            void Launcher::keep_reading(boolThreadF run)
             {
                 if (prunt) prunt("Process started.");
 
                 std::string block;
 
-                still_running = true;
-
-                while (keep && (WaitForSingleObject(piProcInfo.hProcess, 1) == WAIT_TIMEOUT)) {
+                while (run() && (WaitForSingleObject(piProcInfo.hProcess, 1) == WAIT_TIMEOUT)) {
 
                     DWORD dwRead;
                     bool bSuccess = false;
@@ -36,13 +34,11 @@ namespace LSW {
                 }
                 if (prunt) prunt("Process died or have been left alone.");
 
-                still_running = false;
-
                 CloseHandle(piProcInfo.hProcess);
             }
             Launcher::~Launcher()
             {
-                kill();
+                stop();
             }
             void Launcher::hook_output(const std::function<void(const std::string&)> f)
             {
@@ -93,32 +89,36 @@ namespace LSW {
 
                 //if (!(connec = _popen(cmd, "rt"))) return false;
 
-                if (keep) {
-                    if (autosav) {
+                //if (keep) {
+                    autosav.join();
+                    /*if (autosav) {
                         keep = false;
                         autosav->join();
                         delete autosav;
                         autosav = nullptr;
-                    }
-                }
-                keep = true;
-                autosav = new std::thread([&]() { keep_reading(); });
+                    }*/
+                //}
+                //keep = true;
+                autosav.set([&](boolThreadF f) { keep_reading(f); });
+                autosav.start();
+                //autosav = new std::thread([&]() { keep_reading(); });
                 return true;
             }
 
             bool Launcher::running()
             {
-                return still_running;
+                return autosav.running();
             }
 
-            void Launcher::kill()
+            void Launcher::stop()
             {
-                keep = false;
-                if (autosav) {
+                //keep = false;
+                autosav.join();
+                /*if (autosav) {
                     if (autosav->joinable()) autosav->join();
                     delete autosav;
                     autosav = nullptr;
-                }
+                }*/
             }
         }
     }

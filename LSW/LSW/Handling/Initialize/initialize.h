@@ -16,7 +16,7 @@ namespace LSW {
 		namespace Handling {
 
 			/// <summary>
-			/// <para>Initializes basic and audio parts.</para>
+			/// <para>Initializes basics.</para>
 			/// <para>[al_init]</para>
 			/// </summary>
 			/// <returns>{bool} Success</returns>

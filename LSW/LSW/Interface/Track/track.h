@@ -6,10 +6,10 @@
 #include <functional>
 
 // Others
-#include "..\..\Handling\Abort\abort.h"
-#include "..\..\Handling\Initialize\initialize.h"
-#include "..\Mixer\mixer.h"
-#include "..\Sample\sample.h"
+#include "../../Handling/Abort/abort.h"
+#include "../../Handling/Initialize/initialize.h"
+#include "../Mixer/mixer.h"
+#include "../Sample/sample.h"
 
 
 namespace LSW {

@@ -6,8 +6,8 @@
 #include <vector>
 #include <mutex>
 
-#include "..\..\Handling\Abort\abort.h"
-#include "..\SuperMutex\supermutex.h"
+#include "../../Handling/Abort/abort.h"
+#include "../SuperMutex/supermutex.h"
 
 
 namespace LSW {

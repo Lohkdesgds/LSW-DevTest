@@ -2,11 +2,11 @@
 
 #include <memory>
 
-#include "..\..\Handling\Abort\abort.h"
-#include "..\..\Handling\Initialize\initialize.h"
-#include "..\..\Handling\Path\path.h"
-#include "..\..\Tools\Common\common.h"
-#include "..\..\Interface\Logger\logger.h"
+#include "../../Handling/Abort/abort.h"
+#include "../../Handling/Initialize/initialize.h"
+#include "../../Handling/Path/path.h"
+#include "../../Tools/Common/common.h"
+#include "../../Interface/Logger/logger.h"
 
 namespace LSW {
 	namespace v5 {

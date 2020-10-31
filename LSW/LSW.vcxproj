@@ -208,7 +208,9 @@
     <ClCompile Include="LSW\Interface\Connection\connection.cpp" />
     <ClCompile Include="LSW\Interface\Display\display.cpp" />
     <ClCompile Include="LSW\Interface\Downloader\downloader.cpp" />
+    <ClCompile Include="LSW\Interface\EventCustom\eventcustom.cpp" />
     <ClCompile Include="LSW\Interface\Events\events.cpp" />
+    <ClCompile Include="LSW\Interface\EventTimer\eventtimer.cpp" />
     <ClCompile Include="LSW\Interface\Font\font.cpp" />
     <ClCompile Include="LSW\Interface\Logger\logger.cpp" />
     <ClCompile Include="LSW\Interface\Mixer\mixer.cpp" />
@@ -217,12 +219,12 @@
     <ClCompile Include="LSW\Interface\SmartFile\smartfile.cpp" />
     <ClCompile Include="LSW\Interface\Track\track.cpp" />
     <ClCompile Include="LSW\Interface\Voice\voice.cpp" />
+    <ClCompile Include="LSW\Tools\AutoAbort\autoabort.cpp" />
     <ClCompile Include="LSW\Tools\Common\common.cpp" />
     <ClCompile Include="LSW\Tools\CString\cstring.cpp" />
     <ClCompile Include="LSW\Tools\Hash\hash.cpp" />
     <ClCompile Include="LSW\Tools\Launcher\launcher.cpp" />
     <ClCompile Include="LSW\Tools\SuperMutex\supermutex.cpp" />
-    <ClCompile Include="LSW\Tools\SuperThread\superthread.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -243,7 +245,9 @@
     <ClInclude Include="LSW\Interface\Connection\connection.h" />
     <ClInclude Include="LSW\Interface\Display\display.h" />
     <ClInclude Include="LSW\Interface\Downloader\downloader.h" />
+    <ClInclude Include="LSW\Interface\EventCustom\eventcustom.h" />
     <ClInclude Include="LSW\Interface\Events\events.h" />
+    <ClInclude Include="LSW\Interface\EventTimer\eventtimer.h" />
     <ClInclude Include="LSW\Interface\Font\font.h" />
     <ClInclude Include="LSW\Interface\Interface.h" />
     <ClInclude Include="LSW\Interface\Logger\logger.h" />
@@ -255,6 +259,7 @@
     <ClInclude Include="LSW\Interface\Voice\voice.h" />
     <ClInclude Include="LSW\LSWv5.h" />
     <ClInclude Include="LSW\Tools\Any\any.h" />
+    <ClInclude Include="LSW\Tools\AutoAbort\autoabort.h" />
     <ClInclude Include="LSW\Tools\Common\common.h" />
     <ClInclude Include="LSW\Tools\CString\cstring.h" />
     <ClInclude Include="LSW\Tools\Future\future.h" />
@@ -267,7 +272,6 @@
     <ClInclude Include="LSW\Tools\SuperResource\superresource.h" />
     <ClInclude Include="LSW\Tools\SuperThread\superthread.h" />
     <ClInclude Include="LSW\Tools\SuperTimer\supertimer.h" />
-    <ClInclude Include="LSW\Tools\TimedMemory\timedmemory.h" />
     <ClInclude Include="LSW\Tools\Tools.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

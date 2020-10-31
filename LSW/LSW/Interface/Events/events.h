@@ -3,8 +3,8 @@
 #include <memory>
 #include <functional>
 
-#include "..\..\Handling\Initialize\initialize.h"
-#include "..\..\Tools\SuperThread\superthread.h"
+#include "../../Handling/Initialize/initialize.h"
+#include "../../Tools/SuperThread/superthread.h"
 
 namespace LSW {
 	namespace v5 {
@@ -72,10 +72,10 @@ namespace LSW {
 			/// <para>Event is a event source from one of many known things, like keyboard, screen, timer...</para>
 			/// </summary>
 			class Event {
+			protected:
 				std::shared_ptr<ALLEGRO_EVENT_SOURCE> core;
-				std::shared_ptr<bool> is_custom = std::make_shared<bool>(false);
 			public:
-				Event() = default;
+				Event();
 
 				/// <summary>
 				/// <para>Copy constructor.</para>
@@ -87,30 +87,13 @@ namespace LSW {
 				/// <para>Move constructor.</para>
 				/// </summary>
 				/// <param name="{Event}">Event to move.</param>
-				Event(Event&&);
+				Event(Event&&) noexcept;
 
 				/// <summary>
 				/// <para>Direct RAW transformation to Event. This won't deinit the event source by itself!</para>
 				/// </summary>
 				/// <param name="{RAW EVENT SOURCE}">Event source.</param>
 				Event(ALLEGRO_EVENT_SOURCE*);
-
-				/// <summary>
-				/// <para>Creates a User Event Source (created by you) that can be used as a USER_EVENT.</para>
-				/// <para>You can use send_custom_event to send custom event to EventHandlers attached to this.</para>
-				/// </summary>
-				void init_as_custom();
-
-				/// <summary>
-				/// <para>Send some custom data if this is a custom event source.</para>
-				/// <para>You can send up to 32 bytes of data per event (via up to 4 unsigned long long).</para>
-				/// </summary>
-				/// <param name="{int}">Event ID (DON'T USE 0) (you can use this to do many event types in custom event source(s)).</param>
-				/// <param name="{uintptr_t}">Data slot.</param>
-				/// <param name="{uintptr_t}">Data slot.</param>
-				/// <param name="{uintptr_t}">Data slot.</param>
-				/// <param name="{uintptr_t}">Data slot.</param>
-				void send_custom_event(const int, const uintptr_t, const uintptr_t, const uintptr_t, const uintptr_t);
 
 				friend class EventHandler;
 			};
@@ -140,7 +123,6 @@ namespace LSW {
 			const Event get_touchscreen_event();
 
 
-
 			/// <summary>
 			/// <para>Handle multiple Event sources with this. It will start a thread internally and call the function as events happen.</para>
 			/// </summary>
@@ -167,7 +149,7 @@ namespace LSW {
 				void remove(const Event&);
 
 				/// <summary>
-				/// <para>Stops the internal thread (you'll have to reset to start again).</para>
+				/// <para>Stops the internal thread and cleanup (you'll have to reset to start again).</para>
 				/// </summary>
 				void deinit();
 
@@ -176,6 +158,12 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{std::function}">A function to handle the Events.</param>
 				void set_run_autostart(const std::function<void(const RawEvent&)>);
+
+				/// <summary>
+				/// <para>Wait for an event manually (ONLY VALID IF YOU DON'T CALL SET_RUN_AUTOSTART).</para>
+				/// </summary>
+				/// <returns>{RawEvent} The event, if any. if type == 0 it's empty.</returns>
+				const RawEvent wait_event_manually(const double = -1.0);
 			};
 		}
 	}

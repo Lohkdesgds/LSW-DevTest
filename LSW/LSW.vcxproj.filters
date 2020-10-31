@@ -92,9 +92,6 @@
     <Filter Include="LSW\2. Interface\Events">
       <UniqueIdentifier>{f435bed8-3dd0-4d51-9327-6cc1e64d16d7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW\1. Tools\TimedMemory">
-      <UniqueIdentifier>{8d8e1cca-b812-48b0-9748-3649e5280006}</UniqueIdentifier>
-    </Filter>
     <Filter Include="LSW\2. Interface\Camera">
       <UniqueIdentifier>{8307b553-e313-4642-8e03-d24722d93ebc}</UniqueIdentifier>
     </Filter>
@@ -124,6 +121,15 @@
     </Filter>
     <Filter Include="LSW\2. Interface\PathManager">
       <UniqueIdentifier>{f55c6376-a18b-4d68-9aff-160dd9d2ea0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\EventTimer">
+      <UniqueIdentifier>{f1d66068-e879-4c7c-9813-7fdeb951c428}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\EventCustom">
+      <UniqueIdentifier>{2986811a-91ea-4eaa-8f37-2aff7f146d46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\AutoAbort">
+      <UniqueIdentifier>{efd2d73c-c782-4edb-951c-79851b4bd6a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -166,9 +172,6 @@
     <ClCompile Include="LSW\Interface\Color\color.cpp">
       <Filter>LSW\2. Interface\Color</Filter>
     </ClCompile>
-    <ClCompile Include="LSW\Tools\SuperThread\superthread.cpp">
-      <Filter>LSW\1. Tools\SuperThread</Filter>
-    </ClCompile>
     <ClCompile Include="LSW\Interface\Font\font.cpp">
       <Filter>LSW\2. Interface\Font</Filter>
     </ClCompile>
@@ -204,6 +207,15 @@
     </ClCompile>
     <ClCompile Include="LSW\Interface\PathManager\pathmanager.cpp">
       <Filter>LSW\2. Interface\PathManager</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\EventTimer\eventtimer.cpp">
+      <Filter>LSW\2. Interface\EventTimer</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\EventCustom\eventcustom.cpp">
+      <Filter>LSW\2. Interface\EventCustom</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Tools\AutoAbort\autoabort.cpp">
+      <Filter>LSW\1. Tools\AutoAbort</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -293,9 +305,6 @@
     <ClInclude Include="LSW\Interface\Events\events.h">
       <Filter>LSW\2. Interface\Events</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\TimedMemory\timedmemory.h">
-      <Filter>LSW\1. Tools\TimedMemory</Filter>
-    </ClInclude>
     <ClInclude Include="LSW\Interface\Camera\camera.h">
       <Filter>LSW\2. Interface\Camera</Filter>
     </ClInclude>
@@ -325,6 +334,15 @@
     </ClInclude>
     <ClInclude Include="LSW\Interface\PathManager\pathmanager.h">
       <Filter>LSW\2. Interface\PathManager</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\EventTimer\eventtimer.h">
+      <Filter>LSW\2. Interface\EventTimer</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\EventCustom\eventcustom.h">
+      <Filter>LSW\2. Interface\EventCustom</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\AutoAbort\autoabort.h">
+      <Filter>LSW\1. Tools\AutoAbort</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

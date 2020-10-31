@@ -12,45 +12,83 @@ namespace LSW {
 				std::string token;
 				std::vector<std::string> paths;
 
+#ifdef _WIN32
+				const char slash = '\\';
+#else
+				const char slash = '/';
+#endif
+
 				// Windows likes \\ to paths, / to URLs, so the whole stuff is /, but Windows calls will be \\.
 
 				while (std::getline(ss, token, '/'))
 				{
 					str += token;
 					paths.push_back(str);
-					str += '\\';
+					str += slash;
 				}
 
 				std::string u = paths.back();
-				if (size_t h = u.rfind('\\'); h != std::string::npos) {
-					if (u.substr(h).rfind(".") != std::string::npos && s.back() != '\\') paths.pop_back();
+				if (size_t h = u.rfind(slash); h != std::string::npos) {
+					if (u.substr(h).rfind(".") != std::string::npos && s.back() != slash) paths.pop_back();
 				}
 
 				for (auto& i : paths)
 				{
+#ifndef _WIN32
+					mkdir(i.c_str(), 0777);
+#else
 					CreateDirectoryA(i.c_str(), NULL);
+#endif
 				}
 			}
-			bool get_folder_csidl(std::string& s, const char* u)
+			bool get_working_path(std::string& res, const char* path)
+			{
+				size_t siz = 0;
+
+				for (size_t p = 0; p < path::paths_count; p++) {
+					if (strcmp(path, path::paths_known[p]) == 0) {
+
+						getenv_s(&siz, NULL, 0, path::path_known_res[p]);
+						if (siz == 0) return false;
+						res.resize(siz);
+						getenv_s(&siz, res.data(), siz, path::path_known_res[p]);
+						if (res.size()) res.pop_back();
+						for (auto& i : res) i = i == '\\' ? '/' : i;
+						return true;
+					}
+				}
+
+				if (getenv_s(&siz, NULL, 0, path) == 0) {
+
+					if (siz == 0) return false;
+					res.resize(siz);
+					getenv_s(&siz, res.data(), siz, path);
+					for (auto& i : res) i = i == '\\' ? '/' : i;
+					return true;
+				}
+
+				return false;
+			}
+			/*bool get_working_path(std::string& s, const char* u)
 			{
 				short ended = 0;
 				for (auto& i : path::paths_known) {
-					if (strcmp(u, i) == 0) return get_folder_csidl(s, path::paths_pairs[ended].second);
+					if (strcmp(u, i) == 0) return get_working_path(s, path::paths_pairs[ended].second);
 					ended++;
 				}
 				return false;
 			}
-			bool get_folder_csidl(std::string& s, const path::paths_known_e& u)
+			bool get_working_path(std::string& s, const path::paths_known_e& u)
 			{
 				size_t p = 0;
 				for (auto& i : path::paths_pairs) {
-					if (i.first == u) return get_folder_csidl(s, i.second);
+					if (i.first == u) return get_working_path(s, i.second);
 					p++;
 				}
 				return false;
 			}
 
-			bool get_folder_csidl(std::string& s, const int& u)
+			bool get_working_path(std::string& s, const int& u)
 			{
 				wchar_t Folder[1024];
 				HRESULT hr = SHGetFolderPathW(0, u, 0, 0, Folder);
@@ -64,7 +102,7 @@ namespace LSW {
 					return true;
 				}
 				return false;
-			}
+			}*/
 
 			void interpret_path(std::string& cpy)
 			{
@@ -115,7 +153,7 @@ namespace LSW {
 					std::string srch = cpy.substr(pos_0, pos_1 - pos_0 + 1); // this is %tag, not %tag%, so later it's easier to \%tag\% if needed
 
 					std::string path_res;
-					if (get_folder_csidl(path_res, srch.c_str())) { // as said before
+					if (get_working_path(path_res, srch.c_str())) { // as said before
 						endresult += path_res;
 						//printf_s("YY > %s\n", path_res.c_str());
 					}
@@ -127,7 +165,10 @@ namespace LSW {
 					min_pos = pos_1 + 1;
 				}
 
-				if (min_pos < cpy.length()) endresult += cpy.substr(min_pos);
+				if (min_pos < cpy.length()) {
+					std::string lil = cpy.substr(min_pos);
+					endresult += lil;
+				}
 				//if (min_pos < cpy.length()) printf_s("PL > %s\n", cpy.substr(min_pos).c_str());
 
 				cpy = std::move(endresult);

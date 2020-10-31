@@ -4,9 +4,9 @@
 #include <string>
 #include <functional>
 // Others
-#include "..\..\Handling\Initialize\initialize.h"
-#include "..\..\Tools\CString\cstring.h"
-#include "..\Color\color.h"
+#include "../../Handling/Initialize/initialize.h"
+#include "../../Tools/CString/cstring.h"
+#include "../Color/color.h"
 
 namespace LSW {
 	namespace v5 {

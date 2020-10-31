@@ -3,10 +3,10 @@
 #include <memory>
 #include <functional>
 
-#include "..\..\Handling\Abort\abort.h"
-#include "..\..\Handling\Initialize\initialize.h"
+#include "../../Handling/Abort/abort.h"
+#include "../../Handling/Initialize/initialize.h"
 
-#include "..\Bitmap\bitmap.h"
+#include "../Bitmap/bitmap.h"
 
 namespace LSW {
 	namespace v5 {

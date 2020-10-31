@@ -6,6 +6,8 @@
 #include <thread>
 #include <string>
 
+#include "../SuperThread/superthread.h"
+
 
 namespace LSW {
 	namespace v5 {
@@ -30,11 +32,11 @@ namespace LSW {
 				char inter_buf[launcher::buf_size] = { 0 };
 
 				std::function<void(const std::string&)> prunt = std::function<void(const std::string&)>();
-				std::thread* autosav = nullptr;
-				bool keep = false;
-				bool still_running = false;
+				SuperThread autosav;
+				//bool keep = false;
+				//bool still_running = false;
 
-				void keep_reading();
+				void keep_reading(boolThreadF);
 			public:
 				~Launcher();
 
@@ -60,9 +62,9 @@ namespace LSW {
 
 				/// <summary>
 				/// <para>Forces the task to be killed.</para>
-				/// <para>It will set to kill and wait it terminate.</para>
+				/// <para>It will set to stop and wait it terminate.</para>
 				/// </summary>
-				void kill();
+				void stop();
 			};
 
 		}

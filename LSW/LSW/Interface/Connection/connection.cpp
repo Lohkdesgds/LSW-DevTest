@@ -5,6 +5,17 @@ namespace LSW {
 		namespace Interface {
 
 
+			_unprocessed_pack::_unprocessed_pack(const std::string& s)
+			{
+				data = std::move(s);
+			}
+
+			_unprocessed_pack::_unprocessed_pack(std::string&& s, unsigned u)
+			{
+				data = std::move(s);
+				sys = u;
+			}
+
 			bool ConnectionCore::initialize(const char* ip_str, const int port, const int isthis_ipv6)
 			{
 				if (init) return true;
@@ -83,44 +94,76 @@ namespace LSW {
 				return true;
 			}
 
-			void Connection::handle_send()
+			void Connection::handle_send(Tools::boolThreadF run)
 			{
 				std::stringstream ss;
 				ss << std::this_thread::get_id();
 				const std::string common = std::string("[HANDLE_SEND] T#") + ss.str() + std::string(": ");
 
+				unsigned do_sys = 0;
+
+				EventTimer timm(connection::pinging_time);
+
+				EventHandler evhdr;
+				evhdr.add(timm);
+				evhdr.set_run_autostart([&](const Interface::RawEvent& re) {
+					// add to vector so the thread here just send sync.
+					do_sys = static_cast<unsigned>(connection::_internal_tasks::PING);
+				});
+				timm.start();
+				
+
 				logg.debug(common + "Started.");
 
-				while (keep_connection) {
+				while (run() && keep_connection) {
 
 					std::string pack;
+					unsigned sys_t = 0;
 
-					if (alt_generate_auto) {
+					if (do_sys) {
+						switch (do_sys) {
+						case static_cast<unsigned>(connection::_internal_tasks::PING): // first
+						{
+							sys_t = do_sys;
+							long long noww = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+							pack.resize(sizeof(noww));
+							memcpy_s(pack.data(), pack.size(), (void*)&noww, sizeof(noww));
+						}
+							break;
+						}
+						do_sys = 0;
+					}
+					else if (alt_generate_auto) {
 						pack = alt_generate_auto();
 						if (pack.empty()) {
-							std::this_thread::sleep_for(std::chrono::milliseconds(100));
+							std::this_thread::sleep_for(connection::min_delay_no_tasks);
 							continue;
 						}
 						//logg.debug(common + "(auto) tasked.");
 					}
 					else {
-						std::lock_guard<std::mutex> luck(packs_sending_m);
+						Tools::AutoLock luck(packs_sending_m);
 						if (packs_sending.size() == 0) {
-							std::this_thread::sleep_for(std::chrono::milliseconds(100));
+							std::this_thread::sleep_for(connection::min_delay_no_tasks);
 							continue;
 						}
 						else {
-							pack = packs_sending.front();
+							auto _temp = packs_sending.front();
+							pack = std::move(_temp.data);
+							sys_t = _temp.sys;
 							packs_sending.erase(packs_sending.begin());
 							//logg.debug(common + "(default) send tasked.");
 						}
 					}
+
+					if (!pack.length()) continue; // just to be 100% sure.
 
 					const unsigned len = (static_cast<unsigned>(pack.length()) - 1) / connection::package_size; // if len == package_size, it is only one pack, so (len-1)...
 
 					for (unsigned count = 0; count <= len; count++) {
 						_pack one;
 						one.sum_with_n_more = len - count;
+						one.sys = sys_t;
 						std::string res = pack.substr(0, connection::package_size);
 						one.data_len = static_cast<unsigned>(res.length());
 						size_t _count = 0;
@@ -139,9 +182,10 @@ namespace LSW {
 						}
 					}
 				}
+				evhdr.deinit(); // make sure this happens before timar death
 			}
 
-			void Connection::handle_recv()
+			void Connection::handle_recv(Tools::boolThreadF run)
 			{
 				std::stringstream ss;
 				ss << std::this_thread::get_id();
@@ -149,7 +193,7 @@ namespace LSW {
 
 				logg.debug(common + "Started.");
 
-				while (keep_connection) {
+				while (run() && keep_connection) {
 					_pack pack;
 
 					auto fi = ::recv(connected, (char*)&pack, sizeof(_pack), 0);
@@ -157,11 +201,11 @@ namespace LSW {
 
 					logg.debug(common + "RECV once.");
 
-					if (fi > 0) {
-						std::string data;
-						std::lock_guard<std::mutex> luck(packs_received_m);
-						for (unsigned p = 0; p < pack.data_len; p++) data += pack.data[p];
+					if (fi > 0) { // if one is _pack and there're more packs, they will not have _internal_pack in between
 
+						std::string data;
+						Tools::AutoLock luck(packs_received_m);
+						for (unsigned p = 0; p < pack.data_len; p++) data += pack.data[p];
 
 						while (pack.sum_with_n_more > 0) {
 							auto fi2 = ::recv(connected, (char*)&pack, sizeof(_pack), 0);
@@ -179,7 +223,25 @@ namespace LSW {
 							//printf_s("\nReceived one package.");
 						}
 
-						if (alt_receive_autodiscard) {
+						if (pack.sys != 0) { // system package
+							switch (pack.sys) {
+							case static_cast<unsigned>(connection::_internal_tasks::PING): // just a echo // second
+							{
+								Tools::AutoLock luck(packs_sending_m);
+								packs_sending.push_back(_unprocessed_pack{ std::move(data), static_cast<unsigned>(connection::_internal_tasks::PONG) });
+							}
+								break;
+							case static_cast<unsigned>(connection::_internal_tasks::PONG): // response // third
+							{
+								long long noww = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+								long long* before = (long long*)data.data(); // direct raw data
+
+								last_ping = (noww - *before) / 2;
+							}
+								break;
+							}
+						}
+						else if (alt_receive_autodiscard) {
 							alt_receive_autodiscard(data);
 							logg.debug(common + "(auto) tasked.");
 						}
@@ -188,7 +250,7 @@ namespace LSW {
 							logg.debug(common + "(default) tasked.");
 						}
 					}
-					else if (fi < 0) {
+					else if (fi < 0) { // lost connection
 						keep_connection = false;
 						break;
 					}
@@ -198,8 +260,10 @@ namespace LSW {
 			void Connection::init()
 			{
 				keep_connection = true;
-				send_thread = std::thread([&] { handle_send(); });
-				recv_thread = std::thread([&] { handle_recv(); });
+				send_thread.set([&](Tools::boolThreadF f) { handle_send(f); });
+				recv_thread.set([&](Tools::boolThreadF f) { handle_recv(f); });
+				send_thread.start();
+				recv_thread.start();
 			}
 
 			Connection::Connection(SOCKET socket)
@@ -232,8 +296,8 @@ namespace LSW {
 					connected = INVALID_SOCKET;
 					send_thread.join();
 					recv_thread.join();
-					std::lock_guard<std::mutex> lol1(packs_sending_m);
-					std::lock_guard<std::mutex> lol2(packs_received_m);
+					Tools::AutoLock lol1(packs_sending_m);
+					Tools::AutoLock lol2(packs_received_m);
 					packs_sending.clear();
 					packs_received.clear();
 				}
@@ -246,14 +310,14 @@ namespace LSW {
 
 			bool Connection::has_package() const
 			{
-				std::lock_guard<std::mutex> luck(packs_received_m);
+				Tools::AutoLock luck(packs_received_m);
 				return packs_received.size();
 			}
 
 			std::string Connection::get_next()
 			{
 				if (alt_receive_autodiscard) throw Handling::Abort(__FUNCSIG__, "Recvs are overrwriten by a function! You cannot recv package when function is set!");
-				std::lock_guard<std::mutex> luck(packs_received_m);
+				Tools::AutoLock luck(packs_received_m);
 				if (packs_received.size() == 0) return "";
 				std::string cpy = std::move(packs_received.front());
 				packs_received.erase(packs_received.begin());
@@ -263,7 +327,7 @@ namespace LSW {
 			void Connection::send_package(std::string pack)
 			{
 				if (alt_generate_auto) throw Handling::Abort(__FUNCSIG__, "Sends are overrwriten by a function! You cannot send package when function is set!");
-				std::lock_guard<std::mutex> luck(packs_sending_m);
+				Tools::AutoLock luck(packs_sending_m);
 
 				packs_sending.push_back(std::move(pack));
 			}
@@ -276,6 +340,11 @@ namespace LSW {
 			size_t Connection::get_packages_recv() const
 			{
 				return packages_recv;
+			}
+
+			size_t Connection::get_ping()
+			{
+				return last_ping;
 			}
 
 			void Connection::overwrite_reads_to(std::function<void(const std::string&)> ow)
@@ -298,9 +367,9 @@ namespace LSW {
 				alt_generate_auto = std::function<std::string(void)>();
 			}
 
-			void Hosting::handle_queue()
+			void Hosting::handle_queue(Tools::boolThreadF run)
 			{
-				while (keep_connection) {
+				while (run() && keep_connection) {
 					if (listen(Listening, SOMAXCONN) == SOCKET_ERROR) continue;
 
 					// Accept a client socket
@@ -316,7 +385,7 @@ namespace LSW {
 
 					//dis->start_internally_as_host(); // cause sended last time, so should receive so there's no error
 
-					std::lock_guard<std::mutex> safe(connections_m);
+					Tools::AutoLock safe(connections_m);
 					connections.emplace_back(std::move(dis));
 
 					//printf_s("\nSomeone has connected!");
@@ -337,7 +406,8 @@ namespace LSW {
 			void Hosting::init()
 			{
 				keep_connection = true;
-				handle_thread = std::thread([&] { handle_queue(); });
+				handle_thread.set([&](Tools::boolThreadF f) { handle_queue(f); });
+				handle_thread.start();
 			}
 
 			Hosting::Hosting(const int port, const bool ipv6)
@@ -361,7 +431,7 @@ namespace LSW {
 
 			size_t Hosting::size() const
 			{
-				std::lock_guard<std::mutex> safe(connections_m);
+				Tools::AutoLock safe(connections_m);
 				return connections.size();
 			}
 
@@ -372,7 +442,7 @@ namespace LSW {
 					::closesocket(Listening);
 					Listening = INVALID_SOCKET;
 					handle_thread.join();
-					std::unique_lock<std::mutex> luck(connections_m);
+					Tools::AutoLock luck(connections_m);
 					connections.clear();
 				}
 			}
@@ -389,14 +459,14 @@ namespace LSW {
 
 			std::shared_ptr<Connection> Hosting::get_connection(const size_t p)
 			{
-				std::lock_guard<std::mutex> luck(connections_m);
+				Tools::AutoLock luck(connections_m);
 				if (connections.size() <= p) return std::shared_ptr<Connection>();
 				return connections[p];
 			}
 
 			std::shared_ptr<Connection> Hosting::get_latest_connection()
 			{
-				std::unique_lock<std::mutex> luck(connections_m);
+				Tools::AutoLock luck(connections_m);
 				while (connections.size() == 0) {
 					luck.unlock();
 					connection_event.wait_signal(1000);

@@ -1,27 +1,28 @@
 #pragma once
 
-// C
-#include <assert.h>
-#include <Windows.h>
+
 // C++
-#include <thread>
 #include <functional>
 
-#include "..\Future\future.h"
+#include "../../Handling/Abort/abort.h"
+#include "../../Handling/Initialize/initialize.h"
+#include "../Future/future.h"
 
 namespace LSW {
 	namespace v5 {
 		namespace Tools {
+
 
 			// function that returns TRUE if you should KEEP RUNNING.
 			using boolThreadF = std::function<bool(void)>;
 
 			template<typename T>
 			class SuperThreadT {
-				std::thread thr;
-				bool should_stop = false;
+				ALLEGRO_THREAD* thr = nullptr;
 				bool _thread_done_flag = true;
 				Promise<T> promise;
+
+				static void* __run_i_al(ALLEGRO_THREAD* thr, void* arg);
 
 				// if you have to set after kill, easy way
 				template<typename Q = T, std::enable_if_t<!std::is_void_v<Q>, int> = 0>
@@ -31,7 +32,10 @@ namespace LSW {
 				template<typename Q = T, std::enable_if_t<std::is_void_v<Q>, int> = 0>
 				void _set_promise_forced();
 			public:
-				SuperThreadT() = default;
+				/// <summary>
+				/// <para>Initialize necessary stuff.</para>
+				/// </summary>
+				SuperThreadT();
 
 				/// <summary>
 				/// <para>Constructor that sets directly the function.</para>
@@ -106,8 +110,24 @@ namespace LSW {
 
 
 			template<typename T>
+			inline void* SuperThreadT<T>::__run_i_al(ALLEGRO_THREAD* thr, void* arg)
+			{
+				if (!arg) throw Handling::Abort(__FUNCSIG__, "Invalid thread argument internally!");
+				Promise<T>* f = (Promise<T>*)arg;
+				f->work(); // has !al_get_thread_should_stop(thr) internally
+				return thr;
+			}
+
+			template<typename T>
+			inline SuperThreadT<T>::SuperThreadT()
+			{
+				Handling::init_basic();
+			}
+
+			template<typename T>
 			SuperThreadT<T>::SuperThreadT(const std::function<T(boolThreadF)> f)
 			{
+				Handling::init_basic();
 				set(f);
 			}
 
@@ -123,7 +143,7 @@ namespace LSW {
 			void SuperThreadT<T>::set(const std::function<T(boolThreadF)> f)
 			{
 				promise = std::move(Promise<T>([&,f] {
-					return f([&] {return !should_stop; });
+					return f([&] {return !al_get_thread_should_stop(thr); });
 				}));
 			}
 
@@ -131,8 +151,8 @@ namespace LSW {
 			template<typename Q, std::enable_if_t<std::is_void_v<Q>, int>>
 			void SuperThreadT<T>::set(const std::function<T(boolThreadF)> f)
 			{
-				promise = std::move(Promise<T>([&,f] {					
-					f([&] {return !should_stop; });
+				promise = std::move(Promise<T>([&,f] {
+					f([&] {return !al_get_thread_should_stop(thr); });
 				}));
 			}
 
@@ -140,48 +160,53 @@ namespace LSW {
 			Future<T> SuperThreadT<T>::start()
 			{
 				Future<T> fut = promise.get_future();
-				should_stop = false;
-				thr = std::thread([&] { _thread_done_flag = false; promise.work(); _thread_done_flag = true; });
+				thr = al_create_thread(__run_i_al, &promise);
+				al_start_thread(thr);
 				return fut;
 			}
 
 			template<typename T>
 			void SuperThreadT<T>::stop()
 			{
-				should_stop = true;
+				if (thr) al_set_thread_should_stop(thr);
 			}
 
 			template<typename T>
 			void SuperThreadT<T>::join()
 			{
-				should_stop = true;
-				if (thr.joinable()) thr.join();
+				if (thr) {
+					al_set_thread_should_stop(thr);
+					al_join_thread(thr, nullptr);
+					al_destroy_thread(thr);
+					thr = nullptr;
+				}
 				else kill();
 			}
 
 			template<typename T>
 			void SuperThreadT<T>::kill()
 			{
-				should_stop = true;
-				if (_thread_done_flag) {
-					if (!promise.has_set()) _set_promise_forced();
-					if (thr.joinable()) thr.join(); // thread done flag up, it should not lock here.
-				}
-				else { // might be internally blocked or the user is crazy and wants to kill it anyways.
-					if (thr.joinable()) {
-						thr.detach();
+				if (thr) {
+					al_set_thread_should_stop(thr);
+					if (_thread_done_flag) {
+						if (!promise.has_set()) _set_promise_forced();
+						al_join_thread(thr, nullptr);
+						al_destroy_thread(thr);
+						thr = nullptr;
 					}
-					auto handlr = thr.native_handle();
-					::TerminateThread(handlr, 1);
-					if (!promise.has_set()) _set_promise_forced();
-					_thread_done_flag = true;
+					else { // might be internally blocked or the user is crazy and wants to kill it anyways.
+						al_destroy_thread(thr);
+						thr = nullptr;
+						if (!promise.has_set()) _set_promise_forced();
+						_thread_done_flag = true;
+					}
 				}
 			}
 
 			template<typename T>
 			bool SuperThreadT<T>::running() const
 			{
-				return !_thread_done_flag;
+				return thr && !_thread_done_flag;
 			}
 
 			using SuperThread = SuperThreadT<void>;

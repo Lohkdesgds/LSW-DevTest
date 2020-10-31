@@ -8,7 +8,7 @@
 // C++
 #include <string>
 
-#include "..\..\Handling\Path\path.h"
+#include "../../Handling/Path/path.h"
 
 namespace LSW {
     namespace v5 {

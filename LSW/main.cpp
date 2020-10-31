@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "LSW/LSWv5.h"
 
 #include <iostream>
@@ -26,7 +27,15 @@ int main() {
 	logg << L::SLF << fsr(__FUNCSIG__) << "&7#      &eThis is not a game yet, just a test.&7      #" << L::ELF;
 	logg << L::SLF << fsr(__FUNCSIG__) << "&7#======&7====================================&7======#" << L::ELF;
 	
+	{
+		/*size_t len = 0;
+		getenv_s(&len, NULL, 0, "USER");*/
+		std::string t;
+		Handling::get_working_path(t);
 
+		logg << L::SLF << fsr(__FUNCSIG__) << "&7TEST " << t << L::ELF;
+	}
+	
 	Tools::SuperResource<Config> configs;
 
 	auto conf = configs.create("DEFAULT");
@@ -77,7 +86,7 @@ int main() {
 
 		std::string cpy = datapath;
 		Handling::handle_path(cpy);
-		auto size = Tools::get_file_size(cpy);
+		auto size = Interface::quick_get_file_size(cpy);
 
 		if (size <= 0/* || (val % 15 == 0 && !val)*/) {
 			/*if (size <= 0) */logg << L::SLF << fsr(__FUNCSIG__) << "&cData files not found." << L::ELF;
@@ -117,7 +126,7 @@ int main() {
 
 
 
-	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > TIMEDMEMORY TEST < < < < <" << L::ELF;
+	/*logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > TIMEDMEMORY TEST < < < < <" << L::ELF;
 	{
 		logg << L::SLF << fsr(__FUNCSIG__) << "Creating a int with value 10 that should last for about 300 ms..." << L::ELF;
 		Tools::TimedMemory<int> testmemory(300, 10);
@@ -129,7 +138,66 @@ int main() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		logg << L::SLF << fsr(__FUNCSIG__) << "AutoMemory: &a" << [&] {auto c = testmemory.get(); if (c.use_count()) return std::to_string(*c.get()); return std::string("&cnot alloc"); }() << L::ELF;
 	}
-	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF TIMEDMEMORY TEST < < < < <" << L::ELF;
+	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF TIMEDMEMORY TEST < < < < <" << L::ELF;*/
+
+
+	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > AUTOABORT TEST < < < < <" << L::ELF;
+	{
+		{
+			logg << L::SLF << fsr(__FUNCSIG__) << "Setting up thread mode=ASYNC_TIMEOUT_KILLTHISTHREADSELF_THEN_RUN 500 ms..." << L::ELF;
+
+			unsigned count = 0, copy = 0;
+			Tools::SuperThread on;
+			on.set([&](Tools::boolThreadF) {
+				Tools::AutoAbort aa(Tools::autoabort::abort_mode::ASYNC_TIMEOUT_KILLTHISTHREADSELF_THEN_RUN, 500, [&] {
+					copy = count;
+				});
+				while (1) {
+					count++;
+				}
+			});
+
+			logg << L::SLF << fsr(__FUNCSIG__) << "Waiting..." << L::ELF;
+
+			on.start();
+
+			while (copy == 0)
+				std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+			logg << L::SLF << fsr(__FUNCSIG__) << "Got results: Thread had " << count << " and abort copied " << copy << "." << L::ELF;
+
+			on.kill();
+		}
+		/*{
+			logg << L::SLF << fsr(__FUNCSIG__) << "Setting up thread mode=ASYNC_TIMEOUT_RUN_THEN_KILLTHISTHREADSELF 500 ms..." << L::ELF;
+
+			unsigned count = 0, copy = 0;
+			Tools::SuperThread on;
+			on.set([&](Tools::boolThreadF) {
+				Tools::AutoAbort aa(Tools::autoabort::abort_mode::ASYNC_TIMEOUT_RUN_THEN_KILLTHISTHREADSELF, 500, [&] {
+					copy = count;
+				});
+				while (1) {
+					count++;
+				}
+			});
+
+			logg << L::SLF << fsr(__FUNCSIG__) << "Waiting..." << L::ELF;
+
+			on.start();
+
+			while (copy == 0)
+				std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+			logg << L::SLF << fsr(__FUNCSIG__) << "Got results: Thread had " << count << " and abort copied " << copy << "." << L::ELF;
+
+			on.kill();
+		}*/ ///ref there [&] is invalid later at copy = count apparently
+	}
+	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF AUTOABORT TEST < < < < <" << L::ELF;
+
+
+
 
 
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > MULTITASK TEST < < < < <" << L::ELF;
@@ -207,6 +275,13 @@ int main() {
 			res = client.get_next();
 
 			logg << L::SLF << fsr(__FUNCSIG__) << "Did they match? " << ((res == second_msg) ? "YES" : "NO") << L::ELF;
+
+			for (size_t pingin = 0; pingin < 10; pingin++) {
+				logg << L::SLF << fsr(__FUNCSIG__) << "Local ping try #" << pingin << ": " << L::ELF;
+				logg << L::SLF << fsr(__FUNCSIG__) << "- Client: " << client.get_ping() << " ms" << L::ELF;
+				logg << L::SLF << fsr(__FUNCSIG__) << "- Server: " << host_c->get_ping() << " ms" << L::ELF;
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
 		}
 	}
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF SOCKET TEST < < < < <" << L::ELF;

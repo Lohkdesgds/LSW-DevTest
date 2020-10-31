@@ -19,7 +19,7 @@ SuperMap header:
 #include <typeindex>
 
 // import
-#include "..\SuperPair\superpair.h"
+#include "../SuperPair/superpair.h"
 
 namespace LSW {
 	namespace v5 {

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Connection/connection.h"
 #include "Logger/logger.h"
 #include "Downloader/downloader.h"
 #include "Color/color.h"
 #include "Events/events.h"
+#include "EventCustom/eventcustom.h"
+#include "EventTimer/eventtimer.h"
+#include "Connection/connection.h"
 #include "Camera/camera.h"
 #include "Config/config.h"
 

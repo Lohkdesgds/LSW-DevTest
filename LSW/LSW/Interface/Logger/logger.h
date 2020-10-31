@@ -7,9 +7,9 @@
 #include <mutex>
 #include <functional>
 
-#include "..\..\Handling\Abort\abort.h" // fails calls throw
-#include "..\..\Handling\Path\path.h" // handle_path used on init
-#include "..\..\Tools\CString\cstring.h" // uses this as string internally to print colored chars
+#include "../../Handling/Abort/abort.h" // fails calls throw
+#include "../../Handling/Path/path.h" // handle_path used on init
+#include "../../Tools/CString/cstring.h" // uses this as string internally to print colored chars
 
 
 namespace LSW {

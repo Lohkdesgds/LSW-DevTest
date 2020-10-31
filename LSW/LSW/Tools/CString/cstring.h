@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "..\..\Handling\Abort\abort.h"
+#include "../../Handling/Abort/abort.h"
 
 namespace LSW {
 	namespace v5 {

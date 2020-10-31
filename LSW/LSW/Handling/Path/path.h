@@ -1,7 +1,10 @@
 #pragma once
 
+#ifdef _WIN32
 #include <Windows.h>
-#include <ShlObj.h>
+#else
+#include <sys/stat.h>
+#endif
 
 #include <string>
 #include <vector>
@@ -12,8 +15,17 @@ namespace LSW {
 		namespace Handling {
 
 			namespace path {
-				inline const char* paths_known[] = { "%appdata%", "%fonts%", "%mypictures%", "%mydocuments%", "%mymusic%", "%myvideo%", "%desktop%", "%localdata%" };
-				enum class paths_known_e {
+				constexpr size_t paths_count = 1;
+				inline const char* paths_known[paths_count] = { "%appdata%"/*, "%fonts%", "%mypictures%", "%mydocuments%", "%mymusic%", "%myvideo%", "%desktop%", "%localdata%"*/ };
+				inline const char* path_known_res[paths_count] = {
+#ifdef _WIN32
+					"APPDATA"
+#else // assuming linux
+					"HOME"
+#endif
+				};
+
+				/*enum class paths_known_e {
 					APPDATA,
 					FONTS,
 					PICTURES,
@@ -23,7 +35,14 @@ namespace LSW {
 					DESKTOP,
 					LOCAL_APPDATA
 				};
-				const std::pair<paths_known_e, int> paths_pairs[] = {
+				const std::pair<paths_known_e, const char*> paths_pairs[] = {
+#ifdef _WIN32
+					{ paths_known_e::APPDATA, "APPDATA" }
+#else
+					{ paths_known_e::APPDATA, "HOME" }
+#endif
+
+
 					{ paths_known_e::APPDATA, CSIDL_APPDATA },
 					{ paths_known_e::FONTS, CSIDL_FONTS },
 					{ paths_known_e::PICTURES, CSIDL_MYPICTURES },
@@ -32,7 +51,7 @@ namespace LSW {
 					{ paths_known_e::VIDEO, CSIDL_MYVIDEO },
 					{ paths_known_e::DESKTOP, CSIDL_DESKTOPDIRECTORY },
 					{ paths_known_e::LOCAL_APPDATA, CSIDL_LOCAL_APPDATA }
-				};
+				};*/
 			}
 			/// <summary>
 			/// <para>Creates the path automatically (use /)</para>
@@ -42,12 +61,12 @@ namespace LSW {
 			void create_path(const std::string&);
 
 			/// <summary>
-			/// <para>Gets folder path based on string (one of those path::paths_known).</para>
+			/// <para>Gets folder path based on string (one of those path::paths_known or environment).</para>
 			/// </summary>
 			/// <param name="{std::string}">Sets this if path was found.</param>
 			/// <param name="{const char*}">The %path% string like "%appdata%".</param>
 			/// <returns>{bool} Success</returns>
-			bool get_folder_csidl(std::string&, const char*);
+			bool get_working_path(std::string&, const char* = path::paths_known[0]);
 
 			/// <summary>
 			/// <para>Gets folder path based on enum path::paths_known_e.</para>
@@ -55,7 +74,7 @@ namespace LSW {
 			/// <param name="{std::string}">Sets this if path was found.</param>
 			/// <param name="{path::paths_known_e}">The path code.</param>
 			/// <returns>{bool} Success</returns>
-			bool get_folder_csidl(std::string&, const path::paths_known_e&);
+			//bool get_working_path(std::string&, const path::paths_known_e&);
 
 			/// <summary>
 			/// <para>Gets folder path based on direct CSIDL value (if valid, see path::paths_known_e).</para>
@@ -63,7 +82,7 @@ namespace LSW {
 			/// <param name="{std::string}">Sets this if path was found.</param>
 			/// <param name="{int}">The CSIDL code.</param>
 			/// <returns>{bool} Success</returns>
-			bool get_folder_csidl(std::string&, const int&);
+			//bool get_working_path(std::string&, const int&);
 
 			/// <summary>
 			/// <para>Interprets path (ignores stuff like %appdata\%, allows \%appdata% because that can be a path)</para>

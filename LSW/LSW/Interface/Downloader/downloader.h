@@ -12,7 +12,7 @@
 #pragma comment (lib, "wininet.lib")
 
 // + future
-#include "..\..\Tools\SuperThread\superthread.h"
+#include "../../Tools/SuperThread/superthread.h"
 
 
 namespace LSW {

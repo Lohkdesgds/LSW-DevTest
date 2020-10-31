@@ -18,7 +18,7 @@ SuperPair header:
 #include <typeindex>
 #include <any>
 
-#include "..\Common\common.h"
+#include "../Common/common.h"
 
 
 namespace LSW {

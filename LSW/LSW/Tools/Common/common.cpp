@@ -19,33 +19,6 @@ namespace LSW {
 			}
 
 
-			LONGLONG get_file_size(const std::string& s)
-			{
-#ifdef UNICODE
-				HANDLE hFile = CreateFile(Tools::wideup(s).c_str(), GENERIC_READ,
-					FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
-					FILE_ATTRIBUTE_NORMAL, NULL);
-#else
-				HANDLE hFile = CreateFile(s.c_str(), GENERIC_READ,
-					FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
-					FILE_ATTRIBUTE_NORMAL, NULL);
-#endif
-
-
-				if (hFile == INVALID_HANDLE_VALUE)
-					return -1; // error condition, could call GetLastError to find out more
-
-				LARGE_INTEGER size;
-				if (!GetFileSizeEx(hFile, &size))
-				{
-					CloseHandle(hFile);
-					return -1; // error condition, could call GetLastError to find out more
-				}
-
-				CloseHandle(hFile);
-				return size.QuadPart;
-			}
-
 			std::vector<std::string> generate_string_format(const std::string format, const size_t max, const size_t startat)
 			{
 				std::vector<std::string> rett;
@@ -128,6 +101,7 @@ namespace LSW {
 
 				return buf;
 			}
+			/*
 			std::wstring wideup(const std::string& str) {
 				if (str.empty())
 					return std::wstring();
@@ -142,7 +116,8 @@ namespace LSW {
 				if (charsConverted == 0) return L"Error";
 
 				return std::wstring(&buffer[0], charsConverted);
-			}
+			}*/
+
 			const double limit_maximize(double gotten, const double prop)
 			{
 				return sin(gotten * 3.1415) * prop;

@@ -20,9 +20,12 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-#include "..\..\Handling\Abort\abort.h"
-#include "..\..\Tools\SuperMutex\supermutex.h"
-#include "..\Logger\logger.h"
+#include "../../Handling/Abort/abort.h"
+#include "../../Tools/SuperMutex/supermutex.h"
+#include "../../Tools/SuperThread/superthread.h"
+#include "../Logger/logger.h"
+#include "../Events/events.h"
+#include "../EventTimer/eventtimer.h"
 
 namespace LSW {
 	namespace v5 {
@@ -31,12 +34,25 @@ namespace LSW {
 			namespace connection {
 				constexpr int default_port = 42069;
 				constexpr unsigned package_size = 1 << 8;
+				const std::chrono::milliseconds min_delay_no_tasks = std::chrono::milliseconds(5);
+				const double pinging_time = 2.0; // seconds
+				enum class _internal_tasks {NOT_IT,
+					PING,PONG // both sides will task this, no reason to send back result
+				};
 			}
 
 			struct _pack {
 				char data[connection::package_size] = { 0 };
 				unsigned data_len = 0;
-				unsigned sum_with_n_more = 0;
+				size_t sum_with_n_more = 0;
+				unsigned sys = 0; // if sys, _internal_task it is!
+			};
+			struct _unprocessed_pack {
+				std::string data;
+				unsigned sys = 0;
+
+				_unprocessed_pack(const std::string&);
+				_unprocessed_pack(std::string&&, unsigned);
 			};
 
 			/// <summary>
@@ -61,26 +77,28 @@ namespace LSW {
 				ConnectionCore core;
 				Logger logg;
 
-				mutable std::mutex packs_received_m;
+				mutable Tools::SuperMutex packs_received_m;
 				std::vector<std::string> packs_received;
-				std::mutex packs_sending_m;
-				std::vector<std::string> packs_sending;
+				Tools::SuperMutex packs_sending_m;
+				std::vector<_unprocessed_pack> packs_sending;
 
 				SOCKET connected = INVALID_SOCKET;
 				bool keep_connection = false;
 
-				std::thread send_thread;
-				std::thread recv_thread;
+				Tools::SuperThread send_thread;
+				Tools::SuperThread recv_thread;
 
 				// debugging
 				size_t packages_sent = 0;
 				size_t packages_recv = 0;
+				size_t last_ping = 0;
+
 
 				std::function<void(const std::string&)> alt_receive_autodiscard; // your handle, no saving. It calls this instead.
 				std::function<std::string(void)>		alt_generate_auto;		 // it will read only from this if set.
 
-				void handle_send();
-				void handle_recv();
+				void handle_send(Tools::boolThreadF);
+				void handle_recv(Tools::boolThreadF);
 
 				// starts handle's
 				void init();
@@ -148,6 +166,12 @@ namespace LSW {
 				size_t get_packages_recv() const;
 
 				/// <summary>
+				/// <para>Get last ping information.</para>
+				/// </summary>
+				/// <returns>{size_t} Ping in milliseconds.</returns>
+				size_t get_ping();
+
+				/// <summary>
 				/// <para>Set a function to handle RECV RAW data.</para>
 				/// <para>WARN: All data from RECV will be handled exclusively by your custom function if you set one!</para>
 				/// <para>PS: DO NOT SET A FUNCTION THAT CAN POTENTIALLY LOCK!</para>
@@ -186,13 +210,13 @@ namespace LSW {
 
 				size_t max_connections_allowed = 1;
 
-				std::thread handle_thread;
+				Tools::SuperThread handle_thread;
 
 				Tools::Waiter connection_event;
 				std::vector<std::shared_ptr<Connection>> connections;
-				mutable std::mutex connections_m;
+				mutable Tools::SuperMutex connections_m;
 
-				void handle_queue();
+				void handle_queue(Tools::boolThreadF);
 
 				void init();
 			public:

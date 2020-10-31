@@ -3,9 +3,9 @@
 #include <string>
 
 // Others
-#include "..\..\Handling\Initialize\initialize.h"
-#include "..\..\Handling\Path\path.h"
-#include "..\..\Tools\Common\common.h"
+#include "../../Handling/Initialize/initialize.h"
+#include "../../Handling/Path/path.h"
+#include "../../Tools/Common/common.h"
 
 
 namespace LSW {
@@ -33,7 +33,7 @@ namespace LSW {
 				/// <summary>
 				/// <para>Open a file.</para>
 				/// </summary>
-				/// <param name="{std::string}">Path (allows %tags%).</param>
+				/// <param name="{std::string}">Path (allows %tags%, read-only).</param>
 				/// <param name="{file_modes}">File opening mode.</param>
 				/// <returns>{bool} True if successfully opened.</returns>
 				bool open(std::string, const smartfile::file_modes);
@@ -93,6 +93,12 @@ namespace LSW {
 				size_t write(const std::string&, const size_t = 0);
 			};
 
+			/// <summary>
+			/// <para>Quickly open, get size and close a file (interprets %tags%, readonly).</para>
+			/// </summary>
+			/// <param name="{std::string}">Path.</param>
+			/// <returns></returns>
+			int64_t quick_get_file_size(std::string);
 		}
 	}
 }

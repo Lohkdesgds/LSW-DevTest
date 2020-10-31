@@ -5,8 +5,8 @@
 #include <string>
 
 // Others
-#include "..\..\Handling\Initialize\initialize.h"
-#include "..\Voice\voice.h"
+#include "../../Handling/Initialize/initialize.h"
+#include "../Voice/voice.h"
 
 
 namespace LSW {

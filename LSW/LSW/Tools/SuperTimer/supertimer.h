@@ -1,7 +1,7 @@
 #pragma once
 
-#include "..\..\Handling\Abort\abort.h"
-#include "..\..\Handling\Initialize\initialize.h"
+#include "../../Handling/Abort/abort.h"
+#include "../../Handling/Initialize/initialize.h"
 
 
 namespace LSW {

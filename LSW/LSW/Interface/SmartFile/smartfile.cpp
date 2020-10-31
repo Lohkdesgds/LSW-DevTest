@@ -133,6 +133,13 @@ namespace LSW {
 			}
 
 
+
+
+			int64_t quick_get_file_size(std::string p) {
+				SmartFile f;
+				if (!f.open(p, smartfile::file_modes::READ)) return -1;
+				return f.total_size(); // close on destroy
+			}
 		}
 	}
 }

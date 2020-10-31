@@ -1,16 +1,16 @@
 #pragma once
 
-#include "..\..\Handling\Abort\abort.h"
-#include "..\..\Handling\Initialize\initialize.h"
-#include "..\..\Tools\SuperThread\superthread.h"
-#include "..\..\Tools\Future\future.h"
-#include "..\..\Tools\SuperMutex\supermutex.h"
-#include "..\..\Tools\Common\common.h"
-#include "..\..\Tools\Any\any.h"
-#include "..\Events\events.h"
-#include "..\Bitmap\bitmap.h"
-#include "..\Font\font.h"
-#include "..\Camera\camera.h"
+#include "../../Handling/Abort/abort.h"
+#include "../../Handling/Initialize/initialize.h"
+#include "../../Tools/SuperThread/superthread.h"
+#include "../../Tools/Future/future.h"
+#include "../../Tools/SuperMutex/supermutex.h"
+#include "../../Tools/Common/common.h"
+#include "../../Tools/Any/any.h"
+#include "../Events/events.h"
+#include "../Bitmap/bitmap.h"
+#include "../Font/font.h"
+#include "../Camera/camera.h"
 
 namespace LSW {
 	namespace v5 {

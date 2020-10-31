@@ -4,8 +4,8 @@
 #include <string>
 #include <functional>
 // Others
-#include "..\..\Handling\Initialize\initialize.h"
-#include "..\Color\color.h"
+#include "../../Handling/Initialize/initialize.h"
+#include "../Color/color.h"
 
 
 namespace LSW {

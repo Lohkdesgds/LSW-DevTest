@@ -37,47 +37,27 @@ namespace LSW {
 				return ev.user;
 			}
 
+			Event::Event()
+			{
+				Handling::init_basic();
+			}
+
 			Event::Event(const Event& ev)
 			{
 				Handling::init_basic();
 				core = ev.core;
-				is_custom = ev.is_custom;
 			}
 
-			Event::Event(Event&& ev)
+			Event::Event(Event&& ev) noexcept
 			{
 				Handling::init_basic();
 				core = std::move(ev.core);
-				is_custom = std::move(ev.is_custom);
 			}
 
 			Event::Event(ALLEGRO_EVENT_SOURCE* ev)
 			{
 				Handling::init_basic();
 				core = std::shared_ptr<ALLEGRO_EVENT_SOURCE>(ev, [](ALLEGRO_EVENT_SOURCE* e) {});
-				*is_custom = false;
-			}
-
-			void Event::init_as_custom()
-			{
-				*is_custom = true;
-				core = std::shared_ptr<ALLEGRO_EVENT_SOURCE>(
-					[] { auto i = new ALLEGRO_EVENT_SOURCE(); al_init_user_event_source(i); return i; }(),
-					[](ALLEGRO_EVENT_SOURCE* ev) { al_destroy_user_event_source(ev); });
-			}
-
-			void Event::send_custom_event(const int at, const uintptr_t a, const uintptr_t b, const uintptr_t c, const uintptr_t d)
-			{
-				if (!*is_custom || !core) return;
-				ALLEGRO_EVENT ev;
-				ev.type = at;
-				ev.user.data1 = a;
-				ev.user.data2 = b;
-				ev.user.data3 = c;
-				ev.user.data4 = d;
-				ev.user.source = core.get();
-				ev.user.timestamp = al_get_time();
-				al_emit_user_event(core.get(), &ev, NULL);
 			}
 
 
@@ -161,6 +141,14 @@ namespace LSW {
 					});
 					thr.start();
 				}
+			}
+
+			const RawEvent EventHandler::wait_event_manually(const double ww)
+			{
+				ALLEGRO_EVENT ev;
+				if (!own_queue) return ev;
+				al_wait_for_event_timed(own_queue.get(), &ev, ww);
+				return ev;				
 			}
 
 		}

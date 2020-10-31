@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Windows.h>
-
 #include <chrono>
 #include <string>
 #include <sstream>
@@ -9,8 +7,9 @@
 #include <numeric>
 #include <thread>
 #include <random>
+#include <stdarg.h>
 
-#include "..\..\Handling\Abort\abort.h"
+#include "../../Handling/Abort/abort.h"
 
 #undef max
 
@@ -35,14 +34,6 @@ namespace LSW {
 
 				unsigned random();
 			};
-
-			/// <summary>
-			/// <para>Returns > 0 if file exists.</para>
-			/// <para>THIS DOES NOT INTERPRET %TAGS% AUTOMATICALLY!</para>
-			/// </summary>
-			/// <param name="{string}">File path.</param>
-			/// <returns>{long long} File size in bytes.</returns>
-			LONGLONG get_file_size(const std::string&);
 
 			/// <summary>
 			/// <para>Generate strings with a simple format.</para>
@@ -84,7 +75,7 @@ namespace LSW {
 			/// </summary>
 			/// <param name="{std::string}">UTF8 string.</param>
 			/// <returns>{std::wstring} UTF16 string</returns>
-			std::wstring wideup(const std::string&);
+			//std::wstring wideup(const std::string&);
 
 			/// <summary>
 			/// <para>Limits the value using sin().</para>
