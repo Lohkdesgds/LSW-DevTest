@@ -131,6 +131,39 @@
     <Filter Include="LSW\1. Tools\AutoAbort">
       <UniqueIdentifier>{efd2d73c-c782-4edb-951c-79851b4bd6a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\3. Work">
+      <UniqueIdentifier>{dfe9b131-0a42-44ff-923a-1b5b9de4a8f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\Sprite">
+      <UniqueIdentifier>{f09a5a91-6044-41a2-93f0-6f448067ccf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\_include">
+      <UniqueIdentifier>{38a90eb2-01cf-4149-a355-14278c96438a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\Block">
+      <UniqueIdentifier>{a884ffb4-79f6-4c2c-9206-c5602398ec70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\BubbleFX">
+      <UniqueIdentifier>{82d2c63f-c2b4-4d64-9e20-6083db466d1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\Button">
+      <UniqueIdentifier>{a0503d44-9e11-4e59-b214-d69ac824c7a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\ShineFX">
+      <UniqueIdentifier>{9bb1e65a-831d-42c7-bac5-1f372dd69445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\Text">
+      <UniqueIdentifier>{a25c1434-14eb-42d7-aab9-0104ad6c1a35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\Collisioner">
+      <UniqueIdentifier>{c23226b9-543b-44bf-82d0-d6e3924f8fdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\Layering">
+      <UniqueIdentifier>{0f5df191-9be2-4f89-bcaf-a0e0295dd012}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\GameCore">
+      <UniqueIdentifier>{c9e43f15-067e-4703-a2b1-50cb7017aa39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -216,6 +249,12 @@
     </ClCompile>
     <ClCompile Include="LSW\Tools\AutoAbort\autoabort.cpp">
       <Filter>LSW\1. Tools\AutoAbort</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Work\Sprite\sprite.cpp">
+      <Filter>LSW\3. Work\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Work\GameCore\gamecore.cpp">
+      <Filter>LSW\3. Work\GameCore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -343,6 +382,15 @@
     </ClInclude>
     <ClInclude Include="LSW\Tools\AutoAbort\autoabort.h">
       <Filter>LSW\1. Tools\AutoAbort</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\Work.h">
+      <Filter>LSW\3. Work\_include</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\Sprite\sprite.h">
+      <Filter>LSW\3. Work\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\GameCore\gamecore.h">
+      <Filter>LSW\3. Work\GameCore</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

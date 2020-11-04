@@ -85,6 +85,43 @@ namespace LSW {
 				void set(const std::string&, const config::config_section_mode);
 
 				/// <summary>
+				/// <para>Is there a section with this setting set?</para>
+				/// </summary>
+				/// <param name="{std::string}">Section name.</param>
+				/// <param name="{config::config_section_mode}">Mode it has to be.</param>
+				/// <returns>{bool} True if it does.</returns>
+				bool has(const std::string&, const config::config_section_mode);
+
+				/// <summary>
+				/// <para>Is there a section with this key and setting set?</para>
+				/// </summary>
+				/// <param name="{std::string}">Section name.</param>
+				/// <param name="{std::string}">Key name.</param>
+				/// <param name="{config::config_section_mode}">Mode it has to be.</param>
+				/// <returns>{bool} True if it does.</returns>
+				bool has(const std::string&, const std::string&, const config::config_section_mode);
+
+				/// <summary>
+				/// <para>Ensures if value is not present, your default value is set.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section name.</param>
+				/// <param name="{std::string}">Key name.</param>
+				/// <param name="{T}">A default value.</param>
+				/// <param name="{config::config_section_mode}">Mode it has to be.</param>
+				template <typename T>
+				void ensure(const std::string&, const std::string&, const T&, const config::config_section_mode);
+
+				/// <summary>
+				/// <para>Ensures if value is not present, your default value is set.</para>
+				/// </summary>
+				/// <param name="{std::string}">Section name.</param>
+				/// <param name="{std::string}">Key name.</param>
+				/// <param name="{std::initializer_list}">A default list-like value.</param>
+				/// <param name="{config::config_section_mode}">Mode it has to be.</param>
+				template <typename T>
+				void ensure(const std::string&, const std::string&, const std::initializer_list<T>&, const config::config_section_mode);
+
+				/// <summary>
 				/// <para>Set a config value.</para>
 				/// </summary>
 				/// <param name="{std::string}">Section.</param>
@@ -432,6 +469,24 @@ namespace LSW {
 			// // // // // // // // // // // // // \ TEMPLATE IMPLEMENTATION \ // // // // // // // // // // // // //
 
 
+
+			template<typename T>
+			inline void Config::ensure(const std::string& sec, const std::string& key, const T& defval, const config::config_section_mode mode)
+			{
+				if (!has(sec, key, mode)) {
+					set(sec, mode);
+					set(sec, key, defval);
+				}
+			}
+
+			template<typename T>
+			inline void Config::ensure(const std::string& sec, const std::string& key, const std::initializer_list<T>& defval, const config::config_section_mode mode)
+			{
+				if (!has(sec, key, mode)) {
+					set(sec, mode);
+					set(sec, key, defval);
+				}
+			}
 
 			template<> bool Config::get_as(const std::string& sec, const std::string& key) const
 			{

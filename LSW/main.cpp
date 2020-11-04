@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "LSW/LSWv5.h"
 
 #include <iostream>
@@ -14,83 +13,248 @@ const std::string resource_url = "https://www.dropbox.com/s/tuc0mu4eotoh7ay/data
 
 const std::string music_test_inner_path = "musics/music_alt.ogg";
 
+
+void check_file_download(Work::GameCore&);
+void autoabort_test(Work::GameCore&);
+void multitask_test(Work::GameCore&);
+void socketsys_test(Work::GameCore&);
+void smartfile_test(Work::GameCore&);
+void pathmngr_debug(Work::GameCore&, const Interface::PathManager&);
+
+
 int main() {
 
+	Work::GameCore core(logpath, configpath);
+
 	Logger logg;
-	{
-		auto c = logpath;
-		Handling::handle_path(c);
-		logg.init(c);
-	}
 
 	logg << L::SLF << fsr(__FUNCSIG__) << "&7#======&7====================================&7======#" << L::ELF;
 	logg << L::SLF << fsr(__FUNCSIG__) << "&7#      &eThis is not a game yet, just a test.&7      #" << L::ELF;
 	logg << L::SLF << fsr(__FUNCSIG__) << "&7#======&7====================================&7======#" << L::ELF;
-	
+
+	check_file_download(core);
+
+	autoabort_test(core);
+	multitask_test(core);
+	socketsys_test(core);
+	smartfile_test(core);
+
+	Interface::PathManager pather;
+	pather.add_path(datapath);
+
+	pathmngr_debug(core, pather);
+
+
+
+	auto working_on = core.get_display().add_once_task([pather] {
+		Logger logg;
+		Tools::SuperResource<Bitmap> source;
+		Tools::SuperResource<Font> source_font;
+
+		auto atlas = source.create("ATLAS_GLOBAL");
+		auto lmao = source.create("_test");
+
+		auto foo = source_font.create("DEFAULT");
+
+		// use .zip
+		pather.apply();
+
+		foo->load("font.ttf");
+
+		if (!foo) logg << L::SLF << fsr(__FUNCSIG__, E::WARN) << "Failed to load font." << L::ELF;
+		else {
+			logg << L::SLF << fsr(__FUNCSIG__) << "Loaded font successfully." << L::ELF;
+		}
+
+		atlas->load("atlas0.png");
+		bool gud = *atlas;
+
+		if (!gud) logg << L::SLF << fsr(__FUNCSIG__, E::WARN) << "Failed to load atlas." << L::ELF;
+
+		if (gud) {
+			gud = lmao->create_sub(*atlas, 0, 1536, 512, 512);
+			if (!gud) {
+				logg << L::SLF << fsr(__FUNCSIG__, E::WARN) << "Failed to load sub bitmap from atlas." << L::ELF;
+			}
+			else {
+				logg << L::SLF << fsr(__FUNCSIG__) << "Loaded a bitmap from atlas SUCESSFULLY" << L::ELF;
+			}
+		}
+		if (!gud) {
+			lmao->create(300, 300);
+			lmao->clear_to_color(Color(255, 255, 255));
+			if (*lmao) {
+				logg << L::SLF << fsr(__FUNCSIG__) << "Successfully created a bitmap to show." << L::ELF;
+			}
+			else {
+				logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "Failed to create a bitmap." << L::ELF;
+			}
+		}
+
+		pather.unapply();
+
+		return lmao;
+		});
+	auto got = working_on.get().get<Tools::Resource<Bitmap>>();
+
 	{
-		/*size_t len = 0;
-		getenv_s(&len, NULL, 0, "USER");*/
-		std::string t;
-		Handling::get_working_path(t);
+		Tools::SuperResource<Font> source_font;
 
-		logg << L::SLF << fsr(__FUNCSIG__) << "&7TEST " << t << L::ELF;
+		Tools::Resource<Interface::Font> lool;
+		source_font.get("DEFAULT", lool);
+
+		core.get_display().add_draw_task([=](Camera&) {
+			got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
+			//if (track->exists()) {
+			//	float xx = 1.9f * ((1.0f * track->get_position_ms() / track->get_length_ms()) - 0.5f);
+			//
+			//	got->draw(got->get_width() / 2, got->get_height() / 2, xx, 0.9f, 0.0003, 0.0003);
+			//}
+		});
+
+		core.get_display().add_draw_task([lool, logg, core](Camera& curr) {
+			Camera cam2 = curr;
+			const float prop = 2500.0f;
+			cam2.classic_transform(0, 0, 1.0 / prop, 1.0 / prop, 0.0); // change this later somehow
+			cam2.apply();
+			lool->draw(-prop, -1.0f * prop, 0, "&5FPS: &a" + std::to_string(core.get_display().get_frames_per_second()));
+			lool->draw(-prop, -0.96f * prop, 0, "&2Times open: &b" + std::to_string(core.get_config().get_as<unsigned long long>("registry", "times_open")));
+			lool->draw(-prop, -0.92f * prop, 0, "&7Mouse pos: &e" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "x")) + "x" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "y")));
+			lool->draw(-prop, 0.96f * prop, 0, logg.get_last_line().filter_ascii_range());
+			curr.apply();
+		});
 	}
-	
-	Tools::SuperResource<Config> configs;
 
-	auto conf = configs.create("DEFAULT");
+	Tools::SuperResource<Camera> cameras;
 
-	if (!conf->load(configpath)) {
-		logg << L::SLF << fsr(__FUNCSIG__) << "&8No config file found... &eCreating one..." << L::ELF;
+	auto cam = cameras.create("DEFAULT");
+	cam->classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
 
-		conf->save_path(configpath);
+	core.get_display().set_camera(cam);
 
-		conf->set("config", "was_osd_on", false);
-		conf->set("config", "second_screen_debug", false);
-		conf->set("config", "ultradebug", false);
-		conf->set("config", "double_buffering_screen", false);
-		conf->set("config", "last_volume", 0.2);
-		conf->set("config", "resolution_proportion", 1.000000);
-		conf->set("config", "fx_amount", 0.000000);
-		conf->set("config", "screen_width", 1280);
-		conf->set("config", "screen_height", 720);
-		conf->set("config", "last_display_flags", 0);
-		conf->set("config", "pref_refresh_rate", 0);
-		conf->set("config", "times_open", 0);
-		conf->set("config", "playername", "NickName");
-		conf->set("config", "last_version", "unknown");
-		conf->set("config", "playercolor", { 0.0f, 0.0f, 0.0f });
-		conf->set("config", "hidemouse", true);
-		conf->set("config", "limit_framerate_to", 0);
-		conf->set("config", "prints_path", "%win_photos_path%/Lohk's Studios Screenshots/");
+	Tools::SuperResource<Track> tracks;
+	Tools::SuperResource<Sample> samples;
 
-		conf->flush();
-		logg << L::SLF << fsr(__FUNCSIG__) << "&aConfig created and saved successfully." << L::ELF;
+	auto a_music = samples.create("ONE_SAMPLE");
+	auto track = tracks.create("MY_TRACK");
+
+	pather.apply();
+
+	if (a_music->load(music_test_inner_path)) {
+		track->load(a_music);
+		track->attach_to(core.get_mixer());
+		track->set_play_mode(track::play_mode::MODE_LOOP);
+
+		track->play();
+		logg << L::SLF << fsr(__FUNCSIG__) << "Started background music and paused with playmode " << static_cast<int>(track->get_play_mode()) << L::ELF;
+		track->pause();
 	}
 	else {
-		logg << L::SLF << fsr(__FUNCSIG__) << "&aConfig loaded successfully." << L::ELF;
+		logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "Couldn't start track." << L::ELF;
 	}
 
-	/*try {
-		conf->load(configpath);
-	}
-	catch (const Handling::Abort& a) {
-		logg << L::SLF << fsr(__FUNCSIG__) << "&e4Fatal error: " << a << L::ELF;
-	}*/
+	// reset
+	pather.unapply();
 
+
+	
+	EventHandler fullscreen;
+	fullscreen.add(get_keyboard_event());
+	fullscreen.set_run_autostart([&](const RawEvent& ev) {
+		switch (ev.type())
+		{
+		case ALLEGRO_EVENT_KEY_DOWN:
+			if (ev.keyboard_event().keycode == ALLEGRO_KEY_F11) {
+				logg << L::SL << fsr(__FUNCSIG__) << "Toggle Fullscreen called" << L::EL;
+				core.get_display().toggle_fullscreen();
+			}
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_F) {
+				logg << L::SL << fsr(__FUNCSIG__) << "Current FPS: &a" << core.get_display().get_frames_per_second() << L::EL;
+				logg << L::SL << fsr(__FUNCSIG__) << "&eOut of range errors: &7" << core.get_display().debug_errors_out_of_range_skip() << L::EL;
+				logg << L::SL << fsr(__FUNCSIG__) << "&eUnexpected errors: &7" << core.get_display().debug_errors_unexpected() << L::EL;
+			}
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_P) {
+				logg << L::SL << fsr(__FUNCSIG__) << "Play/Pause button called" << L::EL;
+				if (track->exists()) {
+					if (track->is_playing()) track->pause();
+					else track->play();
+				}
+			}
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_R) {
+				logg << L::SL << fsr(__FUNCSIG__) << "Reverse/Continuous button called" << L::EL;
+				if (track->exists()) {
+					track->set_speed(-track->get_speed());
+				}
+			}
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_MINUS) {
+				logg << L::SL << fsr(__FUNCSIG__) << "SlowDown button called" << L::EL;
+				if (track->exists()) {
+					if (fabs(track->get_speed()) > 0.1) track->set_speed(track->get_speed() > 0.0 ? track->get_speed() - 0.05 : track->get_speed() + 0.05);
+					logg << L::SL << fsr(__FUNCSIG__) << "Now speed = " << track->get_speed() << "x" << L::EL;
+				}
+			}
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_EQUALS) {
+				logg << L::SL << fsr(__FUNCSIG__) << "Accel button called" << L::EL;
+				if (track->exists()) {
+					track->set_speed(track->get_speed() > 0.0 ? track->get_speed() + 0.05 : track->get_speed() - 0.05);
+					logg << L::SL << fsr(__FUNCSIG__) << "Now speed = " << track->get_speed() << "x" << L::EL;
+				}
+			}
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_PAD_MINUS) {
+				logg << L::SL << fsr(__FUNCSIG__) << "PAD- button called" << L::EL;
+				float vol = core.get_mixer().get_gain();
+				if (vol > 0.02) vol -= 0.02;
+				core.get_mixer().set_gain(vol);
+
+				logg << L::SL << fsr(__FUNCSIG__) << "(saved) Now volume = " << vol << "." << L::EL;
+			}
+			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_PAD_PLUS) {
+				logg << L::SL << fsr(__FUNCSIG__) << "PAD+ button called" << L::EL;
+				float vol = core.get_mixer().get_gain();
+				if (vol < 1.0) vol += 0.02;
+				core.get_mixer().set_gain(vol);
+
+				logg << L::SL << fsr(__FUNCSIG__) << "(saved) Now volume = " << vol << "." << L::EL;
+			}
+			break;
+		}
+	});
+
+
+	core.yield();
+	core.shutdown();
+
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+
+
+	logg << L::SLF << fsr(__FUNCSIG__) << "&eThe end." << L::ELF;
+
+	//logg.debug("DEBUG TEST LSW");
+
+
+
+	return 0;
+}
+
+void check_file_download(Work::GameCore& core)
+{
+	Logger logg;
 
 	// download resource
 	{
-		auto val = conf->get_as<unsigned long long>("config", "times_open");
-		conf->set("config", "times_open", val + 1);
+		core.get_config().ensure("registry", "times_open", 0, Interface::config::config_section_mode::SAVE);
+		auto val = core.get_config().get_as<unsigned long long>("registry", "times_open");
+		core.get_config().set("registry", "times_open", val + 1);
 
 		std::string cpy = datapath;
 		Handling::handle_path(cpy);
 		auto size = Interface::quick_get_file_size(cpy);
 
-		if (size <= 0/* || (val % 15 == 0 && !val)*/) {
-			/*if (size <= 0) */logg << L::SLF << fsr(__FUNCSIG__) << "&cData files not found." << L::ELF;
+		if (size <= 0) {// || (val % 15 == 0 && !val)
+			//if (size <= 0) logg << L::SLF << fsr(__FUNCSIG__) << "&cData files not found." << L::ELF;
 			//else logg << L::SLF << fsr(__FUNCSIG__) << "&5After 15 times opening/closing, I'll update the zip just to be sure." << L::ELF;
+
+			logg << L::SLF << fsr(__FUNCSIG__) << "&cData files not found." << L::ELF;
 
 			logg << L::SLF << fsr(__FUNCSIG__) << "Downloading..." << L::ELF;
 
@@ -106,7 +270,7 @@ int main() {
 			SmartFile fp;
 			if (!fp.open(cpy, smartfile::file_modes::WRITE)) {
 				logg << L::SLF << fsr(__FUNCSIG__) << "&4Can't open path!&ePlease make sure this app can write into '" << cpy << "'." << L::ELF;
-				return 1;
+				std::terminate();
 			}
 
 			logg << L::SLF << fsr(__FUNCSIG__) << "Flushing file..." << L::ELF;
@@ -123,23 +287,11 @@ int main() {
 			logg << L::SLF << fsr(__FUNCSIG__) << "&aData file found, so no download being done (for now)." << L::ELF;
 		}
 	}
+}
 
-
-
-	/*logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > TIMEDMEMORY TEST < < < < <" << L::ELF;
-	{
-		logg << L::SLF << fsr(__FUNCSIG__) << "Creating a int with value 10 that should last for about 300 ms..." << L::ELF;
-		Tools::TimedMemory<int> testmemory(300, 10);
-		logg << L::SLF << fsr(__FUNCSIG__) << "AutoMemory: &a" << [&] {auto c = testmemory.get(); if (c.use_count()) return std::to_string(*c.get()); return std::string("&cnot alloc"); }() << L::ELF;
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		logg << L::SLF << fsr(__FUNCSIG__) << "AutoMemory: &a" << [&] {auto c = testmemory.get(); if (c.use_count()) return std::to_string(*c.get()); return std::string("&cnot alloc"); }() << L::ELF;
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		logg << L::SLF << fsr(__FUNCSIG__) << "AutoMemory: &a" << [&] {auto c = testmemory.get(); if (c.use_count()) return std::to_string(*c.get()); return std::string("&cnot alloc"); }() << L::ELF;
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		logg << L::SLF << fsr(__FUNCSIG__) << "AutoMemory: &a" << [&] {auto c = testmemory.get(); if (c.use_count()) return std::to_string(*c.get()); return std::string("&cnot alloc"); }() << L::ELF;
-	}
-	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF TIMEDMEMORY TEST < < < < <" << L::ELF;*/
-
+void autoabort_test(Work::GameCore& core)
+{
+	Logger logg;
 
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > AUTOABORT TEST < < < < <" << L::ELF;
 	{
@@ -151,11 +303,11 @@ int main() {
 			on.set([&](Tools::boolThreadF) {
 				Tools::AutoAbort aa(Tools::autoabort::abort_mode::ASYNC_TIMEOUT_KILLTHISTHREADSELF_THEN_RUN, 500, [&] {
 					copy = count;
-				});
+					});
 				while (1) {
 					count++;
 				}
-			});
+				});
 
 			logg << L::SLF << fsr(__FUNCSIG__) << "Waiting..." << L::ELF;
 
@@ -168,37 +320,39 @@ int main() {
 
 			on.kill();
 		}
-		/*{
-			logg << L::SLF << fsr(__FUNCSIG__) << "Setting up thread mode=ASYNC_TIMEOUT_RUN_THEN_KILLTHISTHREADSELF 500 ms..." << L::ELF;
-
-			unsigned count = 0, copy = 0;
-			Tools::SuperThread on;
-			on.set([&](Tools::boolThreadF) {
-				Tools::AutoAbort aa(Tools::autoabort::abort_mode::ASYNC_TIMEOUT_RUN_THEN_KILLTHISTHREADSELF, 500, [&] {
-					copy = count;
-				});
-				while (1) {
-					count++;
-				}
-			});
-
-			logg << L::SLF << fsr(__FUNCSIG__) << "Waiting..." << L::ELF;
-
-			on.start();
-
-			while (copy == 0)
-				std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-			logg << L::SLF << fsr(__FUNCSIG__) << "Got results: Thread had " << count << " and abort copied " << copy << "." << L::ELF;
-
-			on.kill();
-		}*/ ///ref there [&] is invalid later at copy = count apparently
+		//{
+		//	logg << L::SLF << fsr(__FUNCSIG__) << "Setting up thread mode=ASYNC_TIMEOUT_RUN_THEN_KILLTHISTHREADSELF 500 ms..." << L::ELF;
+		//
+		//	unsigned count = 0, copy = 0;
+		//	Tools::SuperThread on;
+		//	on.set([&](Tools::boolThreadF) {
+		//		Tools::AutoAbort aa(Tools::autoabort::abort_mode::ASYNC_TIMEOUT_RUN_THEN_KILLTHISTHREADSELF, 500, [&] {
+		//			copy = count;
+		//		});
+		//		while (1) {
+		//			count++;
+		//		}
+		//	});
+		//
+		//	logg << L::SLF << fsr(__FUNCSIG__) << "Waiting..." << L::ELF;
+		//
+		//	on.start();
+		//
+		//	while (copy == 0)
+		//		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		//
+		//	logg << L::SLF << fsr(__FUNCSIG__) << "Got results: Thread had " << count << " and abort copied " << copy << "." << L::ELF;
+		//
+		//	on.kill();
+		//} ///ref there [&] is invalid later at copy = count apparently
 	}
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF AUTOABORT TEST < < < < <" << L::ELF;
 
+}
 
-
-
+void multitask_test(Work::GameCore& core)
+{
+	Logger logg;
 
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > MULTITASK TEST < < < < <" << L::ELF;
 	{
@@ -208,7 +362,7 @@ int main() {
 			int a = 0;
 			while (b()) a++;
 			return a;
-		});
+			});
 
 		logg << L::SLF << fsr(__FUNCSIG__) << "Starting thread..." << L::ELF;
 		auto fut = thr.start();
@@ -226,6 +380,11 @@ int main() {
 	}
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF MULTITASK TEST < < < < <" << L::ELF;
 
+}
+
+void socketsys_test(Work::GameCore& core)
+{
+	Logger logg;
 
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > SOCKET TEST < < < < <" << L::ELF;
 	{
@@ -286,6 +445,11 @@ int main() {
 	}
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF SOCKET TEST < < < < <" << L::ELF;
 
+}
+
+void smartfile_test(Work::GameCore& core)
+{
+	Logger logg;
 
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > FILE TEST < < < < <" << L::ELF;
 	{
@@ -309,7 +473,7 @@ int main() {
 
 		if (file.is_open()) {
 			std::string buf;
-			
+
 			if (file.read(buf, 256)) {
 				logg << L::SLF << fsr(__FUNCSIG__) << "Got this from file: " << buf << L::ELF;
 			}
@@ -318,7 +482,7 @@ int main() {
 			}
 
 			file.seek(0, smartfile::file_seek::BEGIN);
-			
+
 			file.write("this is a huge test.");
 			logg << L::SLF << fsr(__FUNCSIG__) << "Set file value." << L::ELF;
 
@@ -328,11 +492,14 @@ int main() {
 	}
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF FILE TEST < < < < <" << L::ELF;
 
+}
+
+void pathmngr_debug(Work::GameCore& core, const Interface::PathManager& pather)
+{
+	Logger logg;
 
 	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > PATHMANAGER TEST < < < < <" << L::ELF;
 
-	Interface::PathManager pather;
-	pather.add_path(datapath);
 	pather.apply();
 
 	logg << L::SLF << fsr(__FUNCSIG__) << "Paths found there:" << L::ELF;
@@ -348,308 +515,6 @@ int main() {
 
 	pather.unapply();
 
-	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > ENDED SETUP OF PATHMANAGER < < < < <" << L::ELF;
+	logg << L::SLF << fsr(__FUNCSIG__) << "&e> > > > > END OF PATHMANAGER TEST < < < < <" << L::ELF;
 
-
-
-
-
-
-
-
-
-	logg << L::SLF << fsr(__FUNCSIG__) << "Creating display..." << L::ELF;
-
-	Display disp;
-
-	if (auto k = conf->get_as<int>("config", "last_display_flags"); k != 0) disp.set_new_flags(k);
-	if (auto k = conf->get_as<int>("config", "screen_width"); k != 0) disp.set_width(k);
-	if (auto k = conf->get_as<int>("config", "screen_height"); k != 0) disp.set_height(k);
-
-	Tools::Future<bool> disp_fut = disp.init();
-
-	logg << L::SLF << fsr(__FUNCSIG__) << "Created display." << L::ELF;
-
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-
-	auto working_on = disp.add_once_task([pather] {		
-		Logger logg;
-		Tools::SuperResource<Bitmap> source;
-		Tools::SuperResource<Font> source_font;
-
-		auto atlas = source.create("ATLAS_GLOBAL");
-		auto lmao = source.create("_test");
-
-		auto foo = source_font.create("DEFAULT");
-
-		// use .zip
-		pather.apply();
-
-		foo->load("font.ttf");
-
-		if (!foo) logg << L::SLF << fsr(__FUNCSIG__, E::WARN) << "Failed to load font." << L::ELF;
-		else {
-			logg << L::SLF << fsr(__FUNCSIG__) << "Loaded font successfully." << L::ELF;
-		}
-
-		atlas->load("atlas0.png");
-		bool gud = *atlas;
-
-		if (!gud) logg << L::SLF << fsr(__FUNCSIG__, E::WARN) << "Failed to load atlas." << L::ELF;
-
-		if (gud) {
-			gud = lmao->create_sub(*atlas, 0, 1536, 512, 512);
-			if (!gud) {
-				logg << L::SLF << fsr(__FUNCSIG__, E::WARN) << "Failed to load sub bitmap from atlas." << L::ELF;
-			}
-			else {
-				logg << L::SLF << fsr(__FUNCSIG__) << "Loaded a bitmap from atlas SUCESSFULLY" << L::ELF;
-			}
-		}
-		if (!gud) {
-			lmao->create(300, 300);
-			lmao->clear_to_color(Color(255, 255, 255));
-			if (*lmao) {
-				logg << L::SLF << fsr(__FUNCSIG__) << "Successfully created a bitmap to show." << L::ELF;
-			}
-			else {
-				logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "Failed to create a bitmap." << L::ELF;
-			}
-		}
-
-		pather.unapply();
-
-		return lmao;
-	});
-	auto got = working_on.get().get<Tools::Resource<Bitmap>>();
-
-	// moved config to top
-
-	///auto vector_lol1 = conf->get_array<float>("config", "playercolor");
-	///for (auto& i : vector_lol1) {
-	//////logg << L::SLF << fsr(__FUNCSIG__) << "ARR B4: " << i << L::ELF;
-	///}
-
-	///conf->comment("config", "This is a new version of myself");
-	///conf->set("config", "was_osd_on", false);
-	///conf->set("config", "second_screen_debug", false);
-	///conf->set("config", "ultradebug", false);
-	///conf->set("config", "double_buffering_screen", true);
-	///conf->set("config", "last_volume", 0.200218);
-	///conf->set("config", "resolution_proportion", 2.000000);
-	///conf->set("config", "fx_amount", 0.280000);
-	///conf->set("config", "screen_width", 1920);
-	///conf->set("config", "screen_height", 1080);
-	///conf->set("config", "last_display_flags", 21);
-	///conf->set("config", "pref_refresh_rate", 144);
-	///conf->set("config", "times_open", 6);
-	///conf->set("config", "playername", "Lohk");
-	///conf->set("config", "last_version", "B202002113719");
-	///conf->set("config", "playercolor", { 0.4023f, 0.5307f, 0.2331f });
-	///conf->set("config", "hidemouse", true);
-	///conf->set("config", "limit_framerate_to", 0);
-	///conf->set("config", "prints_path", "%win_photos_path%/Lohk's Studios Screenshots/");
-	///conf->set("private", config::config_section_mode::MEMORY_ONLY);
-	///conf->set("private", "yo config", 10);
-	///conf->flush();
-
-	///auto vector_lol = conf->get_array<float>("config", "playercolor");
-	///for (auto& i : vector_lol) {
-	//////logg << L::SLF << fsr(__FUNCSIG__) << "ARR AFT: " << i << L::ELF;
-	///}
-	///logg << L::SLF << fsr(__FUNCSIG__) << "Only in memory: " << conf->get_as<int>("private", "yo config") << L::ELF;
-	
-
-	{
-		Tools::SuperResource<Font> source_font;
-
-		Tools::Resource<Interface::Font> lool;
-		source_font.get("DEFAULT", lool);
-
-		disp.add_draw_task([=](Camera&) {
-			got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
-			/*if (track->exists()) {
-				float xx = 1.9f * ((1.0f * track->get_position_ms() / track->get_length_ms()) - 0.5f);
-
-				got->draw(got->get_width() / 2, got->get_height() / 2, xx, 0.9f, 0.0003, 0.0003);
-			}*/
-			});
-
-		disp.add_draw_task([lool, &disp, conf, logg](Camera& curr) {
-			Camera cam2 = curr;
-			const float prop = 2500.0f;
-			cam2.classic_transform(0, 0, 1.0 / prop, 1.0 / prop, 0.0); // change this later somehow
-			cam2.apply();
-			lool->draw(-prop, -1.0f * prop, 0, "&5FPS: &a" + std::to_string(disp.get_frames_per_second()));
-			lool->draw(-prop, -0.96f * prop, 0, "&2Times open: &b" + std::to_string(conf->get_as<unsigned long long>("config", "times_open")));
-			lool->draw(-prop, -0.92f * prop, 0, "&7Mouse pos: &e" + std::to_string(conf->get_as<float>("local", "mouse_x")) + "x" + std::to_string(conf->get_as<float>("local", "mouse_y")));
-			lool->draw(-prop, 0.96f * prop, 0, logg.get_last_line().filter_ascii_range());
-			curr.apply();
-			});
-	}
-
-	Tools::SuperResource<Camera> cameras;
-
-	auto cam = cameras.create("DEFAULT");
-	cam->classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
-
-	disp.set_camera(cam);
-
-	Tools::SuperResource<Voice> voices;
-	Tools::SuperResource<Mixer> mixers;
-	Tools::SuperResource<Track> tracks;
-	Tools::SuperResource<Sample> samples;
-
-	auto main_voice = voices.create("MAIN_VOICE");
-	auto main_mixer = mixers.create("MAIN_MIXER");
-
-	main_voice->load();
-	main_mixer->load();
-	main_mixer->attach_to(main_voice);
-	main_mixer->set_gain(conf->get_as<float>("config", "last_volume"));
-
-	auto a_music = samples.create("ONE_SAMPLE");
-	auto track = tracks.create("MY_TRACK");
-
-
-	// music file inside zip
-	pather.apply();
-
-	if (a_music->load(music_test_inner_path)) {
-		track->load(a_music);
-		track->attach_to(main_mixer);
-		track->set_play_mode(track::play_mode::MODE_LOOP);
-
-		track->play();
-		logg << L::SLF << fsr(__FUNCSIG__) << "Started background music and paused with playmode " << static_cast<int>(track->get_play_mode()) << L::ELF;
-		track->pause();
-	}
-	else {
-		logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "Couldn't start track." << L::ELF;
-	}
-
-	// reset
-	pather.unapply();
-
-
-	std::chrono::milliseconds now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-	int nowt = -1;
-	disp.add_draw_task([&](Camera&) {
-		if (auto lala = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()); lala - now > std::chrono::seconds(1)) {
-			now = lala;
-			if (track->exists()) {
-				int ltr = 100.0 * track->get_position_ms() / track->get_length_ms();
-				if (ltr != nowt) {
-					nowt = ltr;
-					logg << L::SLF << fsr(__FUNCSIG__) << nowt << "% | " << (track->get_position_ms() / 1e3) << " of " << (track->get_length_ms() / 1e3) << " s" << L::ELF;
-				}
-			}
-		}
-	});
-
-	EventHandler fullscreen;
-	fullscreen.add(get_keyboard_event());
-	fullscreen.add(get_mouse_event());
-	fullscreen.add(disp.get_event_source());
-	fullscreen.set_run_autostart([&, conf](const RawEvent& ev) {
-		switch (ev.type())
-		{
-		case ALLEGRO_EVENT_MOUSE_AXES:
-			{
-				float x, y;
-				x = ev.mouse_event().x;
-				y = ev.mouse_event().y;
-				if (auto camnow = disp.get_current_camera(); camnow) {
-					Camera inv = *camnow;
-					inv.invert();
-					inv.transform(x, y);
-					//logg << L::SL << fsr(__FUNCSIG__) << "Mouse axis: [" << ev.mouse_event().x << ";" << ev.mouse_event().y << "] " << FormatAs("%.4f") << x << ";" << FormatAs("%.4f") << y << L::EL;
-
-					conf->set("local", config::config_section_mode::MEMORY_ONLY);
-					conf->set("local", "mouse_x", x);
-					conf->set("local", "mouse_y", y);
-				}
-			}
-			break;
-		case ALLEGRO_EVENT_KEY_DOWN:
-			if (ev.keyboard_event().keycode == ALLEGRO_KEY_F11) {
-				logg << L::SL << fsr(__FUNCSIG__) << "Toggle Fullscreen called" << L::EL;
-				disp.toggle_fullscreen();
-								
-				conf->set("config", "last_display_flags", disp.get_flags());
-			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_F) {
-				logg << L::SL << fsr(__FUNCSIG__) << "Current FPS: &a" << disp.get_frames_per_second() << L::EL;
-				logg << L::SL << fsr(__FUNCSIG__) << "&eOut of range errors: &7" << disp.debug_errors_out_of_range_skip() << L::EL;
-				logg << L::SL << fsr(__FUNCSIG__) << "&eUnexpected errors: &7" << disp.debug_errors_unexpected() << L::EL;
-			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_P) {
-				logg << L::SL << fsr(__FUNCSIG__) << "Play/Pause button called" << L::EL;
-				if (track->exists()) {
-					if (track->is_playing()) track->pause();
-					else track->play();
-				}
-			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_R) {
-				logg << L::SL << fsr(__FUNCSIG__) << "Reverse/Continuous button called" << L::EL;
-				if (track->exists()) {
-					track->set_speed(-track->get_speed());
-				}
-			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_MINUS) {
-				logg << L::SL << fsr(__FUNCSIG__) << "SlowDown button called" << L::EL;
-				if (track->exists()) {
-					if (fabs(track->get_speed()) > 0.1) track->set_speed(track->get_speed() > 0.0 ? track->get_speed() - 0.05 : track->get_speed() + 0.05);
-					logg << L::SL << fsr(__FUNCSIG__) << "Now speed = " << track->get_speed() << "x" << L::EL;
-				}
-			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_EQUALS) {
-				logg << L::SL << fsr(__FUNCSIG__) << "Accel button called" << L::EL;
-				if (track->exists()) {
-					track->set_speed(track->get_speed() > 0.0 ? track->get_speed() + 0.05 : track->get_speed() - 0.05);
-					logg << L::SL << fsr(__FUNCSIG__) << "Now speed = " << track->get_speed() << "x" << L::EL;
-				}
-			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_PAD_MINUS) {
-				logg << L::SL << fsr(__FUNCSIG__) << "PAD- button called" << L::EL;
-				float vol = main_mixer->get_gain();
-				if (vol > 0.02) vol -= 0.02;
-				main_mixer->set_gain(vol);
-				conf->set("config", "last_volume", vol);
-				logg << L::SL << fsr(__FUNCSIG__) << "(saved) Now volume = " << vol << "." << L::EL;
-			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_PAD_PLUS) {
-				logg << L::SL << fsr(__FUNCSIG__) << "PAD+ button called" << L::EL;
-				float vol = main_mixer->get_gain();
-				if (vol < 1.0) vol += 0.02;
-				main_mixer->set_gain(vol);
-				conf->set("config", "last_volume", vol);
-				logg << L::SL << fsr(__FUNCSIG__) << "(saved) Now volume = " << vol << "." << L::EL;
-			}
-			break;
-		case ALLEGRO_EVENT_DISPLAY_CLOSE:
-			logg << L::SL << fsr(__FUNCSIG__) << "Close app called" << L::EL;
-			if (track->exists()) track->stop();
-
-			if (auto k = disp.get_width(); k) conf->set("config", "screen_width", k);
-			if (auto k = disp.get_height(); k) conf->set("config", "screen_height", k);
-
-			disp.set_stop();
-			break;
-		}
-	});
-
-	disp_fut.then<void>([&](bool good) {
-		logg << L::SLF << fsr(__FUNCSIG__) << "Display closed with SUCCESS=" << good << L::ELF;
-		logg.debug("disp_fut.then() called.");
-	});
-
-	disp_fut.wait();
-
-
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-
-	logg.debug("DEBUG TEST LSW");
-
-	return 0;
 }

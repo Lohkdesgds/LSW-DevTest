@@ -116,6 +116,10 @@ namespace LSW {
 
 			void Logger::init(std::string path)
 			{
+				if (g.fp) {
+					throw Handling::Abort(__FUNCSIG__, "Path already set! Please don't change on the fly.", Handling::abort::abort_level::GIVEUP); // change later so you can?
+				}
+
 				g.m.lock();
 				g.path = std::move(path);
 

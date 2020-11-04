@@ -11,6 +11,7 @@
 #include "../Bitmap/bitmap.h"
 #include "../Font/font.h"
 #include "../Camera/camera.h"
+#include "../Logger/logger.h"
 
 namespace LSW {
 	namespace v5 {
@@ -36,6 +37,7 @@ namespace LSW {
 				int new_resolution[2] = { display::minimum_display_size[0], display::minimum_display_size[1] };
 				bool new_display_should_vsync = false;
 				bool is_fullscreen = false;
+				bool hide_mouse_new = true;
 				size_t frames_per_second = 0;
 				size_t fails_out_of_range = 0; // out of range ignored because this is faster
 				size_t fails_unexpected = 0; // other error?
@@ -108,7 +110,7 @@ namespace LSW {
 				std::shared_ptr<Camera> get_current_camera() const;
 
 				/// <summary>
-				/// <para>Gets if drawing thread exists and it's running.</para>
+				/// <para>Gets if drawing thread exists and it's running (the display itself might not exist, try display_ready()).</para>
 				/// </summary>
 				/// <returns>{bool} True if running.</returns>
 				bool is_running() const;
@@ -178,6 +180,18 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{bool}">Fullscreen?</param>
 				void set_fullscreen(const bool);
+
+				/// <summary>
+				/// <para>Hide the mouse in screen</para>
+				/// </summary>
+				/// <param name="{bool}">Hide?</param>
+				void hide_mouse(const bool);
+
+				/// <summary>
+				/// <para>Is the display up? (the thread can be running, but not with a screen yet).</para>
+				/// </summary>
+				/// <returns>{bool} Display existance.</returns>
+				bool display_ready() const;
 
 				/// <summary>
 				/// <para>Adds a task to be done once only. Future gives you the result.</para>

@@ -105,11 +105,24 @@ namespace LSW {
 				// endof prettier drawings
 
 				display = DisplayStrongPtr(al_create_display(new_resolution[0], new_resolution[1]), [](ALLEGRO_DISPLAY* d) { al_destroy_display(d); d = nullptr; });
+				if (!display.get()) {
+					Logger logg;
+					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "Cannot create display with these settings/environment!" << L::ELF;
+					logg.debug("Cannot create display with these settings/environment!", E::ERRR);
+					logg.flush();
+					std::terminate();
+				}
 				
 				al_apply_window_constraints(display.get(), true);
 				al_set_window_constraints(display.get(), display::minimum_display_size[0], display::minimum_display_size[1], 0, 0); // minimum size 640,480, max not defined
 
 				set_internal_display_as_bitmap_reference();
+				al_inhibit_screensaver(true);
+
+
+				if (hide_mouse_new) al_hide_mouse_cursor(display.get());
+				else				al_show_mouse_cursor(display.get());
+
 
 				display_events.add(Event(al_get_display_event_source(display.get())));
 				display_events.set_run_autostart([&](const RawEvent& ev) {
@@ -236,6 +249,18 @@ namespace LSW {
 			{
 				is_fullscreen = fullscr;
 				if (display.get()) al_toggle_display_flag(display.get(), ALLEGRO_FULLSCREEN_WINDOW, is_fullscreen);
+			}
+			void Display::hide_mouse(const bool hid)
+			{
+				if (display.get()) {
+					if (hid) al_hide_mouse_cursor(display.get());
+					else al_show_mouse_cursor(display.get());
+				}
+				hide_mouse_new = hid;
+			}
+			bool Display::display_ready() const
+			{
+				return display.get();
 			}
 			Tools::Future<DisplayAnySPtr> Display::add_once_task(DisplayAnyFSPtr tsk)
 			{
