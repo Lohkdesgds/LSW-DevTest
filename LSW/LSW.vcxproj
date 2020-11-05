@@ -260,6 +260,7 @@
     <ClInclude Include="LSW\Interface\Track\track.h" />
     <ClInclude Include="LSW\Interface\Voice\voice.h" />
     <ClInclude Include="LSW\LSWv5.h" />
+    <ClInclude Include="LSW\Tools\AdvancedShared\advancedshared.h" />
     <ClInclude Include="LSW\Tools\Any\any.h" />
     <ClInclude Include="LSW\Tools\AutoAbort\autoabort.h" />
     <ClInclude Include="LSW\Tools\Common\common.h" />

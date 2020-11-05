@@ -5,6 +5,7 @@
 #include <functional>
 // Others
 #include "../../Handling/Initialize/initialize.h"
+#include "../../Tools/AdvancedShared/advancedshared.h"
 #include "../Color/color.h"
 
 
@@ -21,8 +22,14 @@ namespace LSW {
 			class Bitmap {
 				static bool first_time;
 
-				std::function<ALLEGRO_BITMAP*(void)> bitmap; // has shared ptr there
-				static std::function<ALLEGRO_BITMAP*(void)> target;
+				Tools::AdvancedShared<ALLEGRO_BITMAP> bitmap_orig;
+				static Tools::AdvancedShared<ALLEGRO_BITMAP> target_orig;
+				static std::function<ALLEGRO_BITMAP*(void)> dynamic_target;
+
+				static Tools::AdvancedShared<ALLEGRO_BITMAP>& get_target();
+
+				//std::function<ALLEGRO_BITMAP*(void)> bitmap; // has shared ptr there
+				//static std::function<ALLEGRO_BITMAP*(void)> target;
 				bool use_target_as_it = false;
 
 				// set new at bitmap (set(al_load_bitmap...) or something like that)
@@ -66,6 +73,12 @@ namespace LSW {
 				//bool custom(ALLEGRO_DISPLAY*);
 
 				/// <summary>
+				/// <para>If you change default bitmap flags or recreated display, call this so everyone is converted to new standards.</para>
+				/// <para>ALLEGRO_VIDEO_BITMAP is forced by default.</para>
+				/// </summary>
+				static void check_bitmaps_memory();
+
+				/// <summary>
 				/// <para>Create a blank empty transparent Bitmap.</para>
 				/// </summary>
 				/// <param name="{int}">Its width.</param>
@@ -85,7 +98,7 @@ namespace LSW {
 				/// <param name="{int}">Width.</param>
 				/// <param name="{int}">Height.</param>
 				/// <returns></returns>
-				bool create_sub(Bitmap&, const int, const int, const int, const int);
+				bool create_sub(const Bitmap&, const int, const int, const int, const int);
 
 				/// <summary>
 				/// <para>If there's something set, true.</para>
@@ -155,7 +168,7 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{Bitmap}">Bitmap to clone.</param>
 				/// <returns>{bool} True if success.</returns>
-				bool clone(Bitmap&);
+				bool clone(const Bitmap&);
 
 				/// <summary>
 				/// <para>Get Bitmap flags.</para>
@@ -356,6 +369,7 @@ namespace LSW {
 
 				/// <summary>
 				/// <para>Sets a custom function to return the global target (REFERENCE != TARGET, more like a global reference).</para>
+				/// <para>IT WON'T DEALLOC THE BITMAPS THE FUNCTION GIVE. DEALLOC YOURSELF!</para>
 				/// </summary>
 				/// <param name="{std::function}">A function that returns a RAW BITMAP.</param>
 				static void set_custom_reference(std::function<ALLEGRO_BITMAP* (void)>);

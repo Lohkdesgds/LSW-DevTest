@@ -6,6 +6,7 @@
 // Others
 #include "../../Handling/Initialize/initialize.h"
 #include "../../Tools/CString/cstring.h"
+#include "../../Tools/AdvancedShared/advancedshared.h"
 #include "../Color/color.h"
 
 namespace LSW {
@@ -16,12 +17,13 @@ namespace LSW {
 			/// <para>Font holds a font to draw text.</para>
 			/// </summary>
 			class Font {
-				std::shared_ptr<ALLEGRO_FONT> font;
+				Tools::AdvancedShared<ALLEGRO_FONT> font;
 
 				bool set(ALLEGRO_FONT*);
 				ALLEGRO_FONT* quick() const;
 				ALLEGRO_FONT* quick();
 				Color hex(const int) const;
+
 			public:
 				Font();
 

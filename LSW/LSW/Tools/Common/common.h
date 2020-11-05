@@ -132,6 +132,14 @@ namespace LSW {
 			// like autocast, but for type
 			template<typename T> using r_cast_t = std::conditional_t<std::is_pointer<T>::value || std::is_array<T>::value, std::add_pointer_t<std::remove_all_extents_t<std::remove_cvref_t<std::remove_pointer_t<T>>>>, std::remove_all_extents_t<std::remove_cvref_t<std::remove_pointer_t<T>>>>;
 
+
+			template<typename, typename = void>
+			constexpr bool is_type_complete_v = false;
+
+			template<typename T>
+			constexpr bool is_type_complete_v
+				<T, std::void_t<decltype(sizeof(T))>> = true;
+
 			// regress (go back to main) cast
 			/*template<typename Base, typename Cust = r_cast_t<Base>>
 			inline Cust r_cast(Base b) noexcept { if (std::is_pointer_v<Base> || std::is_array_v<Base>) return s_cast<Cust*>(b); return s_cast<Cust>(b); }*/

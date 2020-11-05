@@ -45,19 +45,35 @@ namespace LSW {
 			Event::Event(const Event& ev)
 			{
 				Handling::init_basic();
-				core = ev.core;
+				*this = ev;
 			}
 
 			Event::Event(Event&& ev) noexcept
 			{
 				Handling::init_basic();
+				*this = std::move(ev);
+			}
+
+			void Event::operator=(const Event& ev)
+			{
+				core = ev.core;
+			}
+
+			void Event::operator=(Event&& ev) noexcept
+			{
 				core = std::move(ev.core);
 			}
 
 			Event::Event(ALLEGRO_EVENT_SOURCE* ev)
 			{
+				if (!ev) throw Handling::Abort(__FUNCSIG__, "Invalid RAW event source.");
 				Handling::init_basic();
 				core = std::shared_ptr<ALLEGRO_EVENT_SOURCE>(ev, [](ALLEGRO_EVENT_SOURCE* e) {});
+			}
+
+			bool Event::operator==(const Event& e) const
+			{
+				return core.get() == e.core.get();
 			}
 
 
@@ -88,67 +104,126 @@ namespace LSW {
 				return Event(al_get_touch_input_event_source());
 			}
 
-
 			void EventHandler::__init()
 			{
 				own_queue = std::shared_ptr<ALLEGRO_EVENT_QUEUE>(al_create_event_queue(),
 					[](ALLEGRO_EVENT_QUEUE* ev) { al_destroy_event_queue(ev); ev = nullptr; });
 			}
+			
 			EventHandler::EventHandler()
 			{
 				Handling::init_basic();
 				__init();
 			}
+			
 			EventHandler::~EventHandler()
 			{
-				deinit();
+				reset();
 			}
+			
+			void EventHandler::set_mode(const eventhandler::handling_mode& mod)
+			{
+				mode = mod;
+			}
+
 			void EventHandler::add(const Event& ev)
 			{
+				Tools::AutoLock wrk(thr_m);
 				if (!ev.core) return;
+				if (!own_queue) __init(); // delete queue and recreate clean
 				if (!al_is_event_source_registered(own_queue.get(), ev.core.get())) {
 					al_register_event_source(own_queue.get(), ev.core.get());
 				}
 			}
+			
+			bool EventHandler::has(const Event& ev) const
+			{
+				if (!ev.core) return false;
+				if (!own_queue) return false;
+				return al_is_event_source_registered(own_queue.get(), ev.core.get());
+			}
+
 			void EventHandler::remove(const Event& ev)
 			{
+				Tools::AutoLock wrk(thr_m);
 				if (!ev.core) return;
+				if (!own_queue) __init(); // delete queue and recreate clean
 				if (al_is_event_source_registered(own_queue.get(), ev.core.get())) {
 					al_unregister_event_source(own_queue.get(), ev.core.get());
 				}
 			}
-			void EventHandler::deinit()
+			
+			void EventHandler::reset()
 			{
 				thr.stop();
 				thr.join(); // sync and clear (may take up to 1 sec)
+				Tools::AutoLock wrk(thr_m);
 				own_queue.reset();
 				trigger_func = std::function<void(const RawEvent&)>();
 			}
+
 			void EventHandler::set_run_autostart(const std::function<void(const RawEvent&)> f)
 			{
-				if (!thr.running() && f) {
+				if (f) {
+					if (thr.running()) thr.join();
+					if (!own_queue) __init(); // delete queue and recreate clean
+					
 					trigger_func = f;
-					thr.set([=](Tools::boolThreadF keep) {
+
+					thr.set([&](Tools::boolThreadF keep) {
 						while (keep()) {
 							ALLEGRO_EVENT ev;
-							if (!al_wait_for_event_timed(own_queue.get(), &ev, 1.0)) continue;
+
+							Tools::AutoLock wrk(thr_m);
+
+							if (!own_queue) {
+								std::this_thread::sleep_for(std::chrono::milliseconds(20));
+								continue;
+							}
+							switch (mode) {
+							case eventhandler::handling_mode::ONE_BY_ONE_GUARANTEED:
+								if (!al_wait_for_event_timed(own_queue.get(), &ev, 1.0)) continue;
+								break;
+							case eventhandler::handling_mode::SKIP_TO_BACK_AS_FAST_AS_IT_CAN:
+								if (!al_get_next_event(own_queue.get(), &ev)) {
+									std::this_thread::sleep_for(std::chrono::nanoseconds(500));
+									continue;
+								}
+								else if (!al_is_event_queue_empty(own_queue.get())) al_flush_event_queue(own_queue.get());
+								break;
+							}
+
+							wrk.unlock();
+
 							if (ev.type) {
 								RawEvent re(ev);
 								trigger_func(re);
 							}
 						}
-						return 0;
+						return;
 					});
 					thr.start();
 				}
 			}
 
+			bool EventHandler::running() const
+			{
+				return thr.running();
+			}
+
 			const RawEvent EventHandler::wait_event_manually(const double ww)
 			{
+				Tools::AutoLock wrk(thr_m);
 				ALLEGRO_EVENT ev;
 				if (!own_queue) return ev;
 				al_wait_for_event_timed(own_queue.get(), &ev, ww);
 				return ev;				
+			}
+
+
+			bool operator==(ALLEGRO_EVENT_SOURCE* f, const Event& e)
+			{
+				return e.operator==(f);
 			}
 
 		}

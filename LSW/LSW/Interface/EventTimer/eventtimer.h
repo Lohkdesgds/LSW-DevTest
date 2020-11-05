@@ -40,11 +40,38 @@ namespace LSW {
 
 				EventTimer(ALLEGRO_EVENT_SOURCE*) = delete;
 
+
+				/// <summary>
+				/// <para>Compare if event source is the same.</para>
+				/// </summary>
+				/// <param name="{EventTimer}">Another EventTimer.</param>
+				/// <returns>{bool} True if they are.</returns>
+				bool operator==(const EventTimer&) const;
+
+				/// <summary>
+				/// <para>Compare if event source is the same.</para>
+				/// </summary>
+				/// <param name="{RAW EVENT}">Another RAW TIMER EVENT.</param>
+				/// <returns>{bool} True if they are.</returns>
+				bool operator==(ALLEGRO_TIMER*) const;
+
 				/// <summary>
 				/// <para>Set timer delta in seconds.</para>
 				/// </summary>
 				/// <param name="{double}">Delta in seconds.</param>
 				void set_delta(const double);
+
+				/// <summary>
+				/// <para>Get timer delta in seconds.</para>
+				/// </summary>
+				/// <returns>{double} Delta set in seconds.</returns>
+				double get_delta() const;
+
+				/// <summary>
+				/// <para>Have you started the timer yet?</para>
+				/// </summary>
+				/// <returns>{bool} True if timer started already.</returns>
+				bool running() const;
 
 				/// <summary>
 				/// <para>Start timer event.</para>
@@ -58,6 +85,15 @@ namespace LSW {
 
 			};
 
+
+
+			/// <summary>
+			/// <para>Compare if events are the same.</para>
+			/// </summary>
+			/// <param name="{RAW EVENT}">A RAW EVENT.</param>
+			/// <param name="{EventTimer}">Another Event.</param>
+			/// <returns>{bool} True if they are.</returns>
+			bool operator==(ALLEGRO_TIMER*, const EventTimer&);
 		}
 	}
 }

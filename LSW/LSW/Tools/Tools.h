@@ -8,6 +8,7 @@ Some might depend on Handling-classified headers.
 #include "CString/cstring.h"
 #include "Any/any.h"
 #include "Future/future.h"
+#include "AdvancedShared/advancedshared.h"
 
 #include "SuperMutex/supermutex.h"
 #include "SuperPair/superpair.h"

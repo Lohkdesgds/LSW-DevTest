@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#define TESTING_ALL
+
 using namespace LSW::v5;
 using namespace LSW::v5::Interface;
 
@@ -34,10 +36,12 @@ int main() {
 
 	check_file_download(core);
 
+#ifdef TESTING_ALL
 	autoabort_test(core);
 	multitask_test(core);
 	socketsys_test(core);
 	smartfile_test(core);
+#endif
 
 	Interface::PathManager pather;
 	pather.add_path(datapath);
@@ -72,7 +76,7 @@ int main() {
 		if (!gud) logg << L::SLF << fsr(__FUNCSIG__, E::WARN) << "Failed to load atlas." << L::ELF;
 
 		if (gud) {
-			gud = lmao->create_sub(*atlas, 0, 1536, 512, 512);
+			gud = lmao->create_sub(atlas, 0, 1536, 512, 512);
 			if (!gud) {
 				logg << L::SLF << fsr(__FUNCSIG__, E::WARN) << "Failed to load sub bitmap from atlas." << L::ELF;
 			}
@@ -117,7 +121,7 @@ int main() {
 			const float prop = 2500.0f;
 			cam2.classic_transform(0, 0, 1.0 / prop, 1.0 / prop, 0.0); // change this later somehow
 			cam2.apply();
-			lool->draw(-prop, -1.0f * prop, 0, "&5FPS: &a" + std::to_string(core.get_display().get_frames_per_second()));
+			lool->draw(-prop, -1.0f * prop, 0, "&5FPS: &a" + std::to_string(core.get_display().get_frames_per_second()) + (core.get_display().get_fps_cap() ? (" / " + std::to_string(core.get_display().get_fps_cap()) + " (limit)") : "") + (core.get_display().get_vsync() ? (" &6VSYNC SET") : " &bVSYNC UNSET"));
 			lool->draw(-prop, -0.96f * prop, 0, "&2Times open: &b" + std::to_string(core.get_config().get_as<unsigned long long>("registry", "times_open")));
 			lool->draw(-prop, -0.92f * prop, 0, "&7Mouse pos: &e" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "x")) + "x" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "y")));
 			lool->draw(-prop, 0.96f * prop, 0, logg.get_last_line().filter_ascii_range());
@@ -164,57 +168,102 @@ int main() {
 		switch (ev.type())
 		{
 		case ALLEGRO_EVENT_KEY_DOWN:
-			if (ev.keyboard_event().keycode == ALLEGRO_KEY_F11) {
+			switch (ev.keyboard_event().keycode) {
+			case ALLEGRO_KEY_F11:
+			{
 				logg << L::SL << fsr(__FUNCSIG__) << "Toggle Fullscreen called" << L::EL;
 				core.get_display().toggle_fullscreen();
 			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_F) {
+				break;
+			case ALLEGRO_KEY_F:
+			{
 				logg << L::SL << fsr(__FUNCSIG__) << "Current FPS: &a" << core.get_display().get_frames_per_second() << L::EL;
 				logg << L::SL << fsr(__FUNCSIG__) << "&eOut of range errors: &7" << core.get_display().debug_errors_out_of_range_skip() << L::EL;
 				logg << L::SL << fsr(__FUNCSIG__) << "&eUnexpected errors: &7" << core.get_display().debug_errors_unexpected() << L::EL;
 			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_P) {
+				break;
+			case ALLEGRO_KEY_P:
+			{
 				logg << L::SL << fsr(__FUNCSIG__) << "Play/Pause button called" << L::EL;
 				if (track->exists()) {
 					if (track->is_playing()) track->pause();
 					else track->play();
 				}
 			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_R) {
+				break;
+			case ALLEGRO_KEY_R:
+			{
 				logg << L::SL << fsr(__FUNCSIG__) << "Reverse/Continuous button called" << L::EL;
 				if (track->exists()) {
 					track->set_speed(-track->get_speed());
 				}
 			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_MINUS) {
+				break;
+			case ALLEGRO_KEY_MINUS:
+			{
 				logg << L::SL << fsr(__FUNCSIG__) << "SlowDown button called" << L::EL;
 				if (track->exists()) {
 					if (fabs(track->get_speed()) > 0.1) track->set_speed(track->get_speed() > 0.0 ? track->get_speed() - 0.05 : track->get_speed() + 0.05);
 					logg << L::SL << fsr(__FUNCSIG__) << "Now speed = " << track->get_speed() << "x" << L::EL;
 				}
 			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_EQUALS) {
+				break;
+			case ALLEGRO_KEY_EQUALS:
+			{
 				logg << L::SL << fsr(__FUNCSIG__) << "Accel button called" << L::EL;
 				if (track->exists()) {
 					track->set_speed(track->get_speed() > 0.0 ? track->get_speed() + 0.05 : track->get_speed() - 0.05);
 					logg << L::SL << fsr(__FUNCSIG__) << "Now speed = " << track->get_speed() << "x" << L::EL;
 				}
 			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_PAD_MINUS) {
+				break;
+			case ALLEGRO_KEY_PAD_MINUS:
+			{
 				logg << L::SL << fsr(__FUNCSIG__) << "PAD- button called" << L::EL;
 				float vol = core.get_mixer().get_gain();
 				if (vol > 0.02) vol -= 0.02;
 				core.get_mixer().set_gain(vol);
 
-				logg << L::SL << fsr(__FUNCSIG__) << "(saved) Now volume = " << vol << "." << L::EL;
+				logg << L::SL << fsr(__FUNCSIG__) << "Now volume = " << vol << "." << L::EL;
 			}
-			else if (ev.keyboard_event().keycode == ALLEGRO_KEY_PAD_PLUS) {
+				break;
+			case ALLEGRO_KEY_PAD_PLUS:
+			{
 				logg << L::SL << fsr(__FUNCSIG__) << "PAD+ button called" << L::EL;
 				float vol = core.get_mixer().get_gain();
 				if (vol < 1.0) vol += 0.02;
 				core.get_mixer().set_gain(vol);
 
-				logg << L::SL << fsr(__FUNCSIG__) << "(saved) Now volume = " << vol << "." << L::EL;
+				logg << L::SL << fsr(__FUNCSIG__) << "Now volume = " << vol << "." << L::EL;
+			}
+				break;
+			case ALLEGRO_KEY_COMMA: // ,
+			{
+				logg << L::SL << fsr(__FUNCSIG__) << "< called, reducing fps cap by 5..." << L::EL;
+				auto& d = core.get_display();
+				if (d.get_fps_cap() >= 5) d.set_fps_cap(d.get_fps_cap() - 5);
+				else d.set_fps_cap(0);
+			}
+				break;
+			case ALLEGRO_KEY_FULLSTOP: // .
+			{
+				logg << L::SL << fsr(__FUNCSIG__) << "> called, raising fps cap by 5..." << L::EL;
+				auto& d = core.get_display();
+				d.set_fps_cap(d.get_fps_cap() + 5);
+			}
+				break;
+			case ALLEGRO_KEY_V: 
+			{
+				logg << L::SL << fsr(__FUNCSIG__) << "V called, vsync switch (reopen app to set)." << L::EL;
+				auto& d = core.get_display();
+				d.set_vsync(!d.get_vsync());
+			}
+				break;
+			default:
+			{
+				logg << L::SL << fsr(__FUNCSIG__) << "KEY pressed: &5" << ev.keyboard_event().keycode << L::EL;
+			}
+				break;
 			}
 			break;
 		}

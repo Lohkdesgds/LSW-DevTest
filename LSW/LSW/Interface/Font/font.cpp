@@ -7,19 +7,26 @@ namespace LSW {
 			bool Font::set(ALLEGRO_FONT* f)
 			{
 				if (!f) return false;
-				font = std::shared_ptr<ALLEGRO_FONT>(f, [](ALLEGRO_FONT*& b) { if (al_is_system_installed() && b) { al_destroy_font(b); b = nullptr; } });
+
+				if (!font) {
+					font.create(f, [](ALLEGRO_FONT* b) { if (al_is_system_installed() && b) { al_destroy_font(b); b = nullptr; } });
+				}
+				else {
+					font.swap_destroy(f);
+				}
+
 				return !(!font);
 			}
 
 			ALLEGRO_FONT* Font::quick() const
 			{
-				if (font) return &(*font);
+				if (font) return font.get();
 				return nullptr;
 			}
 
 			ALLEGRO_FONT* Font::quick()
 			{
-				if (font) return &(*font);
+				if (font) return font.get();
 				return nullptr;
 			}
 

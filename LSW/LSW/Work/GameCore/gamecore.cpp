@@ -33,9 +33,10 @@ namespace LSW {
 					share->conf.ensure(gamecore::conf_displaying,	"screen_width",			1280,	Interface::config::config_section_mode::SAVE);
 					share->conf.ensure(gamecore::conf_displaying,	"screen_height",		720,	Interface::config::config_section_mode::SAVE);
 					share->conf.ensure(gamecore::conf_displaying,	"display_flags",		0,		Interface::config::config_section_mode::SAVE);
-					share->conf.ensure(gamecore::conf_displaying,	"force_refresh_rate",	0,		Interface::config::config_section_mode::SAVE);
+					//share->conf.ensure(gamecore::conf_displaying,	"force_refresh_rate",	0,		Interface::config::config_section_mode::SAVE); // automatic is the way
 					share->conf.ensure(gamecore::conf_displaying,	"limit_framerate_to",	0,		Interface::config::config_section_mode::SAVE);
 					share->conf.ensure(gamecore::conf_displaying,	"hidemouse",			true,	Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_displaying,	"vsync",				false,	Interface::config::config_section_mode::SAVE);
 
 					// audio settings
 					share->conf.ensure(gamecore::conf_audio,		"volume",				0.5f,	Interface::config::config_section_mode::SAVE);
@@ -45,39 +46,71 @@ namespace LSW {
 
 					// - - - - START - - - - //
 
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_width"); k != 0)			share->display.set_width(k);
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_width"); k != 0)		share->display.set_width(k);
 					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_height"); k != 0)		share->display.set_height(k);
 					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "display_flags"); k != 0)		share->display.set_new_flags(k);
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "force_refresh_rate"); k != 0)	share->display.set_new_refresh_rate(k);
-					//if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "limit_framerate_to"); k != 0)	share->display.set_fps_cap(k); // to do
-					if (auto k = share->conf.get_as<bool>(gamecore::conf_displaying, "hidemouse"); k != 0)			share->display.hide_mouse(k);
+					//if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "force_refresh_rate"); k != 0)	share->display.set_new_refresh_rate(k); // auto is safer
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "limit_framerate_to"); k != 0)	share->display.set_fps_cap(k); // to do
+
+					share->display.hide_mouse(share->conf.get_as<bool>(gamecore::conf_displaying, "hidemouse"));
+					share->display.set_vsync(share->conf.get_as<bool>(gamecore::conf_displaying, "vsync"));
 
 					share->display.init();
 
 					while (!share->display.display_ready()) std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
-					share->events.add(share->display.get_event_source());
+					share->check_sources.set_delta(gamecore::delta_checking_s);
+					share->update_mouse.set_delta(gamecore::delta_mouse_s);
+					share->latest_display_source = share->display.get_event_source();
+
+					share->check_sources.start();
+					share->update_mouse.start();
+
+					share->events.set_mode(Interface::eventhandler::handling_mode::SKIP_TO_BACK_AS_FAST_AS_IT_CAN);
+					share->events.add(share->check_sources);
+					share->events.add(share->update_mouse);
+					share->events.add(share->latest_display_source);
 					share->events.add(Interface::get_mouse_event());
 					share->events.set_run_autostart([&](const Interface::RawEvent& ev) {
 						switch (ev.type())
 						{
-						case ALLEGRO_EVENT_MOUSE_AXES:
+						case ALLEGRO_EVENT_TIMER:
 						{
-							float x, y;
-							x = ev.mouse_event().x;
-							y = ev.mouse_event().y;
-							if (auto camnow = share->display.get_current_camera(); camnow) {
-								Interface::Camera inv = *camnow;
-								inv.invert();
-								inv.transform(x, y);
-								//logg << L::SL << fsr(__FUNCSIG__) << "Mouse axis: [" << ev.mouse_event().x << ";" << ev.mouse_event().y << "] " << FormatAs("%.4f") << x << ";" << FormatAs("%.4f") << y << L::EL;
+							if (ev.timer_event().source == share->update_mouse && share->_m_newdata) {
+								share->_m_newdata = false;
+								float x = share->_m_x;
+								float y = share->_m_y;
+								if (auto camnow = share->display.get_current_camera(); camnow) {
+									Interface::Camera inv = *camnow;
+									inv.invert();
+									inv.transform(x, y);
+									//logg << L::SL << fsr(__FUNCSIG__) << "Mouse axis: [" << ev.mouse_event().x << ";" << ev.mouse_event().y << "] " << FormatAs("%.4f") << x << ";" << FormatAs("%.4f") << y << L::EL;
 
-								share->conf.set(gamecore::conf_mouse_memory, Interface::config::config_section_mode::MEMORY_ONLY);
-								share->conf.set(gamecore::conf_mouse_memory, "x", x);
-								share->conf.set(gamecore::conf_mouse_memory, "y", y);
+									share->conf.set(gamecore::conf_mouse_memory, Interface::config::config_section_mode::MEMORY_ONLY);
+									share->conf.set(gamecore::conf_mouse_memory, "x", x);
+									share->conf.set(gamecore::conf_mouse_memory, "y", y);
+								}
+							}
+							else if (ev.timer_event().source == share->check_sources) {
+								if (share->latest_display_source != share->display.get_event_source()) {
+									Interface::Logger logg;
+
+									logg.debug("Display event registering refresh! Display has changed/updated.");
+
+									share->events.remove(share->latest_display_source);
+									share->latest_display_source = share->display.get_event_source();
+									share->events.add(share->latest_display_source);
+								}
 							}
 						}
-						break;
+							break;
+						case ALLEGRO_EVENT_MOUSE_AXES:
+						{
+							share->_m_x = ev.mouse_event().x;
+							share->_m_y = ev.mouse_event().y;
+							share->_m_newdata = true;
+						}
+							break;
 						case ALLEGRO_EVENT_DISPLAY_CLOSE:
 						{
 							Interface::Logger logg;
@@ -114,12 +147,18 @@ namespace LSW {
 
 				if (!share->loaded) return;
 
+				share->events.reset();
+				share->check_sources.stop();
+				share->update_mouse.stop();
+
 				share->conf.set(gamecore::conf_audio, "volume", share->mixer.get_gain());
 				share->mixer.mute(true);
 
 				share->conf.set(gamecore::conf_displaying, "screen_width", share->display.get_width());
 				share->conf.set(gamecore::conf_displaying, "screen_height", share->display.get_height());
 				share->conf.set(gamecore::conf_displaying, "display_flags", share->display.get_flags());
+				share->conf.set(gamecore::conf_displaying, "limit_framerate_to", share->display.get_fps_cap());
+				share->conf.set(gamecore::conf_displaying, "vsync", share->display.get_vsync());
 
 				share->conf.flush();
 

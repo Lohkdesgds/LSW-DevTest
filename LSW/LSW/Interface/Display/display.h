@@ -8,18 +8,22 @@
 #include "../../Tools/Common/common.h"
 #include "../../Tools/Any/any.h"
 #include "../Events/events.h"
+#include "../EventTimer/eventtimer.h"
+#include "../EventCustom/eventcustom.h"
 #include "../Bitmap/bitmap.h"
 #include "../Font/font.h"
 #include "../Camera/camera.h"
 #include "../Logger/logger.h"
+#include "../PathManager/pathmanager.h"
 
 namespace LSW {
 	namespace v5 {
 		namespace Interface {
 
 			namespace display {
-				const int minimum_display_size[2] = { 640, 480 };
-				constexpr int default_new_display_flags = ALLEGRO_RESIZABLE | ALLEGRO_OPENGL/* | ALLEGRO_FULLSCREEN_WINDOW*/;
+				const int minimum_display_size[2] = { 320, 240 };
+				constexpr int default_new_display_flags = ALLEGRO_RESIZABLE | ALLEGRO_OPENGL /* | ALLEGRO_FULLSCREEN_WINDOW*/;
+				constexpr size_t max_fps_cap = 300;
 			}
 
 			// Safe smart pointer of RAW DISPLAY.
@@ -35,16 +39,19 @@ namespace LSW {
 				int new_display_flags_apply = display::default_new_display_flags;
 				int new_display_refresh_rate = 0; // not set
 				int new_resolution[2] = { display::minimum_display_size[0], display::minimum_display_size[1] };
-				bool new_display_should_vsync = false;
+				bool should_vsync = false;
+				bool force_vsync_refresh = false;
 				bool is_fullscreen = false;
 				bool hide_mouse_new = true;
+				size_t fps_cap = 0;
 				size_t frames_per_second = 0;
 				size_t fails_out_of_range = 0; // out of range ignored because this is faster
 				size_t fails_unexpected = 0; // other error?
 
-				DisplayStrongPtr display;
+				DisplayStrongPtr disp;
 				EventHandler display_events;
 				
+				//PathManager pathing;
 				Tools::SuperThreadT<bool> thr;				
 
 				size_t draw_tasks_count = 0;
@@ -63,6 +70,7 @@ namespace LSW {
 
 				bool thread_run(Tools::boolThreadF);
 
+				void _reset_display_and_path();
 				void thread_init();
 				void thread_deinit();
 
@@ -80,6 +88,9 @@ namespace LSW {
 				/// </summary>
 				/// <returns>{Future} A Future that you can .wait() or .then() when display is closed.</returns>
 				Tools::Future<bool> init();
+
+				//path is global now. change later to local so this makes sense
+				//void set_path(const PathManager&);
 
 				/// <summary>
 				/// <para>Stops the thread and join.</para>
@@ -104,6 +115,12 @@ namespace LSW {
 				void set_camera(std::function<std::shared_ptr<Camera>(void)>);
 
 				/// <summary>
+				/// <para>Limits the framerate to up to this value.</para>
+				/// </summary>
+				/// <param name="{size_t}">FPS cap (0 = unlimited).</param>
+				void set_fps_cap(const size_t);
+
+				/// <summary>
 				/// <para>Gets the latest camera set in this Display (via set_camera).</para>
 				/// </summary>
 				/// <returns>{std::shared_ptr} The Camera.</returns>
@@ -113,7 +130,7 @@ namespace LSW {
 				/// <para>Gets if drawing thread exists and it's running (the display itself might not exist, try display_ready()).</para>
 				/// </summary>
 				/// <returns>{bool} True if running.</returns>
-				bool is_running() const;
+				bool running() const;
 
 				/// <summary>
 				/// <para>What flags should the new display have?</para>
@@ -165,9 +182,18 @@ namespace LSW {
 
 				/// <summary>
 				/// <para>Should it use VSync?</para>
+				/// <para>IF SECOND PARAMETER IS SET TO TRUE, SOME TEXTURES MIGHT GLITCH OR THE PERFORMANCE MAY GET VERY LOW.</para>
+				/// <para>It's recommended to restart the app.</para>
 				/// </summary>
 				/// <param name="{bool}">VSync on/off?</param>
-				void set_new_vsync(const bool);
+				/// <param name="{bool}">Force refresh right now?</param>
+				void set_vsync(const bool, const bool = false);
+
+				/// <summary>
+				/// <para>Is it with VSync enabled?</para>
+				/// </summary>
+				/// <returns>{bool} True if setting says so.</returns>
+				bool get_vsync() const;
 
 				/// <summary>
 				/// <para>Switch between fullscreen and windowed mode.</para>
@@ -192,6 +218,12 @@ namespace LSW {
 				/// </summary>
 				/// <returns>{bool} Display existance.</returns>
 				bool display_ready() const;
+
+				/// <summary>
+				/// <para>Get the fps cap.</para>
+				/// </summary>
+				/// <returns>{size_t} Current FPS cap.</returns>
+				size_t get_fps_cap() const;
 
 				/// <summary>
 				/// <para>Adds a task to be done once only. Future gives you the result.</para>

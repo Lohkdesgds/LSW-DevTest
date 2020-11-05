@@ -28,7 +28,10 @@ namespace LSW {
 				const std::string conf_displaying		= "display";
 				const std::string conf_audio			= "audio";
 				const std::string conf_mouse_memory		= "mouse"; // in memory only
-				// add other common always used section names			
+				// add other common always used section names
+
+				const double delta_checking_s = 5.0; // sec, check registered events like display
+				const double delta_mouse_s = 1.0 / 120; // sec
 			}
 
 			/// <summary>
@@ -45,6 +48,13 @@ namespace LSW {
 					Interface::Display display; // start this
 
 					Interface::EventHandler events; // just display close event and mouse registration for now
+
+					Interface::EventTimer check_sources; // like when you reload screen the source change.
+					Interface::EventTimer update_mouse;
+					bool _m_newdata = false;
+					float _m_x, _m_y;
+
+					Interface::Event latest_display_source; // copy
 
 					bool closed = false; // if app is closed, true
 					bool loaded = false; // loaded once

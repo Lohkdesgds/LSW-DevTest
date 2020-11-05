@@ -164,6 +164,9 @@
     <Filter Include="LSW\3. Work\GameCore">
       <UniqueIdentifier>{c9e43f15-067e-4703-a2b1-50cb7017aa39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\1. Tools\AdvancedShared">
+      <UniqueIdentifier>{37ef5789-ed57-4ca9-b1fd-205c23df2f6f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -391,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="LSW\Work\GameCore\gamecore.h">
       <Filter>LSW\3. Work\GameCore</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\AdvancedShared\advancedshared.h">
+      <Filter>LSW\1. Tools\AdvancedShared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

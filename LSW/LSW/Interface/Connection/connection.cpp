@@ -182,7 +182,7 @@ namespace LSW {
 						}
 					}
 				}
-				evhdr.deinit(); // make sure this happens before timar death
+				evhdr.reset(); // make sure this happens before timar death
 			}
 
 			void Connection::handle_recv(Tools::boolThreadF run)

@@ -26,6 +26,7 @@ namespace LSW {
 			/// <summary>
 			/// <para>PathManager can change the way internal path works.</para>
 			/// <para>You can set the thread's path relative to one or multiple compacted files using this.</para>
+			/// <para>The paths unfortunalety are global.</para>
 			/// <para>The effects are set per thread while this variable exists or while apply() is valid (before unapply()).</para>
 			/// </summary>
 			class PathManager {

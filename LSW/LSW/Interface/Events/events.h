@@ -5,6 +5,7 @@
 
 #include "../../Handling/Initialize/initialize.h"
 #include "../../Tools/SuperThread/superthread.h"
+#include "../../Tools/SuperMutex/supermutex.h"
 
 namespace LSW {
 	namespace v5 {
@@ -90,10 +91,29 @@ namespace LSW {
 				Event(Event&&) noexcept;
 
 				/// <summary>
+				/// <para>Copy operator.</para>
+				/// </summary>
+				/// <param name="{Event}">Event to copy.</param>
+				void operator=(const Event&);
+
+				/// <summary>
+				/// <para>Move operator.</para>
+				/// </summary>
+				/// <param name="{Event}">Event to move.</param>
+				void operator=(Event&&) noexcept;
+
+				/// <summary>
 				/// <para>Direct RAW transformation to Event. This won't deinit the event source by itself!</para>
 				/// </summary>
 				/// <param name="{RAW EVENT SOURCE}">Event source.</param>
 				Event(ALLEGRO_EVENT_SOURCE*);
+
+				/// <summary>
+				/// <para>Compare if event source is the same.</para>
+				/// </summary>
+				/// <param name="{Event}">Another Event.</param>
+				/// <returns>{bool} True if they are.</returns>
+				bool operator==(const Event&) const;
 
 				friend class EventHandler;
 			};
@@ -123,6 +143,11 @@ namespace LSW {
 			const Event get_touchscreen_event();
 
 
+			namespace eventhandler {
+				enum class handling_mode {ONE_BY_ONE_GUARANTEED, SKIP_TO_BACK_AS_FAST_AS_IT_CAN};
+			}
+
+
 			/// <summary>
 			/// <para>Handle multiple Event sources with this. It will start a thread internally and call the function as events happen.</para>
 			/// </summary>
@@ -130,6 +155,8 @@ namespace LSW {
 				std::shared_ptr<ALLEGRO_EVENT_QUEUE> own_queue; // trigger itself
 				std::function<void(const RawEvent&)> trigger_func;
 				Tools::SuperThread thr;
+				Tools::SuperMutex thr_m;
+				eventhandler::handling_mode mode = eventhandler::handling_mode::ONE_BY_ONE_GUARANTEED;
 
 				void __init();
 			public:
@@ -137,10 +164,25 @@ namespace LSW {
 				~EventHandler();
 
 				/// <summary>
+				/// <para>What mode should it do?</para>
+				/// <para>- ONE_BY_ONE_GUARANTEED: Buffers events if necessary, it will go through all events sometime. This is more CPU friendly.</para>
+				/// <para>- SKIP_TO_BACK_AS_FAST_AS_IT_CAN: If it can't keep up, skip to latest and only work with latest up-to-date events. It may use more CPU.</para>
+				/// </summary>
+				/// <param name="{eventhandler::handling_mode}">Mode to handle events.</param>
+				void set_mode(const eventhandler::handling_mode&);
+
+				/// <summary>
 				/// <para>Adds a Event to be handled by this (non-exclusive).</para>
 				/// </summary>
 				/// <param name="{Event}">A Event source.</param>
 				void add(const Event&);
+
+				/// <summary>
+				/// <para>Is the event registered?</para>
+				/// </summary>
+				/// <param name="{Event}">A Event source.</param>
+				/// <returns>{bool} True if it is.</returns>
+				bool has(const Event&) const;
 
 				/// <summary>
 				/// <para>Remove a Event (if handled by this).</para>
@@ -151,7 +193,7 @@ namespace LSW {
 				/// <summary>
 				/// <para>Stops the internal thread and cleanup (you'll have to reset to start again).</para>
 				/// </summary>
-				void deinit();
+				void reset();
 
 				/// <summary>
 				/// <para>Starts thread to handle events and call function as they happen.</para>
@@ -160,11 +202,26 @@ namespace LSW {
 				void set_run_autostart(const std::function<void(const RawEvent&)>);
 
 				/// <summary>
+				/// <para>Is it running a thread internally right now?</para>
+				/// </summary>
+				/// <returns>{bool} Thread running.</returns>
+				bool running() const;
+
+				/// <summary>
 				/// <para>Wait for an event manually (ONLY VALID IF YOU DON'T CALL SET_RUN_AUTOSTART).</para>
 				/// </summary>
 				/// <returns>{RawEvent} The event, if any. if type == 0 it's empty.</returns>
 				const RawEvent wait_event_manually(const double = -1.0);
 			};
+
+
+			/// <summary>
+			/// <para>Compare if events are the same.</para>
+			/// </summary>
+			/// <param name="{RAW EVENT}">A RAW EVENT.</param>
+			/// <param name="{Event}">Another Event.</param>
+			/// <returns>{bool} True if they are.</returns>
+			bool operator==(ALLEGRO_EVENT_SOURCE*, const Event&);
 		}
 	}
 }

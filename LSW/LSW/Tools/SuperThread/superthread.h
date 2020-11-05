@@ -142,8 +142,12 @@ namespace LSW {
 			template<typename Q, std::enable_if_t<!std::is_void_v<Q>, int>>
 			void SuperThreadT<T>::set(const std::function<T(boolThreadF)> f)
 			{
+				join();
 				promise = std::move(Promise<T>([&,f] {
-					return f([&] {return !al_get_thread_should_stop(thr); });
+					_thread_done_flag = false;
+					T cpy = f([&] {return !al_get_thread_should_stop(thr); });
+					_thread_done_flag = true;
+					return std::move(cpy);
 				}));
 			}
 
@@ -151,17 +155,22 @@ namespace LSW {
 			template<typename Q, std::enable_if_t<std::is_void_v<Q>, int>>
 			void SuperThreadT<T>::set(const std::function<T(boolThreadF)> f)
 			{
+				join();
 				promise = std::move(Promise<T>([&,f] {
+					_thread_done_flag = false;
 					f([&] {return !al_get_thread_should_stop(thr); });
+					_thread_done_flag = true;
 				}));
 			}
 
 			template<typename T>
 			Future<T> SuperThreadT<T>::start()
 			{
+				join();
 				Future<T> fut = promise.get_future();
 				thr = al_create_thread(__run_i_al, &promise);
 				al_start_thread(thr);
+				
 				return fut;
 			}
 
@@ -175,12 +184,13 @@ namespace LSW {
 			void SuperThreadT<T>::join()
 			{
 				if (thr) {
-					al_set_thread_should_stop(thr);
+					//al_set_thread_should_stop(thr);
 					al_join_thread(thr, nullptr);
+					while (!_thread_done_flag) std::this_thread::sleep_for(std::chrono::milliseconds(20));
 					al_destroy_thread(thr);
+					if (!promise.has_set()) _set_promise_forced();
 					thr = nullptr;
 				}
-				else kill();
 			}
 
 			template<typename T>
