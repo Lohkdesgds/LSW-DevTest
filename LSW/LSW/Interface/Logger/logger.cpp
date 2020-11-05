@@ -35,7 +35,7 @@ namespace LSW {
 				return !format.empty();
 			}
 
-			std::string Logger::_generate_date() const
+			std::string Logger::_generate_date()
 			{
 				char temp[26];
 
@@ -56,7 +56,7 @@ namespace LSW {
 				if (cl != g.last_c || g.bypass_last_c_once) {
 					g.bypass_last_c_once = false;
 					int clr_c = static_cast<int>(cl);
-					SetConsoleTextAttribute(hConsole, clr_c);
+					SetConsoleTextAttribute(g.hConsole, clr_c);
 					g.last_c = cl;
 				}
 			}
@@ -144,30 +144,22 @@ namespace LSW {
 					g.m.unlock();
 				}
 			}
-			void Logger::debug(const std::string& str, E situation)
+			void Logger::debug_write_to_file(const bool b)
+			{
+				g.debug_to_file = b;
+			}
+			void Logger::_debug(const std::string& whr, const std::string& str)
 			{
 				// https://docs.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-outputdebugstringw
 				// "Applications should send very minimal debug output and provide a way for the user to enable or disable its use." -> it disables the feature if in release mode then.
 #ifdef _DEBUG
-				std::string back_str;
-				switch (situation) {
-				case E::INFO:
-					back_str = "[INFO]";
-					break;
-				case E::WARN:
-					back_str = "[WARN]";
-					break;
-				case E::ERRR:
-					back_str = "[ERRR]";
-					break;
-				case E::DEBUG:
-					back_str = "[DEBG]";
-					break;
-				}
 				g.dbgm.lock();
-				OutputDebugString(("@\tLSWv5\t>\t" + back_str + _generate_date() + "\t\t\t\t\t\t  " + str + "\n").c_str());
+				OutputDebugString(("@\tLSWv5\t>\t" + _generate_date() + "\t\t\t" + whr + ": " + str + "\n").c_str());
 				g.dbgm.unlock();
 #endif
+				Logger logg;
+				if (g.debug_to_file) logg << L::SLF << whr << "&7" << str << L::ELF;
+				else				 logg << L::SL  << whr << "&7" << str << L::EL;
 			}
 			void Logger::hook(std::function<void(const Tools::Cstring&)> f)
 			{
@@ -198,7 +190,7 @@ namespace LSW {
 						throw Handling::Abort(__FUNCSIG__, "FATAL ERROR MUTEX SHOULDN'T BE UNLOCKED IF IT WASN'T PREVIOUSLY!", Handling::abort::abort_level::FATAL_ERROR);
 					}
 					g.m_b = false;
-					g.m.unlock();	/// yes, visual studio thinks this is an epic WARN, but it will never fail if you use gfile << L::SL(F) << fsr(__FUNCSIG__) << ... << L::EL(F)
+					g.m.unlock();	/// yes, visual studio thinks this is an epic WARN, but it will never fail if you use gfile << L::SL(F) << fsr() << ... << L::EL(F)
 					send_last_and_cleanup(); // send last coloured string to event and clear
 					break;
 				case L::SLF: // START LINE AND SAVE ON FILE
@@ -215,7 +207,7 @@ namespace LSW {
 						throw Handling::Abort(__FUNCSIG__, "FATAL ERROR MUTEX SHOULDN'T BE UNLOCKED IF IT WASN'T PREVIOUSLY!", Handling::abort::abort_level::FATAL_ERROR);
 					}
 					g.file_write_enabled = false;
-					g.m.unlock();	/// yes, visual studio thinks this is an epic WARN, but it will never fail if you use gfile << L::SL(F) << fsr(__FUNCSIG__) << ... << L::EL(F)
+					g.m.unlock();	/// yes, visual studio thinks this is an epic WARN, but it will never fail if you use gfile << L::SL(F) << fsr() << ... << L::EL(F)
 					flush();
 					send_last_and_cleanup(); // send last coloured string to event and clear
 					break;
@@ -369,25 +361,25 @@ namespace LSW {
 				return (this->operator<<(buf));
 			}
 
-			const Tools::Cstring fsr(std::string fname_pretty, const E situation)
+			/*const Tools::Cstring fsr(Tools::Cstring fname_pretty, const E situation)
 			{
-				if (fname_pretty.length() < logger::len_class) {
-					for (size_t p = fname_pretty.length(); p < logger::len_class; p++)
+				if (fname_pretty.size() < logger::len_class) {
+					for (size_t p = fname_pretty.size(); p < logger::len_class; p++)
 					{
 						fname_pretty += '_';
 					}
 				}
 				else {
-					for (size_t p = fname_pretty.length(); p > logger::len_class; p--)
+					for (size_t p = fname_pretty.size(); p > logger::len_class; p--)
 					{
-						fname_pretty.pop_back();
+						fname_pretty.pop();
 					}
 				}
 
-				for (auto& i : fname_pretty) i = ::toupper(i);
+				for (auto& i : fname_pretty) i.ch = ::toupper(i.ch);
 
 				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-				std::string back_str;
+				Tools::Cstring back_str;
 
 				switch (situation) {
 				case E::INFO:
@@ -404,9 +396,37 @@ namespace LSW {
 					break;
 				}
 
-				back_str += "&8[" + fname_pretty + "]&f ";
+				back_str += "&8[" + fname_pretty + "&8]&f ";
 
 				return back_str; // convert
+			}*/
+
+
+			const std::string _fsr(const size_t l, const std::string& fp, const std::string& func, const E e)
+			{
+				std::string back_str;
+				switch (e) {
+				case E::INFO:
+					back_str = "&2[INFO]";
+					break;
+				case E::WARN:
+					back_str = "&c[WARN]";
+					break;
+				case E::ERRR:
+					back_str = "&4[ERRR]";
+					break;
+				case E::DEBUG:
+					back_str = "&5[DEBG]";
+					break;
+				}
+				return Tools::sprintf_a("%s&8[&bL%04zu&8>&a%s&8|&9%s&8]&f ",
+					back_str.c_str(),
+					l,
+					Tools::fixed_size_string(
+						[&] { auto s = std::string(fp); auto p = s.rfind('\\'); p = ((p != std::string::npos) ? p : s.rfind('/')); return ("&a" + ((p != std::string::npos && ((p + 1) < s.length())) ? s.substr(p + 1) : s)); }(),
+						logger::macro_file_siz
+					).c_str(),
+					Tools::fixed_size_string(func, logger::macro_func_siz).c_str());
 			}
 		}
 	}

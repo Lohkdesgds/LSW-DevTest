@@ -108,8 +108,8 @@ namespace LSW {
 
 			char_c Cstring::pop() {
 				if (str.size() > 0) {
-					char_c cpy = str.front();
-					str.erase(str.begin());
+					char_c cpy = str.back();
+					str.erase(str.end()-1);
 					if (str.length() > 0) last_added_color = str.back().cr;
 					return cpy;
 				}
@@ -233,10 +233,23 @@ namespace LSW {
 				append(u);
 			}
 
-			std::basic_string<char_c>::const_iterator Cstring::begin() const {
+			std::basic_string<char_c>::iterator Cstring::begin()
+			{
 				return str.begin();
 			}
-			std::basic_string<char_c>::const_iterator Cstring::end() const {
+
+			std::basic_string<char_c>::iterator Cstring::end()
+			{
+				return str.end();
+			}
+
+			std::basic_string<char_c>::const_iterator Cstring::begin() const
+			{
+				return str.begin();
+			}
+
+			std::basic_string<char_c>::const_iterator Cstring::end() const
+			{
 				return str.end();
 			}
 
@@ -285,6 +298,12 @@ namespace LSW {
 				nstr.last_added_color = last_added_color;
 				return nstr;
 			}
-		}
+
+			Cstring operator+(const std::string& str, const Cstring& cstr)
+			{
+				Cstring conv = str;
+				return conv + cstr;
+			}
+}
 	}
 }

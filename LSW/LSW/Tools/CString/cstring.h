@@ -245,6 +245,18 @@ namespace LSW {
 				/// <para>Begin iterator.</para>
 				/// </summary>
 				/// <returns>{iterator} Begin iterator.</returns>
+				std::basic_string<char_c>::iterator begin();
+
+				/// <summary>
+				/// <para>End iterator.</para>
+				/// </summary>
+				/// <returns>{iterator} End iterator.</returns>
+				std::basic_string<char_c>::iterator end();
+
+				/// <summary>
+				/// <para>Begin iterator.</para>
+				/// </summary>
+				/// <returns>{iterator} Begin iterator.</returns>
 				std::basic_string<char_c>::const_iterator begin() const;
 
 				/// <summary>
@@ -312,6 +324,10 @@ namespace LSW {
 				/// <returns>{Cstring} The filtered string.</returns>
 				Cstring filter_ascii_range(const char = 32, const char = 126) const;
 			};
+
+
+			//Cstring operator+(const char[], const Cstring&);
+			Cstring operator+(const std::string&, const Cstring&);
 		}
 	}
 }

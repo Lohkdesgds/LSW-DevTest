@@ -180,6 +180,15 @@ namespace LSW {
 
 				return vectu;
 			}
+			
+			std::string fixed_size_string(std::string str, const size_t len, const char fill)
+			{
+				size_t p = str.size();
+				for (; p < len; p++) str += '_';
+				if (p > len) str = str.substr(0, len);
+				return str;
+			}
+
 			std::string sprintf_a(const char* format, ...) {
 				std::string str;
 

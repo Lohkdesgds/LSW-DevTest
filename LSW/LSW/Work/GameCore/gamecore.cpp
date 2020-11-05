@@ -19,7 +19,7 @@ namespace LSW {
 						share->logg.init(logg_p);
 					}
 					catch (const Handling::Abort& ab) {
-						share->logg.debug(ab, Interface::E::WARN);
+						debug(std::string(ab));
 					}
 
 					if (!share->conf.load(conf_p)) {
@@ -33,7 +33,6 @@ namespace LSW {
 					share->conf.ensure(gamecore::conf_displaying,	"screen_width",			1280,	Interface::config::config_section_mode::SAVE);
 					share->conf.ensure(gamecore::conf_displaying,	"screen_height",		720,	Interface::config::config_section_mode::SAVE);
 					share->conf.ensure(gamecore::conf_displaying,	"display_flags",		0,		Interface::config::config_section_mode::SAVE);
-					//share->conf.ensure(gamecore::conf_displaying,	"force_refresh_rate",	0,		Interface::config::config_section_mode::SAVE); // automatic is the way
 					share->conf.ensure(gamecore::conf_displaying,	"limit_framerate_to",	0,		Interface::config::config_section_mode::SAVE);
 					share->conf.ensure(gamecore::conf_displaying,	"hidemouse",			true,	Interface::config::config_section_mode::SAVE);
 					share->conf.ensure(gamecore::conf_displaying,	"vsync",				false,	Interface::config::config_section_mode::SAVE);
@@ -41,19 +40,28 @@ namespace LSW {
 					// audio settings
 					share->conf.ensure(gamecore::conf_audio,		"volume",				0.5f,	Interface::config::config_section_mode::SAVE);
 
+					// debug settings
+					share->conf.ensure(gamecore::conf_debug,		"debug_to_file",		true,	Interface::config::config_section_mode::SAVE);
+
+					// mouse (memory)
+					share->conf.ensure(gamecore::conf_mouse_memory, "x",					0.0,	Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "y",					0.0,	Interface::config::config_section_mode::MEMORY_ONLY);
+
 
 					share->conf.flush();
 
 					// - - - - START - - - - //
 
+					share->logg.debug_write_to_file(share->conf.get_as<bool>(gamecore::conf_debug, "debug_to_file"));
+
 					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_width"); k != 0)		share->display.set_width(k);
 					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_height"); k != 0)		share->display.set_height(k);
 					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "display_flags"); k != 0)		share->display.set_new_flags(k);
-					//if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "force_refresh_rate"); k != 0)	share->display.set_new_refresh_rate(k); // auto is safer
 					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "limit_framerate_to"); k != 0)	share->display.set_fps_cap(k); // to do
 
 					share->display.hide_mouse(share->conf.get_as<bool>(gamecore::conf_displaying, "hidemouse"));
 					share->display.set_vsync(share->conf.get_as<bool>(gamecore::conf_displaying, "vsync"));
+
 
 					share->display.init();
 
@@ -62,9 +70,6 @@ namespace LSW {
 					share->check_sources.set_delta(gamecore::delta_checking_s);
 					share->update_mouse.set_delta(gamecore::delta_mouse_s);
 					share->latest_display_source = share->display.get_event_source();
-
-					share->check_sources.start();
-					share->update_mouse.start();
 
 					share->events.set_mode(Interface::eventhandler::handling_mode::SKIP_TO_BACK_AS_FAST_AS_IT_CAN);
 					share->events.add(share->check_sources);
@@ -84,7 +89,7 @@ namespace LSW {
 									Interface::Camera inv = *camnow;
 									inv.invert();
 									inv.transform(x, y);
-									//logg << L::SL << fsr(__FUNCSIG__) << "Mouse axis: [" << ev.mouse_event().x << ";" << ev.mouse_event().y << "] " << FormatAs("%.4f") << x << ";" << FormatAs("%.4f") << y << L::EL;
+									//logg << L::SL << fsr() << "Mouse axis: [" << ev.mouse_event().x << ";" << ev.mouse_event().y << "] " << FormatAs("%.4f") << x << ";" << FormatAs("%.4f") << y << L::EL;
 
 									share->conf.set(gamecore::conf_mouse_memory, Interface::config::config_section_mode::MEMORY_ONLY);
 									share->conf.set(gamecore::conf_mouse_memory, "x", x);
@@ -95,7 +100,7 @@ namespace LSW {
 								if (share->latest_display_source != share->display.get_event_source()) {
 									Interface::Logger logg;
 
-									logg.debug("Display event registering refresh! Display has changed/updated.");
+									debug("Display event registering refresh! Display has changed/updated.");
 
 									share->events.remove(share->latest_display_source);
 									share->latest_display_source = share->display.get_event_source();
@@ -114,13 +119,18 @@ namespace LSW {
 						case ALLEGRO_EVENT_DISPLAY_CLOSE:
 						{
 							Interface::Logger logg;
-							logg.debug("Close app called.");
+							debug("Close app called.");
 
 							share->closed = true;
 						}
 							break;
 						}
 						});
+
+
+					share->update_mouse.start();
+					share->check_sources.start();
+
 
 					if (!share->audio.load() || !share->mixer.load()) throw Handling::Abort(__FUNCSIG__, "Cannot setup AUDIO!");
 

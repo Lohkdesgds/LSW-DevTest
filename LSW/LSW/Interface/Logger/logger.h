@@ -10,7 +10,11 @@
 #include "../../Handling/Abort/abort.h" // fails calls throw
 #include "../../Handling/Path/path.h" // handle_path used on init
 #include "../../Tools/CString/cstring.h" // uses this as string internally to print colored chars
+#include "../../Tools/Common/common.h" // sprintf_a
 
+/*#define __FSR_DEF__ \
+[]{ auto s = std::string(__FILE__); auto p = s.rfind('\\'); p = ((p != std::string::npos) ? p : s.rfind('/')); return ("&a" + ((p != std::string::npos && ((p + 1) < s.length())) ? s.substr(p + 1) : s)); }() \
++ std::string("&bL") + std::to_string(__LINE__) + std::string("&1>") + __FUNCDNAME__*/ 
 
 namespace LSW {
 	namespace v5 {
@@ -21,6 +25,9 @@ namespace LSW {
 				constexpr size_t each_line_stored_by_memlog = 140;
 				constexpr size_t len_class = 45;
 				constexpr size_t default_max_buffer_internally = 256;
+
+				constexpr size_t macro_file_siz = 18;
+				constexpr size_t macro_func_siz = 55;
 			}
 
 			enum class L { EL, SL, SLF, ELF };
@@ -90,6 +97,7 @@ namespace LSW {
 #endif
 					bool m_b = false;
 					bool file_write_enabled = false;
+					bool debug_to_file = true;
 
 					/*ALLEGRO_EVENT_SOURCE evsrc = ALLEGRO_EVENT_SOURCE();
 
@@ -99,14 +107,15 @@ namespace LSW {
 					Tools::Cstring memline_s;
 					Tools::Cstring last_str;
 					std::function<void(const Tools::Cstring&)> sendd;
+
+					HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 				};
 
 				static __idata g;
-				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 				FormatAs latestFormat;
 
-				std::string _generate_date() const;
+				static std::string _generate_date();
 
 				void set_console_color(const Tools::cstring::C);
 				void print_start();
@@ -131,12 +140,18 @@ namespace LSW {
 				void flush();
 
 				/// <summary>
+				/// <para>Whether debug info is saved into the file or just shown in console.</para>
+				/// </summary>
+				/// <param name="{bool}">Flush to file, if file set?</param>
+				void debug_write_to_file(const bool);
+
+				/// <summary>
 				/// <para>Send debug information via debugging channel (when DEBUG mode).</para>
 				/// <para>This uses OutputDebugInfo.</para>
 				/// </summary>
+				/// <param name="{std::string}">From where? (use fsr() for better results)</param>
 				/// <param name="{std::string}">What to send to debug.</param>
-				/// <param name="{E}">Error? Info? Warn?...</param>
-				void debug(const std::string&, const E = E::INFO);
+				static void _debug(const std::string&, const std::string&);
 
 				/// <summary>
 				/// <para>Hook a function to be called every new line of logging.</para>
@@ -255,7 +270,13 @@ namespace LSW {
 			/// <param name="{std::string}">Normally __FUNCSIG__, aka function path.</param>
 			/// <param name="{E}">Error level.</param>
 			/// <returns>{Cstring} Color ready formatted string.</returns>
-			const Tools::Cstring fsr(std::string, const E = E::INFO);
+			//const Tools::Cstring fsr(Tools::Cstring, const E = E::INFO);
+
+			// line, file, func, err
+			const std::string _fsr(const size_t, const std::string&, const std::string&, const E = E::INFO);
+
+#define fsr( ... ) LSW::v5::Interface::_fsr(__LINE__, __FILE__, __FUNCDNAME__, __VA_ARGS__)
+#define debug(str) LSW::v5::Interface::Logger::_debug( _fsr(__LINE__ , __FILE__ , __FUNCDNAME__ , LSW::v5::Interface::E::DEBUG), str)
 
 		}
 	}

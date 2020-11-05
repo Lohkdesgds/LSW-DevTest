@@ -171,8 +171,8 @@ namespace LSW {
 				disp = DisplayStrongPtr(al_create_display(new_resolution[0], new_resolution[1]), [](ALLEGRO_DISPLAY* d) { al_destroy_display(d); d = nullptr; });
 				if (!disp.get()) {
 					Logger logg;
-					logg << L::SLF << fsr(__FUNCSIG__, E::ERRR) << "Cannot create display with these settings/environment!" << L::ELF;
-					logg.debug("Cannot create display with these settings/environment!", E::ERRR);
+					logg << L::SLF << fsr(E::ERRR) << "Cannot create display with these settings/environment!" << L::ELF;
+					debug("Cannot create display with these settings/environment!");
 					logg.flush();
 					std::terminate();
 				}

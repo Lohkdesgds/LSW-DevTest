@@ -27,6 +27,7 @@ namespace LSW {
 				const std::string conf_versioning		= "versioning";
 				const std::string conf_displaying		= "display";
 				const std::string conf_audio			= "audio";
+				const std::string conf_debug			= "debug";
 				const std::string conf_mouse_memory		= "mouse"; // in memory only
 				// add other common always used section names
 

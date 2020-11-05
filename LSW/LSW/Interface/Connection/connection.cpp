@@ -113,7 +113,7 @@ namespace LSW {
 				timm.start();
 				
 
-				logg.debug(common + "Started.");
+				debug(common + "Started.");
 
 				while (run() && keep_connection) {
 
@@ -139,7 +139,7 @@ namespace LSW {
 							std::this_thread::sleep_for(connection::min_delay_no_tasks);
 							continue;
 						}
-						//logg.debug(common + "(auto) tasked.");
+						//debug(common + "(auto) tasked.");
 					}
 					else {
 						Tools::AutoLock luck(packs_sending_m);
@@ -152,7 +152,7 @@ namespace LSW {
 							pack = std::move(_temp.data);
 							sys_t = _temp.sys;
 							packs_sending.erase(packs_sending.begin());
-							//logg.debug(common + "(default) send tasked.");
+							//debug(common + "(default) send tasked.");
 						}
 					}
 
@@ -174,7 +174,7 @@ namespace LSW {
 						auto fi = ::send(connected, (char*)&one, sizeof(_pack), 0);
 						packages_sent++;
 
-						logg.debug(common + "SEND once.");
+						debug(common + "SEND once.");
 
 						if (fi < 0) {
 							keep_connection = false;
@@ -191,7 +191,7 @@ namespace LSW {
 				ss << std::this_thread::get_id();
 				const std::string common = std::string("[HANDLE_RECV] T#") + ss.str() + std::string(": ");
 
-				logg.debug(common + "Started.");
+				debug(common + "Started.");
 
 				while (run() && keep_connection) {
 					_pack pack;
@@ -199,7 +199,7 @@ namespace LSW {
 					auto fi = ::recv(connected, (char*)&pack, sizeof(_pack), 0);
 					packages_recv++;
 
-					logg.debug(common + "RECV once.");
+					debug(common + "RECV once.");
 
 					if (fi > 0) { // if one is _pack and there're more packs, they will not have _internal_pack in between
 
@@ -211,7 +211,7 @@ namespace LSW {
 							auto fi2 = ::recv(connected, (char*)&pack, sizeof(_pack), 0);
 							packages_recv++;
 
-							logg.debug(common + "RECV once.");
+							debug(common + "RECV once.");
 
 							if (fi2 < 0) {
 								keep_connection = false;
@@ -243,11 +243,11 @@ namespace LSW {
 						}
 						else if (alt_receive_autodiscard) {
 							alt_receive_autodiscard(data);
-							logg.debug(common + "(auto) tasked.");
+							debug(common + "(auto) tasked.");
 						}
 						else {
 							packs_received.emplace_back(std::move(data));
-							logg.debug(common + "(default) tasked.");
+							debug(common + "(default) tasked.");
 						}
 					}
 					else if (fi < 0) { // lost connection

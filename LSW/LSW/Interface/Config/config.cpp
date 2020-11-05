@@ -63,7 +63,7 @@ namespace LSW {
 			bool Config::load(std::string str)
 			{
 				if (str.empty()) {
-					logg.debug("A configuration could not be loaded because path was null!", E::ERRR);
+					debug("A configuration could not be loaded because path was null!");
 					//throw Handling::Abort(__FUNCSIG__, "A configuration could not be loaded because path was null!");
 					return false;
 				}
@@ -72,7 +72,7 @@ namespace LSW {
 				ALLEGRO_CONFIG* conf = nullptr;
 				conf = al_load_config_file(str.c_str());
 				if (!conf) {
-					logg.debug("Failed to load configuration file: " + str, E::ERRR);
+					debug("Failed to load configuration file: " + str);
 					//throw Handling::Abort(__FUNCSIG__, "Failed to open config '" + str + "'!");
 					return false;
 				}
@@ -102,7 +102,7 @@ namespace LSW {
 
 							const char* result = al_get_config_value(conf, section, key);
 
-							logg.debug(std::string(section) + " > " + key + " = " + result);
+							debug(std::string(section) + " > " + key + " = " + result);
 
 							backk.key_and_value.push_back({ key, result });
 
@@ -118,7 +118,7 @@ namespace LSW {
 			void Config::save_path(std::string str)
 			{
 				if (str.empty()) {
-					logg.debug("Null path is not a valid path at save_path!", E::ERRR);
+					debug("Null path is not a valid path at save_path!");
 					throw Handling::Abort(__FUNCSIG__, "Null path is not a valid path at save_path!");
 				}
 
@@ -129,13 +129,13 @@ namespace LSW {
 			void Config::flush()
 			{
 				if (path.empty()) {
-					logg.debug("A configuration could not be saved because path was null!", E::WARN);
+					debug("A configuration could not be saved because path was null!");
 					return;
 				}
 
 				ALLEGRO_CONFIG* conf = al_create_config();
 				if (!conf) {
-					logg.debug("Failed to create a buffer to flush config.", E::ERRR);
+					debug("Failed to create a buffer to flush config.");
 					throw Handling::Abort(__FUNCSIG__, "Failed to create a buffer to flush config.");
 				}
 
@@ -149,12 +149,12 @@ namespace LSW {
 
 				if (!al_save_config_file(path.c_str(), conf)) {
 					al_destroy_config(conf);
-					logg.debug("Failed to save configuration file: " + path, E::ERRR);
+					debug("Failed to save configuration file: " + path);
 					throw Handling::Abort(__FUNCSIG__, "Failed to save config '" + path + "'!");
 				}
 				al_destroy_config(conf);
 
-				logg.debug("Saved configuration file: " + path);
+				debug("Saved configuration file: " + path);
 			}
 
 			void Config::set(const std::string& sec, const config::config_section_mode mode)

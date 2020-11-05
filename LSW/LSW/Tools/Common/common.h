@@ -116,6 +116,15 @@ namespace LSW {
 			/// <returns>{size_t} Length of the string.</returns>
 			template<size_t N> inline const size_t strlen_s(char(&str)[N]) { return strnlen_s(str, N); }
 
+			/// <summary>
+			/// <para>Do you want a fixed sized string? If smaller, characters are added; else, sliced.</para>
+			/// </summary>
+			/// <param name="{std::string}">Original string.</param>
+			/// <param name="{size_t}">Desired size.</param>
+			/// <param name="{char}">Fill.</param>
+			/// <returns>{std::string} Fixed size generated string.</returns>
+			std::string fixed_size_string(std::string, const size_t, const char = '_');
+
 
 			/// <summary>
 			/// <para>Works like a printf_s, but the output is std::string.</para>
