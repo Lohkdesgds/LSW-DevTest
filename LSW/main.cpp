@@ -49,14 +49,18 @@ int main() {
 	pathmngr_debug(core, pather);
 
 
+	Tools::SuperResource<Work::Block> blocks;
 
 	auto working_on = core.get_display().add_once_task([pather] {
 		Logger logg;
 		Tools::SuperResource<Bitmap> source;
 		Tools::SuperResource<Font> source_font;
+		Tools::SuperResource<Work::Block> blocks;
 
 		auto atlas = source.create("ATLAS_GLOBAL");
 		auto lmao = source.create("_test");
+
+		auto blk = blocks.create("_test_block");
 
 		auto foo = source_font.create("DEFAULT");
 
@@ -82,6 +86,9 @@ int main() {
 			}
 			else {
 				logg << L::SLF << fsr() << "Loaded a bitmap from atlas SUCESSFULLY" << L::ELF;
+
+				blk->insert(lmao);
+
 			}
 		}
 		if (!gud) {
@@ -97,9 +104,50 @@ int main() {
 
 		pather.unapply();
 
-		return lmao;
-		});
-	auto got = working_on.get().get<Tools::Resource<Bitmap>>();
+		return true;
+	});
+	
+	//auto got = working_on.get().get<Tools::Resource<Bitmap>>();
+
+	working_on.wait();
+	
+	Tools::Resource<Work::Block> blk;
+	if (!blocks.get("_test_block", blk)) {
+		logg << L::SLF << fsr(E::ERRR) << "Block wasn't found somehow..." << L::ELF;
+		core.shutdown();
+		return -1;
+	}
+
+	//blk->set<double>(Work::sprite::e_double::TARG_POSX, [] { return (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5; });
+	//blk->set<double>(Work::sprite::e_double::TARG_POSY, [] { return (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5; });
+	blk->set<double>(Work::sprite::e_double::TARG_POSX, [] { return 0.5 * cos(MILLI_NOW.count() / 1227.0); });
+	blk->set<double>(Work::sprite::e_double::TARG_POSY, [] { return 0.5 * sin(MILLI_NOW.count() / 789.0); });
+	blk->set(Work::sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
+
+	//blk->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
+	//blk->set<double>(Work::sprite::e_double::TARG_POSY, 0.0);
+	blk->set<double>(Work::sprite::e_double::SCALE_G, 0.5);
+
+	blk->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&] {
+		Logger logg;
+#ifdef _DEBUG
+		logg << L::SL << fsr() << "Clicked." << L::EL;
+
+		logg << L::SL << fsr() << "LAST_COLLISION_TIME: " << blk->get_direct<double>(Work::sprite::e_double_readonly::LAST_COLLISION_TIME) << L::EL;
+		logg << L::SL << fsr() << "LAST_DRAW: " << blk->get_direct<double>(Work::sprite::e_double_readonly::LAST_DRAW) << L::EL;
+		logg << L::SL << fsr() << "LAST_UPDATE: " << blk->get_direct<double>(Work::sprite::e_double_readonly::LAST_UPDATE) << L::EL;
+		logg << L::SL << fsr() << "UPDATE_DELTA: " << blk->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+		logg << L::SL << fsr() << "POS: " << blk->get_direct<double>(Work::sprite::e_double_readonly::POSX) << "x" << blk->get_direct<double>(Work::sprite::e_double_readonly::POSY) << L::EL;
+		logg << L::SL << fsr() << "TRGPOS: " << blk->get_direct<double>(Work::sprite::e_double::TARG_POSX) << "x" << blk->get_direct<double>(Work::sprite::e_double::TARG_POSY) << L::EL;
+#else
+		logg << L::SL << fsr() << "Uau vc sabe clicar, boa!" << L::EL;
+#endif
+	});
+
+	Work::Collisioner collision_control(core.get_config());
+	collision_control.insert(blk);
+
+	collision_control.start(1.0 / 13);
 
 	{
 		Tools::SuperResource<Font> source_font;
@@ -107,8 +155,12 @@ int main() {
 		Tools::Resource<Interface::Font> lool;
 		source_font.get("DEFAULT", lool);
 
-		core.get_display().add_draw_task([=](Camera&) {
-			got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
+		core.get_display().add_draw_task([=](Camera& c) {
+			///got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
+			
+			blk->draw(c);
+			//blk->update_and_clear(core.get_config());
+
 			//if (track->exists()) {
 			//	float xx = 1.9f * ((1.0f * track->get_position_ms() / track->get_length_ms()) - 0.5f);
 			//
@@ -116,14 +168,15 @@ int main() {
 			//}
 		});
 
-		core.get_display().add_draw_task([lool, logg, core](Camera& curr) {
+		core.get_display().add_draw_task([&collision_control, lool, logg, core](Camera& curr) {
 			Camera cam2 = curr;
 			const float prop = 2500.0f;
 			cam2.classic_transform(0, 0, 1.0 / prop, 1.0 / prop, 0.0); // change this later somehow
 			cam2.apply();
 			lool->draw(-prop, -1.0f * prop, 0, "&5FPS: &a" + std::to_string(core.get_display().get_frames_per_second()) + (core.get_display().get_fps_cap() ? (" / " + std::to_string(core.get_display().get_fps_cap()) + " (limit)") : "") + (core.get_display().get_vsync() ? (" &6VSYNC SET") : " &bVSYNC UNSET"));
-			lool->draw(-prop, -0.96f * prop, 0, "&2Times open: &b" + std::to_string(core.get_config().get_as<unsigned long long>("registry", "times_open")));
-			lool->draw(-prop, -0.92f * prop, 0, "&7Mouse pos: &e" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "x")) + "x" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "y")));
+			lool->draw(-prop, -0.96f * prop, 0, "&2TPS: &d" + std::to_string(collision_control.effective_tps()));
+			lool->draw(-prop, -0.92f * prop, 0, "&2Times open: &b" + std::to_string(core.get_config().get_as<unsigned long long>("registry", "times_open")));
+			lool->draw(-prop, -0.88f * prop, 0, "&7Mouse pos: &e" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "x")) + "x" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "y")));
 			lool->draw(-prop, 0.96f * prop, 0, logg.get_last_line().filter_ascii_range());
 			curr.apply();
 		});
@@ -269,6 +322,7 @@ int main() {
 		}
 	});
 
+	collision_control.stop();
 
 	core.yield();
 	core.shutdown();

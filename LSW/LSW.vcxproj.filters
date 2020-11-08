@@ -259,6 +259,12 @@
     <ClCompile Include="LSW\Work\GameCore\gamecore.cpp">
       <Filter>LSW\3. Work\GameCore</Filter>
     </ClCompile>
+    <ClCompile Include="LSW\Work\Block\block.cpp">
+      <Filter>LSW\3. Work\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Work\Collisioner\collisioner.cpp">
+      <Filter>LSW\3. Work\Collisioner</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -397,6 +403,12 @@
     </ClInclude>
     <ClInclude Include="LSW\Tools\AdvancedShared\advancedshared.h">
       <Filter>LSW\1. Tools\AdvancedShared</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\Block\block.h">
+      <Filter>LSW\3. Work\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\Collisioner\collisioner.h">
+      <Filter>LSW\3. Work\Collisioner</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

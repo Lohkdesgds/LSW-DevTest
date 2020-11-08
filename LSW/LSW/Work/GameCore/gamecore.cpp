@@ -43,9 +43,12 @@ namespace LSW {
 					// debug settings
 					share->conf.ensure(gamecore::conf_debug,		"debug_to_file",		true,	Interface::config::config_section_mode::SAVE);
 
-					// mouse (memory)
-					share->conf.ensure(gamecore::conf_mouse_memory, "x",					0.0,	Interface::config::config_section_mode::MEMORY_ONLY);
-					share->conf.ensure(gamecore::conf_mouse_memory, "y",					0.0,	Interface::config::config_section_mode::MEMORY_ONLY);
+					// mouse (memory) ### TIED TO SPRITE!
+					share->conf.ensure(gamecore::conf_mouse_memory, "x",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "y",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "press_count",			0u,		Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "down_latest",			-1,		Interface::config::config_section_mode::MEMORY_ONLY);
+					// set "b0" ... as mouse buttons (bool)
 
 
 					share->conf.flush();
@@ -71,7 +74,7 @@ namespace LSW {
 					share->update_mouse.set_delta(gamecore::delta_mouse_s);
 					share->latest_display_source = share->display.get_event_source();
 
-					share->events.set_mode(Interface::eventhandler::handling_mode::SKIP_TO_BACK_AS_FAST_AS_IT_CAN);
+					// SHHHH share->events.set_mode(Interface::eventhandler::handling_mode::NO_BUFFER_SKIP);
 					share->events.add(share->check_sources);
 					share->events.add(share->update_mouse);
 					share->events.add(share->latest_display_source);
@@ -114,6 +117,24 @@ namespace LSW {
 							share->_m_x = ev.mouse_event().x;
 							share->_m_y = ev.mouse_event().y;
 							share->_m_newdata = true;
+						}
+							break;
+						case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+						{
+							std::string bb = "b" + std::to_string(ev.mouse_event().button);
+							share->conf.set(gamecore::conf_mouse_memory, "down_latest", (int)(1 + ev.mouse_event().button));
+							auto _press = share->conf.get_as<unsigned>(gamecore::conf_mouse_memory, "press_count");
+							share->conf.set(gamecore::conf_mouse_memory, "press_count", ++_press);
+							share->conf.set(gamecore::conf_mouse_memory, bb, true);
+						}
+							break;
+						case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+						{
+							std::string bb = "b" + std::to_string(ev.mouse_event().button);
+							share->conf.set(gamecore::conf_mouse_memory, "down_latest", -(int)(1 + ev.mouse_event().button));
+							auto _press = share->conf.get_as<unsigned>(gamecore::conf_mouse_memory, "press_count");
+							share->conf.set(gamecore::conf_mouse_memory, "press_count", _press ? (_press - 1) : 0u);
+							share->conf.set(gamecore::conf_mouse_memory, bb, true);
 						}
 							break;
 						case ALLEGRO_EVENT_DISPLAY_CLOSE:

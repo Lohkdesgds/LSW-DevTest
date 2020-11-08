@@ -84,13 +84,12 @@ namespace LSW {
 
 			Bitmap::Bitmap(const Bitmap& oth)
 			{
-				bitmap_orig = oth.bitmap_orig;
-				use_target_as_it = oth.use_target_as_it;
+				*this = oth;
+			}
 
-				if (first_time) {
-					first_time = false;
-					set_new_bitmap_flags(); // first setup
-				}
+			Bitmap::Bitmap(Bitmap&& oth)
+			{
+				*this = std::move(oth);
 			}
 
 			Bitmap& Bitmap::operator=(const Bitmap& oth)

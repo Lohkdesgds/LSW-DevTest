@@ -45,7 +45,6 @@ namespace LSW {
 				int interpret_drawing_mode(const bitmap::drawing_mode) const;
 			public:
 				Bitmap();
-				// clone
 
 				/// <summary>
 				/// <para>Clones (the reference) of the internal Bitmap.</para>
@@ -54,14 +53,20 @@ namespace LSW {
 				Bitmap(const Bitmap&);
 
 				/// <summary>
-				/// <para>Copy operator=</para>
+				/// <para>Moves the internal Bitmap's data to this.</para>
+				/// </summary>
+				/// <param name="{Bitmap}">A Bitmap to move data from.</param>
+				Bitmap(Bitmap&&);
+
+				/// <summary>
+				/// <para>Copy operator.</para>
 				/// </summary>
 				/// <param name="{Bitmap}">A Bitmap to copy the reference.</param>
 				/// <returns>{Bitmap} Itself</returns>
 				Bitmap& operator=(const Bitmap&);
 
 				/// <summary>
-				/// <para>Move operator=</para>
+				/// <para>Move operator.</para>
 				/// </summary>
 				/// <param name="{Bitmap}">A Bitmap to move from.</param>
 				/// <returns>{Bitmap} Itself</returns>

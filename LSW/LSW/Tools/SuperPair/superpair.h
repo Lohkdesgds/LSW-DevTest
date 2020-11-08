@@ -206,7 +206,7 @@ namespace LSW {
 				{
 					for (auto& i : keys) {
 						if (i.type() == typeid(key)) {
-							if (std::any_cast<base_reverse_cast<Q>>(i) == key)
+							if (std::any_cast<r_cast_t<Q>>(i) == key)
 								return &holding;
 						}
 					}
@@ -258,7 +258,7 @@ namespace LSW {
 				{
 					for (auto& i : keys) {
 						if (i.type() == typeid(key)) {
-							if (std::any_cast<base_reverse_cast<Q>>(i) == key)
+							if (std::any_cast<r_cast_t<Q>>(i) == key)
 								return &holding;
 						}
 					}

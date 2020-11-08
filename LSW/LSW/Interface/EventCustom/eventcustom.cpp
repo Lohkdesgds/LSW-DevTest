@@ -25,12 +25,9 @@ namespace LSW {
 				start_as_custom();
 			}
 
-			EventCustom::EventCustom(EventCustom&& e)
+			EventCustom::EventCustom(EventCustom&& e) : Event(std::move(e))
 			{
 				Handling::init_basic();
-				// shh if move this have to be done in future, do the ones here before parent
-				this->Event::Event(std::move(e));
-				// last
 				start_as_custom();
 			}
 

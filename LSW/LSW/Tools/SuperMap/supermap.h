@@ -103,6 +103,18 @@ namespace LSW {
 				}
 
 				/// <summary>
+				/// <para>Move a SuperMap into this SuperMap.</para>
+				/// </summary>
+				/// <param name="{SuperMap}">The SuperMap being moved.</param>
+				/// <returns></returns>
+				void add(SuperMap&& mp)
+				{
+					for (auto& i : mp.sps) {
+						add(std::move(i));
+					}
+				}
+
+				/// <summary>
 				/// <para>Adds a initializer list of multiple SuperPairs.</para>
 				/// </summary>
 				/// <param name="{initializer_list}">A initializer list of SuperPairs.</param>
@@ -120,6 +132,14 @@ namespace LSW {
 				/// <param name="{SuperPair}">A SuperPair to add.</param>
 				void add(const SuperPair<T>& sp) {
 					sps.push_back(sp);
+				}
+
+				/// <summary>
+				/// <para>Moves a single SuperPair.</para>
+				/// </summary>
+				/// <param name="{SuperPair}">A SuperPair to move.</param>
+				void add(SuperPair<T>&& sp) {
+					sps.push_back(std::move(sp));
 				}
 
 

@@ -13,6 +13,8 @@
 
 #undef max
 
+#define MILLI_NOW std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+
 // Any error here is because of Unicode. Use Multi-byte instead.
 
 namespace LSW {

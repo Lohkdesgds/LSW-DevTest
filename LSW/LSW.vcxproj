@@ -225,6 +225,8 @@
     <ClCompile Include="LSW\Tools\Hash\hash.cpp" />
     <ClCompile Include="LSW\Tools\Launcher\launcher.cpp" />
     <ClCompile Include="LSW\Tools\SuperMutex\supermutex.cpp" />
+    <ClCompile Include="LSW\Work\Block\block.cpp" />
+    <ClCompile Include="LSW\Work\Collisioner\collisioner.cpp" />
     <ClCompile Include="LSW\Work\GameCore\gamecore.cpp" />
     <ClCompile Include="LSW\Work\Sprite\sprite.cpp" />
     <ClCompile Include="main.cpp" />
@@ -276,6 +278,8 @@
     <ClInclude Include="LSW\Tools\SuperThread\superthread.h" />
     <ClInclude Include="LSW\Tools\SuperTimer\supertimer.h" />
     <ClInclude Include="LSW\Tools\Tools.h" />
+    <ClInclude Include="LSW\Work\Block\block.h" />
+    <ClInclude Include="LSW\Work\Collisioner\collisioner.h" />
     <ClInclude Include="LSW\Work\GameCore\gamecore.h" />
     <ClInclude Include="LSW\Work\Sprite\sprite.h" />
     <ClInclude Include="LSW\Work\Work.h" />

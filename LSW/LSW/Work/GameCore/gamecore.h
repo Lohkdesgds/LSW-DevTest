@@ -28,11 +28,11 @@ namespace LSW {
 				const std::string conf_displaying		= "display";
 				const std::string conf_audio			= "audio";
 				const std::string conf_debug			= "debug";
-				const std::string conf_mouse_memory		= "mouse"; // in memory only
+				const std::string conf_mouse_memory		= "mouse"; // in memory only ### TIED TO SPRITE
 				// add other common always used section names
 
 				const double delta_checking_s = 5.0; // sec, check registered events like display
-				const double delta_mouse_s = 1.0 / 120; // sec
+				const double delta_mouse_s = 1.0 / 60; // sec
 			}
 
 			/// <summary>

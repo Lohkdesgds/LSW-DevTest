@@ -5,9 +5,9 @@ namespace LSW {
 		namespace Interface {
 
 
-			RawEvent::RawEvent(ALLEGRO_EVENT& evx)
+			RawEvent::RawEvent(ALLEGRO_EVENT&& evx)
 			{
-				ev = evx;
+				ev = std::move(evx);
 			}
 
 			int RawEvent::type() const
@@ -174,30 +174,34 @@ namespace LSW {
 						while (keep()) {
 							ALLEGRO_EVENT ev;
 
-							Tools::AutoLock wrk(thr_m);
-
-							if (!own_queue) {
-								std::this_thread::sleep_for(std::chrono::milliseconds(20));
-								continue;
-							}
-							switch (mode) {
-							case eventhandler::handling_mode::ONE_BY_ONE_GUARANTEED:
-								if (!al_wait_for_event_timed(own_queue.get(), &ev, 1.0)) continue;
-								break;
-							case eventhandler::handling_mode::SKIP_TO_BACK_AS_FAST_AS_IT_CAN:
-								if (!al_get_next_event(own_queue.get(), &ev)) {
-									std::this_thread::sleep_for(std::chrono::nanoseconds(500));
+							try {
+								if (!own_queue) {
+									std::this_thread::sleep_for(std::chrono::milliseconds(20));
 									continue;
 								}
-								else if (!al_is_event_queue_empty(own_queue.get())) al_flush_event_queue(own_queue.get());
-								break;
+								switch (mode) {
+								case eventhandler::handling_mode::BUFFERING_AUTO:
+									if (!al_wait_for_event_timed(own_queue.get(), &ev, 1.0)) {
+										continue;
+									}
+									break;
+								case eventhandler::handling_mode::NO_BUFFER_SKIP:
+									if (!al_wait_for_event_timed(own_queue.get(), &ev, 1.0)) {
+										continue;
+									}
+									else if (!al_is_event_queue_empty(own_queue.get())) al_flush_event_queue(own_queue.get()); // no buffer!
+									break;
+								}
+
+								if (ev.type) {
+									RawEvent re(std::move(ev));
+									trigger_func(re);
+								}
 							}
-
-							wrk.unlock();
-
-							if (ev.type) {
-								RawEvent re(ev);
-								trigger_func(re);
+							catch (...) {
+#ifdef _DEBUG
+								std::cout << "__INTERNAL__ __SKIP__ UNKNOWN ERROR AT EVENT_HANDLER" << std::endl;
+#endif
 							}
 						}
 						return;

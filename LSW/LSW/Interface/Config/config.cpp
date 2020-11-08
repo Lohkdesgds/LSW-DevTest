@@ -162,7 +162,7 @@ namespace LSW {
 				this->_get_to_set(sec, mode);
 			}
 
-			bool Config::has(const std::string& sec, const config::config_section_mode mode)
+			bool Config::has(const std::string& sec, const config::config_section_mode mode) const
 			{
 				for (auto& i : conff) {
 					if (i.section_name == sec) {
@@ -172,10 +172,34 @@ namespace LSW {
 				return false;
 			}
 
-			bool Config::has(const std::string& sec, const std::string& key, const config::config_section_mode mode)
+			bool Config::has(const std::string& sec, const std::string& key, const config::config_section_mode mode) const
 			{
 				for (auto& i : conff) {
 					if (i.section_name == sec &&  i.mode == mode){
+						for (auto& j : i.key_and_value) {
+							if (j.first == key) {
+								return true;
+							}
+						}
+					}
+				}
+				return false;
+			}
+
+			bool Config::has(const std::string& sec) const
+			{
+				for (auto& i : conff) {
+					if (i.section_name == sec) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			bool Config::has(const std::string& sec, const std::string& key) const
+			{
+				for (auto& i : conff) {
+					if (i.section_name == sec) {
 						for (auto& j : i.key_and_value) {
 							if (j.first == key) {
 								return true;

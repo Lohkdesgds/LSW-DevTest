@@ -18,7 +18,7 @@ namespace LSW {
 				ALLEGRO_EVENT ev;
 			public:
 				RawEvent() = delete;
-				RawEvent(ALLEGRO_EVENT&);
+				RawEvent(ALLEGRO_EVENT&&);
 
 				/// <summary>
 				/// <para>What event type was it? (ALLEGRO_EVENT_*).</para>
@@ -144,7 +144,7 @@ namespace LSW {
 
 
 			namespace eventhandler {
-				enum class handling_mode {ONE_BY_ONE_GUARANTEED, SKIP_TO_BACK_AS_FAST_AS_IT_CAN};
+				enum class handling_mode {BUFFERING_AUTO, NO_BUFFER_SKIP};
 			}
 
 
@@ -156,7 +156,7 @@ namespace LSW {
 				std::function<void(const RawEvent&)> trigger_func;
 				Tools::SuperThread thr;
 				Tools::SuperMutex thr_m;
-				eventhandler::handling_mode mode = eventhandler::handling_mode::ONE_BY_ONE_GUARANTEED;
+				eventhandler::handling_mode mode = eventhandler::handling_mode::BUFFERING_AUTO;
 
 				void __init();
 			public:
@@ -165,8 +165,8 @@ namespace LSW {
 
 				/// <summary>
 				/// <para>What mode should it do?</para>
-				/// <para>- ONE_BY_ONE_GUARANTEED: Buffers events if necessary, it will go through all events sometime. This is more CPU friendly.</para>
-				/// <para>- SKIP_TO_BACK_AS_FAST_AS_IT_CAN: If it can't keep up, skip to latest and only work with latest up-to-date events. It may use more CPU.</para>
+				/// <para>- BUFFERING_AUTO: Buffers events if necessary, it will go through all events sometime. This is more CPU friendly.</para>
+				/// <para>- NO_BUFFER_SKIP: If it can't keep up, skip to latest and only work with latest up-to-date events. It may use more CPU.</para>
 				/// </summary>
 				/// <param name="{eventhandler::handling_mode}">Mode to handle events.</param>
 				void set_mode(const eventhandler::handling_mode&);

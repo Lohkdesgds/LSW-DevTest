@@ -90,7 +90,7 @@ namespace LSW {
 				/// <param name="{std::string}">Section name.</param>
 				/// <param name="{config::config_section_mode}">Mode it has to be.</param>
 				/// <returns>{bool} True if it does.</returns>
-				bool has(const std::string&, const config::config_section_mode);
+				bool has(const std::string&, const config::config_section_mode) const;
 
 				/// <summary>
 				/// <para>Is there a section with this key and setting set?</para>
@@ -99,7 +99,22 @@ namespace LSW {
 				/// <param name="{std::string}">Key name.</param>
 				/// <param name="{config::config_section_mode}">Mode it has to be.</param>
 				/// <returns>{bool} True if it does.</returns>
-				bool has(const std::string&, const std::string&, const config::config_section_mode);
+				bool has(const std::string&, const std::string&, const config::config_section_mode) const;
+
+				/// <summary>
+				/// <para>Is there a section with this setting set?</para>
+				/// </summary>
+				/// <param name="{std::string}">Section name.</param>
+				/// <returns>{bool} True if it does.</returns>
+				bool has(const std::string&) const;
+
+				/// <summary>
+				/// <para>Is there a section with this key and setting set?</para>
+				/// </summary>
+				/// <param name="{std::string}">Section name.</param>
+				/// <param name="{std::string}">Key name.</param>
+				/// <returns>{bool} True if it does.</returns>
+				bool has(const std::string&, const std::string&) const;
 
 				/// <summary>
 				/// <para>Ensures if value is not present, your default value is set.</para>

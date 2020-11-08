@@ -51,14 +51,36 @@ namespace LSW {
 				}
 
 				/// <summary>
-				/// <para>Adds to the SuperMap internally.</para>
+				/// <para>Gets the shared_ptr of the SuperMap inside this object.</para>
 				/// </summary>
-				/// <param name="{SuperMap}">Another SuperMap with other SuperPairs</param>
+				/// <returns>{SuperMap} Shared_ptr of SuperMap.</returns>
 				template<typename Key, typename Compare = r_cast_t<Key>,
 					std::enable_if_t<std::is_same<Compare, BaseType>::value, int> = 0
 				>
-					void set(SuperMap<TransformedToFuncType> mp) {
+					std::shared_ptr<SuperMap<TransformedToFuncType>> get() const {
+					return map;
+				}
+
+				/// <summary>
+				/// <para>Adds to the SuperMap internally.</para>
+				/// </summary>
+				/// <param name="{SuperMap}">Another SuperMap with other SuperPairs.</param>
+				template<typename Key, typename Compare = r_cast_t<Key>,
+					std::enable_if_t<std::is_same<Compare, BaseType>::value, int> = 0
+				>
+					void set(const SuperMap<TransformedToFuncType>& mp) {
 					map->add(mp);
+				}
+
+				/// <summary>
+				/// <para>Moves to the SuperMap internally.</para>
+				/// </summary>
+				/// <param name="{SuperMap}">Another SuperMap with other SuperPairs.</param>
+				template<typename Key, typename Compare = r_cast_t<Key>,
+					std::enable_if_t<std::is_same<Compare, BaseType>::value, int> = 0
+				>
+					void set(SuperMap<TransformedToFuncType>&& mp) {
+					map->add(std::move(mp));
 				}
 
 				/// <summary>
@@ -68,8 +90,19 @@ namespace LSW {
 				template<typename Key, typename Compare = r_cast_t<Key>,
 					std::enable_if_t<std::is_same<Compare, BaseType>::value, int> = 0
 				>
-					void set(std::shared_ptr<SuperMap<TransformedToFuncType>> mp) {
+					void set(const std::shared_ptr<SuperMap<TransformedToFuncType>>& mp) {
 					map = mp;
+				}
+
+				/// <summary>
+				/// <para>Move the internal shared_ptr from another SuperMap.</para>
+				/// </summary>
+				/// <param name="{shared_ptr}">The other SuperMap this should be cutting from.</param>
+				template<typename Key, typename Compare = r_cast_t<Key>,
+					std::enable_if_t<std::is_same<Compare, BaseType>::value, int> = 0
+				>
+					void set(std::shared_ptr<SuperMap<TransformedToFuncType>>&& mp) {
+					map = std::move(mp);
 				}
 
 				/// <summary>
@@ -80,7 +113,7 @@ namespace LSW {
 				template<typename Key, typename Arg1, typename Compare = r_cast_t<Key>,
 					std::enable_if_t<std::is_same<Compare, BaseType>::value, int> = 0
 				>
-					void set(Arg1 arg1, Key arg2) {
+					void set(const Arg1& arg1, Key arg2) {
 					auto* ptr = (*map)[arg1];
 					if (!ptr) map->add({ [=] {return arg2; }, arg1 });
 					else *ptr = [=] {return arg2; };
@@ -94,7 +127,7 @@ namespace LSW {
 				template<typename Key, typename Arg1, typename Compare = r_cast_t<Key>,
 					std::enable_if_t<std::is_same<Compare, BaseType>::value, int> = 0
 				>
-					void set(Arg1 arg1, std::function<Key(void)> arg2) {
+					void set(const Arg1& arg1, std::function<Key(void)> arg2) {
 					auto* ptr = (*map)[arg1];
 					if (!ptr) map->add({ arg2, arg1 });
 					else *ptr = arg2;
@@ -109,7 +142,7 @@ namespace LSW {
 				template<typename Key, typename Arg1, typename Compare = r_cast_t<Key>,
 					std::enable_if_t<std::is_same<Compare, BaseType>::value, int> = 0
 				>
-					bool get(Arg1 arg1, Key& arg2) {
+					bool get(const Arg1& arg1, Key& arg2) const {
 
 					if (auto* ptr = (*map)[arg1]; ptr) {
 						arg2 = (*ptr)();
@@ -127,7 +160,7 @@ namespace LSW {
 				template<typename Key, typename Arg1, typename Compare = r_cast_t<Key>,
 					std::enable_if_t<std::is_same<Compare, BaseType>::value, int> = 0
 				>
-					bool get(Arg1 arg1, std::function<Key(void)>& arg2) {
+					bool get(const Arg1& arg1, std::function<Key(void)>& arg2) const {
 					if (auto* ptr = (*map)[arg1]; ptr) {
 						arg2 = *ptr;
 						return true;
@@ -143,7 +176,7 @@ namespace LSW {
 				template<typename Ret, typename Arg1, typename Compare = r_cast_t<Ret>,
 					std::enable_if_t<(!std::is_pointer<Ret>::value&& std::is_same<Compare, BaseType>::value), int> = 0
 				>
-					Ret get_direct(Arg1 arg1) {
+					Ret get_direct(const Arg1& arg1) const {
 					if (auto* ptr = (*map)[arg1]; ptr) {
 						return (*ptr)();
 					}
@@ -156,9 +189,9 @@ namespace LSW {
 				/// <param name="{Arg1}">A key.</param>
 				/// <returns>{std::function*} Not nullptr if the function was found.</returns>
 				template<typename Ret, typename Arg1, typename Compare = r_cast_t<std::remove_pointer_t<Ret>>,
-					std::enable_if_t<(std::is_pointer<Ret>::value&& std::is_same<Compare, BaseType>::value), int> = 0
+					std::enable_if_t<(std::is_pointer<Ret>::value && std::is_same<Compare, BaseType>::value), int> = 0
 				>
-					std::function<Compare(void)>* get_direct(Arg1 arg1) {
+					std::function<Compare(void)>* get_direct(const Arg1& arg1) {
 					if (auto* ptr = (*map)(arg1); ptr) {
 						return ptr;
 					}

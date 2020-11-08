@@ -35,7 +35,7 @@ namespace LSW {
 				tim = e.tim;
 			}
 
-			EventTimer::EventTimer(EventTimer&& e) : Event(e)
+			EventTimer::EventTimer(EventTimer&& e) : Event(std::move(e))
 			{
 				if (!e.tim) throw Handling::Abort(__FUNCSIG__, "Incompatible event to copy!");
 				tim = std::move(e.tim);
