@@ -18,6 +18,7 @@ SuperPair header:
 #include <typeindex>
 #include <any>
 
+#include "../../Handling/Abort/abort.h"
 #include "../Common/common.h"
 
 
@@ -74,8 +75,7 @@ namespace LSW {
 				/// <param name="{SuperPair}">A SuperPair of the same type to copy.</param>
 				template<typename K>
 				SuperPair(const SuperPair<K>& sp) {
-					keys = sp.keys;
-					holding = sp.holding;
+					*this = sp;
 				}
 
 				/// <summary>
@@ -84,8 +84,7 @@ namespace LSW {
 				/// <param name="{SuperPair}">A SuperPair of the same type to move.</param>
 				template<typename K>
 				SuperPair(SuperPair<K>&& sp) {
-					keys = std::move(sp.keys);
-					holding = std::move(sp.holding);
+					*this = std::move(sp);
 				}
 
 				/// <summary>
@@ -108,6 +107,28 @@ namespace LSW {
 				{
 					holding = val;
 				}
+
+				/// <summary>
+				/// <para>Copy operator.</para>
+				/// </summary>
+				/// <param name="{SuperPair}">A SuperPair of the same type to copy.</param>
+				template<typename K>
+				void operator=(const SuperPair<K>& sp) {
+					
+					keys = sp.keys;
+					holding = sp.holding;
+				}
+
+				/// <summary>
+				/// <para>Move operator.</para>
+				/// </summary>
+				/// <param name="{SuperPair}">A SuperPair of the same type to move.</param>
+				template<typename K>
+				void operator=(SuperPair<K>&& sp) {
+					keys = std::move(sp.keys);
+					holding = std::move(sp.holding);
+				}
+
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -333,6 +354,41 @@ namespace LSW {
 				{
 					for (auto& i : keys) if (i.type() == typeid(r_cast_t<Q>)) return true;
 					return false;
+				}
+
+				/// <summary>
+				/// <para>Gets if there's this key there.</para>
+				/// </summary>
+				/// <returns>{bool} True if match.</returns>
+				template<typename Q>
+				bool has_type(Q key) const
+				{
+					for (auto& i : keys) {
+						if (i.type() == typeid(key)) {
+							if (std::any_cast<r_cast_t<Q>>(i) == key) return true;
+						}
+					}
+					return false;
+				}
+
+				/// <summary>
+				/// <para>Gets if there's this key there.</para>
+				/// </summary>
+				/// <returns>{bool} True if match.</returns>
+				template<>
+				bool has_type(const char* key) const
+				{
+					return has_type(std::string(key));
+				}
+
+				/// <summary>
+				/// <para>Gets if there's this key there.</para>
+				/// </summary>
+				/// <returns>{bool} True if match.</returns>
+				template<>
+				bool has_type(char* key) const
+				{
+					return has_type(std::string(key));
 				}
 
 

@@ -81,6 +81,24 @@ namespace LSW {
 					sps = std::move(mp.sps);
 				}
 
+				/// <summary>
+				/// <para>Copy operator.</para>
+				/// </summary>
+				/// <param name="{SuperMap}">The other SuperMap to copy.</param>
+				void operator=(const SuperMap& mp)
+				{
+					add(mp);
+				}
+
+				/// <summary>
+				/// <para>Move operator.</para>
+				/// </summary>
+				/// <param name="{SuperMap}">The other SuperMap to move.</param>
+				void operator=(SuperMap&& mp)
+				{
+					sps = std::move(mp.sps);
+				}
+
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 				Simple functions
@@ -120,9 +138,7 @@ namespace LSW {
 				/// <param name="{initializer_list}">A initializer list of SuperPairs.</param>
 				void add(std::initializer_list<SuperPair<T>> spTi) {
 					for (auto& i : spTi) {
-						SuperPair<T> spp;
-						spp = i;
-						add(spp);
+						add(i);
 					}
 				}
 
@@ -202,7 +218,7 @@ namespace LSW {
 				/// <returns>{SuperPair} The SuperPair with that key.</returns>
 				template<typename K>
 				SuperPair<T>* get_pair(K key) {
-					for (auto& i : sps) if (T* ptr; ptr = i[key]) return &i;
+					for (auto& i : sps) if (i.has_type(key)) return &i;
 					return nullptr;
 				}
 
@@ -211,11 +227,11 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{K}">A key.</param>
 				/// <returns>{SuperPair} The SuperPair with that key.</returns>
-				template<typename K, size_t size_o>
+				/*template<typename K, size_t size_o>
 				SuperPair<T>* get_pair(K(&key)[size_o]) {
 					for (auto& i : sps) if (T* ptr; ptr = i(key, size_o)) return &i;
 					return nullptr;
-				}
+				}*/
 
 				/// <summary>
 				/// <para>Gets a SuperPair based on key if matches.</para>
@@ -223,11 +239,11 @@ namespace LSW {
 				/// <param name="{K}">A key.</param>
 				/// <param name="{size_t}">The key length.</param>
 				/// <returns>{SuperPair} The SuperPair with that key.</returns>
-				template<typename K>
+				/*template<typename K>
 				SuperPair<T>* get_pair(K* key, size_t size) {
 					for (auto& i : sps) if (T* ptr; ptr = i(key, size)) return &i;
 					return nullptr;
-				}
+				}*/
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -244,7 +260,9 @@ namespace LSW {
 				/// <returns>{T} The value, if match, else nullptr.</returns>
 				template<typename K>
 				T* operator[](K key) {
-					for (auto& i : sps) if (T* ptr; ptr = i[key]) return ptr;
+					for (auto& i : sps) {
+						if (i.has_type(key)) return i[key];
+					}
 					return nullptr;
 				}
 
@@ -263,7 +281,9 @@ namespace LSW {
 				/// <returns>{T} The value, if match, else nullptr.</returns>
 				template<typename K>
 				const T* operator[](K key) const {
-					for (auto& i : sps) if (const T* ptr = i(key); ptr) return ptr;
+					for (auto& i : sps) {
+						if (i.has_type(key)) return i[key];
+					}
 					return nullptr;
 				}
 			};

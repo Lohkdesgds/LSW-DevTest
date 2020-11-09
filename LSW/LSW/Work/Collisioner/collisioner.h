@@ -23,7 +23,6 @@ namespace LSW {
 				Tools::SuperMutex sprites_m;
 				std::vector<Sprite_Base> sprites;
 
-				Tools::SuperThread thr;
 				double effective_speed = 0.0;
 				std::chrono::milliseconds _last; // for effective speed calculation
 
@@ -44,6 +43,10 @@ namespace LSW {
 
 				// tick interval, seconds
 				void start(const double);
+				// change internal speed, if running
+				void set_speed(const double);
+				// get current expected tps
+				const double get_speed() const;
 				// stop
 				void stop();
 

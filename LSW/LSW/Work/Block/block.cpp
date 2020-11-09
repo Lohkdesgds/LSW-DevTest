@@ -119,14 +119,37 @@ namespace LSW {
 			}
 			Block::Block(const Block& other) : Sprite_Base(other)
 			{
+				custom_draw_task = [&] {draw_self(); };
+	
 				*this = other;
 			}
 			Block::Block(Block&& other) : Sprite_Base(std::move(other))
 			{
+				custom_draw_task = [&] {draw_self(); };
+
 				*this = std::move(other);
 			}
 
-			void Block::operator=(const Block& other)
+			void Block::operator=(const Block& oth)
+			{
+				this->Sprite_Base::clone(oth);
+
+				// difference from Sprite_Base
+				set<std::chrono::milliseconds>(oth.get<std::chrono::milliseconds>());
+			}
+
+			void Block::operator=(Block&& other)
+			{
+				reference.be_reference_to_target(true);
+
+				// difference from Sprite_Base
+				set<std::chrono::milliseconds>(std::move(other.get<std::chrono::milliseconds>()));
+
+				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
+				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
+			}
+
+			void Block::clone(const Block& other)
 			{
 				custom_draw_task = [&] {draw_self(); };
 
@@ -137,27 +160,6 @@ namespace LSW {
 
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
-			}
-
-			void Block::operator=(Block&& other)
-			{
-				custom_draw_task = [&] {draw_self(); };
-
-				reference.be_reference_to_target(true);
-
-				// difference from Sprite_Base
-				set<std::chrono::milliseconds>(std::move(other.get<std::chrono::milliseconds>()));
-
-				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
-				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
-			}
-
-			void Block::twin_up_attributes(const Block& oth)
-			{
-				this->Sprite_Base::twin_up_attributes(oth);
-
-				// difference from Sprite_Base
-				set<std::chrono::milliseconds>(oth.get<std::chrono::milliseconds>());
 			}
 
 			void Block::insert(const Interface::Bitmap& bmp)

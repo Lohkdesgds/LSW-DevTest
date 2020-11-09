@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#define TESTING_ALL
+//#define TESTING_ALL
 
 using namespace LSW::v5;
 using namespace LSW::v5::Interface;
@@ -61,6 +61,9 @@ int main() {
 		auto lmao = source.create("_test");
 
 		auto blk = blocks.create("_test_block");
+		auto blk2 = blocks.create("_test_block_mouse");
+		auto blk3 = blocks.create("_test_col");
+		auto blk4 = blocks.create("_test_block2");
 
 		auto foo = source_font.create("DEFAULT");
 
@@ -88,7 +91,9 @@ int main() {
 				logg << L::SLF << fsr() << "Loaded a bitmap from atlas SUCESSFULLY" << L::ELF;
 
 				blk->insert(lmao);
-
+				blk2->insert(lmao);
+				blk3->insert(lmao);
+				blk4->insert(lmao);
 			}
 		}
 		if (!gud) {
@@ -111,43 +116,93 @@ int main() {
 
 	working_on.wait();
 	
-	Tools::Resource<Work::Block> blk;
+	Tools::Resource<Work::Block> blk, blk2, blk3, blk4;
+
 	if (!blocks.get("_test_block", blk)) {
 		logg << L::SLF << fsr(E::ERRR) << "Block wasn't found somehow..." << L::ELF;
 		core.shutdown();
 		return -1;
 	}
+	
+	if (!blocks.get("_test_block_mouse", blk2)) {
+		logg << L::SLF << fsr(E::ERRR) << "Block wasn't found somehow..." << L::ELF;
+		core.shutdown();
+		return -1;
+	}
+	
+	if (!blocks.get("_test_col", blk3)) {
+		logg << L::SLF << fsr(E::ERRR) << "Block wasn't found somehow..." << L::ELF;
+		core.shutdown();
+		return -1;
+	}
+
+	if (!blocks.get("_test_block2", blk4)) {
+		logg << L::SLF << fsr(E::ERRR) << "Block wasn't found somehow..." << L::ELF;
+		core.shutdown();
+		return -1;
+	}
+	
 
 	//blk->set<double>(Work::sprite::e_double::TARG_POSX, [] { return (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5; });
 	//blk->set<double>(Work::sprite::e_double::TARG_POSY, [] { return (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5; });
-	blk->set<double>(Work::sprite::e_double::TARG_POSX, [] { return 0.5 * cos(MILLI_NOW.count() / 1227.0); });
-	blk->set<double>(Work::sprite::e_double::TARG_POSY, [] { return 0.5 * sin(MILLI_NOW.count() / 789.0); });
+	blk->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
+	blk->set<double>(Work::sprite::e_double::TARG_POSY, [] { return 0.25 + 0.55 * sin(MILLI_NOW.count() / 689.0); });
+	blk->set<double>(Work::sprite::e_double::SCALE_G, 0.8);
+	blk->set<double>(Work::sprite::e_double::SCALE_Y, 0.3);
 	blk->set(Work::sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
+	//blk->set(Work::sprite::e_boolean::SHOWBOX, true);
 
-	//blk->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
-	//blk->set<double>(Work::sprite::e_double::TARG_POSY, 0.0);
-	blk->set<double>(Work::sprite::e_double::SCALE_G, 0.5);
+	blk4->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
+	blk4->set<double>(Work::sprite::e_double::TARG_POSY, [] { return -0.25 + 0.55 * sin(MILLI_NOW.count() / 689.0); });
+	blk4->set<double>(Work::sprite::e_double::SCALE_G, 0.8);
+	blk4->set<double>(Work::sprite::e_double::SCALE_Y, 0.3);
+	blk4->set(Work::sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
 
 	blk->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&] {
 		Logger logg;
 #ifdef _DEBUG
 		logg << L::SL << fsr() << "Clicked." << L::EL;
 
-		logg << L::SL << fsr() << "LAST_COLLISION_TIME: " << blk->get_direct<double>(Work::sprite::e_double_readonly::LAST_COLLISION_TIME) << L::EL;
-		logg << L::SL << fsr() << "LAST_DRAW: " << blk->get_direct<double>(Work::sprite::e_double_readonly::LAST_DRAW) << L::EL;
-		logg << L::SL << fsr() << "LAST_UPDATE: " << blk->get_direct<double>(Work::sprite::e_double_readonly::LAST_UPDATE) << L::EL;
-		logg << L::SL << fsr() << "UPDATE_DELTA: " << blk->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
-		logg << L::SL << fsr() << "POS: " << blk->get_direct<double>(Work::sprite::e_double_readonly::POSX) << "x" << blk->get_direct<double>(Work::sprite::e_double_readonly::POSY) << L::EL;
-		logg << L::SL << fsr() << "TRGPOS: " << blk->get_direct<double>(Work::sprite::e_double::TARG_POSX) << "x" << blk->get_direct<double>(Work::sprite::e_double::TARG_POSY) << L::EL;
+		logg << L::SL << fsr() << "0 UPDATE_DELTA: " << blk->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+		logg << L::SL << fsr() << "2 UPDATE_DELTA: " << blk2->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+		logg << L::SL << fsr() << "3 UPDATE_DELTA: " << blk3->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+		logg << L::SL << fsr() << "4 UPDATE_DELTA: " << blk4->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
 #else
 		logg << L::SL << fsr() << "Uau vc sabe clicar, boa!" << L::EL;
 #endif
 	});
 
+
+	blk2->set<double>(Work::sprite::e_double::TARG_POSX, [&] { return core.get_config().get_as<double>("mouse", "x"); });
+	blk2->set<double>(Work::sprite::e_double::TARG_POSY, [&] { return core.get_config().get_as<double>("mouse", "y"); });
+	blk2->set<double>(Work::sprite::e_double::SCALE_G, 0.15);
+	blk2->set(Work::sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
+	//blk2->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+	//blk2->set(Work::sprite::e_boolean::SHOWBOX, true);
+	//blk2->set(Work::sprite::e_color::COLOR, Color(255, 255, 255));
+
+
+
+	blk3->set<double>(Work::sprite::e_double::TARG_POSX, -0.65);
+	blk3->set<double>(Work::sprite::e_double::TARG_POSY, -0.5);
+	blk3->set<double>(Work::sprite::e_double::SCALE_G, 0.20);
+	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);
+	//blk3->set<double>(Work::sprite::e_double::ROUGHNESS, 0.1);
+	//blk2->set(Work::sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
+	//blk2->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+	//blk3->set(Work::sprite::e_boolean::SHOWBOX, true);
+	//blk2->set(Work::sprite::e_color::COLOR, Color(255, 255, 255));
+
+
+
+
 	Work::Collisioner collision_control(core.get_config());
 	collision_control.insert(blk);
+	collision_control.insert(blk2);
+	collision_control.insert(blk3);
+	collision_control.insert(blk4);
 
-	collision_control.start(1.0 / 13);
+	collision_control.start(1.0 / 20);
 
 	{
 		Tools::SuperResource<Font> source_font;
@@ -159,6 +214,9 @@ int main() {
 			///got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
 			
 			blk->draw(c);
+			blk4->draw(c);
+			blk2->draw(c);
+			blk3->draw(c);
 			//blk->update_and_clear(core.get_config());
 
 			//if (track->exists()) {
@@ -312,6 +370,55 @@ int main() {
 				d.set_vsync(!d.get_vsync());
 			}
 				break;
+			case ALLEGRO_KEY_F1: 
+			{
+				auto d = 1.0 / collision_control.get_speed();
+				if (d < 0.0) {
+					logg << L::SL << fsr() << "Cannot change acceleration." << L::EL;
+					break;
+				}
+
+				if (d > 50.0) {
+					d -= 10.0;
+				}
+				else if (d > 20.0) {
+					d -= 5.0;
+				}
+				else if (d > 10.0) {
+					d -= 2.0;
+				}
+				else if (d > 5.0) {
+					d -= 1.0;
+				}
+				else if (d < 5.0) d = 5.0;
+				logg << L::SL << fsr() << "Slowing down collision system, now at " << (int)d << " tps." << L::EL;
+				collision_control.set_speed(1.0 / d);
+			}
+				break;
+			case ALLEGRO_KEY_F2: 
+			{
+				auto d = 1.0 / collision_control.get_speed();
+				if (d < 0.0) {
+					logg << L::SL << fsr() << "Cannot change acceleration." << L::EL;
+					break;
+				}
+
+				if (d < 10.0) {
+					d += 1.0;
+				}
+				else if (d < 20.0) {
+					d += 2.0;
+				}
+				else if (d < 50.0) {
+					d += 5.0;
+				}
+				else {
+					d += 10.0;
+				}
+				logg << L::SL << fsr() << "Accelerating collision system, now at " << (int)d << " tps." << L::EL;
+				collision_control.set_speed(1.0 / d);
+			}
+				break;
 			default:
 			{
 				logg << L::SL << fsr() << "KEY pressed: &5" << ev.keyboard_event().keycode << L::EL;
@@ -322,9 +429,10 @@ int main() {
 		}
 	});
 
+	core.yield();
+
 	collision_control.stop();
 
-	core.yield();
 	core.shutdown();
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));

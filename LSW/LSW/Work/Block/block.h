@@ -18,19 +18,19 @@ namespace LSW {
 				enum class e_boolean { SET_FRAME_VALUE_READONLY };
 				enum class e_double { FRAMES_PER_SECOND, TIE_SIZE_TO_DISPLAY_PROPORTION };
 
-				const Tools::SuperMap<std::function<std::chrono::milliseconds(void)>>		e_chronomillis_readonly_defaults = {
-					{[] {return std::chrono::milliseconds(0);},																		(e_chronomillis_readonly::LAST_FRAME),					("last_frame")},
-					{[] {return std::chrono::milliseconds(0);},																		(e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION),	("last_tie_verification")}
+				const Tools::SuperMap<Tools::sfm_safe_feature<std::chrono::milliseconds>>		e_chronomillis_readonly_defaults = {
+					{std::chrono::milliseconds(0),																		(e_chronomillis_readonly::LAST_FRAME),					("last_frame")},
+					{std::chrono::milliseconds(0),																		(e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION),	("last_tie_verification")}
 				};
-				const Tools::SuperMap<std::function<int(void)>>			e_integer_defaults = {
-					{[] {return 0; },																								(e_integer::FRAME),										("frame")}
+				const Tools::SuperMap<Tools::sfm_safe_feature<int>>			e_integer_defaults = {
+					{0,																									(e_integer::FRAME),										("frame")}
 				};
-				const Tools::SuperMap<std::function<bool(void)>>		e_boolean_defaults = {
-					{[] {return false; },																							(e_boolean::SET_FRAME_VALUE_READONLY),					("set_frame_readonly")}
+				const Tools::SuperMap<Tools::sfm_safe_feature<bool>>		e_boolean_defaults = {
+					{false,																								(e_boolean::SET_FRAME_VALUE_READONLY),					("set_frame_readonly")}
 				};
-				const Tools::SuperMap<std::function<double(void)>>		e_double_defaults = {
-					{[] {return 10.0; },																							(e_double::FRAMES_PER_SECOND),							("frames_per_second")},
-					{[] {return 0.0; },																								(e_double::TIE_SIZE_TO_DISPLAY_PROPORTION),				("tie_size_to_display_proportion")}
+				const Tools::SuperMap<Tools::sfm_safe_feature<double>>		e_double_defaults = {
+					{10.0,																								(e_double::FRAMES_PER_SECOND),							("frames_per_second")},
+					{0.0,																								(e_double::TIE_SIZE_TO_DISPLAY_PROPORTION),				("tie_size_to_display_proportion")}
 				};
 
 				constexpr size_t maximum_bitmap_amount = static_cast<size_t>(std::numeric_limits<int>::max());
@@ -69,7 +69,7 @@ namespace LSW {
 
 
 				// set to blindly use this comrade's attributes as theirs (this must be Block)
-				void twin_up_attributes(const Block&);
+				void clone(const Block&);
 
 
 				// add new copy

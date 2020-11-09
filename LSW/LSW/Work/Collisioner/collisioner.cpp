@@ -18,8 +18,9 @@ namespace LSW {
 				for (auto& i : sprites) {
 					i.update_and_clear(conf, true); // process positioning
 
-					for (auto& j : sprites) {
-						if (i.is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, j)) i.collide(j, true);
+					for (const auto& j : sprites) {
+						if (!i.is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, j))
+							i.collide(j, true);
 					}
 				}
 
@@ -38,10 +39,8 @@ namespace LSW {
 			void Collisioner::insert(const Sprite_Base& s)
 			{
 				Tools::AutoLock luck(sprites_m);
-				for (auto& i : sprites) { if (i.is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, s)) return; }
-				Sprite_Base cpy;
-				cpy.twin_up_attributes(s);
-				sprites.push_back(std::move(cpy));
+				for (const auto& i : sprites) { if (i.is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, s)) return; }
+				sprites.push_back(s);
 			}
 
 			void Collisioner::remove(const Sprite_Base& s)
@@ -56,8 +55,8 @@ namespace LSW {
 
 			void Collisioner::start(const double dt)
 			{
-				if (thr.running()) throw Handling::Abort(__FUNCSIG__, "Already running!", Handling::abort::abort_level::GIVEUP);
-				if (dt <= 0.0) throw Handling::Abort(__FUNCSIG__, "Already running!", Handling::abort::abort_level::GIVEUP);
+				if (evhdl.running()) throw Handling::Abort(__FUNCSIG__, "Already running!", Handling::abort::abort_level::GIVEUP);
+				if (dt <= 0.0) throw Handling::Abort(__FUNCSIG__, "Invalid delta!", Handling::abort::abort_level::GIVEUP);
 
 				tick.set_delta(dt);
 				_last = MILLI_NOW;
@@ -71,12 +70,25 @@ namespace LSW {
 				tick.start();
 			}
 
+			void Collisioner::set_speed(const double dt)
+			{
+				if (dt <= 0.0) throw Handling::Abort(__FUNCSIG__, "Invalid delta!", Handling::abort::abort_level::GIVEUP);
+				if (evhdl.running()) {
+					tick.set_delta(dt);
+				}
+			}
+
+			const double Collisioner::get_speed() const
+			{
+				if (evhdl.running()) {
+					return tick.get_delta();
+				}
+				return -1.0;
+			}
+
 			void Collisioner::stop()
 			{
-				if (thr.running()) {
-					thr.stop();
-					thr.join();
-
+				if (evhdl.running()) {
 					tick.stop();
 					evhdl.reset();
 					effective_speed = 0.0;

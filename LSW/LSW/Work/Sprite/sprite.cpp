@@ -11,6 +11,8 @@ namespace LSW {
 				posy = cpy.posy;
 				sizx = cpy.sizx;
 				sizy = cpy.sizy;
+				dx_max = cpy.dx_max;
+				dy_max = cpy.dy_max;
 				memcpy_s(&directions_cases, sizeof(directions_cases), &cpy.directions_cases, sizeof(cpy.directions_cases));
 				was_col = cpy.was_col;
 			}
@@ -27,19 +29,22 @@ namespace LSW {
 
 				if (is_col) {
 					if (fabs(diff_x) < fabs(diff_y)) {
+						if (fabs(diff_x) > fabs(dx_max)) dx_max = diff_x;
+						
 						if (dist_x > 0.0) {
-							directions_cases[static_cast<int>(sprite::e_direction::WEST)]++; // VEM DO WEST
+							directions_cases[static_cast<int>(sprite::e_direction_array_version::WEST)]++; // VEM DO WEST
 						}
 						else {
-							directions_cases[static_cast<int>(sprite::e_direction::EAST)]++; // VEM DO EAST
+							directions_cases[static_cast<int>(sprite::e_direction_array_version::EAST)]++; // VEM DO EAST
 						}
 					}
 					else {
+						if (fabs(diff_y) > fabs(dy_max)) dy_max = diff_y;
 						if (dist_y > 0.0) {
-							directions_cases[static_cast<int>(sprite::e_direction::NORTH)]++; // VEM DO NORTH
+							directions_cases[static_cast<int>(sprite::e_direction_array_version::NORTH)]++; // VEM DO NORTH
 						}
 						else {
-							directions_cases[static_cast<int>(sprite::e_direction::SOUTH)]++; // VEM DO SOUTH
+							directions_cases[static_cast<int>(sprite::e_direction_array_version::SOUTH)]++; // VEM DO SOUTH
 						}
 					}
 				}
@@ -58,54 +63,61 @@ namespace LSW {
 				return is_col;
 			}
 
-			sprite::e_direction Sprite_Base::easier_collision_handle::process_result()
+			int Sprite_Base::easier_collision_handle::process_result()
 			{
 				bool n, s, w, e;
-				n = directions_cases[static_cast<int>(sprite::e_direction::NORTH)] > 0;
-				s = directions_cases[static_cast<int>(sprite::e_direction::SOUTH)] > 0;
-				w = directions_cases[static_cast<int>(sprite::e_direction::WEST)] > 0;
-				e = directions_cases[static_cast<int>(sprite::e_direction::EAST)] > 0;
+				n = directions_cases[static_cast<int>(sprite::e_direction_array_version::NORTH)] > 0;
+				s = directions_cases[static_cast<int>(sprite::e_direction_array_version::SOUTH)] > 0;
+				w = directions_cases[static_cast<int>(sprite::e_direction_array_version::WEST)] > 0;
+				e = directions_cases[static_cast<int>(sprite::e_direction_array_version::EAST)] > 0;
+
+				const int east = static_cast<int>(sprite::e_direction::EAST);
+				const int west = static_cast<int>(sprite::e_direction::WEST);
+				const int north = static_cast<int>(sprite::e_direction::NORTH);
+				const int south = static_cast<int>(sprite::e_direction::SOUTH);
+
 
 				if (n) { // north
 					if (w && !e) {
-						return sprite::e_direction::EAST; // GOTO EAST
+						return south | east; // GOTO EAST
 					}
 					if (e && !w) {
-						return sprite::e_direction::WEST; // GOTO WEST
+						return south | west; // GOTO WEST
 					}
 					if (s) {
-						if (directions_cases[static_cast<int>(sprite::e_direction::NORTH)] > directions_cases[static_cast<int>(sprite::e_direction::SOUTH)]) return sprite::e_direction::SOUTH;
-						if (directions_cases[static_cast<int>(sprite::e_direction::SOUTH)] > directions_cases[static_cast<int>(sprite::e_direction::NORTH)]) return sprite::e_direction::NORTH;
-						return sprite::e_direction::NONE; // NO GOTO
+						if (directions_cases[static_cast<int>(sprite::e_direction_array_version::NORTH)] > directions_cases[static_cast<int>(sprite::e_direction_array_version::SOUTH)]) return south;
+						if (directions_cases[static_cast<int>(sprite::e_direction_array_version::SOUTH)] > directions_cases[static_cast<int>(sprite::e_direction_array_version::NORTH)]) return north;
+						return 0; // NO GOTO
 					}
-					return sprite::e_direction::SOUTH; // GOTO SOUTH
+					return south; // GOTO SOUTH
 				}
 				else if (s) { //south
 					if (w && !e) {
-						return sprite::e_direction::EAST; // GOTO EAST
+						return north | east; // GOTO EAST
 					}
 					if (e && !w) {
-						return sprite::e_direction::WEST; // GOTO WEST
+						return north | west; // GOTO WEST
 					}
-					return sprite::e_direction::NORTH; // GOTO NORTH
+					return north; // GOTO NORTH
 				}
 				else if (w) { // west
 					if (e) {
-						if (directions_cases[static_cast<int>(sprite::e_direction::EAST)] > directions_cases[static_cast<int>(sprite::e_direction::WEST)]) return sprite::e_direction::WEST;
-						if (directions_cases[static_cast<int>(sprite::e_direction::WEST)] > directions_cases[static_cast<int>(sprite::e_direction::EAST)]) return sprite::e_direction::EAST;
-						return sprite::e_direction::NONE;
+						if (directions_cases[static_cast<int>(sprite::e_direction_array_version::EAST)] > directions_cases[static_cast<int>(sprite::e_direction_array_version::WEST)]) return west;
+						if (directions_cases[static_cast<int>(sprite::e_direction_array_version::WEST)] > directions_cases[static_cast<int>(sprite::e_direction_array_version::EAST)]) return east;
+						return 0;
 					}
-					return sprite::e_direction::EAST;
+					return east;
 				}
 				else if (e) { // east
-					return sprite::e_direction::WEST;
+					return west;
 				}
-				return sprite::e_direction::NONE;
+				return 0;
 			}
 
 			void Sprite_Base::easier_collision_handle::reset_directions()
 			{
 				for (auto& i : directions_cases) i = 0;
+				dx_max = dy_max = 0.0;
 			}
 
 			void Sprite_Base::easier_collision_handle::setup(const double px, const double py, const double sx, const double sy)
@@ -123,6 +135,8 @@ namespace LSW {
 			{
 				/*if (!data_sprite_base) throw Handling::Abort(__FUNCSIG__, "Failed to create Sprite base's data!");
 				data_sprite_base->original_this = (void*)this;*/
+				Handling::init_basic();
+				Handling::init_graphics();
 
 				set<sprite::functional>(sprite::e_functional_defaults);
 				set<double>(sprite::e_double_defaults);
@@ -153,19 +167,7 @@ namespace LSW {
 				hook(e, std::function<void(void)>());
 			}*/
 
-			void Sprite_Base::twin_up_attributes(const Sprite_Base& oth) // reference
-			{
-				set<sprite::functional>(oth.get<sprite::functional>());
-				set<sprite::e_tie_functional>(oth.get<sprite::e_tie_functional>());
-				set<double>(oth.get<double>());
-				set<bool>(oth.get<bool>());
-				set<std::string>(oth.get<std::string>());
-				set<int>(oth.get<int>());
-				set<Interface::Color>(oth.get<Interface::Color>());
-				set<uintptr_t>(oth.get<uintptr_t>());
-			}
-
-			void Sprite_Base::operator=(const Sprite_Base& other)
+			void Sprite_Base::clone(const Sprite_Base& other) // reference
 			{
 				set<sprite::functional>(*other.get<sprite::functional>());
 				set<sprite::e_tie_functional>(*other.get<sprite::e_tie_functional>());
@@ -175,6 +177,18 @@ namespace LSW {
 				set<int>(*other.get<int>());
 				set<Interface::Color>(*other.get<Interface::Color>());
 				set<uintptr_t>(*other.get<uintptr_t>());
+			}
+
+			void Sprite_Base::operator=(const Sprite_Base& oth)
+			{
+				set<sprite::functional>(oth.get<sprite::functional>());
+				set<sprite::e_tie_functional>(oth.get<sprite::e_tie_functional>());
+				set<double>(oth.get<double>());
+				set<bool>(oth.get<bool>());
+				set<std::string>(oth.get<std::string>());
+				set<int>(oth.get<int>());
+				set<Interface::Color>(oth.get<Interface::Color>());
+				set<uintptr_t>(oth.get<uintptr_t>());
 			}
 
 			void Sprite_Base::operator=(Sprite_Base&& other)
@@ -194,13 +208,13 @@ namespace LSW {
 
 				if (get_direct<uintptr_t>(sprite::e_uintptrt::DATA_FROM) == (uintptr_t)this) { // only original copy should update parameters
 					//if (is_eq(sprite::e_boolean::SHOWBOX, true) || is_eq(sprite::e_boolean::SHOWDOT, true)) {
-					Interface::Camera clean_camera = cam;
-					clean_camera.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
 
 					const auto affected_by_cam = get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM);
 					const auto targ_rotation = get_direct<double>(sprite::e_double::TARG_ROTATION);
-					const auto targ_posx = get_direct<double>(sprite::e_double::TARG_POSX);
-					const auto targ_posy = get_direct<double>(sprite::e_double::TARG_POSY);
+					const auto real_targ_posx = get_direct<double>(sprite::e_double::TARG_POSX);
+					const auto real_targ_posy = get_direct<double>(sprite::e_double::TARG_POSY);
+					const auto targ_posx = get_direct<double>(sprite::e_double_readonly::PROJECTED_POSX);
+					const auto targ_posy = get_direct<double>(sprite::e_double_readonly::PROJECTED_POSY);
 					const auto scale_g = get_direct<double>(sprite::e_double::SCALE_G);
 					const auto scale_x = get_direct<double>(sprite::e_double::SCALE_X);
 					const auto scale_y = get_direct<double>(sprite::e_double::SCALE_Y);
@@ -215,6 +229,8 @@ namespace LSW {
 						cam.apply();
 					}
 					else {
+						Interface::Camera clean_camera = cam;
+						clean_camera.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
 						clean_camera.apply();
 					}
 
@@ -224,7 +240,7 @@ namespace LSW {
 					double dt = timee - last_draw_v;
 					set(sprite::e_double_readonly::LAST_DRAW, timee);
 
-					double perc_run = 1.0;// ((update_delta > 2.0 && update_delta <= 50.0) ? update_delta : 10.0)* dt;		// ex: 5 per sec * 0.2 (1/5 sec) = 1, so posx = actual posx...
+					double perc_run = (update_delta > 0.0 ? (0.5 / update_delta) : 0.1) * pow(dt, 0.86);		// ex: 5 per sec * 0.2 (1/5 sec) = 1, so posx = actual posx...
 					if (perc_run > 1.0) perc_run = 1.0;					// 1.0 is "set value"
 					if (perc_run < 1.0 / 10000) perc_run = 1.0 / 10000; // can't be infinitely smooth right? come on
 
@@ -244,10 +260,16 @@ namespace LSW {
 						const double calculated_scale_y = scale_g * scale_y;
 
 						al_draw_filled_rectangle(
-							/* X1: */ targ_posx - calculated_scale_x * 0.5,
-							/* Y1: */ targ_posy - calculated_scale_y * 0.5,
-							/* X2: */ targ_posx + calculated_scale_x * 0.5,
-							/* Y2: */ targ_posy + calculated_scale_y * 0.5,
+							/* X1: */ real_targ_posx - calculated_scale_x * 0.5,
+							/* Y1: */ real_targ_posy - calculated_scale_y * 0.5,
+							/* X2: */ real_targ_posx + calculated_scale_x * 0.5,
+							/* Y2: */ real_targ_posy + calculated_scale_y * 0.5,
+							al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
+						al_draw_filled_rectangle(
+							/* X1: */ real_targ_posx - calculated_scale_x * 0.515,
+							/* Y1: */ real_targ_posy - calculated_scale_y * 0.515,
+							/* X2: */ real_targ_posx + calculated_scale_x * 0.515,
+							/* Y2: */ real_targ_posy + calculated_scale_y * 0.515,
 							al_map_rgba(180, easy_collision.was_col ? 90 : 180, easy_collision.was_col ? 90 : 180, 180));
 					}
 
@@ -255,7 +277,7 @@ namespace LSW {
 						al_draw_filled_circle(
 							/* X1: */ posx_v,
 							/* X1: */ posy_v,
-							/* SCL */ 0.1f * (fabs(0.30f) + 0.12f),
+							/* SCL */ 0.05f,
 							al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
 					}
 					//}
@@ -272,10 +294,10 @@ namespace LSW {
 
 				if (oth.is_eq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE))) return; // no collision
 				if (is_eq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
-				if (oth.is_eq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
+				//if (oth.is_eq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
 
 				if (easy_collision.overlap(oth.easy_collision)) {
-					collision_list.push_back(oth.get_direct<std::string>(sprite::e_string::ID));
+					//collision_list.push_back(oth.get_direct<std::string>(sprite::e_string::ID));
 				}
 
 			}
@@ -284,17 +306,12 @@ namespace LSW {
 			{
 				if (!run_anyway && get_direct<uintptr_t>(sprite::e_uintptrt::DATA_FROM) != (uintptr_t)this) return; // this is a copy following attrbutes from somewhere else, no duplication in update
 
-				copy_final_m.lock();
-				copy_final = collision_list;
-				collision_list.clear();
-				copy_final_m.unlock();
-
 				{
-					auto update_now = al_get_time();
-					auto last_update = get_direct<double>(sprite::e_double_readonly::LAST_UPDATE);
+					double update_now = al_get_time();
+					double last_update = get_direct<double>(sprite::e_double_readonly::LAST_UPDATE);
 					if (update_now - last_update > sprite::maximum_time_between_collisions) last_update = update_now - 1.0;
 					set(sprite::e_double_readonly::LAST_UPDATE, update_now);
-					set(sprite::e_double_readonly::UPDATE_DELTA, 1.0 / (update_now - last_update));
+					set(sprite::e_double_readonly::UPDATE_DELTA, (update_now - last_update));
 				}
 
 				const auto roughness = get_direct<double>(sprite::e_double::ROUGHNESS);
@@ -312,33 +329,38 @@ namespace LSW {
 					// task to be done (no auto-clean, internal, only if layer (as above))
 					if (custom_think_task) custom_think_task();
 
-					auto nogo = easy_collision.process_result();
+					auto nowgo = easy_collision.process_result();
+					double sum_dx = 0.0;
+					double sum_dy = 0.0;
 
-					switch (nogo) {
-					case sprite::e_direction::SOUTH:
+					if (nowgo & static_cast<int>(sprite::e_direction::SOUTH)) {
 						if (get_direct<double>(sprite::e_double_readonly::SPEED_Y) < 0.0) {
 							set(sprite::e_double_readonly::SPEED_Y, -roughness * get_direct<double>(sprite::e_double::ELASTICITY_Y) * get_direct<double>(sprite::e_double_readonly::SPEED_Y));
-							//get_direct<double>(sprite::e_double::ACCELERATION_Y] = sprite::minimum_sprite_accel_collision;
+							//set(sprite::e_double::ACCELERATION_Y, sprite::minimum_sprite_accel_collision);
 						}
-						break;
-					case sprite::e_direction::NORTH:
+						sum_dy = fabs(easy_collision.dy_max);
+					}
+					else if (nowgo & static_cast<int>(sprite::e_direction::NORTH)) {
 						if (get_direct<double>(sprite::e_double_readonly::SPEED_Y) > 0.0) {
 							set(sprite::e_double_readonly::SPEED_Y, -roughness * get_direct<double>(sprite::e_double::ELASTICITY_Y) * get_direct<double>(sprite::e_double_readonly::SPEED_Y));
-							//get_direct<double>(sprite::e_double::ACCELERATION_Y] = -sprite::minimum_sprite_accel_collision;
+							//set(sprite::e_double::ACCELERATION_Y, -sprite::minimum_sprite_accel_collision);
 						}
-						break;
-					case sprite::e_direction::EAST:
+						sum_dy = -fabs(easy_collision.dy_max);
+					}
+
+					if (nowgo & static_cast<int>(sprite::e_direction::EAST)) {
 						if (get_direct<double>(sprite::e_double_readonly::SPEED_X) < 0.0) {
 							set(sprite::e_double_readonly::SPEED_X, -roughness * get_direct<double>(sprite::e_double::ELASTICITY_X) * get_direct<double>(sprite::e_double_readonly::SPEED_X));
-							//get_direct<double>(sprite::e_double::ACCELERATION_X] = sprite::minimum_sprite_accel_collision;
+							//set(sprite::e_double::ACCELERATION_X, sprite::minimum_sprite_accel_collision);
 						}
-						break;
-					case sprite::e_direction::WEST:
+						sum_dx = fabs(easy_collision.dx_max);
+					}
+					else if (nowgo & static_cast<int>(sprite::e_direction::WEST)) {
 						if (get_direct<double>(sprite::e_double_readonly::SPEED_X) > 0.0) {
 							set(sprite::e_double_readonly::SPEED_X, -roughness * get_direct<double>(sprite::e_double::ELASTICITY_X) * get_direct<double>(sprite::e_double_readonly::SPEED_X));
-							//get_direct<double>(sprite::e_double::ACCELERATION_X] = -sprite::minimum_sprite_accel_collision;
+							//set(sprite::e_double::ACCELERATION_X, -sprite::minimum_sprite_accel_collision);
 						}
-						break;
+						sum_dx = -fabs(easy_collision.dx_max);
 					}
 
 					const auto targ_posx_c = get_direct<double>(sprite::e_double::TARG_POSX);
@@ -347,16 +369,23 @@ namespace LSW {
 					const auto speed_y_c = get_direct<double>(sprite::e_double_readonly::SPEED_Y);
 
 
-					set<double>(sprite::e_double::TARG_POSX, [targ_posx_c, speed_x_c] { return targ_posx_c + speed_x_c; });
+					set<double>(sprite::e_double::TARG_POSX, targ_posx_c + speed_x_c + sum_dx);
+					set<double>(sprite::e_double_readonly::PROJECTED_POSX, targ_posx_c + speed_x_c + 2.0 * (sum_dx));
 					set(sprite::e_double_readonly::SPEED_X, (get_direct<double>(sprite::e_double_readonly::SPEED_X) + get_direct<double>(sprite::e_double::ACCELERATION_X)) * roughness);
 
-					set<double>(sprite::e_double::TARG_POSY, [targ_posy_c, speed_y_c] { return targ_posy_c + speed_y_c; });
+					set<double>(sprite::e_double::TARG_POSY, targ_posy_c + speed_y_c + sum_dy);
+					set<double>(sprite::e_double_readonly::PROJECTED_POSY, targ_posy_c + speed_y_c + 2.0 * (sum_dy));
 					set(sprite::e_double_readonly::SPEED_Y, (get_direct<double>(sprite::e_double_readonly::SPEED_Y) + get_direct<double>(sprite::e_double::ACCELERATION_Y)) * roughness);
 
 					/*if (auto spr = (get_direct<double>(sprite::e_double::SPEED_ROTATION])(); spr != 0.0) {
 						double act = (get_direct<double>(sprite::e_double::TARG_ROTATION])();
 						get_direct<double>(sprite::e_double::TARG_ROTATION] = [spr,act] {return act + spr; };
 					}*/
+				}
+
+				else { // read only
+					set<double>(sprite::e_double_readonly::PROJECTED_POSX, get_direct<double>(sprite::e_double::TARG_POSX));
+					set<double>(sprite::e_double_readonly::PROJECTED_POSY, get_direct<double>(sprite::e_double::TARG_POSY));
 				}
 
 
@@ -415,12 +444,12 @@ namespace LSW {
 			Sprite_Base::easier_collision_handle& Sprite_Base::get_collision()
 			{
 				return easy_collision;
-			}*/
+			}
 			const std::vector<std::string> Sprite_Base::get_collided_with_list()
 			{
 				Tools::AutoLock luck(copy_final_m);
 				return copy_final;
-			}
+			}*/
 
 		}
 	}

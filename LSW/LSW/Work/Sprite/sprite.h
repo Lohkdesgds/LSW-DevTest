@@ -16,6 +16,7 @@
 */
 
 #include "../../Handling/Abort/abort.h"
+#include "../../Handling/Initialize/initialize.h"
 #include "../../Tools/SuperMap/SuperMap.h"
 #include "../../Tools/SuperFunctionalMap/superfunctionalmap.h"
 #include "../../Tools/SuperMutex/supermutex.h"
@@ -32,7 +33,7 @@ namespace LSW {
 				COL_MINDIST_... = the distance it has to move in ... (on a collision tick)
 				...UPDATE... = automatic smoothing based on collision calls
 				*/
-				enum class e_double_readonly { SPEED_X, SPEED_Y, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */, LAST_DRAW, LAST_UPDATE, UPDATE_DELTA, POSX, POSY, ROTATION, COL_MINDIST_X, COL_MINDIST_Y };
+				enum class e_double_readonly { SPEED_X, SPEED_Y, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */, LAST_DRAW, LAST_UPDATE, UPDATE_DELTA, POSX, POSY, PROJECTED_POSX, PROJECTED_POSY, ROTATION, COL_MINDIST_X, COL_MINDIST_Y };
 				enum class e_boolean_readonly { COLLISION_MOUSE_ON, COLLISION_MOUSE_CLICK, COLLISION_COLLIDED /* related to: LAST_COLLISION_TIME */ };
 				enum class e_tief_readonly { LAST_STATE };
 
@@ -50,86 +51,97 @@ namespace LSW {
 					COLLISION_NONE // no collision behaviour at all
 				};
 
-				enum class e_direction { NORTH, SOUTH, EAST, WEST, NONE };
+				enum class e_direction_array_version {
+					NORTH, SOUTH, EAST, WEST
+				};
+				enum class e_direction {
+					NONE = 0,
+					NORTH = 1 << 0,
+					SOUTH = 1 << 1,
+					EAST  = 1 << 2,
+					WEST  = 1 << 3
+				};
 
 				enum class e_tie_functional { DELAYED_WORK_AUTODEL, COLLISION_MOUSE_ON, COLLISION_MOUSE_CLICK, COLLISION_MOUSE_UNCLICK, COLLISION_COLLIDED_OTHER, COLLISION_NONE };
 				constexpr auto tie_functional_size = static_cast<size_t>(e_tie_functional::COLLISION_NONE) + 1;
 
 				using functional = std::function<void(void)>;
 
-				constexpr double minimum_sprite_accel_collision = 1e-6;
+				constexpr double minimum_sprite_accel_collision = 1e-4;
 				constexpr double game_collision_oversize = 1e-3;
 				constexpr double maximum_time_between_collisions = 1.0; // sec
 
-				const Tools::SuperMap<std::function<std::string(void)>> e_string_defaults = {
-					{[] {return "";},															(e_string::ID),										("id")}
+				const Tools::SuperMap<Tools::sfm_safe_feature<std::string>> e_string_defaults = {
+					{std::string(""),															(e_string::ID),										("id")}
 				};
 
-				const Tools::SuperMap<std::function<double(void)>> e_double_defaults = {
-					{[] {return 0.0;},															(e_double_readonly::SPEED_X),						("speed_x")},
-					{[] {return 0.0;},															(e_double_readonly::SPEED_Y),						("speed_y")},
-					{[] {return 0.0;},															(e_double_readonly::LAST_COLLISION_TIME),			("last_collision_time")},
-					{[] {return 0.0;},															(e_double_readonly::LAST_DRAW),						("last_draw")},
-					{[] {return 0.0;},															(e_double_readonly::LAST_UPDATE),					("last_update")},
-					{[] {return 0.0;},															(e_double_readonly::UPDATE_DELTA),					("update_delta")},
-					{[] {return 0.0;},															(e_double_readonly::POSX),							("pos_x")}, // drawing POSX
-					{[] {return 0.0;},															(e_double_readonly::POSY),							("pos_y")}, // drawing POSY
-					{[] {return 0.0;},															(e_double_readonly::ROTATION),						("rotation")}, // drawing ROTATION
-					{[] {return 0.0;},															(e_double_readonly::COL_MINDIST_X),					("collision_min_distance_x")},
-					{[] {return 0.0;},															(e_double_readonly::COL_MINDIST_Y),					("collision_min_distance_y")},
+				const Tools::SuperMap<Tools::sfm_safe_feature<double>> e_double_defaults = {
+					{0.0,															(e_double_readonly::SPEED_X),						("speed_x")},
+					{0.0,															(e_double_readonly::SPEED_Y),						("speed_y")},
+					{0.0,															(e_double_readonly::LAST_COLLISION_TIME),			("last_collision_time")},
+					{0.0,															(e_double_readonly::LAST_DRAW),						("last_draw")},
+					{0.0,															(e_double_readonly::LAST_UPDATE),					("last_update")},
+					{0.0,															(e_double_readonly::UPDATE_DELTA),					("update_delta")},
+					{0.0,															(e_double_readonly::POSX),							("pos_x")}, // WAS drawing POSX
+					{0.0,															(e_double_readonly::POSY),							("pos_y")}, // WAS drawing POSY
+					{0.0,															(e_double_readonly::PROJECTED_POSX),				("projected_pos_x")}, // drawing POSX
+					{0.0,															(e_double_readonly::PROJECTED_POSY),				("projected_pos_y")}, // drawing POSY
+					{0.0,															(e_double_readonly::ROTATION),						("rotation")}, // drawing ROTATION
+					{0.0,															(e_double_readonly::COL_MINDIST_X),					("collision_min_distance_x")},
+					{0.0,															(e_double_readonly::COL_MINDIST_Y),					("collision_min_distance_y")},
 
-					{[] {return 0.0;},															(e_double::TARG_POSX),								("target_pos_x")},
-					{[] {return 0.0;},															(e_double::TARG_POSY),								("target_pos_y")},
-					{[] {return 1.0;},															(e_double::SCALE_X),								("scale_x")},
-					{[] {return 1.0;},															(e_double::SCALE_Y),								("scale_y")},
-					{[] {return 1.0;},															(e_double::SCALE_G),								("scale_g")},
-					{[] {return 0.0;},															(e_double::CENTER_X),								("center_x")},
-					{[] {return 0.0;},															(e_double::CENTER_Y),								("center_y")},
-					{[] {return 0.0;},															(e_double::TARG_ROTATION),							("target_rotation")},
-					{[] {return 0.0;},															(e_double::ACCELERATION_X),							("acceleration_x")},
-					{[] {return 0.0;},															(e_double::ACCELERATION_Y),							("acceleration_y")},
-					{[] {return 0.3;},															(e_double::SPEEDXY_LIMIT),							("speed_limit")},
-					{[] {return 0.85;},															(e_double::ELASTICITY_X),							("elasticity_x")},
-					{[] {return 0.85;},															(e_double::ELASTICITY_Y),							("elasticity_y")},
-					{[] {return 0.9999;},														(e_double::ROUGHNESS),								("roughness")}
+					{0.0,															(e_double::TARG_POSX),								("target_pos_x")},
+					{0.0,															(e_double::TARG_POSY),								("target_pos_y")},
+					{1.0,															(e_double::SCALE_X),								("scale_x")},
+					{1.0,															(e_double::SCALE_Y),								("scale_y")},
+					{1.0,															(e_double::SCALE_G),								("scale_g")},
+					{0.0,															(e_double::CENTER_X),								("center_x")},
+					{0.0,															(e_double::CENTER_Y),								("center_y")},
+					{0.0,															(e_double::TARG_ROTATION),							("target_rotation")},
+					{0.0,															(e_double::ACCELERATION_X),							("acceleration_x")},
+					{0.0,															(e_double::ACCELERATION_Y),							("acceleration_y")},
+					{0.3,															(e_double::SPEEDXY_LIMIT),							("speed_limit")},
+					{0.85,															(e_double::ELASTICITY_X),							("elasticity_x")},
+					{0.85,															(e_double::ELASTICITY_Y),							("elasticity_y")},
+					{0.9999,														(e_double::ROUGHNESS),								("roughness")}
 				};
 
-				const Tools::SuperMap<std::function<bool(void)>> e_boolean_defaults = {
-					{[] {return false;},														(e_boolean_readonly::COLLISION_MOUSE_ON),			("collision_mouse_on")},
-					{[] {return false;},														(e_boolean_readonly::COLLISION_MOUSE_CLICK),		("collision_mouse_click")},
-					{[] {return false;},														(e_boolean_readonly::COLLISION_COLLIDED),			("collision_collided")},
-					{[] {return true;},															(e_boolean::DRAW),									("draw")},
-					{[] {return false;},														(e_boolean::USE_COLOR),								("use_color")},
-					{[] {return true;},															(e_boolean::AFFECTED_BY_CAM),						("affected_by_camera")},
-					{[] {return false;},														(e_boolean::SHOWDOT),								("show_dot")}, // shows dot where it will be drawn
-					{[] {return false;},														(e_boolean::SHOWBOX),								("show_box")}, // shows rectangle where collision updated (latest update)
-					{[] {return true;},															(e_boolean::RESPECT_CAMERA_LIMITS),					("respect_camera_limits")},
-					{[] {return false;},														(e_boolean::SET_TARG_POS_VALUE_READONLY),			("set_targ_pos_value_readonly")}
+				const Tools::SuperMap<Tools::sfm_safe_feature<bool>> e_boolean_defaults = {
+					{false,															(e_boolean_readonly::COLLISION_MOUSE_ON),			("collision_mouse_on")},
+					{false,															(e_boolean_readonly::COLLISION_MOUSE_CLICK),		("collision_mouse_click")},
+					{false,															(e_boolean_readonly::COLLISION_COLLIDED),			("collision_collided")},
+					{true,															(e_boolean::DRAW),									("draw")},
+					{false,															(e_boolean::USE_COLOR),								("use_color")},
+					{true,															(e_boolean::AFFECTED_BY_CAM),						("affected_by_camera")},
+					{false,															(e_boolean::SHOWDOT),								("show_dot")}, // shows dot where it will be drawn
+					{false,															(e_boolean::SHOWBOX),								("show_box")}, // shows rectangle where collision updated (latest update)
+					{true,															(e_boolean::RESPECT_CAMERA_LIMITS),					("respect_camera_limits")},
+					{false,															(e_boolean::SET_TARG_POS_VALUE_READONLY),			("set_targ_pos_value_readonly")}
 				};
 
-				const Tools::SuperMap<std::function<int(void)>> e_integer_defaults = {
-					{[] {return static_cast<int>(e_collision_mode_cast::COLLISION_BOTH);},		(e_integer::COLLISION_MODE),						("collision_mode")}
+				const Tools::SuperMap<Tools::sfm_safe_feature<int>> e_integer_defaults = {
+					{static_cast<int>(e_collision_mode_cast::COLLISION_BOTH),		(e_integer::COLLISION_MODE),						("collision_mode")}
 				};
 
-				const Tools::SuperMap<std::function<Interface::Color(void)>> e_color_defaults = {
-					{[] {return Interface::Color();},											(e_color::COLOR),									("color")}
+				const Tools::SuperMap<Tools::sfm_safe_feature<Interface::Color>> e_color_defaults = {
+					{Interface::Color(255,255,255),									(e_color::COLOR),									("color")}
 				};
 
-				const Tools::SuperMap<std::function<uintptr_t(void)>> e_uintptrt_defaults = {
-					{[] {return (uintptr_t)0;},													(e_uintptrt::DATA_FROM)}
+				const Tools::SuperMap<Tools::sfm_safe_feature<uintptr_t>> e_uintptrt_defaults = {
+					{(uintptr_t)0,													(e_uintptrt::DATA_FROM)}
 				};
 
-				const Tools::SuperMap<std::function<e_tie_functional(void)>> e_tief_defaults = {
-					{[] {return e_tie_functional::COLLISION_NONE;},								(e_tief_readonly::LAST_STATE)}
+				const Tools::SuperMap<Tools::sfm_safe_feature<e_tie_functional>> e_tief_defaults = {
+					{e_tie_functional::COLLISION_NONE,								(e_tief_readonly::LAST_STATE)}
 				};
 
-				const Tools::SuperMap<std::function<functional(void)>> e_functional_defaults = {
-					{[] {return functional(); },												(e_tie_functional::DELAYED_WORK_AUTODEL)},
-					{[] {return functional(); },												(e_tie_functional::COLLISION_MOUSE_ON)},
-					{[] {return functional(); },												(e_tie_functional::COLLISION_MOUSE_CLICK)},
-					{[] {return functional(); },												(e_tie_functional::COLLISION_MOUSE_UNCLICK)},
-					{[] {return functional(); },												(e_tie_functional::COLLISION_COLLIDED_OTHER)},
-					{[] {return functional(); },												(e_tie_functional::COLLISION_NONE)}
+				const Tools::SuperMap<Tools::sfm_safe_feature<functional>> e_functional_defaults = {
+					{functional(),													(e_tie_functional::DELAYED_WORK_AUTODEL)},
+					{functional(),													(e_tie_functional::COLLISION_MOUSE_ON)},
+					{functional(),													(e_tie_functional::COLLISION_MOUSE_CLICK)},
+					{functional(),													(e_tie_functional::COLLISION_MOUSE_UNCLICK)},
+					{functional(),													(e_tie_functional::COLLISION_COLLIDED_OTHER)},
+					{functional(),													(e_tie_functional::COLLISION_NONE)}
 				};
 			}
 
@@ -146,6 +158,8 @@ namespace LSW {
 				struct easier_collision_handle {
 					double	posx = 0.0,
 							posy = 0.0,
+							dx_max = 0.0,
+							dy_max = 0.0,
 							sizx = 0.0, // full size
 							sizy = 0.0; // full size
 
@@ -157,8 +171,8 @@ namespace LSW {
 
 					// test overlap between this and someone else
 					bool overlap(const easier_collision_handle&);
-					// Where should I go?
-					sprite::e_direction process_result();
+					// Where should I go? (combo x/y of sprite::e_direction)
+					int process_result();
 					// Resets directions history
 					void reset_directions();
 					// X, Y, SX, SY
@@ -166,8 +180,8 @@ namespace LSW {
 				} easy_collision;
 
 			protected:
-				std::vector<std::string> collision_list, copy_final;
-				Tools::SuperMutex copy_final_m;
+				//std::vector<std::string> collision_list, copy_final;
+				//Tools::SuperMutex copy_final_m;
 
 				std::function<void(void)> custom_draw_task; // set this as draw() of new children (so the draw() calls this if exists for further drawing scheme)
 				std::function<void(void)> custom_think_task; // set this as a collision / every tick function (so update() calls this if exists for further tasking)
@@ -205,7 +219,7 @@ namespace LSW {
 				//void unhook(const sprite::e_tie_functional);
 
 				// set to blindly use this comrade's attributes as theirs
-				void twin_up_attributes(const Sprite_Base&);
+				void clone(const Sprite_Base&);
 
 				void operator=(const Sprite_Base&);
 				void operator=(Sprite_Base&&);
@@ -228,9 +242,8 @@ namespace LSW {
 				//easier_collision_handle& get_collision();
 
 				// list of IDs (internal IDs)
-				const std::vector<std::string> get_collided_with_list();
+				//const std::vector<std::string> get_collided_with_list();
 			};
-
 		}
 	}
 }

@@ -7,6 +7,7 @@
 #include "../../Handling/Abort/abort.h"
 #include "../../Handling/Initialize/initialize.h"
 #include "../Future/future.h"
+#include "../Common/common.h"
 
 namespace LSW {
 	namespace v5 {
@@ -105,7 +106,6 @@ namespace LSW {
 			void SuperThreadT<T>::_set_promise_forced()
 			{
 				promise.set_value();
-
 			}
 
 
@@ -144,10 +144,19 @@ namespace LSW {
 			{
 				join();
 				promise = std::move(Promise<T>([&,f] {
-					_thread_done_flag = false;
-					T cpy = f([&] {return !al_get_thread_should_stop(thr); });
-					_thread_done_flag = true;
-					return std::move(cpy);
+					try {
+						_thread_done_flag = false;
+						T cpy = f([&] {return !al_get_thread_should_stop(thr); });
+						_thread_done_flag = true;
+						return std::move(cpy);
+					}
+					catch (const Handling::Abort& e) { // for now. later: save and get elsewhere
+						std::cout << "Exception at SuperThread #" << Tools::get_thread_id() << ": " << e.what() << std::endl;
+					}
+					catch (...) { // for now. later: save and get elsewhere
+						std::cout << "Unknown exception at SuperThread #" << Tools::get_thread_id() << "." << std::endl;
+					}
+					return T{};
 				}));
 			}
 
@@ -156,10 +165,18 @@ namespace LSW {
 			void SuperThreadT<T>::set(const std::function<T(boolThreadF)> f)
 			{
 				join();
-				promise = std::move(Promise<T>([&,f] {
-					_thread_done_flag = false;
-					f([&] {return !al_get_thread_should_stop(thr); });
-					_thread_done_flag = true;
+				promise = std::move(Promise<T>([&, f] {
+					try {
+						_thread_done_flag = false;
+						f([&] {return !al_get_thread_should_stop(thr); });
+						_thread_done_flag = true;
+					}
+					catch (const Handling::Abort& e) { // for now. later: save and get elsewhere
+						std::cout << "Exception at SuperThread #" << Tools::get_thread_id() << ": " << e.what() << std::endl;
+					}
+					catch (...) { // for now. later: save and get elsewhere
+						std::cout << "Unknown exception at SuperThread #" << Tools::get_thread_id() << "." << std::endl;
+					}
 				}));
 			}
 
