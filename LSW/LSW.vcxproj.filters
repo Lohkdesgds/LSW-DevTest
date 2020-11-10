@@ -167,6 +167,9 @@
     <Filter Include="LSW\1. Tools\AdvancedShared">
       <UniqueIdentifier>{37ef5789-ed57-4ca9-b1fd-205c23df2f6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\1. Tools\FastFunction">
+      <UniqueIdentifier>{e088062e-7cb4-4d82-bb96-a6d6f590fa0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -409,6 +412,9 @@
     </ClInclude>
     <ClInclude Include="LSW\Work\Collisioner\collisioner.h">
       <Filter>LSW\3. Work\Collisioner</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\FastFunction\fastfunction.h">
+      <Filter>LSW\1. Tools\FastFunction</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

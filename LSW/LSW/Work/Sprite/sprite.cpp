@@ -133,8 +133,6 @@ namespace LSW {
 
 			Sprite_Base::Sprite_Base()
 			{
-				/*if (!data_sprite_base) throw Handling::Abort(__FUNCSIG__, "Failed to create Sprite base's data!");
-				data_sprite_base->original_this = (void*)this;*/
 				Handling::init_basic();
 				Handling::init_graphics();
 
@@ -156,16 +154,6 @@ namespace LSW {
 			{
 				*this = std::move(other);
 			}
-
-			/*void Sprite_Base::hook(const sprite::e_tie_functional e, const std::function<void(void)> f)
-			{
-				pair_tied[static_cast<size_t>(e)] = f;
-			}
-
-			void Sprite_Base::unhook(const sprite::e_tie_functional e)
-			{
-				hook(e, std::function<void(void)>());
-			}*/
 
 			void Sprite_Base::clone(const Sprite_Base& other) // reference
 			{
@@ -203,89 +191,82 @@ namespace LSW {
 				set<uintptr_t>(std::move(other.get<uintptr_t>()));
 			}
 
-			bool Sprite_Base::draw(const Interface::Camera& cam)
+			void Sprite_Base::draw(const Interface::Camera& cam, const bool run_anyway)
 			{
+				if (!run_anyway && get_direct<uintptr_t>(sprite::e_uintptrt::DATA_FROM) != (uintptr_t)this) return;  // only original copy should update parameters
+				//if (is_eq(sprite::e_boolean::SHOWBOX, true) || is_eq(sprite::e_boolean::SHOWDOT, true)) {
 
-				if (get_direct<uintptr_t>(sprite::e_uintptrt::DATA_FROM) == (uintptr_t)this) { // only original copy should update parameters
-					//if (is_eq(sprite::e_boolean::SHOWBOX, true) || is_eq(sprite::e_boolean::SHOWDOT, true)) {
+				const auto affected_by_cam = get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM);
+				const auto targ_rotation = get_direct<double>(sprite::e_double::TARG_ROTATION);
+				const auto real_targ_posx = get_direct<double>(sprite::e_double::TARG_POSX);
+				const auto real_targ_posy = get_direct<double>(sprite::e_double::TARG_POSY);
+				const auto targ_posx = get_direct<double>(sprite::e_double_readonly::PROJECTED_POSX);
+				const auto targ_posy = get_direct<double>(sprite::e_double_readonly::PROJECTED_POSY);
+				const auto scale_g = get_direct<double>(sprite::e_double::SCALE_G);
+				const auto scale_x = get_direct<double>(sprite::e_double::SCALE_X);
+				const auto scale_y = get_direct<double>(sprite::e_double::SCALE_Y);
+				const auto update_delta = get_direct<double>(sprite::e_double_readonly::UPDATE_DELTA);
+				const auto last_draw_v = get_direct<double>(sprite::e_double_readonly::LAST_DRAW);
+				const auto rotation_v = get_direct<double>(sprite::e_double_readonly::ROTATION);
+				const auto posx_v = get_direct<double>(sprite::e_double_readonly::POSX);
+				const auto posy_v = get_direct<double>(sprite::e_double_readonly::POSY);					
 
-					const auto affected_by_cam = get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM);
-					const auto targ_rotation = get_direct<double>(sprite::e_double::TARG_ROTATION);
-					const auto real_targ_posx = get_direct<double>(sprite::e_double::TARG_POSX);
-					const auto real_targ_posy = get_direct<double>(sprite::e_double::TARG_POSY);
-					const auto targ_posx = get_direct<double>(sprite::e_double_readonly::PROJECTED_POSX);
-					const auto targ_posy = get_direct<double>(sprite::e_double_readonly::PROJECTED_POSY);
-					const auto scale_g = get_direct<double>(sprite::e_double::SCALE_G);
-					const auto scale_x = get_direct<double>(sprite::e_double::SCALE_X);
-					const auto scale_y = get_direct<double>(sprite::e_double::SCALE_Y);
-					const auto update_delta = get_direct<double>(sprite::e_double_readonly::UPDATE_DELTA);
-					const auto last_draw_v = get_direct<double>(sprite::e_double_readonly::LAST_DRAW);
-					const auto rotation_v = get_direct<double>(sprite::e_double_readonly::ROTATION);
-					const auto posx_v = get_direct<double>(sprite::e_double_readonly::POSX);
-					const auto posy_v = get_direct<double>(sprite::e_double_readonly::POSY);					
+				Interface::Camera _cleancam;
 
-
-					if (affected_by_cam) {
-						cam.apply();
-					}
-					else {
-						Interface::Camera clean_camera = cam;
-						clean_camera.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
-						clean_camera.apply();
-					}
-
-					// delta T calculation
-
-					double timee = al_get_time();
-					double dt = timee - last_draw_v;
-					set(sprite::e_double_readonly::LAST_DRAW, timee);
-
-					double perc_run = (update_delta > 0.0 ? (0.5 / update_delta) : 0.1) * pow(dt, 0.86);		// ex: 5 per sec * 0.2 (1/5 sec) = 1, so posx = actual posx...
-					if (perc_run > 1.0) perc_run = 1.0;					// 1.0 is "set value"
-					if (perc_run < 1.0 / 10000) perc_run = 1.0 / 10000; // can't be infinitely smooth right? come on
-
-					// new position calculation
-
-					set(sprite::e_double_readonly::ROTATION, (1.0 - perc_run) * rotation_v + perc_run * targ_rotation);
-					set(sprite::e_double_readonly::POSX, (1.0 - perc_run) * posx_v + perc_run * targ_posx);
-					set(sprite::e_double_readonly::POSY, (1.0 - perc_run) * posy_v + perc_run * targ_posy);
-
-					//rotation = [=] {return (1.0 - perc_run) * rotation_v + perc_run * targ_rotation; };
-					//posx = [=] {return (1.0 - perc_run) * posx_v + perc_run * targ_posx; };
-					//posy = [=] {return (1.0 - perc_run) * posy_v + perc_run * targ_posy; };
-
-					if (is_eq(sprite::e_boolean::SHOWBOX, true)) {
-
-						const double calculated_scale_x = scale_g * scale_x;
-						const double calculated_scale_y = scale_g * scale_y;
-
-						al_draw_filled_rectangle(
-							/* X1: */ real_targ_posx - calculated_scale_x * 0.5,
-							/* Y1: */ real_targ_posy - calculated_scale_y * 0.5,
-							/* X2: */ real_targ_posx + calculated_scale_x * 0.5,
-							/* Y2: */ real_targ_posy + calculated_scale_y * 0.5,
-							al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
-						al_draw_filled_rectangle(
-							/* X1: */ real_targ_posx - calculated_scale_x * 0.515,
-							/* Y1: */ real_targ_posy - calculated_scale_y * 0.515,
-							/* X2: */ real_targ_posx + calculated_scale_x * 0.515,
-							/* Y2: */ real_targ_posy + calculated_scale_y * 0.515,
-							al_map_rgba(180, easy_collision.was_col ? 90 : 180, easy_collision.was_col ? 90 : 180, 180));
-					}
-
-					if (is_eq(sprite::e_boolean::SHOWDOT, true)) {
-						al_draw_filled_circle(
-							/* X1: */ posx_v,
-							/* X1: */ posy_v,
-							/* SCL */ 0.05f,
-							al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
-					}
-					//}
+				if (affected_by_cam) {
+					cam.apply();
 				}
-				// custom_draw_task has nothing to do with clone attributes, so this is fine! (I guess so)
-				if (custom_draw_task) custom_draw_task();
+				else {
+					_cleancam = cam;
+					_cleancam.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
+					_cleancam.apply();
+				}
 
-				return true;
+				// delta T calculation
+
+				double timee = al_get_time();
+				double dt = timee - last_draw_v;
+				set(sprite::e_double_readonly::LAST_DRAW, timee);
+
+				double perc_run = (update_delta > 0.0 ? (0.5 / update_delta) : 0.1) * pow(dt, 0.86);		// ex: 5 per sec * 0.2 (1/5 sec) = 1, so posx = actual posx...
+				if (perc_run > 1.0) perc_run = 1.0;					// 1.0 is "set value"
+				if (perc_run < 1.0 / 10000) perc_run = 1.0 / 10000; // can't be infinitely smooth right? come on
+
+				// new position calculation
+
+				set(sprite::e_double_readonly::ROTATION, (1.0 - perc_run) * rotation_v + perc_run * targ_rotation);
+				set(sprite::e_double_readonly::POSX, (1.0 - perc_run) * posx_v + perc_run * targ_posx);
+				set(sprite::e_double_readonly::POSY, (1.0 - perc_run) * posy_v + perc_run * targ_posy);
+
+				if (is_eq(sprite::e_boolean::SHOWBOX, true)) {
+
+					const double calculated_scale_x = scale_g * scale_x;
+					const double calculated_scale_y = scale_g * scale_y;
+
+					al_draw_filled_rectangle(
+						/* X1: */ real_targ_posx - calculated_scale_x * 0.5,
+						/* Y1: */ real_targ_posy - calculated_scale_y * 0.5,
+						/* X2: */ real_targ_posx + calculated_scale_x * 0.5,
+						/* Y2: */ real_targ_posy + calculated_scale_y * 0.5,
+						al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
+					al_draw_filled_rectangle(
+						/* X1: */ real_targ_posx - calculated_scale_x * 0.515,
+						/* Y1: */ real_targ_posy - calculated_scale_y * 0.515,
+						/* X2: */ real_targ_posx + calculated_scale_x * 0.515,
+						/* Y2: */ real_targ_posy + calculated_scale_y * 0.515,
+						al_map_rgba(180, easy_collision.was_col ? 90 : 180, easy_collision.was_col ? 90 : 180, 180));
+				}
+
+				if (is_eq(sprite::e_boolean::SHOWDOT, true)) {
+					al_draw_filled_circle(
+						/* X1: */ posx_v,
+						/* X1: */ posy_v,
+						/* SCL */ 0.05f,
+						al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
+				}
+				//}
+					
+				draw_task(affected_by_cam ? cam : _cleancam);
 			}
 
 			void Sprite_Base::collide(const Sprite_Base& oth, const bool run_anyway) // if colliding, do not accept speed entry (keyboard player moving)
@@ -293,13 +274,11 @@ namespace LSW {
 				if (!run_anyway && get_direct<uintptr_t>(sprite::e_uintptrt::DATA_FROM) != (uintptr_t)this) return; // this is a copy following attrbutes from somewhere else, no duplication in collision
 
 				if (oth.is_eq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE))) return; // no collision
-				if (is_eq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
-				//if (oth.is_eq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true)) return; // no collision (readonly)
+				if (oth.is_eq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_INVERSE))) return; // no collision
+				if (is_eq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE))) return; // no collision
+				if (is_eq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_STATIC))) return; // no collision
 
-				if (easy_collision.overlap(oth.easy_collision)) {
-					//collision_list.push_back(oth.get_direct<std::string>(sprite::e_string::ID));
-				}
-
+				easy_collision.overlap(oth.easy_collision);
 			}
 
 			void Sprite_Base::update_and_clear(const Interface::Config& conf, const bool run_anyway)// needs to use ACCELERATION_X when collision, ELASTICITY_X to know how much of it goes backwards, TARG_POSX
@@ -319,17 +298,18 @@ namespace LSW {
 
 				// delayed work to do (auto-clean)
 				if (auto f = get_direct<sprite::functional>(sprite::e_tie_functional::DELAYED_WORK_AUTODEL); f) {
-					f();
-					set<sprite::functional>(sprite::e_tie_functional::DELAYED_WORK_AUTODEL, std::function<void(void)>());
+					f(Tools::Any{});
+					set<sprite::functional>(sprite::e_tie_functional::DELAYED_WORK_AUTODEL, [](auto) {});
 				}
 
 
-				if (is_eq(sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, false)) {
-
-					// task to be done (no auto-clean, internal, only if layer (as above))
-					if (custom_think_task) custom_think_task();
+				if (!is_eq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_STATIC)) &&
+					!is_eq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE))) {
 
 					auto nowgo = easy_collision.process_result();
+
+					think_task(nowgo);
+
 					double sum_dx = 0.0;
 					double sum_dy = 0.0;
 
@@ -389,34 +369,54 @@ namespace LSW {
 				}
 
 
-				float m[2] = { 0.0f };
-				bool is_mouse_pressed = false;
-				bool mouse_collide = false;
-
-				if (conf.has("mouse", "press_count")) {
-
-					is_mouse_pressed = conf.get_as<unsigned>("mouse", "press_count") > 0;
-					m[0] = conf.get_as<float>("mouse", "x");
-					m[1] = conf.get_as<float>("mouse", "y");
-
-					const double dist_x = get_direct<double>(sprite::e_double::TARG_POSX) - m[0];
-					const double dist_y = get_direct<double>(sprite::e_double::TARG_POSY) - m[1];
-
-					mouse_collide = (
-						(fabs(dist_x) < 0.5 * get_direct<double>(sprite::e_double::SCALE_X) * get_direct<double>(sprite::e_double::SCALE_G)) &&
-						(fabs(dist_y) < 0.5 * get_direct<double>(sprite::e_double::SCALE_X) * get_direct<double>(sprite::e_double::SCALE_G))
-					);
-				}
-
 				{
+					std::array<double, 4> m = { 0.0 };
+					bool is_mouse_pressed = false;
+					bool mouse_collide = false;
+					bool avoid_trigger = false;
+					bool invalid_nomove = !get_direct<bool>(sprite::e_boolean_readonly::COLLISION_COLLIDED);
+
+
+					double mouse_b4[2];
+
+					mouse_b4[0] = get_direct<double>(sprite::e_double_readonly::MOUSE_CLICK_LAST_X);
+					mouse_b4[1] = get_direct<double>(sprite::e_double_readonly::MOUSE_CLICK_LAST_Y);
+
+					if (conf.has("mouse", "press_count")) {
+
+						is_mouse_pressed = conf.get_as<unsigned>("mouse", "press_count") > 0;
+
+						if (get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM)) {
+							m[0] = conf.get_as<double>("mouse", "x");
+							m[1] = conf.get_as<double>("mouse", "y");
+						}
+						else {
+							m[0] = conf.get_as<double>("mouse", "rx");
+							m[1] = conf.get_as<double>("mouse", "ry");
+						}
+
+						m[2] = (m[0] - get_direct<double>(sprite::e_double::TARG_POSX)) / (0.5 * get_direct<double>(sprite::e_double::SCALE_X) * get_direct<double>(sprite::e_double::SCALE_G));
+						m[3] = (m[1] - get_direct<double>(sprite::e_double::TARG_POSY)) / (0.5 * get_direct<double>(sprite::e_double::SCALE_Y) * get_direct<double>(sprite::e_double::SCALE_G));
+
+						mouse_collide = (
+							(fabs(m[2]) < 1.0) &&
+							(fabs(m[3]) < 1.0)
+							);
+					}
 					sprite::e_tie_functional last_state = get_direct<sprite::e_tie_functional>(sprite::e_tief_readonly::LAST_STATE);
 					sprite::e_tie_functional new_state{};
 
 					if (mouse_collide) {
-						new_state = is_mouse_pressed ? sprite::e_tie_functional::COLLISION_MOUSE_CLICK : sprite::e_tie_functional::COLLISION_MOUSE_ON;
-					}
-					else if (last_state == sprite::e_tie_functional::COLLISION_MOUSE_CLICK) {
-						new_state = sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK;
+						if (is_mouse_pressed) {
+							new_state = sprite::e_tie_functional::COLLISION_MOUSE_CLICK;
+							avoid_trigger = get_direct<bool>(sprite::e_boolean_readonly::COLLISION_MOUSE_CLICK) || !get_direct<bool>(sprite::e_boolean_readonly::COLLISION_COLLIDED);
+						}
+						else if (last_state == sprite::e_tie_functional::COLLISION_MOUSE_CLICK) {
+							new_state = sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK;
+						}
+						else {
+							new_state = sprite::e_tie_functional::COLLISION_MOUSE_ON;
+						}
 					}
 					else if (easy_collision.was_col) {
 						new_state = sprite::e_tie_functional::COLLISION_COLLIDED_OTHER;
@@ -425,12 +425,54 @@ namespace LSW {
 						new_state = sprite::e_tie_functional::COLLISION_NONE;
 					}
 
+					set(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE, get_direct<bool>(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE) || (fabs(m[0] - mouse_b4[0]) >= sprite::move_accept_move_max_as_none) || (fabs(m[1] - mouse_b4[1]) >= sprite::move_accept_move_max_as_none));
+
 					if (new_state != last_state) {
+
+						Tools::Any ref;
+						if ((static_cast<int>(new_state) >= static_cast<int>(sprite::e_tie_functional::_MOUSE_BEGIN)) && (static_cast<int>(new_state) <= static_cast<int>(sprite::e_tie_functional::_MOUSE_END))) ref = m;
+
+						if (!invalid_nomove) {
+							switch (new_state) {
+							case sprite::e_tie_functional::COLLISION_MOUSE_CLICK:
+							{
+								if (!get_direct<bool>(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE)) {
+									if (auto f = get_direct<sprite::functional>(sprite::e_tie_functional::COLLISION_MOUSE_CLICK_NOMOVE); f) f(ref);
+								}
+
+								set(sprite::e_double_readonly::MOUSE_CLICK_LAST_X, m[0]);
+								set(sprite::e_double_readonly::MOUSE_CLICK_LAST_Y, m[1]);
+								set(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE, false);
+							}
+							break;
+							case sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK:
+							{
+								if (!get_direct<bool>(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE)) {
+									if (auto f = get_direct<sprite::functional>(sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK_NOMOVE); f) f(ref);
+								}
+
+								set(sprite::e_double_readonly::MOUSE_CLICK_LAST_X, m[0]);
+								set(sprite::e_double_readonly::MOUSE_CLICK_LAST_Y, m[1]);
+								set(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE, false);
+							}
+							break;
+							}
+						}
+
 						set<sprite::e_tie_functional>(sprite::e_tief_readonly::LAST_STATE, new_state);
 
-						if (auto f = get_direct<sprite::functional>(new_state); f) f();
+						if (auto f = get_direct<sprite::functional>(new_state); !avoid_trigger && f) f(ref);
 					}
+
+
+					set(sprite::e_boolean_readonly::COLLISION_COLLIDED, mouse_collide);
+					set(sprite::e_boolean_readonly::COLLISION_MOUSE_PRESSED, is_mouse_pressed);
+					if (mouse_collide) {
+						set(sprite::e_boolean_readonly::COLLISION_MOUSE_CLICK, is_mouse_pressed);
+					}
+
 				}
+
 
 				double scale_x, scale_y;
 
@@ -439,18 +481,6 @@ namespace LSW {
 
 				easy_collision.setup(get_direct<double>(sprite::e_double::TARG_POSX), get_direct<double>(sprite::e_double::TARG_POSY), scale_x, scale_y);
 			}
-
-			/*
-			Sprite_Base::easier_collision_handle& Sprite_Base::get_collision()
-			{
-				return easy_collision;
-			}
-			const std::vector<std::string> Sprite_Base::get_collided_with_list()
-			{
-				Tools::AutoLock luck(copy_final_m);
-				return copy_final;
-			}*/
-
 		}
 	}
 }

@@ -55,15 +55,9 @@ int main() {
 		Logger logg;
 		Tools::SuperResource<Bitmap> source;
 		Tools::SuperResource<Font> source_font;
-		Tools::SuperResource<Work::Block> blocks;
 
 		auto atlas = source.create("ATLAS_GLOBAL");
 		auto lmao = source.create("_test");
-
-		auto blk = blocks.create("_test_block");
-		auto blk2 = blocks.create("_test_block_mouse");
-		auto blk3 = blocks.create("_test_col");
-		auto blk4 = blocks.create("_test_block2");
 
 		auto foo = source_font.create("DEFAULT");
 
@@ -89,11 +83,6 @@ int main() {
 			}
 			else {
 				logg << L::SLF << fsr() << "Loaded a bitmap from atlas SUCESSFULLY" << L::ELF;
-
-				blk->insert(lmao);
-				blk2->insert(lmao);
-				blk3->insert(lmao);
-				blk4->insert(lmao);
 			}
 		}
 		if (!gud) {
@@ -115,50 +104,96 @@ int main() {
 	//auto got = working_on.get().get<Tools::Resource<Bitmap>>();
 
 	working_on.wait();
-	
-	Tools::Resource<Work::Block> blk, blk2, blk3, blk4;
 
-	if (!blocks.get("_test_block", blk)) {
-		logg << L::SLF << fsr(E::ERRR) << "Block wasn't found somehow..." << L::ELF;
-		core.shutdown();
-		return -1;
-	}
-	
-	if (!blocks.get("_test_block_mouse", blk2)) {
-		logg << L::SLF << fsr(E::ERRR) << "Block wasn't found somehow..." << L::ELF;
-		core.shutdown();
-		return -1;
-	}
-	
-	if (!blocks.get("_test_col", blk3)) {
-		logg << L::SLF << fsr(E::ERRR) << "Block wasn't found somehow..." << L::ELF;
+
+	Tools::SuperResource<Camera> cameras;
+
+	auto cam = cameras.create("DEFAULT");
+	cam->classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
+
+	core.get_display().set_camera(cam);
+
+
+	Tools::SuperResource<Bitmap> bmps;
+
+	Tools::Resource<Bitmap> lmao;// = source.create("_test");
+
+	if (!bmps.get("_test", lmao)) {
+		logg << L::SLF << fsr(E::ERRR) << "Texture wasn't found somehow..." << L::ELF;
 		core.shutdown();
 		return -1;
 	}
 
-	if (!blocks.get("_test_block2", blk4)) {
-		logg << L::SLF << fsr(E::ERRR) << "Block wasn't found somehow..." << L::ELF;
-		core.shutdown();
-		return -1;
-	}
+	auto blk = blocks.create("_test_block");
+	auto blk2 = blocks.create("_test_block_mouse");
+	auto blk3 = blocks.create("_test_col");
+	auto blk4 = blocks.create("_test_block2");
+	auto blk_height = blocks.create("_test_slidex");
+	auto blk_width = blocks.create("_test_slidey");
+
+	blk->insert(lmao);
+	blk2->insert(lmao);
+	blk3->insert(lmao);
+	blk4->insert(lmao);
+	blk_height->insert(lmao);
+	blk_width->insert(lmao);
 	
 
-	//blk->set<double>(Work::sprite::e_double::TARG_POSX, [] { return (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5; });
-	//blk->set<double>(Work::sprite::e_double::TARG_POSY, [] { return (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5; });
+
+
+
+	blk_height->set(Work::sprite::e_double::TARG_POSX, 0.99);
+	blk_height->set(Work::sprite::e_double::TARG_POSY, 0.0);
+	blk_height->set(Work::sprite::e_double::SCALE_G, 1.0);
+	blk_height->set(Work::sprite::e_double::SCALE_Y, 1.9);
+	blk_height->set(Work::sprite::e_double::SCALE_X, 0.02);
+	blk_height->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	blk_height->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+
+	blk_height->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK, [&](const Tools::Any& ref) {
+		auto u = ref.get<std::array<double, 4>>();
+		cam->get_classic().y = u[3];
+		core.get_display().set_refresh_camera();
+
+		Logger logg;
+		logg << L::SL << fsr() << "Y set to " << u[3] << L::EL;
+	});
+
+	blk_width->set(Work::sprite::e_double::TARG_POSX, 0.0);
+	blk_width->set(Work::sprite::e_double::TARG_POSY, 0.99);
+	blk_width->set(Work::sprite::e_double::SCALE_G, 1.0);
+	blk_width->set(Work::sprite::e_double::SCALE_X, 1.9);
+	blk_width->set(Work::sprite::e_double::SCALE_Y, 0.02);
+	blk_width->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	blk_width->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+
+	blk_width->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK, [&](const Tools::Any& ref) {
+		auto u = ref.get<std::array<double, 4>>();
+		cam->get_classic().x = u[2];
+		core.get_display().set_refresh_camera();
+
+		Logger logg;
+		logg << L::SL << fsr() << "X set to " << u[2] << L::EL;
+	});
+
+
+
+
+
+
 	blk->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
 	blk->set<double>(Work::sprite::e_double::TARG_POSY, [] { return 0.25 + 0.55 * sin(MILLI_NOW.count() / 689.0); });
 	blk->set<double>(Work::sprite::e_double::SCALE_G, 0.8);
 	blk->set<double>(Work::sprite::e_double::SCALE_Y, 0.3);
-	blk->set(Work::sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
-	//blk->set(Work::sprite::e_boolean::SHOWBOX, true);
+	blk->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
 
 	blk4->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
 	blk4->set<double>(Work::sprite::e_double::TARG_POSY, [] { return -0.25 + 0.55 * sin(MILLI_NOW.count() / 689.0); });
 	blk4->set<double>(Work::sprite::e_double::SCALE_G, 0.8);
 	blk4->set<double>(Work::sprite::e_double::SCALE_Y, 0.3);
-	blk4->set(Work::sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
+	blk4->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
 
-	blk->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&] {
+	blk->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](auto) {
 		Logger logg;
 #ifdef _DEBUG
 		logg << L::SL << fsr() << "Clicked." << L::EL;
@@ -176,25 +211,22 @@ int main() {
 	blk2->set<double>(Work::sprite::e_double::TARG_POSX, [&] { return core.get_config().get_as<double>("mouse", "x"); });
 	blk2->set<double>(Work::sprite::e_double::TARG_POSY, [&] { return core.get_config().get_as<double>("mouse", "y"); });
 	blk2->set<double>(Work::sprite::e_double::SCALE_G, 0.15);
-	blk2->set(Work::sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
-	//blk2->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
-	//blk2->set(Work::sprite::e_boolean::SHOWBOX, true);
-	//blk2->set(Work::sprite::e_color::COLOR, Color(255, 255, 255));
+	blk2->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+	blk2->set(Work::sprite::e_boolean::SHOWBOX, true);
 
 
 
 	blk3->set<double>(Work::sprite::e_double::TARG_POSX, -0.65);
 	blk3->set<double>(Work::sprite::e_double::TARG_POSY, -0.5);
 	blk3->set<double>(Work::sprite::e_double::SCALE_G, 0.20);
-	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);
-	//blk3->set<double>(Work::sprite::e_double::ROUGHNESS, 0.1);
-	//blk2->set(Work::sprite::e_boolean::SET_TARG_POS_VALUE_READONLY, true);
-	//blk2->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
-	//blk3->set(Work::sprite::e_boolean::SHOWBOX, true);
-	//blk2->set(Work::sprite::e_color::COLOR, Color(255, 255, 255));
+	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);blk3->set(Work::sprite::e_boolean::SHOWBOX, true);
 
 
 
+
+	Work::Collisioner slide_control(core.get_config());
+	slide_control.insert(blk_height);
+	slide_control.insert(blk_width);
 
 	Work::Collisioner collision_control(core.get_config());
 	collision_control.insert(blk);
@@ -203,6 +235,7 @@ int main() {
 	collision_control.insert(blk4);
 
 	collision_control.start(1.0 / 20);
+	slide_control.start(1.0 / 10);
 
 	{
 		Tools::SuperResource<Font> source_font;
@@ -217,6 +250,8 @@ int main() {
 			blk4->draw(c);
 			blk2->draw(c);
 			blk3->draw(c);
+			blk_height->draw(c);
+			blk_width->draw(c);
 			//blk->update_and_clear(core.get_config());
 
 			//if (track->exists()) {
@@ -226,26 +261,19 @@ int main() {
 			//}
 		});
 
-		core.get_display().add_draw_task([&collision_control, lool, logg, core](Camera& curr) {
+		core.get_display().add_draw_task([&collision_control, &slide_control, lool, logg, core](Camera& curr) {
 			Camera cam2 = curr;
 			const float prop = 2500.0f;
 			cam2.classic_transform(0, 0, 1.0 / prop, 1.0 / prop, 0.0); // change this later somehow
 			cam2.apply();
 			lool->draw(-prop, -1.0f * prop, 0, "&5FPS: &a" + std::to_string(core.get_display().get_frames_per_second()) + (core.get_display().get_fps_cap() ? (" / " + std::to_string(core.get_display().get_fps_cap()) + " (limit)") : "") + (core.get_display().get_vsync() ? (" &6VSYNC SET") : " &bVSYNC UNSET"));
-			lool->draw(-prop, -0.96f * prop, 0, "&2TPS: &d" + std::to_string(collision_control.effective_tps()));
+			lool->draw(-prop, -0.96f * prop, 0, "&3TPS: &d" + std::to_string(collision_control.effective_tps()) + " & " + std::to_string(slide_control.effective_tps()));
 			lool->draw(-prop, -0.92f * prop, 0, "&2Times open: &b" + std::to_string(core.get_config().get_as<unsigned long long>("registry", "times_open")));
 			lool->draw(-prop, -0.88f * prop, 0, "&7Mouse pos: &e" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "x")) + "x" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "y")));
 			lool->draw(-prop, 0.96f * prop, 0, logg.get_last_line().filter_ascii_range());
 			curr.apply();
 		});
 	}
-
-	Tools::SuperResource<Camera> cameras;
-
-	auto cam = cameras.create("DEFAULT");
-	cam->classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
-
-	core.get_display().set_camera(cam);
 
 	Tools::SuperResource<Track> tracks;
 	Tools::SuperResource<Sample> samples;
@@ -432,6 +460,7 @@ int main() {
 	core.yield();
 
 	collision_control.stop();
+	slide_control.stop();
 
 	core.shutdown();
 

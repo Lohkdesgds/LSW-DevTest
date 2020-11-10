@@ -267,6 +267,7 @@
     <ClInclude Include="LSW\Tools\AutoAbort\autoabort.h" />
     <ClInclude Include="LSW\Tools\Common\common.h" />
     <ClInclude Include="LSW\Tools\CString\cstring.h" />
+    <ClInclude Include="LSW\Tools\FastFunction\fastfunction.h" />
     <ClInclude Include="LSW\Tools\Future\future.h" />
     <ClInclude Include="LSW\Tools\Hash\hash.h" />
     <ClInclude Include="LSW\Tools\Launcher\launcher.h" />

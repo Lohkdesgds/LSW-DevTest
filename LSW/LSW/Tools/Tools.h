@@ -5,6 +5,7 @@ Some might depend on Handling-classified headers.
 */
 
 #include "Common/common.h"
+#include "FastFunction/fastfunction.h"
 #include "CString/cstring.h"
 #include "Any/any.h"
 #include "Future/future.h"

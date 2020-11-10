@@ -253,7 +253,7 @@ namespace LSW {
 			void Display::set_camera(std::shared_ptr<Camera> cam)
 			{
 				std::lock_guard<std::mutex> luck(cam_m);
-				camera_f = [cam] { return cam; };
+				camera_f = cam;
 				refresh_camera = true;
 			}
 			void Display::set_camera(std::function<std::shared_ptr<Camera>(void)> f)
@@ -266,7 +266,7 @@ namespace LSW {
 			{
 				fps_cap = cap;
 			}
-			std::shared_ptr<Camera> Display::get_current_camera() const
+			std::shared_ptr<Camera> Display::get_current_camera()
 			{
 				return camera_f();
 			}
@@ -341,6 +341,12 @@ namespace LSW {
 				}
 				hide_mouse_new = hid;
 			}
+
+			void Display::set_refresh_camera()
+			{
+				refresh_camera = true;
+			}
+			
 			bool Display::display_ready() const
 			{
 				return disp.get();

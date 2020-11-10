@@ -7,6 +7,7 @@
 #include "../../Tools/SuperMutex/supermutex.h"
 #include "../../Tools/Common/common.h"
 #include "../../Tools/Any/any.h"
+#include "../../Tools/FastFunction/fastfunction.h"
 #include "../Events/events.h"
 #include "../EventTimer/eventtimer.h"
 #include "../EventCustom/eventcustom.h"
@@ -63,7 +64,7 @@ namespace LSW {
 
 				std::mutex cam_m;
 				//std::shared_ptr<Camera> camera;
-				std::function<std::shared_ptr<Camera>(void)> camera_f = [] {return nullptr; };
+				Tools::FastFunction<std::shared_ptr<Camera>> camera_f;
 				bool refresh_camera = false;
 
 				std::shared_ptr<Bitmap> get_buffer_ref();
@@ -124,7 +125,7 @@ namespace LSW {
 				/// <para>Gets the latest camera set in this Display (via set_camera).</para>
 				/// </summary>
 				/// <returns>{std::shared_ptr} The Camera.</returns>
-				std::shared_ptr<Camera> get_current_camera() const;
+				std::shared_ptr<Camera> get_current_camera();
 
 				/// <summary>
 				/// <para>Gets if drawing thread exists and it's running (the display itself might not exist, try display_ready()).</para>
@@ -208,10 +209,15 @@ namespace LSW {
 				void set_fullscreen(const bool);
 
 				/// <summary>
-				/// <para>Hide the mouse in screen</para>
+				/// <para>Hide the mouse in screen.</para>
 				/// </summary>
 				/// <param name="{bool}">Hide?</param>
 				void hide_mouse(const bool);
+
+				/// <summary>
+				/// <para>Set the display to refresh the camera.</para>
+				/// </summary>
+				void set_refresh_camera();
 
 				/// <summary>
 				/// <para>Is the display up? (the thread can be running, but not with a screen yet).</para>

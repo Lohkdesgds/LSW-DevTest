@@ -6,7 +6,7 @@ namespace LSW {
 		namespace Work {
 
 			
-			void Block::draw_self()
+			void Block::draw_task(const Interface::Camera& c)
 			{
 				if (bitmaps.empty()) return;
 
@@ -37,32 +37,35 @@ namespace LSW {
 					}
 				}
 
-				int frame = get_direct<int>(block::e_integer::FRAME);
+				size_t frame = get_direct<size_t>(block::e_sizet::FRAME);
 
-				{
+				if (!get_direct<bool>(block::e_boolean::SET_FRAME_VALUE_READONLY)) {
+
 					const double delta = get_direct<double>(block::e_double::FRAMES_PER_SECOND); // delta t, 1/t = sec
 					std::chrono::milliseconds last_time = get_direct<std::chrono::milliseconds>(block::e_chronomillis_readonly::LAST_FRAME);
 
-					if (delta > 0.0 && frame >= 0) { // if delta <= 0 or frame < 0, static
+					if (delta > 0.0) { // if delta <= 0 or frame < 0, static
 						std::chrono::milliseconds delta_tr = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(1.0 / delta));
+
 						if (delta_tr.count() > 0) {
-							while (std::chrono::system_clock::now().time_since_epoch() > last_time) {
-								last_time += delta_tr;
-								if (++frame >= bitmaps.size()) frame = 0;
+
+							if (std::chrono::system_clock::now().time_since_epoch() > last_time * block::max_frames_behind) {
+								last_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+							}
+							else {
+								while (std::chrono::system_clock::now().time_since_epoch() > last_time) {
+									last_time += delta_tr;
+									if (++frame >= bitmaps.size()) frame = 0;
+								}
 							}
 						}
 					}
-					else {
-						frame = frame > 0 ? frame : -frame;
-						if (frame >= bitmaps.size()) frame = static_cast<int>(bitmaps.size() - 1);
-					}
 
 					set<std::chrono::milliseconds>(block::e_chronomillis_readonly::LAST_FRAME, last_time);
-				}
 
-				if (!get_direct<bool>(block::e_boolean::SET_FRAME_VALUE_READONLY)) {
-					set<int>(block::e_integer::FRAME, frame);
+					set(block::e_sizet::FRAME, frame);
 				}
+				if (frame >= bitmaps.size()) frame = static_cast<int>(bitmaps.size() - 1);
 
 				auto rnn = bitmaps[frame];
 				if (!rnn) throw Handling::Abort(__FUNCSIG__, "Unexpected NULL on draw!");
@@ -104,43 +107,39 @@ namespace LSW {
 			}
 			Block::Block() : Sprite_Base()
 			{
-				//if (!data_block) throw Handling::Abort(__FUNCSIG__, "Failed to create Block's data!");
-				custom_draw_task = [&] {draw_self(); };
-
 				reference.be_reference_to_target(true);
 
 				set<double>(block::e_double_defaults);
 				set<bool>(block::e_boolean_defaults);
-				set<int>(block::e_integer_defaults);
+				set<size_t>(block::e_sizet_defaults); // same as uintptr_t
 				set<std::chrono::milliseconds>(block::e_chronomillis_readonly_defaults);
 
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
 			Block::Block(const Block& other) : Sprite_Base(other)
-			{
-				custom_draw_task = [&] {draw_self(); };
-	
+			{	
 				*this = other;
 			}
 			Block::Block(Block&& other) : Sprite_Base(std::move(other))
 			{
-				custom_draw_task = [&] {draw_self(); };
-
 				*this = std::move(other);
 			}
 
 			void Block::operator=(const Block& oth)
 			{
-				this->Sprite_Base::clone(oth);
+				this->Sprite_Base::operator=(oth);
 
 				// difference from Sprite_Base
 				set<std::chrono::milliseconds>(oth.get<std::chrono::milliseconds>());
+
+				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
+				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
 
 			void Block::operator=(Block&& other)
 			{
-				reference.be_reference_to_target(true);
+				this->Sprite_Base::operator=(std::move(other));
 
 				// difference from Sprite_Base
 				set<std::chrono::milliseconds>(std::move(other.get<std::chrono::milliseconds>()));
@@ -151,9 +150,7 @@ namespace LSW {
 
 			void Block::clone(const Block& other)
 			{
-				custom_draw_task = [&] {draw_self(); };
-
-				reference.be_reference_to_target(true);
+				this->Sprite_Base::clone(other);
 
 				// difference from Sprite_Base
 				set<std::chrono::milliseconds>(*other.get<std::chrono::milliseconds>());
@@ -166,14 +163,18 @@ namespace LSW {
 			{
 				bitmaps.push_back(bmp);
 			}
-			void Block::remove(const std::function<bool(const Interface::Bitmap&)> remf)
+
+			size_t Block::remove(const std::function<bool(const Interface::Bitmap&)> remf)
 			{
+				size_t match = 0;
 				for (size_t p = 0; p < bitmaps.size(); p++) {
 					auto& i = bitmaps[p];
 					if (remf(i)) {
+						match++;
 						bitmaps.erase(bitmaps.begin() + p);
 					}
 				}
+				return match;
 			}
 
 		}

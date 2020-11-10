@@ -25,6 +25,11 @@ namespace LSW {
 				template<> const char* get() {
 					return ((if_string_buf = std::any_cast<std::string>(*this)).c_str());
 				}
+				template<typename T> T get() const {
+					return std::any_cast<T>(*this);
+				}
+				template<> char* get() const = delete;
+				template<> const char* get() const = delete;
 
 				using std::any::operator=;
 

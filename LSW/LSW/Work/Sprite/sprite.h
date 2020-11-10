@@ -10,6 +10,8 @@
  * ## MOUSE CONFIGURATION ##
  * - [ "mouse", "x" ]:				Position X; float
  * - [ "mouse", "y" ]:				Position Y; float
+ * - [ "mouse", "rx" ]:				Position X (no camera); float
+ * - [ "mouse", "ry" ]:				Position Y (no camera); float
  * - [ "mouse", "press_count" ]:	Pressed buttons count; unsigned
  * - [ "mouse", "down_latest" ]:	Latest event, from what key, starting with 1 for button 0, negative for release; int
  * - [ "mouse", "b#" ]:				Button # (placeholder) latest state, if not set, never had one; bool
@@ -17,12 +19,15 @@
 
 #include "../../Handling/Abort/abort.h"
 #include "../../Handling/Initialize/initialize.h"
+#include "../../Tools/Any/any.h"
 #include "../../Tools/SuperMap/SuperMap.h"
 #include "../../Tools/SuperFunctionalMap/superfunctionalmap.h"
 #include "../../Tools/SuperMutex/supermutex.h"
 #include "../../Interface/Camera/camera.h"
 #include "../../Interface/Config/config.h"
 #include "../../Interface/Color/color.h"
+
+#include <array>
 
 namespace LSW {
 	namespace v5 {
@@ -33,13 +38,13 @@ namespace LSW {
 				COL_MINDIST_... = the distance it has to move in ... (on a collision tick)
 				...UPDATE... = automatic smoothing based on collision calls
 				*/
-				enum class e_double_readonly { SPEED_X, SPEED_Y, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */, LAST_DRAW, LAST_UPDATE, UPDATE_DELTA, POSX, POSY, PROJECTED_POSX, PROJECTED_POSY, ROTATION, COL_MINDIST_X, COL_MINDIST_Y };
-				enum class e_boolean_readonly { COLLISION_MOUSE_ON, COLLISION_MOUSE_CLICK, COLLISION_COLLIDED /* related to: LAST_COLLISION_TIME */ };
+				enum class e_double_readonly { SPEED_X, SPEED_Y, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */, LAST_DRAW, LAST_UPDATE, UPDATE_DELTA, POSX, POSY, PROJECTED_POSX, PROJECTED_POSY, ROTATION/*, COL_MINDIST_X, COL_MINDIST_Y*/, MOUSE_CLICK_LAST_X, MOUSE_CLICK_LAST_Y };
+				enum class e_boolean_readonly { COLLISION_MOUSE_PRESSED, COLLISION_MOUSE_CLICK, COLLISION_COLLIDED /* related to: LAST_COLLISION_TIME */, INVALIDATE_MOUSE_NOMOVE };
 				enum class e_tief_readonly { LAST_STATE };
 
 				enum class e_string { ID };
 				enum class e_double { TARG_POSX, TARG_POSY, SCALE_X, SCALE_Y, SCALE_G, CENTER_X, CENTER_Y, TARG_ROTATION, ACCELERATION_X, ACCELERATION_Y, SPEEDXY_LIMIT, ELASTICITY_X, ELASTICITY_Y, ROUGHNESS };
-				enum class e_boolean { DRAW, USE_COLOR, AFFECTED_BY_CAM, SHOWDOT, SHOWBOX, RESPECT_CAMERA_LIMITS, SET_TARG_POS_VALUE_READONLY /*Readonly means no collision or acceleration, just f()*/ };
+				enum class e_boolean { DRAW, USE_COLOR, AFFECTED_BY_CAM, SHOWDOT, SHOWBOX, RESPECT_CAMERA_LIMITS /*Readonly means no collision or acceleration, just f()*/ };
 				enum class e_integer { COLLISION_MODE };
 				enum class e_color { COLOR };
 				enum class e_uintptrt { DATA_FROM };
@@ -54,6 +59,8 @@ namespace LSW {
 				enum class e_direction_array_version {
 					NORTH, SOUTH, EAST, WEST
 				};
+
+				// saving as a int with binary vals
 				enum class e_direction {
 					NONE = 0,
 					NORTH = 1 << 0,
@@ -62,20 +69,34 @@ namespace LSW {
 					WEST  = 1 << 3
 				};
 
-				enum class e_tie_functional { DELAYED_WORK_AUTODEL, COLLISION_MOUSE_ON, COLLISION_MOUSE_CLICK, COLLISION_MOUSE_UNCLICK, COLLISION_COLLIDED_OTHER, COLLISION_NONE };
-				constexpr auto tie_functional_size = static_cast<size_t>(e_tie_functional::COLLISION_NONE) + 1;
+				enum class e_tie_functional { 
+					COLLISION_NONE = 0,
+					DELAYED_WORK_AUTODEL,
+					COLLISION_MOUSE_ON,
+					COLLISION_MOUSE_CLICK,
+					COLLISION_MOUSE_UNCLICK,
+					COLLISION_MOUSE_CLICK_NOMOVE, // also triggers CLICK above, may overwrite sprite::e_tief_readonly::LAST_STATE
+					COLLISION_MOUSE_UNCLICK_NOMOVE, // also triggers UNCLICK above, may overwrite sprite::e_tief_readonly::LAST_STATE
+					COLLISION_COLLIDED_OTHER,
 
-				using functional = std::function<void(void)>;
+					_MOUSE_BEGIN = COLLISION_MOUSE_ON,
+					_MOUSE_END = COLLISION_MOUSE_UNCLICK_NOMOVE
+				};
+
+
+				using functional = std::function<void(const Tools::Any&)>;
+
 
 				constexpr double minimum_sprite_accel_collision = 1e-4;
 				constexpr double game_collision_oversize = 1e-3;
 				constexpr double maximum_time_between_collisions = 1.0; // sec
+				constexpr double move_accept_move_max_as_none = 0.025; // click event, how much movement is considered no move? (around the point, +/-)
 
-				const Tools::SuperMap<Tools::sfm_safe_feature<std::string>> e_string_defaults = {
-					{std::string(""),															(e_string::ID),										("id")}
+				const Tools::SuperMap<Tools::FastFunction<std::string>> e_string_defaults = {
+					{std::string(""),												(e_string::ID),										("id")}
 				};
 
-				const Tools::SuperMap<Tools::sfm_safe_feature<double>> e_double_defaults = {
+				const Tools::SuperMap<Tools::FastFunction<double>> e_double_defaults = {
 					{0.0,															(e_double_readonly::SPEED_X),						("speed_x")},
 					{0.0,															(e_double_readonly::SPEED_Y),						("speed_y")},
 					{0.0,															(e_double_readonly::LAST_COLLISION_TIME),			("last_collision_time")},
@@ -87,8 +108,8 @@ namespace LSW {
 					{0.0,															(e_double_readonly::PROJECTED_POSX),				("projected_pos_x")}, // drawing POSX
 					{0.0,															(e_double_readonly::PROJECTED_POSY),				("projected_pos_y")}, // drawing POSY
 					{0.0,															(e_double_readonly::ROTATION),						("rotation")}, // drawing ROTATION
-					{0.0,															(e_double_readonly::COL_MINDIST_X),					("collision_min_distance_x")},
-					{0.0,															(e_double_readonly::COL_MINDIST_Y),					("collision_min_distance_y")},
+					{0.0,															(e_double_readonly::MOUSE_CLICK_LAST_X),			("mouse_click_last_x")},
+					{0.0,															(e_double_readonly::MOUSE_CLICK_LAST_Y),			("mouse_click_last_y")},
 
 					{0.0,															(e_double::TARG_POSX),								("target_pos_x")},
 					{0.0,															(e_double::TARG_POSY),								("target_pos_y")},
@@ -106,36 +127,37 @@ namespace LSW {
 					{0.9999,														(e_double::ROUGHNESS),								("roughness")}
 				};
 
-				const Tools::SuperMap<Tools::sfm_safe_feature<bool>> e_boolean_defaults = {
-					{false,															(e_boolean_readonly::COLLISION_MOUSE_ON),			("collision_mouse_on")},
+				const Tools::SuperMap<Tools::FastFunction<bool>> e_boolean_defaults = {
+					{false,															(e_boolean_readonly::COLLISION_MOUSE_PRESSED),		("collision_mouse_on")},
 					{false,															(e_boolean_readonly::COLLISION_MOUSE_CLICK),		("collision_mouse_click")},
 					{false,															(e_boolean_readonly::COLLISION_COLLIDED),			("collision_collided")},
+					{false,															(e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE),		("invalidate_mouse_nomove")},
+
 					{true,															(e_boolean::DRAW),									("draw")},
 					{false,															(e_boolean::USE_COLOR),								("use_color")},
 					{true,															(e_boolean::AFFECTED_BY_CAM),						("affected_by_camera")},
 					{false,															(e_boolean::SHOWDOT),								("show_dot")}, // shows dot where it will be drawn
 					{false,															(e_boolean::SHOWBOX),								("show_box")}, // shows rectangle where collision updated (latest update)
-					{true,															(e_boolean::RESPECT_CAMERA_LIMITS),					("respect_camera_limits")},
-					{false,															(e_boolean::SET_TARG_POS_VALUE_READONLY),			("set_targ_pos_value_readonly")}
+					{true,															(e_boolean::RESPECT_CAMERA_LIMITS),					("respect_camera_limits")}
 				};
 
-				const Tools::SuperMap<Tools::sfm_safe_feature<int>> e_integer_defaults = {
+				const Tools::SuperMap<Tools::FastFunction<int>> e_integer_defaults = {
 					{static_cast<int>(e_collision_mode_cast::COLLISION_BOTH),		(e_integer::COLLISION_MODE),						("collision_mode")}
 				};
 
-				const Tools::SuperMap<Tools::sfm_safe_feature<Interface::Color>> e_color_defaults = {
+				const Tools::SuperMap<Tools::FastFunction<Interface::Color>> e_color_defaults = {
 					{Interface::Color(255,255,255),									(e_color::COLOR),									("color")}
 				};
 
-				const Tools::SuperMap<Tools::sfm_safe_feature<uintptr_t>> e_uintptrt_defaults = {
+				const Tools::SuperMap<Tools::FastFunction<uintptr_t>> e_uintptrt_defaults = {
 					{(uintptr_t)0,													(e_uintptrt::DATA_FROM)}
 				};
 
-				const Tools::SuperMap<Tools::sfm_safe_feature<e_tie_functional>> e_tief_defaults = {
+				const Tools::SuperMap<Tools::FastFunction<e_tie_functional>> e_tief_defaults = {
 					{e_tie_functional::COLLISION_NONE,								(e_tief_readonly::LAST_STATE)}
 				};
 
-				const Tools::SuperMap<Tools::sfm_safe_feature<functional>> e_functional_defaults = {
+				const Tools::SuperMap<Tools::FastFunction<functional>> e_functional_defaults = {
 					{functional(),													(e_tie_functional::DELAYED_WORK_AUTODEL)},
 					{functional(),													(e_tie_functional::COLLISION_MOUSE_ON)},
 					{functional(),													(e_tie_functional::COLLISION_MOUSE_CLICK)},
@@ -145,13 +167,11 @@ namespace LSW {
 				};
 			}
 
-			/*
-			Sprite_Base:
-			- Base pra qualquer coisa (imagem, texto...)
-			- Texto pode ter um tamanho definido como uma imagem, mas desenhar como texto mesmo assim ( [ área sem nada ] + texto desenhado normalmente sem problemas )
-			*/
-
-			// HAS: double, bool, std::string, int, Interface::Color, uintptr_t
+			/// <summary>
+			/// <para>Sprite_Base: it is the "core" for many things in the Work part of the library.</para>
+			/// <para>This has collision, transformation, common tags, debugging and some features to get other derived classes almost up and running already. You define draw_task and think_task and you're good to go!</para>
+			/// <para>This allows classes to be compatible collision-wide and makes drawing them so easy via draw().</para>
+			/// </summary>
 			class Sprite_Base :
 				public Tools::SuperFunctionalMap<double>,public Tools::SuperFunctionalMap<bool>,public Tools::SuperFunctionalMap<std::string>,public Tools::SuperFunctionalMap<int>,public Tools::SuperFunctionalMap<Interface::Color>,public Tools::SuperFunctionalMap<uintptr_t>,public Tools::SuperFunctionalMap<sprite::functional>,public Tools::SuperFunctionalMap<sprite::e_tie_functional>
 			{
@@ -179,12 +199,17 @@ namespace LSW {
 					void setup(const double, const double, const double, const double);
 				} easy_collision;
 
-			protected:
-				//std::vector<std::string> collision_list, copy_final;
-				//Tools::SuperMutex copy_final_m;
+				/// <summary>
+				/// <para>Set this as your drawing function (Sprite_Base's draw will call this).</para>
+				/// </summary>
+				/// <param name="{Camera}">The Camera applied here (AFFECTED_BY_CAM affect this).</param>
+				virtual void draw_task(const Interface::Camera&) {}
 
-				std::function<void(void)> custom_draw_task; // set this as draw() of new children (so the draw() calls this if exists for further drawing scheme)
-				std::function<void(void)> custom_think_task; // set this as a collision / every tick function (so update() calls this if exists for further tasking)
+				/// <summary>
+				/// <para>Set this as your thinking function (Sprite_Base's update_and_clear will call this).</para>
+				/// </summary>
+				/// <param name="{int}">The collision result direction (e_direction combination).</param>
+				virtual void think_task(const int) {}
 			public:
 				using Tools::SuperFunctionalMap<double>::set;
 				using Tools::SuperFunctionalMap<double>::get;
@@ -211,38 +236,79 @@ namespace LSW {
 				using Tools::SuperFunctionalMap<sprite::e_tie_functional>::get;
 				using Tools::SuperFunctionalMap<sprite::e_tie_functional>::get_direct;
 
+				/// <summary>
+				/// <para>Empty default start.</para>
+				/// </summary>
 				Sprite_Base();
+
+				/// <summary>
+				/// <para>Constructor referencing a Sprite_Base (not a copy).</para>
+				/// </summary>
+				/// <param name="{Sprite_Base}">The one to reference attributes from (no copy).</param>
 				Sprite_Base(const Sprite_Base&);
+
+				/// <summary>
+				/// <para>Constructor to move a Sprite_Base to this (move).</para>
+				/// </summary>
+				/// <param name="{Sprite_Base}">The one to move attributes from.</param>
 				Sprite_Base(Sprite_Base&&);
 
-				//void hook(const sprite::e_tie_functional, const std::function<void(void)>);
-				//void unhook(const sprite::e_tie_functional);
-
-				// set to blindly use this comrade's attributes as theirs
+				/// <summary>
+				/// <para>Clone other Sprite_Base attributes.</para>
+				/// <para>You can also clone a specific type by doing set(*get()).</para>
+				/// </summary>
+				/// <param name="{Sprite_Base}">Other to copy from.</param>
 				void clone(const Sprite_Base&);
 
+				/// <summary>
+				/// <para>Reference a Sprite_Base (not a copy).</para>
+				/// </summary>
+				/// <param name="{Sprite_Base}">The one to reference attributes from (no copy).</param>
 				void operator=(const Sprite_Base&);
+
+				/// <summary>
+				/// <para>Move a Sprite_Base to this (move).</para>
+				/// </summary>
+				/// <param name="{Sprite_Base}">The one to move attributes from.</param>
 				void operator=(Sprite_Base&&);
 
-
-				//template<typename T, typename V> inline bool is_eq(const T& e, const std::function<V(void)>& v) const { auto* i = get_direct<V*>(e); return *i == v || (*i)() == v(); }
+				/// <summary>
+				/// <para>Compare values right now given a key.</para>
+				/// </summary>
+				/// <param name="{T}">A key.</param>
+				/// <param name="{V}">A value</param>
+				/// <returns>{bool} True if equal right now.</returns>
 				template<typename T, typename V> inline bool is_eq(const T& e, const V& v) const { return get_direct<V>(e) == v; }
+
+				/// <summary>
+				/// <para>Compare values right now directly to another Sprite_Base given a key.</para>
+				/// </summary>
+				/// <param name="{T}">A key.</param>
+				/// <param name="{Sprite_Base}">A Sprite_Base with same key set to compare directly.</param>
+				/// <returns>{bool} True if equal right now.</returns>
 				template<typename V, typename T> inline bool is_eq(const T& e, const Sprite_Base& s) const { return get_direct<V>(e) == s.get_direct<V>(e); }
 
-				// ALWAYS CALL NATIVE DRAW FROM SPRITE_BASE! | Camera is useful to make it consistent
-				bool draw(const Interface::Camera&);
-			
-				// camera is useful for consistent run, bool to run even though it's a reference to someone?
+				/// <summary>
+				/// <para>Calculate and draw this (calls derived class implementation of draw_task. PLEASE DON'T OVERRIDE THIS).</para>
+				/// </summary>
+				/// <param name="{Camera}">Reference camera used in draw, properties may change it to default.</param>
+				/// <param name="{bool}">Do collision even though this is a copy (if it is)?</param>
+				/// <returns></returns>
+				void draw(const Interface::Camera&, const bool = false);
+
+				/// <summary>
+				/// <para>Collide with another Sprite_Base.</para>
+				/// </summary>
+				/// <param name="{Sprite_Base}">Another Sprite_Base derived class.</param>
+				/// <param name="{bool}">Do collision even though this is a copy (if it is)?</param>
 				void collide(const Sprite_Base&, const bool = false);
-			
-				// chech header information if you're not using GameCore (for config), bool to run even though it's a reference to someone?
+
+				/// <summary>
+				/// <para>Update based on collisions and task other specific stuff like mouse collision (based on the Config) and smoothness automatic calculation.</para>
+				/// </summary>
+				/// <param name="{Config}">A Config with mouse data (see header top lines).</param>
+				/// <param name="{bool}">Do update even though this is a copy (if it is)?</param>
 				void update_and_clear(const Interface::Config&, const bool = false);
-
-				// YOU SHALL update() BEFORE TESTING COLLISION!
-				//easier_collision_handle& get_collision();
-
-				// list of IDs (internal IDs)
-				//const std::vector<std::string> get_collided_with_list();
 			};
 		}
 	}

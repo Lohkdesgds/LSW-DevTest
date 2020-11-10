@@ -46,6 +46,8 @@ namespace LSW {
 					// mouse (memory) ### TIED TO SPRITE!
 					share->conf.ensure(gamecore::conf_mouse_memory, "x",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
 					share->conf.ensure(gamecore::conf_mouse_memory, "y",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "rx",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "ry",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
 					share->conf.ensure(gamecore::conf_mouse_memory, "press_count",			0u,		Interface::config::config_section_mode::MEMORY_ONLY);
 					share->conf.ensure(gamecore::conf_mouse_memory, "down_latest",			-1,		Interface::config::config_section_mode::MEMORY_ONLY);
 					// set "b0" ... as mouse buttons (bool)
@@ -88,15 +90,23 @@ namespace LSW {
 								share->_m_newdata = false;
 								float x = share->_m_x;
 								float y = share->_m_y;
+								float rx = share->_m_x;
+								float ry = share->_m_y;
 								if (auto camnow = share->display.get_current_camera(); camnow) {
 									Interface::Camera inv = *camnow;
 									inv.invert();
 									inv.transform(x, y);
+									Interface::Camera cninv = *camnow;
+									cninv.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
+									cninv.invert();
+									cninv.transform(rx, ry);
 									//logg << L::SL << fsr() << "Mouse axis: [" << ev.mouse_event().x << ";" << ev.mouse_event().y << "] " << FormatAs("%.4f") << x << ";" << FormatAs("%.4f") << y << L::EL;
 
 									share->conf.set(gamecore::conf_mouse_memory, Interface::config::config_section_mode::MEMORY_ONLY);
 									share->conf.set(gamecore::conf_mouse_memory, "x", x);
 									share->conf.set(gamecore::conf_mouse_memory, "y", y);
+									share->conf.set(gamecore::conf_mouse_memory, "rx", rx);
+									share->conf.set(gamecore::conf_mouse_memory, "ry", ry);
 								}
 							}
 							else if (ev.timer_event().source == share->check_sources) {
