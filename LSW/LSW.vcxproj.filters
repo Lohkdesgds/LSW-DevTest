@@ -170,6 +170,9 @@
     <Filter Include="LSW\1. Tools\FastFunction">
       <UniqueIdentifier>{e088062e-7cb4-4d82-bb96-a6d6f590fa0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\1. Tools\StopWatch">
+      <UniqueIdentifier>{af135940-468b-4e16-8a07-1d47c8f9f337}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -267,6 +270,12 @@
     </ClCompile>
     <ClCompile Include="LSW\Work\Collisioner\collisioner.cpp">
       <Filter>LSW\3. Work\Collisioner</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Work\Text\text.cpp">
+      <Filter>LSW\3. Work\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Tools\Stopwatch\stopwatch.cpp">
+      <Filter>LSW\1. Tools\StopWatch</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -415,6 +424,12 @@
     </ClInclude>
     <ClInclude Include="LSW\Tools\FastFunction\fastfunction.h">
       <Filter>LSW\1. Tools\FastFunction</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\Text\text.h">
+      <Filter>LSW\3. Work\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Stopwatch\stopwatch.h">
+      <Filter>LSW\1. Tools\StopWatch</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -167,7 +167,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
@@ -187,7 +187,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
@@ -224,11 +224,13 @@
     <ClCompile Include="LSW\Tools\CString\cstring.cpp" />
     <ClCompile Include="LSW\Tools\Hash\hash.cpp" />
     <ClCompile Include="LSW\Tools\Launcher\launcher.cpp" />
+    <ClCompile Include="LSW\Tools\Stopwatch\stopwatch.cpp" />
     <ClCompile Include="LSW\Tools\SuperMutex\supermutex.cpp" />
     <ClCompile Include="LSW\Work\Block\block.cpp" />
     <ClCompile Include="LSW\Work\Collisioner\collisioner.cpp" />
     <ClCompile Include="LSW\Work\GameCore\gamecore.cpp" />
     <ClCompile Include="LSW\Work\Sprite\sprite.cpp" />
+    <ClCompile Include="LSW\Work\Text\text.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -271,6 +273,7 @@
     <ClInclude Include="LSW\Tools\Future\future.h" />
     <ClInclude Include="LSW\Tools\Hash\hash.h" />
     <ClInclude Include="LSW\Tools\Launcher\launcher.h" />
+    <ClInclude Include="LSW\Tools\Stopwatch\stopwatch.h" />
     <ClInclude Include="LSW\Tools\SuperFunctionalMap\superfunctionalmap.h" />
     <ClInclude Include="LSW\Tools\SuperMap\supermap.h" />
     <ClInclude Include="LSW\Tools\SuperMutex\supermutex.h" />
@@ -283,6 +286,7 @@
     <ClInclude Include="LSW\Work\Collisioner\collisioner.h" />
     <ClInclude Include="LSW\Work\GameCore\gamecore.h" />
     <ClInclude Include="LSW\Work\Sprite\sprite.h" />
+    <ClInclude Include="LSW\Work\Text\text.h" />
     <ClInclude Include="LSW\Work\Work.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -28,6 +28,30 @@ namespace LSW {
 				Font();
 
 				/// <summary>
+				/// <para>Clones (the reference) of the internal Font.</para>
+				/// </summary>
+				/// <param name="{Font}">A Font to copy the reference.</param>
+				Font(const Font&);
+
+				/// <summary>
+				/// <para>Moves the internal Font's data to this.</para>
+				/// </summary>
+				/// <param name="{Font}">A Font to move data from.</param>
+				Font(Font&&);
+
+				/// <summary>
+				/// <para>Copy operator.</para>
+				/// </summary>
+				/// <param name="{Font}">A Font to copy the reference.</param>
+				void operator=(const Font&);
+
+				/// <summary>
+				/// <para>Move operator.</para>
+				/// </summary>
+				/// <param name="{Font}">A Font to move from.</param>
+				void operator=(Font&&);
+
+				/// <summary>
 				/// <para>Load a font with specific size (you may want multiple Fonts for multiple sizes).</para>
 				/// </summary>
 				/// <param name="{char*}">Path to font.</param>
@@ -36,9 +60,6 @@ namespace LSW {
 				/// <returns></returns>
 				// load common font, with size and flags
 				bool load(const char*, const int = 75, const int = 0);
-				// load ttf font, with size and flags
-				//bool load_ttf(const char*, const int = 75, const int = 0);
-
 
 				/// <summary>
 				/// <para>Operator bool.</para>

@@ -194,6 +194,8 @@ namespace LSW {
 			void Sprite_Base::draw(const Interface::Camera& cam, const bool run_anyway)
 			{
 				if (!run_anyway && get_direct<uintptr_t>(sprite::e_uintptrt::DATA_FROM) != (uintptr_t)this) return;  // only original copy should update parameters
+				if (is_eq(sprite::e_boolean::DRAW, false)) return;
+
 				//if (is_eq(sprite::e_boolean::SHOWBOX, true) || is_eq(sprite::e_boolean::SHOWDOT, true)) {
 
 				const auto affected_by_cam = get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM);
@@ -209,18 +211,15 @@ namespace LSW {
 				const auto last_draw_v = get_direct<double>(sprite::e_double_readonly::LAST_DRAW);
 				const auto rotation_v = get_direct<double>(sprite::e_double_readonly::ROTATION);
 				const auto posx_v = get_direct<double>(sprite::e_double_readonly::POSX);
-				const auto posy_v = get_direct<double>(sprite::e_double_readonly::POSY);					
+				const auto posy_v = get_direct<double>(sprite::e_double_readonly::POSY);
+				const auto last_update = get_direct<double>(sprite::e_double_readonly::LAST_UPDATE); // al_get_time
 
-				Interface::Camera _cleancam;
+				Interface::Camera _cleancam = cam;
 
-				if (affected_by_cam) {
-					cam.apply();
-				}
-				else {
-					_cleancam = cam;
+				if (!affected_by_cam) {
 					_cleancam.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
-					_cleancam.apply();
 				}
+				_cleancam.apply();
 
 				// delta T calculation
 
@@ -230,13 +229,20 @@ namespace LSW {
 
 				double perc_run = (update_delta > 0.0 ? (0.5 / update_delta) : 0.1) * pow(dt, 0.86);		// ex: 5 per sec * 0.2 (1/5 sec) = 1, so posx = actual posx...
 				if (perc_run > 1.0) perc_run = 1.0;					// 1.0 is "set value"
-				if (perc_run < 1.0 / 10000) perc_run = 1.0 / 10000; // can't be infinitely smooth right? come on
+				if (perc_run < 1.0 / 500) perc_run = 1.0 / 500; // can't be infinitely smooth right? come on
 
 				// new position calculation
 
-				set(sprite::e_double_readonly::ROTATION, (1.0 - perc_run) * rotation_v + perc_run * targ_rotation);
-				set(sprite::e_double_readonly::POSX, (1.0 - perc_run) * posx_v + perc_run * targ_posx);
-				set(sprite::e_double_readonly::POSY, (1.0 - perc_run) * posy_v + perc_run * targ_posy);
+				if (al_get_time() - last_update >= sprite::maximum_time_between_collisions) {
+					set(sprite::e_double_readonly::ROTATION, targ_rotation);
+					set(sprite::e_double_readonly::POSX, real_targ_posx);
+					set(sprite::e_double_readonly::POSY, real_targ_posy);
+				}
+				else {
+					set(sprite::e_double_readonly::ROTATION, (1.0 - perc_run) * rotation_v + perc_run * targ_rotation);
+					set(sprite::e_double_readonly::POSX, (1.0 - perc_run) * posx_v + perc_run * targ_posx);
+					set(sprite::e_double_readonly::POSY, (1.0 - perc_run) * posy_v + perc_run * targ_posy);
+				}
 
 				if (is_eq(sprite::e_boolean::SHOWBOX, true)) {
 
@@ -266,7 +272,7 @@ namespace LSW {
 				}
 				//}
 					
-				draw_task(affected_by_cam ? cam : _cleancam);
+				draw_task(_cleancam);
 			}
 
 			void Sprite_Base::collide(const Sprite_Base& oth, const bool run_anyway) // if colliding, do not accept speed entry (keyboard player moving)

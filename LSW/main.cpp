@@ -58,13 +58,14 @@ int main() {
 
 		auto atlas = source.create("ATLAS_GLOBAL");
 		auto lmao = source.create("_test");
+		auto dirt = source.create("_dirt");
 
 		auto foo = source_font.create("DEFAULT");
 
 		// use .zip
 		pather.apply();
 
-		foo->load("font.ttf");
+		foo->load("font.ttf", 75);
 
 		if (!foo) logg << L::SLF << fsr(E::WARN) << "Failed to load font." << L::ELF;
 		else {
@@ -78,6 +79,7 @@ int main() {
 
 		if (gud) {
 			gud = lmao->create_sub(atlas, 0, 1536, 512, 512);
+			gud = gud && dirt->create_sub(atlas, 0, 1024, 512, 512);
 			if (!gud) {
 				logg << L::SLF << fsr(E::WARN) << "Failed to load sub bitmap from atlas." << L::ELF;
 			}
@@ -113,33 +115,57 @@ int main() {
 
 	core.get_display().set_camera(cam);
 
+	bool __simple_texts = false;
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - BLOCKS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 
 	Tools::SuperResource<Bitmap> bmps;
-
-	Tools::Resource<Bitmap> lmao;// = source.create("_test");
+	Tools::Resource<Bitmap> lmao, dirt;// = source.create("_test");
 
 	if (!bmps.get("_test", lmao)) {
 		logg << L::SLF << fsr(E::ERRR) << "Texture wasn't found somehow..." << L::ELF;
 		core.shutdown();
 		return -1;
 	}
+	if (!bmps.get("_dirt", dirt)) {
+		logg << L::SLF << fsr(E::ERRR) << "Texture wasn't found somehow..." << L::ELF;
+		core.shutdown();
+		return -1;
+	}
 
-	auto blk = blocks.create("_test_block");
+	auto blk0 = blocks.create("_test_block");
+	auto blk1 = blocks.create("_test_block2");
 	auto blk2 = blocks.create("_test_block_mouse");
 	auto blk3 = blocks.create("_test_col");
-	auto blk4 = blocks.create("_test_block2");
 	auto blk_height = blocks.create("_test_slidex");
 	auto blk_width = blocks.create("_test_slidey");
+	auto blk_switch = blocks.create("_test_switch");
 
-	blk->insert(lmao);
+	blk0->insert(lmao);
 	blk2->insert(lmao);
 	blk3->insert(lmao);
-	blk4->insert(lmao);
+	blk1->insert(lmao);
 	blk_height->insert(lmao);
 	blk_width->insert(lmao);
+	blk_switch->insert(dirt);
 	
 
 
+
+
+	blk_switch->set(Work::sprite::e_double::TARG_POSX, 0.9);
+	blk_switch->set(Work::sprite::e_double::TARG_POSY, -0.9);
+	blk_switch->set(Work::sprite::e_double::SCALE_G, 0.1);
+	blk_switch->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	blk_switch->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+
+	blk_switch->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](const Tools::Any& ref) {
+		__simple_texts = !__simple_texts;
+
+		Logger logg;
+		logg << L::SL << fsr() << "SWITCH TEXT " << (__simple_texts ? "Y" : "N") << L::EL;
+	});
 
 
 	blk_height->set(Work::sprite::e_double::TARG_POSX, 0.99);
@@ -181,27 +207,27 @@ int main() {
 
 
 
-	blk->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
-	blk->set<double>(Work::sprite::e_double::TARG_POSY, [] { return 0.25 + 0.55 * sin(MILLI_NOW.count() / 689.0); });
-	blk->set<double>(Work::sprite::e_double::SCALE_G, 0.8);
-	blk->set<double>(Work::sprite::e_double::SCALE_Y, 0.3);
-	blk->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+	blk0->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
+	blk0->set<double>(Work::sprite::e_double::TARG_POSY, [] { return 0.25 + 0.55 * sin(MILLI_NOW.count() / 689.0); });
+	blk0->set<double>(Work::sprite::e_double::SCALE_G, 0.8);
+	blk0->set<double>(Work::sprite::e_double::SCALE_Y, 0.3);
+	blk0->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
 
-	blk4->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
-	blk4->set<double>(Work::sprite::e_double::TARG_POSY, [] { return -0.25 + 0.55 * sin(MILLI_NOW.count() / 689.0); });
-	blk4->set<double>(Work::sprite::e_double::SCALE_G, 0.8);
-	blk4->set<double>(Work::sprite::e_double::SCALE_Y, 0.3);
-	blk4->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+	blk1->set<double>(Work::sprite::e_double::TARG_POSX, 0.0);
+	blk1->set<double>(Work::sprite::e_double::TARG_POSY, [] { return -0.25 + 0.55 * sin(MILLI_NOW.count() / 689.0); });
+	blk1->set<double>(Work::sprite::e_double::SCALE_G, 0.8);
+	blk1->set<double>(Work::sprite::e_double::SCALE_Y, 0.3);
+	blk1->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
 
-	blk->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](auto) {
+	blk0->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](auto) {
 		Logger logg;
 #ifdef _DEBUG
 		logg << L::SL << fsr() << "Clicked." << L::EL;
 
-		logg << L::SL << fsr() << "0 UPDATE_DELTA: " << blk->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+		logg << L::SL << fsr() << "0 UPDATE_DELTA: " << blk0->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
 		logg << L::SL << fsr() << "2 UPDATE_DELTA: " << blk2->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
 		logg << L::SL << fsr() << "3 UPDATE_DELTA: " << blk3->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
-		logg << L::SL << fsr() << "4 UPDATE_DELTA: " << blk4->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+		logg << L::SL << fsr() << "4 UPDATE_DELTA: " << blk1->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
 #else
 		logg << L::SL << fsr() << "Uau vc sabe clicar, boa!" << L::EL;
 #endif
@@ -212,66 +238,241 @@ int main() {
 	blk2->set<double>(Work::sprite::e_double::TARG_POSY, [&] { return core.get_config().get_as<double>("mouse", "y"); });
 	blk2->set<double>(Work::sprite::e_double::SCALE_G, 0.15);
 	blk2->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
-	blk2->set(Work::sprite::e_boolean::SHOWBOX, true);
+	//blk2->set(Work::sprite::e_boolean::SHOWBOX, true);
 
 
 
 	blk3->set<double>(Work::sprite::e_double::TARG_POSX, -0.65);
 	blk3->set<double>(Work::sprite::e_double::TARG_POSY, -0.5);
 	blk3->set<double>(Work::sprite::e_double::SCALE_G, 0.20);
-	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);blk3->set(Work::sprite::e_boolean::SHOWBOX, true);
-
-
+	//blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);blk3->set(Work::sprite::e_boolean::SHOWBOX, true);
 
 
 	Work::Collisioner slide_control(core.get_config());
 	slide_control.insert(blk_height);
 	slide_control.insert(blk_width);
+	slide_control.insert(blk_switch);
 
 	Work::Collisioner collision_control(core.get_config());
-	collision_control.insert(blk);
+	collision_control.insert(blk0);
 	collision_control.insert(blk2);
 	collision_control.insert(blk3);
-	collision_control.insert(blk4);
+	collision_control.insert(blk1);
 
 	collision_control.start(1.0 / 20);
 	slide_control.start(1.0 / 10);
 
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - BLOCKS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - TEXTS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+
+
+	Tools::SuperResource<Font> source_font;
+	Tools::SuperResource<Work::Text> texts;
+
+	Tools::Resource<Interface::Font> sfont;
+	if (!source_font.get("DEFAULT", sfont)) {
+		logg << L::SLF << fsr(E::ERRR) << "Font wasn't found somehow..." << L::ELF;
+			core.shutdown();
+			return -1;
+	}
+
+	auto txt0 = texts.create("_line0");
+	//auto txt1 = texts.create("_line1");
+	//auto txt2 = texts.create("_line2");
+	//auto txt3 = texts.create("_line3");
+	auto txt4 = texts.create("_line4");
+	auto txtu = texts.create("_lineu");
+
+	auto txtf0 = texts.create("_follow_0");
+	auto txtf1 = texts.create("_follow_1");
+
+	txt0->set(sfont);/*
+	txt1->set(sfont);
+	txt2->set(sfont);
+	txt3->set(sfont);*/
+	txt4->set(sfont);
+	txtu->set(sfont);
+	txtf0->set(sfont);
+	txtf1->set(sfont);
+
+	Tools::Stopwatch sw; // noo need to mutex, []{} is called in sync with draw
+	sw.prepare(13);
+	size_t __c = 0;
+
+
+	txt0->set<Tools::Cstring>(Work::text::e_cstring::STRING, 
+		[&core, &collision_control, &slide_control, &__simple_texts] {
+			return (__simple_texts ? ("&a" + std::to_string(core.get_display().get_frames_per_second())) : (
+				"&5FPS: &a" + std::to_string(core.get_display().get_frames_per_second()) + (core.get_display().get_fps_cap() ? (" / " + std::to_string(core.get_display().get_fps_cap()) + " (limit)") : "") + (core.get_display().get_vsync() ? (" &6VSYNC SET") : " &bVSYNC UNSET") + "\n" +
+				"&3TPS: &d" + std::to_string(collision_control.effective_tps()) + " & " + std::to_string(slide_control.effective_tps()) + "\n" +
+				"&2Times open: &b" + std::to_string(core.get_config().get_as<unsigned long long>("registry", "times_open")) + "\n" +
+				"&7Mouse pos: &e" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "x")) + "x" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "y"))
+				));
+		});
+	txt0->set(Work::sprite::e_double::TARG_POSX, -1.0);
+	txt0->set(Work::sprite::e_double::TARG_POSY, -1.00);
+	txt0->set(Work::sprite::e_double::SCALE_G, 0.07);
+	txt0->set(Work::sprite::e_double::SCALE_X, 0.35);
+	txt0->set(Work::text::e_double::LINE_ADJUST, 0.85);
+	txt0->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	txt0->set(Work::text::e_double::UPDATES_PER_SECOND, 1.0);
+
+	/*txt1->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&collision_control, &slide_control] { return "&3TPS: &d" + std::to_string(collision_control.effective_tps()) + " & " + std::to_string(slide_control.effective_tps()); });
+	txt1->set(Work::sprite::e_double::TARG_POSX, -1.0);
+	txt1->set(Work::sprite::e_double::TARG_POSY, -0.93);
+	txt1->set(Work::sprite::e_double::SCALE_G, 0.07);
+	txt1->set(Work::sprite::e_double::SCALE_X, 0.35);
+	txt1->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+
+	txt2->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&core] { return "&2Times open: &b" + std::to_string(core.get_config().get_as<unsigned long long>("registry", "times_open")); });
+	txt2->set(Work::sprite::e_double::TARG_POSX, -1.0);
+	txt2->set(Work::sprite::e_double::TARG_POSY, -0.86);
+	txt2->set(Work::sprite::e_double::SCALE_G, 0.07);
+	txt2->set(Work::sprite::e_double::SCALE_X, 0.35);
+	txt2->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+
+	txt3->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&core] { return "&7Mouse pos: &e" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "x")) + "x" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "y")); });
+	txt3->set(Work::sprite::e_double::TARG_POSX, -1.0);
+	txt3->set(Work::sprite::e_double::TARG_POSY, -0.79);
+	txt3->set(Work::sprite::e_double::SCALE_G, 0.07);
+	txt3->set(Work::sprite::e_double::SCALE_X, 0.35);
+	txt3->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);*/
+
+	txt4->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] {
+		if (!__c) return std::string("&9Debug sync lost, please wait.");
+		return 
+			"&9DEBUG BMP/TEXT DRAW:\n" + sw.generate_table() + "\n&eTotal time draw: " + sw.get_string_between(0, sw.last_point_valid());
+	});
+	txt4->set(Work::sprite::e_double::TARG_POSX, -1.0);
+	txt4->set(Work::sprite::e_double::TARG_POSY, -0.72);
+	txt4->set(Work::sprite::e_double::SCALE_G, 0.052);
+	txt4->set(Work::sprite::e_double::SCALE_X, 0.35);
+	txt4->set(Work::text::e_double::LINE_ADJUST, 0.75);
+	txt4->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	txt4->set(Work::text::e_double::UPDATES_PER_SECOND, 2.0);
+	txt4->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(127, 0, 0));
+	txt4->set<bool>(Work::sprite::e_boolean::DRAW, [&] {return !__simple_texts; });
+	txt4->set(Work::text::e_double::SHADOW_DISTANCE_X, 0.0007);
+	txt4->set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.0007);
+
+	txtu->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&logg] { return logg.get_last_line().filter_ascii_range(); });
+	txtu->set(Work::sprite::e_double::TARG_POSX, -1.0);
+	txtu->set(Work::sprite::e_double::TARG_POSY, 0.927);
+	txtu->set(Work::sprite::e_double::SCALE_G, 0.06);
+	txtu->set(Work::sprite::e_double::SCALE_X, 0.35);
+	//txtu->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(0, 0, 0));
+	txtu->set(Work::text::e_double::SHADOW_DISTANCE_X, 0.001);
+	txtu->set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.001);
+	txtu->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	txtu->set<bool>(Work::sprite::e_boolean::DRAW, [&] {return !__simple_texts; });
+	txtu->set(Work::text::e_double::UPDATES_PER_SECOND, 3.0);
+
+	txtf0->set<Tools::Cstring>(Work::text::e_cstring::STRING, [] { std::string t = "FOLLOW 0 HYPE"; return t.substr(0, (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 500) % (10 + t.length())); });
+	txtf0->set(Work::sprite::e_double::TARG_POSX, 0);
+	txtf0->set(Work::sprite::e_double::TARG_POSY, -0.1);
+	txtf0->set(Work::sprite::e_double::SCALE_G, 0.15);
+	txtf0->set(Work::sprite::e_double::SCALE_X, 0.65);
+	txtf0->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
+	txtf0->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, blk0);
+	txtf0->set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 0.66);
+	txtf0->set(Work::text::e_double::UPDATES_PER_SECOND, 20.0);
+	txtf0->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(150, 100, 100));
+	txtf0->set(Work::text::e_double::SHADOW_DISTANCE_X, 0.005);
+	txtf0->set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.005);
+	txtf0->set(Work::text::e_boolean::USE_BITMAP_BUFFER, true);
+
+	txtf1->set<Tools::Cstring>(Work::text::e_cstring::STRING, "FOLLOW 1 HYPE 60 FPS");
+	txtf1->set(Work::sprite::e_double::TARG_POSX, 0);
+	txtf1->set(Work::sprite::e_double::TARG_POSY, -0.1);
+	txtf1->set(Work::sprite::e_double::SCALE_G, 0.15);
+	txtf1->set(Work::sprite::e_double::SCALE_X, 0.50);
+	txtf1->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
+	txtf1->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, blk1);
+	txtf1->set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 0.40);
+	txtf1->set(Work::text::e_double::UPDATES_PER_SECOND, 60.0);
+	txtf1->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(100, 100, 150));
+	txtf1->set(Work::text::e_double::SHADOW_DISTANCE_X, 0.005);
+	txtf1->set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.005);
+	txtf1->set(Work::text::e_boolean::USE_BITMAP_BUFFER, true);
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - TEXTS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+
+
 	{
-		Tools::SuperResource<Font> source_font;
 
-		Tools::Resource<Interface::Font> lool;
-		source_font.get("DEFAULT", lool);
-
-		core.get_display().add_draw_task([=](Camera& c) {
+		core.get_display().add_draw_task([=, &__c, &sw](const Camera& c) {
 			///got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
 			
-			blk->draw(c);
-			blk4->draw(c);
+			if (!__c) sw.start(); // 0
+			blk0->draw(c);
+			if (!__c) sw.click_one(); // 1
+			blk1->draw(c);
+			if (!__c) sw.click_one(); // 2
 			blk2->draw(c);
+			if (!__c) sw.click_one(); // 3
 			blk3->draw(c);
+			if (!__c) sw.click_one(); // 4
 			blk_height->draw(c);
+			if (!__c) sw.click_one(); // 5
 			blk_width->draw(c);
-			//blk->update_and_clear(core.get_config());
+			if (!__c) sw.click_one(); // 6
+			blk_switch->draw(c);
+			if (!__c) sw.click_one(); // 7
+			txt0->draw(c);
+			if (!__c) sw.click_one(); // 8
+			txtu->draw(c);
+			if (!__c) sw.click_one(); // 9
+			txtf0->draw(c);
+			if (!__c) sw.click_one(); // 10
+			txtf1->draw(c);
+			if (!__c) sw.click_one(); // 11
+			txt4->draw(c); // has to be last
+			if (!__c) sw.click_one(); // 12
 
-			//if (track->exists()) {
-			//	float xx = 1.9f * ((1.0f * track->get_position_ms() / track->get_length_ms()) - 0.5f);
-			//
-			//	got->draw(got->get_width() / 2, got->get_height() / 2, xx, 0.9f, 0.0003, 0.0003);
-			//}
-		});
+			if (++__c > 200) __c = 0;
 
-		core.get_display().add_draw_task([&collision_control, &slide_control, lool, logg, core](Camera& curr) {
-			Camera cam2 = curr;
-			const float prop = 2500.0f;
-			cam2.classic_transform(0, 0, 1.0 / prop, 1.0 / prop, 0.0); // change this later somehow
-			cam2.apply();
-			lool->draw(-prop, -1.0f * prop, 0, "&5FPS: &a" + std::to_string(core.get_display().get_frames_per_second()) + (core.get_display().get_fps_cap() ? (" / " + std::to_string(core.get_display().get_fps_cap()) + " (limit)") : "") + (core.get_display().get_vsync() ? (" &6VSYNC SET") : " &bVSYNC UNSET"));
-			lool->draw(-prop, -0.96f * prop, 0, "&3TPS: &d" + std::to_string(collision_control.effective_tps()) + " & " + std::to_string(slide_control.effective_tps()));
-			lool->draw(-prop, -0.92f * prop, 0, "&2Times open: &b" + std::to_string(core.get_config().get_as<unsigned long long>("registry", "times_open")));
-			lool->draw(-prop, -0.88f * prop, 0, "&7Mouse pos: &e" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "x")) + "x" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "y")));
-			lool->draw(-prop, 0.96f * prop, 0, logg.get_last_line().filter_ascii_range());
-			curr.apply();
+			/*
+			Tools::Stopwatch sw;
+			sw.prepare(14);
+
+			sw.start(); // 0
+			blk0->draw(c);
+			sw.click_one(); // 1
+			blk1->draw(c);
+			sw.click_one(); // 2
+			blk2->draw(c);
+			sw.click_one(); // 3
+			blk3->draw(c);
+			sw.click_one(); // 4
+			blk_height->draw(c);
+			sw.click_one(); // 5
+			blk_width->draw(c);
+			sw.click_one(); // 6
+			txt0->draw(c);
+			sw.click_one(); // 7
+			txt1->draw(c);
+			sw.click_one(); // 8
+			txt2->draw(c);
+			sw.click_one(); // 9
+			txt3->draw(c);
+			sw.click_one(); // 10
+			txtu->draw(c);
+			sw.click_one(); // 11
+			txtf0->draw(c);
+			sw.click_one(); // 12
+			txtf1->draw(c);
+			sw.click_one(); // ...
+
+			Logger logg;
+			logg << L::SL << fsr() << "Stopwatch said:\n" << sw.generate_table() << L::EL;
+			*/
+
 		});
 	}
 
@@ -458,6 +659,9 @@ int main() {
 	});
 
 	core.yield();
+
+	collision_control.set_stop();
+	slide_control.set_stop();
 
 	collision_control.stop();
 	slide_control.stop();

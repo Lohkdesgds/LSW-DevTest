@@ -188,7 +188,7 @@ namespace LSW {
 
 				if (!share->loaded) return;
 
-				share->events.reset();
+				share->events.stop();
 				share->check_sources.stop();
 				share->update_mouse.stop();
 

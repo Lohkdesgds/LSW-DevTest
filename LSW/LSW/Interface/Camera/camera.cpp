@@ -46,7 +46,7 @@ namespace LSW {
 				al_build_camera_transform(&t, x, y, z, lx, ly, lz, ux, uy, uz);
 			}
 
-			bool Camera::classic_transform(std::shared_ptr<Bitmap> bmp, const float x, const float y, const float sx, const float sy, const float r)
+			bool Camera::classic_transform(const Bitmap& bmp, const float x, const float y, const float sx, const float sy, const float r)
 			{
 				last_targ = bmp;
 				return classic_transform(x, y, sx, sy, r);
@@ -67,8 +67,8 @@ namespace LSW {
 			{
 				if (!last_targ) return false;
 
-				const int dx = last_targ->get_width();
-				const int dy = last_targ->get_height();
+				const int dx = last_targ.get_width();
+				const int dy = last_targ.get_height();
 
 				identity();
 				rotate(cl_2d.rot);
@@ -78,7 +78,7 @@ namespace LSW {
 				return true;
 			}
 
-			bool Camera::classic_update(std::shared_ptr<Bitmap> bmp)
+			bool Camera::classic_update(const Bitmap& bmp)
 			{
 				last_targ = bmp;
 				return classic_refresh();

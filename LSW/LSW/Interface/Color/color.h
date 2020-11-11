@@ -11,7 +11,7 @@ namespace LSW {
 			/// </summary>
 			class Color : public ALLEGRO_COLOR {
 			public:
-				Color() = default;
+				Color();
 
 				/// <summary>
 				/// <para>Intialize with the RGBA float values.</para>

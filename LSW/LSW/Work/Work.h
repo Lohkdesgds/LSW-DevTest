@@ -4,5 +4,6 @@
 
 #include "Sprite/sprite.h"
 #include "Block/block.h"
+#include "Text/text.h"
 
 #include "Collisioner/collisioner.h"

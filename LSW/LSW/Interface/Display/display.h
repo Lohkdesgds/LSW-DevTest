@@ -34,7 +34,7 @@ namespace LSW {
 			// Function that returns any.
 			using DisplayAnyFSPtr = std::function<DisplayAnySPtr(void)>;
 
-			using DisplayTask = std::function<void(Camera&)>;
+			using DisplayTask = std::function<void(const Camera&)>;
 
 			class Display {
 				int new_display_flags_apply = display::default_new_display_flags;

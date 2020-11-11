@@ -191,9 +191,14 @@ namespace LSW {
 				void remove(const Event&);
 
 				/// <summary>
+				/// <para>Set to stop internal thread (no lock, stop properly with stop()).</para>
+				/// </summary>
+				void set_stop();
+
+				/// <summary>
 				/// <para>Stops the internal thread and cleanup (you'll have to reset to start again).</para>
 				/// </summary>
-				void reset();
+				void stop();
 
 				/// <summary>
 				/// <para>Starts thread to handle events and call function as they happen.</para>

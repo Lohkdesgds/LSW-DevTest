@@ -89,7 +89,7 @@ namespace LSW {
 
 				constexpr double minimum_sprite_accel_collision = 1e-4;
 				constexpr double game_collision_oversize = 1e-3;
-				constexpr double maximum_time_between_collisions = 1.0; // sec
+				constexpr double maximum_time_between_collisions = 1.0; // sec, used for smoothness too
 				constexpr double move_accept_move_max_as_none = 0.025; // click event, how much movement is considered no move? (around the point, +/-)
 
 				const Tools::SuperMap<Tools::FastFunction<std::string>> e_string_defaults = {
@@ -203,7 +203,7 @@ namespace LSW {
 				/// <para>Set this as your drawing function (Sprite_Base's draw will call this).</para>
 				/// </summary>
 				/// <param name="{Camera}">The Camera applied here (AFFECTED_BY_CAM affect this).</param>
-				virtual void draw_task(const Interface::Camera&) {}
+				virtual void draw_task(Interface::Camera&) {}
 
 				/// <summary>
 				/// <para>Set this as your thinking function (Sprite_Base's update_and_clear will call this).</para>

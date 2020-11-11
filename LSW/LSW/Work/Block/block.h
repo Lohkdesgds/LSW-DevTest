@@ -29,7 +29,7 @@ namespace LSW {
 					{false,																								(e_boolean::SET_FRAME_VALUE_READONLY),					("set_frame_readonly")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<double>>		e_double_defaults = {
-					{10.0,																								(e_double::FRAMES_PER_SECOND),							("frames_per_second")},
+					{10.0,																								(e_double::FRAMES_PER_SECOND),							("frames_per_second")}, // FPS, not delta sec
 					{0.0,																								(e_double::TIE_SIZE_TO_DISPLAY_PROPORTION),				("tie_size_to_display_proportion")}
 				};
 
@@ -48,9 +48,9 @@ namespace LSW {
 				// bitmap internally uses shared_ptr so no worries!
 				std::vector<Interface::Bitmap> bitmaps;
 
-				Interface::Bitmap reference;
+				//Interface::Bitmap reference;
 
-				void draw_task(const Interface::Camera&);
+				void draw_task(Interface::Camera&);
 				void think_task(const int) {}
 			public:
 				using Sprite_Base::set;

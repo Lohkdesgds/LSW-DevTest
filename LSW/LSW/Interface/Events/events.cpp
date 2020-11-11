@@ -118,7 +118,7 @@ namespace LSW {
 			
 			EventHandler::~EventHandler()
 			{
-				reset();
+				stop();
 			}
 			
 			void EventHandler::set_mode(const eventhandler::handling_mode& mod)
@@ -152,8 +152,13 @@ namespace LSW {
 					al_unregister_event_source(own_queue.get(), ev.core.get());
 				}
 			}
+
+			void EventHandler::set_stop()
+			{
+				thr.stop();
+			}
 			
-			void EventHandler::reset()
+			void EventHandler::stop()
 			{
 				thr.stop();
 				thr.join(); // sync and clear (may take up to 1 sec)

@@ -26,7 +26,7 @@ namespace LSW {
 			class Camera {
 				ALLEGRO_TRANSFORM t{};
 				classic_2d cl_2d;
-				std::shared_ptr<Bitmap> last_targ;
+				Bitmap last_targ;
 			public:
 				Camera() = default;
 
@@ -93,7 +93,7 @@ namespace LSW {
 				/// <param name="{float}">Scale Y.</param>
 				/// <param name="{float}">Angle (rad).</param>
 				/// <returns>{bool} True if successfully created.</returns>
-				bool classic_transform(std::shared_ptr<Bitmap>, const float, const float, const float, const float, const float);
+				bool classic_transform(const Bitmap&, const float, const float, const float, const float, const float);
 				
 				/// <summary>
 				/// <para>Classic LSW way to build a camera (assuming you've set a Bitmap earlier).</para>
@@ -115,9 +115,9 @@ namespace LSW {
 				/// <summary>
 				/// <para>Updates the internal Bitmap reference (for classic transformations).</para>
 				/// </summary>
-				/// <param name="{std::shared_ptr}">A shared_ptr of a Bitmap.</param>
+				/// <param name="{Bitmap}">A Bitmap.</param>
 				/// <returns>{bool} True if successfully set.</returns>
-				bool classic_update(std::shared_ptr<Bitmap>);
+				bool classic_update(const Bitmap&);
 
 				/// <summary>
 				/// <para>Gets classic settings information (only classic stuff).</para>

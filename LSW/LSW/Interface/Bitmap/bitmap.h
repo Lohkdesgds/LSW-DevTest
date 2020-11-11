@@ -24,9 +24,9 @@ namespace LSW {
 
 				Tools::AdvancedShared<ALLEGRO_BITMAP> bitmap_orig;
 				static Tools::AdvancedShared<ALLEGRO_BITMAP> target_orig;
-				static std::function<ALLEGRO_BITMAP*(void)> dynamic_target;
+				static std::function<ALLEGRO_BITMAP*(void)> dynamic_reference;
 
-				static Tools::AdvancedShared<ALLEGRO_BITMAP>& get_target();
+				static ALLEGRO_BITMAP* get_global_reference();
 
 				//std::function<ALLEGRO_BITMAP*(void)> bitmap; // has shared ptr there
 				//static std::function<ALLEGRO_BITMAP*(void)> target;
@@ -59,23 +59,33 @@ namespace LSW {
 				Bitmap(Bitmap&&);
 
 				/// <summary>
-				/// <para>Copy operator.</para>
+				/// <para>Copy operator (+1 reference).</para>
 				/// </summary>
 				/// <param name="{Bitmap}">A Bitmap to copy the reference.</param>
-				/// <returns>{Bitmap} Itself</returns>
-				Bitmap& operator=(const Bitmap&);
+				void operator=(const Bitmap&);
 
 				/// <summary>
 				/// <para>Move operator.</para>
 				/// </summary>
 				/// <param name="{Bitmap}">A Bitmap to move from.</param>
-				/// <returns>{Bitmap} Itself</returns>
-				Bitmap& operator=(Bitmap&&);
+				void operator=(Bitmap&&);
 
-				// if custom destructor is needed, can do nothing if not defined
-				//bool custom(ALLEGRO_BITMAP*, std::function<void(ALLEGRO_BITMAP*&)> = std::function<void(ALLEGRO_BITMAP*&)>());
-				// custom for display, just add, no function /// TODO: later when class Display is created, change this to work with that.
-				//bool custom(ALLEGRO_DISPLAY*);
+				/// <summary>
+				/// <para>Creates a Bitmap with the exact size of this Bitmap if needed. Sub bitmaps will fail.</para>
+				/// </summary>
+				/// <param name="{Bitmap}">The reference size.</param>
+				/// <param name="{bool}">Redraw this into new this if new? (sets reference as target after copy).</param>
+				/// <param name="{float}">Proportion (scalable based on reference, 1.0 means 100%).</param>
+				/// <returns>{bool} False if something got wrong.</returns>
+				bool copy_attributes(const Bitmap&, const bool = true, const double = 1.0);
+
+				/// <summary>
+				/// <para>Creates a Bitmap with the exact size of the reference Bitmap if needed. Sub bitmaps will fail.</para>
+				/// </summary>
+				/// <param name="{bool}">Redraw this into new this if new? (sets reference as target after copy).</param>
+				/// <param name="{float}">Proportion (scalable based on reference, 1.0 means 100%).</param>
+				/// <returns>{bool} False if something got wrong.</returns>
+				bool copy_reference_attributes(const bool = true, const double = 1.0);
 
 				/// <summary>
 				/// <para>If you change default bitmap flags or recreated display, call this so everyone is converted to new standards.</para>
@@ -104,6 +114,11 @@ namespace LSW {
 				/// <param name="{int}">Height.</param>
 				/// <returns></returns>
 				bool create_sub(const Bitmap&, const int, const int, const int, const int);
+
+				/// <summary>
+				/// <para>Unreference, reset to clean Bitmap.</para>
+				/// </summary>
+				void reset();
 
 				/// <summary>
 				/// <para>If there's something set, true.</para>

@@ -11,7 +11,7 @@ namespace LSW {
 		namespace Tools {
 
 			/// <summary>
-			/// <para></para>
+			/// <para>A shared unique changeable smart pointer. You can change value, the variable itself or just the object's variable easy!</para>
 			/// </summary>
 			template<typename T>
 			class AdvancedShared {

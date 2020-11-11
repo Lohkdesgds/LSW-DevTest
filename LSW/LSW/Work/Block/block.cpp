@@ -6,7 +6,7 @@ namespace LSW {
 		namespace Work {
 
 			
-			void Block::draw_task(const Interface::Camera& c)
+			void Block::draw_task(Interface::Camera& c)
 			{
 				if (bitmaps.empty()) return;
 
@@ -16,7 +16,7 @@ namespace LSW {
 					if (const double _dd = get_direct<double>(block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
 						set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + block::default_delta_t_frame_delay));
 												
-						if (!reference.empty()) {
+						/*if (!reference.empty()) {
 							int tx = reference.get_width() * _dd;
 							int ty = reference.get_height() * _dd;
 
@@ -33,7 +33,8 @@ namespace LSW {
 								i = std::move(now); // unloads automatically
 							}
 							reference.set_as_target();
-						}
+						}*/
+						for (auto& i : bitmaps) i.copy_reference_attributes(true);
 					}
 				}
 
@@ -70,6 +71,7 @@ namespace LSW {
 				auto rnn = bitmaps[frame];
 				if (!rnn) throw Handling::Abort(__FUNCSIG__, "Unexpected NULL on draw!");
 
+				// P.S.: Text copied this
 
 				float cx, cy, px, py, dsx, dsy, rot_rad;
 				int bmpx, bmpy;
@@ -105,9 +107,10 @@ namespace LSW {
 				}
 
 			}
+
 			Block::Block() : Sprite_Base()
 			{
-				reference.be_reference_to_target(true);
+				//reference.be_reference_to_target(true);
 
 				set<double>(block::e_double_defaults);
 				set<bool>(block::e_boolean_defaults);
@@ -117,10 +120,12 @@ namespace LSW {
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
+
 			Block::Block(const Block& other) : Sprite_Base(other)
 			{	
 				*this = other;
 			}
+			
 			Block::Block(Block&& other) : Sprite_Base(std::move(other))
 			{
 				*this = std::move(other);
@@ -133,6 +138,8 @@ namespace LSW {
 				// difference from Sprite_Base
 				set<std::chrono::milliseconds>(oth.get<std::chrono::milliseconds>());
 
+				bitmaps = oth.bitmaps;
+
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
@@ -144,6 +151,8 @@ namespace LSW {
 				// difference from Sprite_Base
 				set<std::chrono::milliseconds>(std::move(other.get<std::chrono::milliseconds>()));
 
+				bitmaps = std::move(other.bitmaps);
+
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
@@ -154,6 +163,8 @@ namespace LSW {
 
 				// difference from Sprite_Base
 				set<std::chrono::milliseconds>(*other.get<std::chrono::milliseconds>());
+
+				bitmaps = other.bitmaps;
 
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);

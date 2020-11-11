@@ -73,26 +73,25 @@ namespace LSW {
 			void Collisioner::set_speed(const double dt)
 			{
 				if (dt <= 0.0) throw Handling::Abort(__FUNCSIG__, "Invalid delta!", Handling::abort::abort_level::GIVEUP);
-				if (evhdl.running()) {
-					tick.set_delta(dt);
-				}
+				tick.set_delta(dt);				
 			}
 
 			const double Collisioner::get_speed() const
 			{
-				if (evhdl.running()) {
-					return tick.get_delta();
-				}
-				return -1.0;
+				return tick.get_delta();
+			}
+
+			void Collisioner::set_stop()
+			{
+				tick.stop();
+				evhdl.set_stop();
 			}
 
 			void Collisioner::stop()
 			{
-				if (evhdl.running()) {
-					tick.stop();
-					evhdl.reset();
-					effective_speed = 0.0;
-				}
+				tick.stop();
+				evhdl.stop();
+				effective_speed = 0.0;
 			}
 
 			double Collisioner::effective_tps() const

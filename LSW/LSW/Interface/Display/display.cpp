@@ -87,10 +87,11 @@ namespace LSW {
 						frames++;
 
 						if (refresh_camera) {
+							set_internal_display_as_bitmap_reference();
 							std::lock_guard<std::mutex> cam_m_luck(cam_m);
 							cam_cpy = camera_f();
 							if (refresh_camera && cam_cpy) {
-								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(get_buffer_ref());
+								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(*get_buffer_ref());
 								//refresh_camera = false;
 								cam_cpy->classic_refresh();
 
@@ -124,6 +125,12 @@ namespace LSW {
 #endif
 								fails_out_of_range++;
 							}
+							catch (Handling::Abort a) {
+#ifdef _DEBUG
+								std::cout << "__INTERNAL__ __SKIP__ ERROR AT DRAW_TASKS: " << a.what() << std::endl;
+#endif
+								fails_unexpected++;
+							}
 							catch (...) { // probably can skip (later: add counter by time)
 #ifdef _DEBUG
 								std::cout << "__INTERNAL__ __SKIP__ UNKNOWN ERROR AT DRAW_TASKS" << std::endl;
@@ -144,7 +151,7 @@ namespace LSW {
 
 				thread_deinit();
 
-				handler.reset();
+				handler.stop();
 				timar.stop();
 
 				return verynice;
@@ -162,7 +169,7 @@ namespace LSW {
 				// endof prettier drawings
 
 				if (display_events.running()) {
-					display_events.reset();
+					display_events.stop();
 				}
 				if (disp) {
 					disp.reset();
@@ -210,7 +217,7 @@ namespace LSW {
 			}
 			void Display::thread_deinit()
 			{
-				display_events.reset();
+				display_events.stop();
 				if (disp) {
 					disp.reset();
 					disp = nullptr;

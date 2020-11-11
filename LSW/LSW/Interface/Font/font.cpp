@@ -74,16 +74,30 @@ namespace LSW {
 				Handling::init_font();
 			}
 
+			Font::Font(const Font& f)
+			{
+				*this = f;
+			}
+
+			Font::Font(Font&& f)
+			{
+				*this = std::move(f);
+			}
+
+			void Font::operator=(const Font& f)
+			{
+				font = f.font;
+			}
+
+			void Font::operator=(Font&& f)
+			{
+				font = std::move(f.font);
+			}
+
 			bool Font::load(const char* p, const int s, const int f)
 			{
 				return set(al_load_font(p, s, f));
 			}
-
-			// default load calls the right one
-			/*bool Font::load_ttf(const char* p, const int s, const int f)
-			{
-				return set(al_load_ttf_font(p, s, f));
-			}*/
 
 			Font::operator bool() const
 			{

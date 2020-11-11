@@ -71,6 +71,11 @@ namespace LSW {
 				const double get_speed() const;
 				
 				/// <summary>
+				/// <para>Set to stop collision thread (no lock, call stop() later to sync if you want to).</para>
+				/// </summary>
+				void set_stop();
+				
+				/// <summary>
 				/// <para>Stop collision thread.</para>
 				/// </summary>
 				void stop();
