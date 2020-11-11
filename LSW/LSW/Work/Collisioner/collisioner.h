@@ -7,6 +7,7 @@
 #include "../../Interface/Config/config.h"
 #include "../Sprite/sprite.h"
 
+#include <functional>
 
 namespace LSW {
 	namespace v5 {
@@ -21,7 +22,7 @@ namespace LSW {
 			/// </summary>
 			class Collisioner {
 				Tools::SuperMutex sprites_m;
-				std::vector<Sprite_Base> sprites;
+				std::vector<std::reference_wrapper<Sprite_Base>> sprites;
 
 				double effective_speed = 0.0;
 				std::chrono::milliseconds _last{}; // for effective speed calculation
@@ -45,7 +46,7 @@ namespace LSW {
 				/// <para>Insert a object to collide internally.</para>
 				/// </summary>
 				/// <param name="{Sprite_Base}">A Sprite_Base class type.</param>
-				void insert(const Sprite_Base&);
+				void insert(Sprite_Base&);
 				/// <summary>
 				/// <para>Remove a object based on its sprite::e_uintptrt::DATA_FROM.</para>
 				/// </summary>

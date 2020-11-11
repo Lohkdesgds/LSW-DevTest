@@ -71,9 +71,11 @@ namespace LSW {
 				const int dy = last_targ.get_height();
 
 				identity();
-				rotate(cl_2d.rot);
+				/*rotate(cl_2d.rot);
 				scale(0.5f * dx * cl_2d.sx, 0.5f * dy * cl_2d.sy);
-				translate(0.5f * dx - cl_2d.x * dx * 0.5f, 0.5f * dy - cl_2d.y * dy * 0.5f); // classic cartesian +
+				translate((0.5f * dx - cl_2d.x * dx * 0.5f * cl_2d.sx), (0.5f * dy - cl_2d.y * dy * 0.5f * cl_2d.sy)); // classic cartesian +*/
+				build_transform(0.5f * dx, 0.5f * dy, 0.5f * dx * cl_2d.sx, 0.5f * dy * cl_2d.sy, cl_2d.rot);
+				translate(-cl_2d.x * dx * cl_2d.sx * 0.5f, -cl_2d.y * dy * cl_2d.sy * 0.5f);
 
 				return true;
 			}

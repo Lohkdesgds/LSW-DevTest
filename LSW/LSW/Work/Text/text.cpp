@@ -4,6 +4,47 @@ namespace LSW {
 	namespace v5 {
 		namespace Work {
 
+			void Text::_think_lines()
+			{
+				const auto delta_t = get_direct<std::chrono::milliseconds>(text::e_chronomillis_readonly::LAST_UPDATE_STRING);
+				const auto ups_val = get_direct<double>(text::e_double::UPDATES_PER_SECOND);
+
+				bool instantaneous = ups_val <= 0.0;
+
+				// STRING
+				if (instantaneous || std::chrono::system_clock::now().time_since_epoch() > delta_t) // do update string
+				{
+					//if (get_direct<std::string>(sprite::e_string::ID) == "HEYO MAYO!") std::cout << "UPDATE\n";
+					set(text::e_chronomillis_readonly::LAST_UPDATE_STRING, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()) + std::chrono::milliseconds(instantaneous ? 0 : (unsigned long long)(1000.0 / ups_val)));
+
+					auto p_str = get_direct<Tools::Cstring>(text::e_cstring::STRING);
+					//_buf_lines.clear();
+
+					size_t arrp = 0;
+
+					size_t pos = 0;
+					while ((pos = p_str.find('\n')) != std::string::npos) {
+
+						if (arrp < _buf_lines.size()) {
+							_buf_lines[arrp] = std::move(p_str.substr(0, pos));
+						}
+						else _buf_lines.push_back(std::move(p_str.substr(0, pos)));
+						arrp++;
+
+						if (pos + 1 >= p_str.size()) break;
+						p_str = std::move(p_str.substr(pos + 1));
+					}
+					if (p_str.size() > 0) {
+						if (arrp < _buf_lines.size()) {
+							_buf_lines[arrp] = std::move(p_str);
+						}
+						else _buf_lines.push_back(std::move(p_str));
+						arrp++;
+					}
+					_buf_lines.resize(arrp);
+				}
+			}
+			
 			void Text::_draw_text(Interface::Camera& ruler)
 			{
 				double off_x = 0.0;
@@ -41,13 +82,28 @@ namespace LSW {
 
 				double pos_now[2];
 
-				pos_now[0] = 1.0/* * text::default_sharpness_font*/ * (((posx)*cos(p_rotation_rad)) - ((posy)*sin(p_rotation_rad)) + off_x); // transformed to sprite's coords
-				pos_now[1] = 1.0/* * text::default_sharpness_font*/ * (((posy)*cos(p_rotation_rad)) + ((posx)*sin(p_rotation_rad)) + off_y); // transformed to sprite's coords
+				pos_now[0] = (((posx)*cos(p_rotation_rad)) - ((posy)*sin(p_rotation_rad)) + off_x); // transformed to sprite's coords
+				pos_now[1] = (((posy)*cos(p_rotation_rad)) + ((posx)*sin(p_rotation_rad)) + off_y); // transformed to sprite's coords
 
 
 
 				auto& cls = ruler.get_classic();
-				ruler.classic_transform((cls.x - pos_now[0]), (cls.y - pos_now[1]), cls.sx * scale_g * scale_x / font_siz, cls.sy * scale_g * scale_y / font_siz, cls.rot + rotation_rad);
+				double csx, csy;
+
+				csx = scale_g * scale_x / font_siz;
+				csy = scale_g * scale_y / font_siz;
+				//csx = (((csx)*cos(p_rotation_rad)) - ((csy)*sin(p_rotation_rad)));
+				//csy = (((csy)*cos(p_rotation_rad)) + ((csx)*sin(p_rotation_rad)));
+
+
+				Interface::Camera shadow_cam;// = ruler;
+
+				if (should_care_about_shadow) {
+					shadow_cam = ruler;
+					shadow_cam.classic_transform((cls.x - pos_now[0] - s_dist_x) / csx, (cls.y - pos_now[1] - s_dist_y) / csy, cls.sx * csx, cls.sy * csy, cls.rot + rotation_rad);
+				}
+				ruler.classic_transform((cls.x - pos_now[0]) / csx, (cls.y - pos_now[1]) / csy, cls.sx * csx, cls.sy * csy, cls.rot + rotation_rad);
+
 				ruler.apply();
 
 
@@ -56,7 +112,11 @@ namespace LSW {
 				for (size_t o = 0; o < _buf_lines.size(); o++) {
 					const auto& i = _buf_lines[o];
 
-					if (should_care_about_shadow) fontt.draw(s_col, s_dist_x * 1.0 / ruler.get_classic().sx, height * o +  s_dist_y * 1.0 / ruler.get_classic().sy, mode, i.s_str().c_str());
+					if (should_care_about_shadow) {
+						shadow_cam.apply();
+						fontt.draw(s_col, 0.0, height * o, mode, i.s_str().c_str());
+						ruler.apply();
+					}
 					fontt.draw(0.0, height * o, mode, i);
 				}
 
@@ -74,18 +134,20 @@ namespace LSW {
 			{
 				if (!fontt) throw Handling::Abort(__FUNCSIG__, "No Font texture!", Handling::abort::abort_level::GIVEUP);
 
-				const auto delta_t = get_direct<std::chrono::milliseconds>(text::e_chronomillis_readonly::LAST_UPDATE_STRING);
+				const auto delta_t = get_direct<std::chrono::milliseconds>(text::e_chronomillis_readonly::LAST_UPDATE_BITMAP);
 				const auto use_buffer = get_direct<bool>(text::e_boolean::USE_BITMAP_BUFFER);
 				const auto scale_buff = get_direct<double>(text::e_double::BUFFER_SCALE_RESOLUTION);
 				const auto ups_val = get_direct<double>(text::e_double::UPDATES_PER_SECOND);
+				const auto last_update = get_direct<double>(sprite::e_double_readonly::LAST_UPDATE); // al_get_time
 
-				if (ups_val <= 0.0)	throw Handling::Abort(__FUNCSIG__, "Invalid UPS value! (UPDATES_PER_SECOND must be >= 0.0)", Handling::abort::abort_level::GIVEUP);
+				//if (ups_val <= 0.0)	throw Handling::Abort(__FUNCSIG__, "Invalid UPS value! (UPDATES_PER_SECOND must be >= 0.0)", Handling::abort::abort_level::GIVEUP);
 
-				// STRING
-				if (std::chrono::system_clock::now().time_since_epoch() > delta_t) // do update string
+				bool instantaneous = ups_val <= 0.0;
+
+
+				if (instantaneous || std::chrono::system_clock::now().time_since_epoch() > delta_t) // do update string
 				{
-					set(text::e_chronomillis_readonly::LAST_UPDATE_STRING, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()) + std::chrono::milliseconds((unsigned long long)(1000.0 / ups_val)));
-
+					set(text::e_chronomillis_readonly::LAST_UPDATE_BITMAP, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()) + std::chrono::milliseconds(instantaneous ? 0 : (unsigned long long)(1000.0 / ups_val)));
 
 					if (use_buffer) {
 						if (scale_buff <= 0.0 || !buff.copy_reference_attributes(true, scale_buff)) { // ensure loaded
@@ -94,16 +156,9 @@ namespace LSW {
 					}
 
 
-					auto p_str = get_direct<Tools::Cstring>(text::e_cstring::STRING);
-					_buf_lines.clear();
-
-					size_t pos = 0;
-					while ((pos = p_str.find('\n')) != std::string::npos) {
-						_buf_lines.push_back(std::move(p_str.substr(0, pos)));
-						if (pos + 1 >= p_str.size()) break;
-						p_str = std::move(p_str.substr(pos + 1));
+					if (al_get_time() - last_update >= sprite::maximum_time_between_collisions) {
+						_think_lines();
 					}
-					if (p_str.size() > 0) _buf_lines.push_back(std::move(p_str));
 
 
 					if (use_buffer) {
@@ -131,6 +186,11 @@ namespace LSW {
 
 			}
 
+			void Text::think_task(const int u)
+			{
+				_think_lines(); // this way so if drawing thread can also do this if needed
+			}
+
 			Text::Text() : Sprite_Base()
 			{
 				set<std::chrono::milliseconds>(text::e_chronomillis_readonly_defaults);
@@ -142,7 +202,7 @@ namespace LSW {
 				set<bool>(text::e_boolean_defaults);
 
 				set(Work::text::e_color::SHADOW_COLOR, Interface::Color(0, 0, 0));
-				set(text::e_chronomillis_readonly::LAST_UPDATE_STRING, MILLI_NOW);
+				set(text::e_chronomillis_readonly::LAST_UPDATE_BITMAP, MILLI_NOW);
 				set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
 			}
 

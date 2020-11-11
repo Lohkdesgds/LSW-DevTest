@@ -300,7 +300,7 @@ namespace LSW {
 				}
 
 				const auto roughness = get_direct<double>(sprite::e_double::ROUGHNESS);
-
+				int nowgo = 0;
 
 				// delayed work to do (auto-clean)
 				if (auto f = get_direct<sprite::functional>(sprite::e_tie_functional::DELAYED_WORK_AUTODEL); f) {
@@ -312,9 +312,7 @@ namespace LSW {
 				if (!is_eq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_STATIC)) &&
 					!is_eq(sprite::e_integer::COLLISION_MODE, static_cast<int>(sprite::e_collision_mode_cast::COLLISION_NONE))) {
 
-					auto nowgo = easy_collision.process_result();
-
-					think_task(nowgo);
+					nowgo = easy_collision.process_result();
 
 					double sum_dx = 0.0;
 					double sum_dy = 0.0;
@@ -486,6 +484,8 @@ namespace LSW {
 				scale_y = get_direct<double>(sprite::e_double::SCALE_G) * get_direct<double>(sprite::e_double::SCALE_Y);
 
 				easy_collision.setup(get_direct<double>(sprite::e_double::TARG_POSX), get_direct<double>(sprite::e_double::TARG_POSY), scale_x, scale_y);
+
+				think_task(nowgo);
 			}
 		}
 	}

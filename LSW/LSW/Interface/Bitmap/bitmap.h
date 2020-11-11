@@ -14,7 +14,7 @@ namespace LSW {
 		namespace Interface {
 
 			namespace bitmap {
-				constexpr int default_new_bitmap_flags = ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR;
+				constexpr int default_new_bitmap_flags = ALLEGRO_MIN_LINEAR;// | ALLEGRO_MAG_LINEAR;
 
 				enum class drawing_mode {DEFAULT, FLIP_HORIZONTAL, FLIP_VERTICAL, FLIP_HORIZONTAL_VERTICAL};
 			}

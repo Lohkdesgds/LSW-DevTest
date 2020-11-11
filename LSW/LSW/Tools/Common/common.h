@@ -22,7 +22,7 @@ namespace LSW {
 		namespace Tools {
 
 			namespace common {
-				constexpr size_t known_size_len = 8;
+				constexpr int known_size_len = 8;
 				inline const char* known_size_ends[known_size_len] = { "k", "M", "G", "T", "P", "E", "Z", "Y" };
 			}
 
@@ -67,9 +67,9 @@ namespace LSW {
 			/// </summary>
 			/// <param name="{double}">The value.</param>
 			/// <param name="{size_t}">Numbers after the dot.</param>
-			/// <param name="{bool}">Do you prefer 1.3k or 1.3 k? (the space between the number and magnetude)</param>
+			/// <param name="{bool}">Do you prefer 1.3k (false) or 1.3 k (true)? (the space between the number and magnetude).</param>
 			/// <returns>{std::string} The string generated.</returns>
-			std::string byte_auto_string(double, const size_t = 1, const bool = false);
+			std::string byte_auto_string(double, const size_t = 1, const bool = true);
 
 			// https://stackoverflow.com/a/26914562
 			/// <summary>

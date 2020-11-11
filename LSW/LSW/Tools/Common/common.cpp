@@ -87,7 +87,9 @@ namespace LSW {
 			std::string byte_auto_string(double end, const size_t t, const bool space) {
 				int prefix = -1;
 
-				while (prefix < (common::known_size_len - 1) && (end /= (1e3)) >= 1.0) prefix++;
+				while (prefix < (common::known_size_len - 1) && (end /= (1e3)) >= 1.0)
+					prefix++;
+				
 				end *= 1e3;
 
 				char buf[1 << 7];
@@ -101,22 +103,6 @@ namespace LSW {
 
 				return buf;
 			}
-			/*
-			std::wstring wideup(const std::string& str) {
-				if (str.empty())
-					return std::wstring();
-
-				size_t charsNeeded = ::MultiByteToWideChar(CP_UTF8, 0,
-					str.data(), (int)str.size(), NULL, 0);
-				if (charsNeeded == 0) return L"Error";
-
-				std::vector<wchar_t> buffer(charsNeeded + 1);
-				int charsConverted = ::MultiByteToWideChar(CP_UTF8, 0,
-					str.data(), (int)str.size(), &buffer[0], static_cast<int>(buffer.size()));
-				if (charsConverted == 0) return L"Error";
-
-				return std::wstring(&buffer[0], charsConverted);
-			}*/
 
 			const double limit_maximize(double gotten, const double prop)
 			{

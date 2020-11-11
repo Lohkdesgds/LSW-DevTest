@@ -26,8 +26,7 @@ namespace LSW {
 						share->conf.save_path(conf_p);
 					}
 
-					share->conf.set(gamecore::conf_versioning, Interface::config::config_section_mode::SAVE);
-					share->conf.set(gamecore::conf_versioning, "automatic version", version_app);
+					share->conf.ensure(gamecore::conf_versioning,	"automatic version",	version_app, Interface::config::config_section_mode::SAVE);
 
 					// display settings
 					share->conf.ensure(gamecore::conf_displaying,	"screen_width",			1280,	Interface::config::config_section_mode::SAVE);
@@ -191,6 +190,8 @@ namespace LSW {
 				share->events.stop();
 				share->check_sources.stop();
 				share->update_mouse.stop();
+
+				share->conf.set(gamecore::conf_versioning, "automatic version", version_app);
 
 				share->conf.set(gamecore::conf_audio, "volume", share->mixer.get_gain());
 				share->mixer.mute(true);

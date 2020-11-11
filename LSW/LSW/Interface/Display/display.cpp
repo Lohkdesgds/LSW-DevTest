@@ -3,6 +3,9 @@
 namespace LSW {
 	namespace v5 {
 		namespace Interface {
+
+			Tools::SuperMutex Display::sync_threads;
+
 			std::shared_ptr<Bitmap> Display::get_buffer_ref()
 			{
 				if (!disp) return nullptr;
@@ -159,6 +162,8 @@ namespace LSW {
 			void Display::_reset_display_and_path()
 			{
 				//if (pathing.paths_set().size()) pathing.apply();
+
+				Tools::AutoLock sync(sync_threads);
 
 				al_set_new_display_flags(new_display_flags_apply);
 				if (new_display_refresh_rate > 0) al_set_new_display_refresh_rate(new_display_refresh_rate);

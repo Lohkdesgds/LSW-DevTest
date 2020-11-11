@@ -16,11 +16,11 @@ namespace LSW {
 				effective_speed = ((collisioner::speed_smoothness_calculation - 1.0) * effective_speed + (1e3 / diff.count())) / collisioner::speed_smoothness_calculation;
 
 				for (auto& i : sprites) {
-					i.update_and_clear(conf, true); // process positioning
+					i.get().update_and_clear(conf, true); // process positioning
 
 					for (const auto& j : sprites) {
-						if (!i.is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, j))
-							i.collide(j, true);
+						if (!i.get().is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, j))
+							i.get().collide(j, true);
 					}
 				}
 
@@ -36,18 +36,18 @@ namespace LSW {
 				stop();
 			}
 
-			void Collisioner::insert(const Sprite_Base& s)
+			void Collisioner::insert(Sprite_Base& s)
 			{
 				Tools::AutoLock luck(sprites_m);
-				for (const auto& i : sprites) { if (i.is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, s)) return; }
-				sprites.push_back(s);
+				for (const auto& i : sprites) { if (i.get().is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, s)) return; }
+				sprites.push_back(std::ref(s));
 			}
 
 			void Collisioner::remove(const Sprite_Base& s)
 			{
 				Tools::AutoLock luck(sprites_m);
 				for (size_t p = 0; p < sprites.size(); p++) {
-					if (sprites[p].is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, s)) {
+					if (sprites[p].get().is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, s)) {
 						sprites.erase(sprites.begin() + p--);
 					}
 				}

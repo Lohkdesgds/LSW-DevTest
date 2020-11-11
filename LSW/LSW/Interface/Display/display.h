@@ -49,6 +49,7 @@ namespace LSW {
 				size_t fails_out_of_range = 0; // out of range ignored because this is faster
 				size_t fails_unexpected = 0; // other error?
 
+				static Tools::SuperMutex sync_threads;
 				DisplayStrongPtr disp;
 				EventHandler display_events;
 				

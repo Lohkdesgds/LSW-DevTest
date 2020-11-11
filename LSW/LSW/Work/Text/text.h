@@ -15,7 +15,7 @@ namespace LSW {
 
 				namespace text {
 
-				enum class e_chronomillis_readonly { LAST_UPDATE_STRING };
+				enum class e_chronomillis_readonly { LAST_UPDATE_BITMAP, LAST_UPDATE_STRING };
 
 				enum class e_cstring { STRING };
 				enum class e_double { SHADOW_DISTANCE_X, SHADOW_DISTANCE_Y, TEXT_UPDATE_TIME, BUFFER_SCALE_RESOLUTION, UPDATES_PER_SECOND, LINE_ADJUST };
@@ -25,6 +25,7 @@ namespace LSW {
 				enum class e_sprite_ref { FOLLOWING };
 
 				const Tools::SuperMap<Tools::FastFunction<std::chrono::milliseconds>>		e_chronomillis_readonly_defaults = {
+					{std::chrono::milliseconds(0),																				(e_chronomillis_readonly::LAST_UPDATE_BITMAP),			("last_update_bitmap")},
 					{std::chrono::milliseconds(0),																				(e_chronomillis_readonly::LAST_UPDATE_STRING),			("last_update_string")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<Tools::Cstring>>					e_string_defaults = {
@@ -61,10 +62,11 @@ namespace LSW {
 
 				std::vector<Tools::Cstring> _buf_lines;
 
+				void _think_lines();
 				void _draw_text(Interface::Camera&);
 
-				void draw_task(Interface::Camera&);
-				void think_task(const int) {}
+				void draw_task(Interface::Camera&) override;
+				void think_task(const int) override;
 			public:
 				using Sprite_Base::set;
 				using Sprite_Base::get;

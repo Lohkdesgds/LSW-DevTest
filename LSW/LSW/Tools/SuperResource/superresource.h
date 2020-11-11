@@ -202,6 +202,7 @@ namespace LSW {
 
 				operator std::shared_ptr<T>();
 				operator const T&() const;
+				operator T&();
 
 				T* get();
 				const T* get() const;
@@ -535,6 +536,12 @@ namespace LSW {
 
 			template<typename T>
 			inline Resource<T>::operator const T& () const
+			{
+				return *r.get();
+			}
+
+			template<typename T>
+			inline Resource<T>::operator T& ()
 			{
 				return *r.get();
 			}
