@@ -13,6 +13,11 @@ namespace LSW {
 	namespace v5 {
 		namespace Tools {
 
+			namespace superthread {
+
+				enum class performance_mode { BALANCED, LOW_POWER, VERY_LOW_POWER, PERFORMANCE, HIGH_PERFORMANCE };
+
+			}
 
 			// function that returns TRUE if you should KEEP RUNNING.
 			using boolThreadF = std::function<bool(void)>;
@@ -22,6 +27,9 @@ namespace LSW {
 				ALLEGRO_THREAD* thr = nullptr;
 				bool _thread_done_flag = true;
 				Promise<T> promise;
+				superthread::performance_mode perform{}; // balanced
+
+				void _perf();
 
 				static void* __run_i_al(ALLEGRO_THREAD* thr, void* arg);
 
@@ -37,6 +45,12 @@ namespace LSW {
 				/// <para>Initialize necessary stuff.</para>
 				/// </summary>
 				SuperThreadT();
+
+				/// <summary>
+				/// <para>Constructor that sets directly the performance mode.</para>
+				/// </summary>
+				/// <param name="{performance_mode}">How fast should this run?</param>
+				SuperThreadT(const superthread::performance_mode&);
 
 				/// <summary>
 				/// <para>Constructor that sets directly the function.</para>
@@ -65,6 +79,12 @@ namespace LSW {
 				/// </summary>
 				/// <returns>{Future} The Future that will hold the value the function you've set returns.</returns>
 				Future<T> start();
+
+				/// <summary>
+				/// <para>Multitasking sometimes doesn't work without some adjustments. What performance mode you want?</para>
+				/// </summary>
+				/// <param name="{performance_mode}">How hard should it hit the CPU?</param>
+				void set_performance_mode(const superthread::performance_mode&);
 
 				/// <summary>
 				/// <para>Sets internal bool to say stop.</para>
@@ -110,6 +130,36 @@ namespace LSW {
 
 
 			template<typename T>
+			inline void SuperThreadT<T>::_perf()
+			{
+				switch (perform) {
+				case superthread::performance_mode::BALANCED:
+					std::this_thread::yield();
+					std::this_thread::sleep_for(std::chrono::microseconds(500)); // top 2000 loops
+					std::this_thread::yield();
+					break;
+				case superthread::performance_mode::LOW_POWER:
+					std::this_thread::yield();
+					std::this_thread::sleep_for(std::chrono::milliseconds(2)); // top 500 loops
+					std::this_thread::yield();
+					break;
+				case superthread::performance_mode::VERY_LOW_POWER:
+					std::this_thread::yield();
+					std::this_thread::sleep_for(std::chrono::milliseconds(8)); // top 125 loops
+					std::this_thread::yield();
+					break;
+				case superthread::performance_mode::PERFORMANCE:
+					std::this_thread::yield();
+					std::this_thread::sleep_for(std::chrono::microseconds(100)); // top 10000 loops
+					std::this_thread::yield();
+					break;
+				case superthread::performance_mode::HIGH_PERFORMANCE:
+					std::this_thread::yield(); // sync
+					break;
+				}
+			}
+
+			template<typename T>
 			inline void* SuperThreadT<T>::__run_i_al(ALLEGRO_THREAD* thr, void* arg)
 			{
 				if (!arg) throw Handling::Abort(__FUNCSIG__, "Invalid thread argument internally!");
@@ -122,6 +172,13 @@ namespace LSW {
 			inline SuperThreadT<T>::SuperThreadT()
 			{
 				Handling::init_basic();
+			}
+
+			template<typename T>
+			SuperThreadT<T>::SuperThreadT(const superthread::performance_mode& m)
+			{
+				Handling::init_basic();
+				set_performance_mode(m);
 			}
 
 			template<typename T>
@@ -146,7 +203,7 @@ namespace LSW {
 				promise = std::move(Promise<T>([&,f] {
 					try {
 						_thread_done_flag = false;
-						T cpy = f([&] {return !al_get_thread_should_stop(thr); });
+						T cpy = f([&] { _perf(); return !al_get_thread_should_stop(thr); });
 						_thread_done_flag = true;
 						return std::move(cpy);
 					}
@@ -168,7 +225,7 @@ namespace LSW {
 				promise = std::move(Promise<T>([&, f] {
 					try {
 						_thread_done_flag = false;
-						f([&] {return !al_get_thread_should_stop(thr); });
+						f([&] { _perf(); return !al_get_thread_should_stop(thr); });
 						_thread_done_flag = true;
 					}
 					catch (const Handling::Abort& e) { // for now. later: save and get elsewhere
@@ -189,6 +246,12 @@ namespace LSW {
 				al_start_thread(thr);
 				
 				return fut;
+			}
+
+			template<typename T>
+			inline void SuperThreadT<T>::set_performance_mode(const superthread::performance_mode& mode)
+			{
+				perform = mode;
 			}
 
 			template<typename T>

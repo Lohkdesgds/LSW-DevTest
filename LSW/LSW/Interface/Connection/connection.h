@@ -85,8 +85,8 @@ namespace LSW {
 				SOCKET connected = INVALID_SOCKET;
 				bool keep_connection = false;
 
-				Tools::SuperThread send_thread;
-				Tools::SuperThread recv_thread;
+				Tools::SuperThread send_thread{ Tools::superthread::performance_mode::PERFORMANCE };
+				Tools::SuperThread recv_thread{ Tools::superthread::performance_mode::PERFORMANCE };
 
 				// debugging
 				size_t packages_sent = 0;
@@ -210,7 +210,7 @@ namespace LSW {
 
 				size_t max_connections_allowed = 1;
 
-				Tools::SuperThread handle_thread;
+				Tools::SuperThread handle_thread{ Tools::superthread::performance_mode::PERFORMANCE };
 
 				Tools::Waiter connection_event;
 				std::vector<std::shared_ptr<Connection>> connections;

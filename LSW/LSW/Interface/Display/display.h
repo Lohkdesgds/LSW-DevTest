@@ -54,7 +54,7 @@ namespace LSW {
 				EventHandler display_events;
 				
 				//PathManager pathing;
-				Tools::SuperThreadT<bool> thr;				
+				Tools::SuperThreadT<bool> thr{ Tools::superthread::performance_mode::HIGH_PERFORMANCE };
 
 				size_t draw_tasks_count = 0;
 				std::vector<std::pair<size_t, DisplayTask>> draw_tasks;

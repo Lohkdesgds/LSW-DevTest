@@ -264,13 +264,13 @@ int main() {
 	});
 
 
-	blk_mouse->set<double>(Work::sprite::e_double::TARG_POSX, [&] { return core.get_config().get_as<double>("mouse", "rx"); });
-	blk_mouse->set<double>(Work::sprite::e_double::TARG_POSY, [&] { return core.get_config().get_as<double>("mouse", "ry"); });
+	blk_mouse->set<double>(Work::sprite::e_double::TARG_POSX, [&] { return core.get_config().get_as<double>("mouse", "x"); });
+	blk_mouse->set<double>(Work::sprite::e_double::TARG_POSY, [&] { return core.get_config().get_as<double>("mouse", "y"); });
 	blk_mouse->set<double>(Work::sprite::e_double::SCALE_G, 0.15);
 	blk_mouse->set<double>(Work::sprite::e_double::TARG_ROTATION, [] {return 30.0 * al_get_time(); });
 	blk_mouse->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
 	blk_mouse->set(Work::sprite::e_boolean::SHOWBOX, true);
-	blk_mouse->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	//blk_mouse->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
 
 
 
@@ -347,7 +347,8 @@ int main() {
 		[&core, &collision_control, &overlay_control, &__simple_texts] {
 			return (__simple_texts ? ("&a" + std::to_string(core.get_display().get_frames_per_second())) : (
 				"&5FPS: &a" + std::to_string(core.get_display().get_frames_per_second()) + (core.get_display().get_fps_cap() ? (" / " + std::to_string(core.get_display().get_fps_cap()) + " (limit)") : "") + (core.get_display().get_vsync() ? (" &6VSYNC SET") : " &bVSYNC UNSET") + "\n" +
-				"&3TPS: &d" + std::to_string(collision_control.effective_tps()) + " & " + std::to_string(overlay_control.effective_tps()) + "\n" +
+				"&3TPS: &d" + std::to_string(collision_control.effective_tps()) + " [" + Tools::sprintf_a("%04.1lf", collision_control.actual_ms()) + " ms, " + Tools::sprintf_a("%04.1lf", 100.0 * collision_control.actual_load()) + "%] & " +
+				std::to_string(overlay_control.effective_tps()) + " [" + Tools::sprintf_a("%04.1lf", overlay_control.actual_ms()) + " ms, " + Tools::sprintf_a("%04.1lf", 100.0 * overlay_control.actual_load()) + "%]\n" +
 				"&2Times open: &b" + std::to_string(core.get_config().get_as<unsigned long long>("registry", "times_open")) + "\n" +
 				"&7Mouse pos: &e" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "x")) + "x" + std::to_string(core.get_config().get_as<float>(Work::gamecore::conf_mouse_memory, "y"))
 				));
@@ -443,7 +444,7 @@ int main() {
 	txtmouse->set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.002);
 	txtmouse->set(Work::text::e_boolean::USE_BITMAP_BUFFER, true);
 	txtmouse->set<bool>(Work::sprite::e_boolean::DRAW, [&] {return !__simple_texts; });
-	txtmouse->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	//txtmouse->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
 	txtmouse->set<double>(Work::sprite::e_double::TARG_ROTATION, [] {return 90.0 * al_get_time(); });
 
 

@@ -154,13 +154,20 @@ namespace LSW {
 			class EventHandler {
 				std::shared_ptr<ALLEGRO_EVENT_QUEUE> own_queue; // trigger itself
 				std::function<void(const RawEvent&)> trigger_func;
-				Tools::SuperThread thr;
+				Tools::SuperThread thr{ Tools::superthread::performance_mode::PERFORMANCE };
 				Tools::SuperMutex thr_m;
 				eventhandler::handling_mode mode = eventhandler::handling_mode::BUFFERING_AUTO;
 
 				void __init();
 			public:
 				EventHandler();
+
+				/// <summary>
+				/// <para>Set internal thread's performance.</para>
+				/// </summary>
+				/// <param name="{performance_mode}">Performance mode.</param>
+				EventHandler(const Tools::superthread::performance_mode&);
+
 				~EventHandler();
 
 				/// <summary>
@@ -194,6 +201,12 @@ namespace LSW {
 				/// <para>Set to stop internal thread (no lock, stop properly with stop()).</para>
 				/// </summary>
 				void set_stop();
+
+				/// <summary>
+				/// <para>Set internal thread's performance.</para>
+				/// </summary>
+				/// <param name="{performance_mode}">Performance mode.</param>
+				void set_performance_mode(const Tools::superthread::performance_mode&);
 
 				/// <summary>
 				/// <para>Stops the internal thread and cleanup (you'll have to reset to start again).</para>

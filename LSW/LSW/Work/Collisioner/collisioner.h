@@ -14,7 +14,8 @@ namespace LSW {
 		namespace Work {
 
 			namespace collisioner {
-				constexpr double speed_smoothness_calculation = 10.0; // >= 2.0, greater is smoother, but slower
+				constexpr double speed_smoothness_calculation = 8.0; // >= 2.0, greater is smoother, but slower
+				constexpr unsigned max_delay = 5; // 5 times the speed, if dead for this long, effective speed and time taken goes to 0
 			}
 
 			/// <summary>
@@ -24,8 +25,8 @@ namespace LSW {
 				Tools::SuperMutex sprites_m;
 				std::vector<std::reference_wrapper<Sprite_Base>> sprites;
 
-				double effective_speed = 0.0;
-				std::chrono::milliseconds _last{}; // for effective speed calculation
+				double effective_speed = 0.0, time_taken_process = 0.0;
+				std::chrono::milliseconds _last{}, max_timeout; // for effective speed calculation
 
 				Interface::EventHandler evhdl;
 				Interface::EventTimer tick;
@@ -86,6 +87,18 @@ namespace LSW {
 				/// </summary>
 				/// <returns>{double} Approx. TPS.</returns>
 				double effective_tps() const;
+
+				/// <summary>
+				/// <para>How many milliseconds does it take to process the list? (average).</para>
+				/// </summary>
+				/// <returns>{double} Time to tick once.</returns>
+				double actual_ms() const;
+
+				/// <summary>
+				/// <para>How heavy is the CPU? (1.0 means 100%)</para>
+				/// </summary>
+				/// <returns>{double} Load [0.0,1.0].</returns>
+				double actual_load() const;
 			};
 
 

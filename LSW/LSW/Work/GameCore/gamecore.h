@@ -48,7 +48,7 @@ namespace LSW {
 					Interface::Mixer mixer;
 					Interface::Display display; // start this
 
-					Interface::EventHandler events; // just display close event and mouse registration for now
+					Interface::EventHandler events{ Tools::superthread::performance_mode::HIGH_PERFORMANCE }; // just display close event and mouse registration for now
 
 					Interface::EventTimer check_sources; // like when you reload screen the source change.
 					Interface::EventTimer update_mouse;

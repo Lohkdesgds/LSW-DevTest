@@ -116,6 +116,13 @@ namespace LSW {
 				__init();
 			}
 			
+			EventHandler::EventHandler(const Tools::superthread::performance_mode& m)
+			{
+				thr.set_performance_mode(m);
+				Handling::init_basic();
+				__init();
+			}
+
 			EventHandler::~EventHandler()
 			{
 				stop();
@@ -158,6 +165,11 @@ namespace LSW {
 				thr.stop();
 			}
 			
+			void EventHandler::set_performance_mode(const Tools::superthread::performance_mode& m)
+			{
+				thr.set_performance_mode(m);
+			}
+
 			void EventHandler::stop()
 			{
 				thr.stop();
@@ -176,12 +188,12 @@ namespace LSW {
 					trigger_func = f;
 
 					thr.set([&](Tools::boolThreadF keep) {
+						ALLEGRO_EVENT ev;
 						while (keep()) {
-							ALLEGRO_EVENT ev;
 
 							try {
 								if (!own_queue) {
-									std::this_thread::sleep_for(std::chrono::milliseconds(20));
+									//std::this_thread::sleep_for(std::chrono::milliseconds(20));
 									continue;
 								}
 								switch (mode) {
@@ -191,7 +203,7 @@ namespace LSW {
 									}
 									break;
 								case eventhandler::handling_mode::NO_BUFFER_SKIP:
-									if (!al_wait_for_event_timed(own_queue.get(), &ev, 1.0)) {
+									if (!al_get_next_event(own_queue.get(), &ev)) {
 										continue;
 									}
 									else if (!al_is_event_queue_empty(own_queue.get())) al_flush_event_queue(own_queue.get()); // no buffer!
