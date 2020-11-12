@@ -356,7 +356,7 @@ int main() {
 				));
 		});
 	txt0->set(Work::sprite::e_double::TARG_POSX, -1.0);
-	txt0->set(Work::sprite::e_double::TARG_POSY, -1.01);
+	txt0->set(Work::sprite::e_double::TARG_POSY, -0.97);
 	txt0->set(Work::sprite::e_double::SCALE_G, 0.07);
 	//txt0->set(Work::sprite::e_double::SCALE_X, 0.35);
 	txt0->set(Work::text::e_double::LINE_ADJUST, 0.85);
@@ -375,7 +375,7 @@ int main() {
 			"&9DEBUG BMP/TEXT DRAW:\n" + sw.generate_table() + "\n&eTotal time draw: " + sw.get_string_between(0, sw.last_point_valid());
 	});
 	txtdebug->set(Work::sprite::e_double::TARG_POSX, -1.0);
-	txtdebug->set(Work::sprite::e_double::TARG_POSY, -0.72);
+	txtdebug->set(Work::sprite::e_double::TARG_POSY, -0.69);
 	txtdebug->set(Work::sprite::e_double::SCALE_G, 0.052);
 	//txtdebug->set(Work::sprite::e_double::SCALE_X, 0.35);
 	txtdebug->set(Work::text::e_double::LINE_ADJUST, 0.75);
@@ -392,7 +392,7 @@ int main() {
 
 	txtu->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&logg] { return logg.get_last_line().filter_ascii_range(); });
 	txtu->set(Work::sprite::e_double::TARG_POSX, -1.0);
-	txtu->set(Work::sprite::e_double::TARG_POSY, 0.927);
+	txtu->set(Work::sprite::e_double::TARG_POSY, 0.96);
 	txtu->set(Work::sprite::e_double::SCALE_G, 0.06);
 	//txtu->set(Work::sprite::e_double::SCALE_X, 0.35);
 	//txtu->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(0, 0, 0));
@@ -406,7 +406,7 @@ int main() {
 
 	txtf0->set<Tools::Cstring>(Work::text::e_cstring::STRING, [] { std::string t = "FOLLOW 0 HYPE"; return t.substr(0, (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 500) % (10 + t.length())); });
 	txtf0->set(Work::sprite::e_double::TARG_POSX, 0.0);
-	txtf0->set(Work::sprite::e_double::TARG_POSY, -0.1);
+	//txtf0->set(Work::sprite::e_double::TARG_POSY, -0.1);
 	txtf0->set(Work::sprite::e_double::SCALE_G, 0.15);
 	//txtf0->set(Work::sprite::e_double::SCALE_X, 0.6);
 	txtf0->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
@@ -420,7 +420,7 @@ int main() {
 
 	txtf1->set<Tools::Cstring>(Work::text::e_cstring::STRING, "FOLLOW 1 HYPERSMOOTH 60 FPS");
 	txtf1->set(Work::sprite::e_double::TARG_POSX, 0.0);
-	txtf1->set(Work::sprite::e_double::TARG_POSY, -0.1);
+	//txtf1->set(Work::sprite::e_double::TARG_POSY, -0.1);
 	txtf1->set(Work::sprite::e_double::SCALE_G, 0.15);
 	txtf1->set(Work::sprite::e_double::SCALE_X, 0.85);
 	txtf1->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));

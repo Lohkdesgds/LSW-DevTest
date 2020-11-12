@@ -114,10 +114,10 @@ namespace LSW {
 
 					if (should_care_about_shadow) {
 						shadow_cam.apply();
-						fontt.draw(s_col, 0.0, height * o, mode, i.s_str().c_str());
+						fontt.draw(s_col, 0.0, height * (o - 0.5), mode, i.s_str().c_str());
 						ruler.apply();
 					}
-					fontt.draw(0.0, height * o, mode, i);
+					fontt.draw(0.0, height * (o - 0.5), mode, i);
 				}
 
 
