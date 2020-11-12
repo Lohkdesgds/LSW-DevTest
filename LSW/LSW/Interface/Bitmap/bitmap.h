@@ -76,16 +76,16 @@ namespace LSW {
 				/// <param name="{Bitmap}">The reference size.</param>
 				/// <param name="{bool}">Redraw this into new this if new? (sets reference as target after copy).</param>
 				/// <param name="{float}">Proportion (scalable based on reference, 1.0 means 100%).</param>
-				/// <returns>{bool} False if something got wrong.</returns>
-				bool copy_attributes(const Bitmap&, const bool = true, const double = 1.0);
+				/// <returns>{int} 0 fail, 1 good, 2 had to resize.</returns>
+				int copy_attributes(const Bitmap&, const bool = true, const double = 1.0);
 
 				/// <summary>
 				/// <para>Creates a Bitmap with the exact size of the reference Bitmap if needed. Sub bitmaps will fail.</para>
 				/// </summary>
 				/// <param name="{bool}">Redraw this into new this if new? (sets reference as target after copy).</param>
 				/// <param name="{float}">Proportion (scalable based on reference, 1.0 means 100%).</param>
-				/// <returns>{bool} False if something got wrong.</returns>
-				bool copy_reference_attributes(const bool = true, const double = 1.0);
+				/// <returns>{int} 0 fail, 1 good, 2 had to resize.</returns>
+				int copy_reference_attributes(const bool = true, const double = 1.0);
 
 				/// <summary>
 				/// <para>If you change default bitmap flags or recreated display, call this so everyone is converted to new standards.</para>
@@ -386,6 +386,11 @@ namespace LSW {
 				/// <para>Set this as a copy of the current target (if any) (REFERENCE != TARGET, more like a global reference).</para>
 				/// </summary>
 				void copy_reference_to_this();
+
+				/// <summary>
+				/// <para>Set this as reference to everybody and as the main target.</para>
+				/// </summary>
+				void set_this_as_reference();
 
 				/// <summary>
 				/// <para>Sets a custom function to return the global target (REFERENCE != TARGET, more like a global reference).</para>

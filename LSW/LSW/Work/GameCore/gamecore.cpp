@@ -35,6 +35,7 @@ namespace LSW {
 					share->conf.ensure(gamecore::conf_displaying,	"limit_framerate_to",	0,		Interface::config::config_section_mode::SAVE);
 					share->conf.ensure(gamecore::conf_displaying,	"hidemouse",			true,	Interface::config::config_section_mode::SAVE);
 					share->conf.ensure(gamecore::conf_displaying,	"vsync",				false,	Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_displaying,	"doublebuffer_scale",	0.0,	Interface::config::config_section_mode::SAVE);
 
 					// audio settings
 					share->conf.ensure(gamecore::conf_audio,		"volume",				0.5f,	Interface::config::config_section_mode::SAVE);
@@ -58,14 +59,14 @@ namespace LSW {
 
 					share->logg.debug_write_to_file(share->conf.get_as<bool>(gamecore::conf_debug, "debug_to_file"));
 
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_width"); k != 0)		share->display.set_width(k);
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_height"); k != 0)		share->display.set_height(k);
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "display_flags"); k != 0)		share->display.set_new_flags(k);
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "limit_framerate_to"); k != 0)	share->display.set_fps_cap(k); // to do
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_width"); k != 0)			share->display.set_width(k);
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_height"); k != 0)			share->display.set_height(k);
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "display_flags"); k != 0)			share->display.set_new_flags(k);
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "limit_framerate_to"); k != 0)		share->display.set_fps_cap(k);
+					if (auto k = share->conf.get_as<double>(gamecore::conf_displaying, "doublebuffer_scale"); k > 0.0)	share->display.set_double_buffering_scale(k);
 
 					share->display.hide_mouse(share->conf.get_as<bool>(gamecore::conf_displaying, "hidemouse"));
 					share->display.set_vsync(share->conf.get_as<bool>(gamecore::conf_displaying, "vsync"));
-
 
 					share->display.init();
 
@@ -87,10 +88,20 @@ namespace LSW {
 						{
 							if (ev.timer_event().source == share->update_mouse && share->_m_newdata) {
 								share->_m_newdata = false;
+								
 								float x = share->_m_x;
 								float y = share->_m_y;
 								float rx = share->_m_x;
 								float ry = share->_m_y;
+
+								auto bufsc = get_display().get_current_buffering_scale();
+								if (bufsc) {
+									x *= bufsc;
+									y *= bufsc;
+									rx *= bufsc;
+									ry *= bufsc;
+								}
+
 								if (auto camnow = share->display.get_current_camera(); camnow) {
 									Interface::Camera inv = *camnow;
 									inv.invert();
@@ -201,6 +212,7 @@ namespace LSW {
 				share->conf.set(gamecore::conf_displaying, "display_flags", share->display.get_flags());
 				share->conf.set(gamecore::conf_displaying, "limit_framerate_to", share->display.get_fps_cap());
 				share->conf.set(gamecore::conf_displaying, "vsync", share->display.get_vsync());
+				share->conf.set(gamecore::conf_displaying, "doublebuffer_scale", share->display.get_current_buffering_scale());
 
 				share->conf.flush();
 

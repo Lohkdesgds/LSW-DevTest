@@ -44,6 +44,7 @@ namespace LSW {
 				bool force_vsync_refresh = false;
 				bool is_fullscreen = false;
 				bool hide_mouse_new = true;
+				double double_buffering = 0.0; // <= 0.0 = no
 				size_t fps_cap = 0;
 				size_t frames_per_second = 0;
 				size_t fails_out_of_range = 0; // out of range ignored because this is faster
@@ -51,7 +52,8 @@ namespace LSW {
 
 				static Tools::SuperMutex sync_threads;
 				DisplayStrongPtr disp;
-				EventHandler display_events;
+				Bitmap dbuffer;
+				EventHandler display_events{ Tools::superthread::performance_mode::LOW_POWER };
 				
 				//PathManager pathing;
 				Tools::SuperThreadT<bool> thr{ Tools::superthread::performance_mode::HIGH_PERFORMANCE };
@@ -68,7 +70,7 @@ namespace LSW {
 				Tools::FastFunction<std::shared_ptr<Camera>> camera_f;
 				bool refresh_camera = false;
 
-				std::shared_ptr<Bitmap> get_buffer_ref();
+				Bitmap get_buffer_ref();
 
 				bool thread_run(Tools::boolThreadF);
 
@@ -81,9 +83,9 @@ namespace LSW {
 				~Display();
 
 				/// <summary>
-				/// <para>Sets Bitmap's reference as the display buffer (this is set by default once).</para>
+				/// <para>Sets Bitmap's reference as the display buffer or bitmap buffer (this is set by default once, based on settings).</para>
 				/// </summary>
-				void set_internal_display_as_bitmap_reference();
+				void fix_internal_bitmap_reference();
 
 				/// <summary>
 				/// <para>Start drawing thread.</para>
@@ -103,6 +105,19 @@ namespace LSW {
 				/// <para>Set the drawing thread to stop (no lock).</para>
 				/// </summary>
 				void set_stop();
+
+				/// <summary>
+				/// <para>If greater than 0.0, it will create and use a second buffer as main display with the proportion (based on screen).</para>
+				/// <para>FOR SECURITY REASONS, you can't set more than 8.0 from here.</para>
+				/// </summary>
+				/// <param name="{double}">Scale of buffer, or no buffer if <= 0.0.</param>
+				void set_double_buffering_scale(const double);
+
+				/// <summary>
+				/// <para>The double buffering attribute. 0 means disabled. [0.0,8.0]</para>
+				/// </summary>
+				/// <returns>{double} Buffer scale.</returns>
+				double get_current_buffering_scale() const;
 
 				/// <summary>
 				/// <para>Set a Camera to be applied to drawing thread.</para>

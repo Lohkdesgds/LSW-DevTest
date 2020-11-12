@@ -24,7 +24,7 @@ void smartfile_test(Work::GameCore&);
 void pathmngr_debug(Work::GameCore&, const Interface::PathManager&);
 
 
-const int font_size_set = 100;
+const int font_size_set = 200;
 
 int main() {
 
@@ -45,6 +45,8 @@ int main() {
 	socketsys_test(core);
 	smartfile_test(core);
 #endif
+
+	//core.get_display().set_double_buffering_scale(0.3);
 
 	Interface::PathManager pather;
 	pather.add_path(datapath);
@@ -652,6 +654,28 @@ int main() {
 				logg << L::SL << fsr() << "V called, vsync switch (reopen app to set)." << L::EL;
 				auto& d = core.get_display();
 				d.set_vsync(!d.get_vsync());
+			}
+				break;
+			case ALLEGRO_KEY_L: 
+			{
+				auto dbuffs = core.get_display().get_current_buffering_scale();
+				if (dbuffs >= 0.05) {
+					dbuffs -= 0.05;
+					if (dbuffs < 0.05) dbuffs = 0.0;
+					logg << L::SL << fsr() << "L called, lowering dbuffer to " << Tools::sprintf_a("%.0lf", 100.0 * dbuffs) << "%..." << L::EL;
+					core.get_display().set_double_buffering_scale(dbuffs);
+				}
+				else {
+					logg << L::SL << fsr() << "L called, but already disabled double buffering!" << L::EL;
+				}
+			}
+				break;
+			case ALLEGRO_KEY_O: 
+			{
+				auto dbuffs = core.get_display().get_current_buffering_scale();
+				dbuffs += 0.05;
+				logg << L::SL << fsr() << "O called, trying to increase dbuffer to " << Tools::sprintf_a("%.0lf", 100.0 * dbuffs) << "%..." << L::EL;
+				core.get_display().set_double_buffering_scale(dbuffs);
 			}
 				break;
 			case ALLEGRO_KEY_F1: 

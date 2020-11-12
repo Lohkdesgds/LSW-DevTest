@@ -101,9 +101,9 @@ namespace LSW {
 				use_target_as_it = oth.use_target_as_it;
 			}
 
-			bool Bitmap::copy_attributes(const Bitmap& rf, const bool cpy, const double prop)
+			int Bitmap::copy_attributes(const Bitmap& rf, const bool cpy, const double prop)
 			{
-				if (is_sub()) return false;
+				if (is_sub()) return 0;
 				int sx, sy;
 				sx = rf.get_width() * prop;
 				sy = rf.get_height() * prop;
@@ -120,13 +120,15 @@ namespace LSW {
 						set_reference_as_target();
 					}
 					*this = std::move(secure);
+
+					return 2;
 				}
-				return true;
+				return 1;
 			}
 
-			bool Bitmap::copy_reference_attributes(const bool cpy, const double prop)
+			int Bitmap::copy_reference_attributes(const bool cpy, const double prop)
 			{
-				if (is_sub()) return false;
+				if (is_sub()) return 0;
 				Bitmap reference;
 				reference.be_reference_to_target(true);
 				return copy_attributes(reference, cpy, prop);
@@ -365,6 +367,11 @@ namespace LSW {
 				if (auto q = quick(); q) {
 					bitmap_orig = get_global_reference();
 				}
+			}
+			void Bitmap::set_this_as_reference()
+			{
+				target_orig = bitmap_orig;
+				dynamic_reference = std::function<ALLEGRO_BITMAP*(void)>();
 			}
 			void Bitmap::set_custom_reference(std::function<ALLEGRO_BITMAP*(void)> f)
 			{

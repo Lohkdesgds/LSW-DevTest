@@ -6,11 +6,11 @@ namespace LSW {
 
 			Tools::SuperMutex Display::sync_threads;
 
-			std::shared_ptr<Bitmap> Display::get_buffer_ref()
+			Bitmap Display::get_buffer_ref()
 			{
-				if (!disp) return nullptr;
-				auto b = std::make_shared<Bitmap>();
-				b->force(al_get_backbuffer(disp.get()));
+				if (!dbuffer.empty()) return dbuffer;
+				Bitmap b;
+				b.force(al_get_backbuffer(disp.get()));
 				return b;
 			}
 			bool Display::thread_run(Tools::boolThreadF keep)
@@ -18,22 +18,30 @@ namespace LSW {
 				bool verynice = true;
 				bool redraw = false;
 				bool regen_disp_pls = false;
+				bool check_dbuf = false;
+				
+				Camera fixed_default_camera;
+				fixed_default_camera.identity();
+
 
 				bool was_vsync = should_vsync;
 				size_t frames = 0;
 
 				EventTimer timar(1.0);
 				EventTimer fpsc(1.0);
+				EventTimer doublebuffer_check(2.0);
 
 				EventHandler handler;
 				handler.add(timar);
 				handler.add(fpsc);
+				handler.add(doublebuffer_check);
 
 				timar.start();
 				if (fps_cap) {
 					fpsc.set_delta(1.0 / fps_cap);
 					fpsc.start();
 				}
+				doublebuffer_check.start();
 
 				// always timer event lmao, refreshes once per sec
 				handler.set_run_autostart([&](const RawEvent& raw) {
@@ -67,7 +75,10 @@ namespace LSW {
 					else if (raw.timer_event().source == fpsc) {
 						redraw = true;
 					}
-
+					else if (raw.timer_event().source == doublebuffer_check)
+					{
+						check_dbuf = true;
+					}
 				});
 
 				try {
@@ -86,15 +97,32 @@ namespace LSW {
 							_reset_display_and_path();
 							refresh_camera = true;
 						}
+						if (check_dbuf)
+						{
+							check_dbuf = false;
+							if (double_buffering <= 0.0)
+							{
+								fix_internal_bitmap_reference();
+								dbuffer.reset();
+								refresh_camera = true;
+							}
+							else {
+								Bitmap ref;
+								ref.force(al_get_backbuffer(disp.get()));
+								refresh_camera |= 2 == dbuffer.copy_attributes(ref, false, double_buffering);
+								fix_internal_bitmap_reference();
+							}
+							dbuffer.set_reference_as_target();
+						}
 
 						frames++;
 
 						if (refresh_camera) {
-							set_internal_display_as_bitmap_reference();
+							fix_internal_bitmap_reference();
 							std::lock_guard<std::mutex> cam_m_luck(cam_m);
 							cam_cpy = camera_f();
 							if (refresh_camera && cam_cpy) {
-								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(*get_buffer_ref());
+								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(get_buffer_ref());
 								//refresh_camera = false;
 								cam_cpy->classic_refresh();
 
@@ -142,8 +170,18 @@ namespace LSW {
 							}
 						}
 
-						if (should_vsync) al_wait_for_vsync();
-						al_flip_display();
+						if (!dbuffer.empty()) {
+							al_set_target_backbuffer(disp.get());
+							fixed_default_camera.apply();
+							dbuffer.draw(0, 0, get_width(), get_height());
+							al_flip_display();
+							dbuffer.set_reference_as_target();
+						}
+						else {
+							al_set_target_backbuffer(disp.get());
+							al_flip_display();
+						}
+
 					}
 				}
 				catch (...) { // enhance later
@@ -194,7 +232,7 @@ namespace LSW {
 				al_apply_window_constraints(disp.get(), true);
 				al_set_window_constraints(disp.get(), display::minimum_display_size[0], display::minimum_display_size[1], 0, 0); // minimum size 640,480, max not defined
 
-				set_internal_display_as_bitmap_reference();
+				fix_internal_bitmap_reference();
 				al_inhibit_screensaver(true);
 
 
@@ -238,14 +276,19 @@ namespace LSW {
 			{
 				deinit();
 			}
-			void Display::set_internal_display_as_bitmap_reference()
+			void Display::fix_internal_bitmap_reference()
 			{
-				std::weak_ptr<ALLEGRO_DISPLAY> a = disp; // won't lock display
-				Bitmap::set_custom_reference([a]() -> ALLEGRO_BITMAP* {
-					if (auto d = a.lock(); d.get())
-						return al_get_backbuffer(d.get());
-					return nullptr;
-				});
+				if (double_buffering <= 0.0 || dbuffer.empty()) {
+					std::weak_ptr<ALLEGRO_DISPLAY> a = disp; // won't lock display
+					Bitmap::set_custom_reference([a]() -> ALLEGRO_BITMAP* {
+						if (auto d = a.lock(); d.get())
+							return al_get_backbuffer(d.get());
+						return nullptr;
+						});
+				}
+				else {
+					dbuffer.set_this_as_reference();
+				}
 			}
 			Tools::Future<bool> Display::init()
 			{
@@ -261,6 +304,14 @@ namespace LSW {
 			void Display::set_stop()
 			{
 				thr.stop();
+			}
+			void Display::set_double_buffering_scale(const double bufs)
+			{
+				double_buffering = bufs > 8.0 ? 8.0 : (bufs < 0.0 ? 0.0 : bufs);
+			}
+			double Display::get_current_buffering_scale() const
+			{
+				return double_buffering;
 			}
 			void Display::set_camera(std::shared_ptr<Camera> cam)
 			{
