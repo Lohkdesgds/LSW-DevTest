@@ -40,9 +40,8 @@ namespace LSW {
 
 			/// <summary>
 			/// <para>Display is the window used to draw stuff.</para>
-			/// <para>You can't create directly because this uses Target<> template. Use generate_display<>() to generate a Display of index defined by the call.</para>
 			/// </summary>
-			class Display : protected TargetInterface {
+			class Display {
 				int new_display_flags_apply = display::default_new_display_flags;
 				int new_display_refresh_rate = 0; // not set
 				int new_resolution[2] = { display::minimum_display_size[0], display::minimum_display_size[1] };
@@ -55,6 +54,9 @@ namespace LSW {
 				size_t frames_per_second = 0;
 				size_t fails_out_of_range = 0; // out of range ignored because this is faster
 				size_t fails_unexpected = 0; // other error?
+
+				// target index
+				Interface::Target targ;
 
 				static Tools::SuperMutex sync_threads;
 				DisplayStrongPtr disp;
@@ -83,7 +85,12 @@ namespace LSW {
 				void thread_deinit();
 
 			public:
-				Display();
+				/// <summary>
+				/// <para>Custom index for Target. If you set this different than one, you'll have to set each Sprite_Base based class to target this number. Defaults to 0.</para>
+				/// </summary>
+				/// <param name="{size_t}">Index for Target stuff.</param>
+				Display(const size_t = 0);
+
 				~Display();
 
 				/// <summary>
@@ -305,32 +312,6 @@ namespace LSW {
 			bool operator==(ALLEGRO_DISPLAY*, const Display&);
 			bool operator!=(ALLEGRO_DISPLAY*, const Display&);
 
-			/// <summary>
-			/// <para>Template minimal part. 99.9% of the Display don't need to be a template, so...</para>
-			/// <para>This sets Target<> template access so a non-template can use template without needing full template.</para>
-			/// </summary>
-			template<size_t u>
-			class DisplayT : protected Display {
-				Target<u> _targ;
-				void targ_set(const Bitmap&);
-				void targ_set(const std::function<Bitmap(void)>&);
-				void targ_apply();
-				Bitmap targ_get();
-			};
-
-			template<size_t u>
-			bool operator==(ALLEGRO_DISPLAY*, const DisplayT<u>&);
-			template<size_t u>
-			bool operator!=(ALLEGRO_DISPLAY*, const DisplayT<u>&);
-
-			/// <summary>
-			/// <para>Generate a Display resource (so you can use it anywhere) using a specific Target index.</para>
-			/// </summary>
-			template<size_t u>
-			Tools::Resource<Display> generate_display();
-
 		}
 	}
 }
-
-#include "display.ipp"

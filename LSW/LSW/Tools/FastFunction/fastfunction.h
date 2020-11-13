@@ -7,8 +7,6 @@ namespace LSW {
 	namespace v5 {
 		namespace Tools {
 			
-
-
 			/// <summary>
 			/// <para>There are many places where you want to support dynamic function-based values, but also be fast if you don't want complicated stuff.</para>
 			/// <para>This allows easy almost atomic (it depends on T) safe (functional side) store.</para>

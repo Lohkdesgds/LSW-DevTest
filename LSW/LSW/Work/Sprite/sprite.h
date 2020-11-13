@@ -47,7 +47,7 @@ namespace LSW {
 				enum class e_boolean { DRAW, USE_COLOR, AFFECTED_BY_CAM, SHOWDOT, SHOWBOX, RESPECT_CAMERA_LIMITS /*Readonly means no collision or acceleration, just f()*/ };
 				enum class e_integer { COLLISION_MODE };
 				enum class e_color { COLOR };
-				enum class e_uintptrt { DATA_FROM };
+				enum class e_uintptrt { DATA_FROM, INDEX_TARGET_IN_USE }; // == size_t
 
 				enum class e_collision_mode_cast {
 					COLLISION_BOTH, // collide and move if colliding
@@ -150,7 +150,8 @@ namespace LSW {
 				};
 
 				const Tools::SuperMap<Tools::FastFunction<uintptr_t>> e_uintptrt_defaults = {
-					{(uintptr_t)0,													(e_uintptrt::DATA_FROM)}
+					{(uintptr_t)0,													(e_uintptrt::DATA_FROM)},
+					{(uintptr_t)0,													(e_uintptrt::INDEX_TARGET_IN_USE)}
 				};
 
 				const Tools::SuperMap<Tools::FastFunction<e_tie_functional>> e_tief_defaults = {

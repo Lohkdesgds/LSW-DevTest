@@ -40,50 +40,40 @@ namespace LSW {
 			/// </summary>
 			class GameCore {
 			protected:
-
 				struct shared {
 					Interface::Logger logg;
 					Interface::Config conf;
 					Interface::Voice audio;
 					Interface::Mixer mixer;
-					Tools::Resource<Interface::Display> display; // start this
+					Interface::Display display{0};
 
 					Interface::EventHandler events{ Tools::superthread::performance_mode::HIGH_PERFORMANCE }; // just display close event and mouse registration for now
 
 					Interface::EventTimer check_sources; // like when you reload screen the source change.
 					Interface::EventTimer update_mouse;
 					bool _m_newdata = false;
-					float _m_x, _m_y;
+					float _m_x{}, _m_y{};
 
 					Interface::Event latest_display_source; // copy
 
 					bool closed = false; // if app is closed, true
 					bool loaded = false; // loaded once
 
-					// I hate this.
-					bool _force_after_load = false;
-					std::string _force_logg_path, _force_conf_path;
-					
 					Tools::SuperMutex m;
+
+					shared(const size_t);
 				};
+				
+				std::shared_ptr<shared> share;// = std::make_shared<shared>();
 
-				std::shared_ptr<shared> share;
-
-				void _assert(std::shared_ptr<shared>&&);
-				// logg, conf
-				void _setup(const std::string&, const std::string&);
-
-				GameCore(const bool);
 			public:
-				GameCore();
-
 				/// <summary>
-				/// <para>Start Logger and Config directly.</para>
+				/// <para>Start Logger and Config directly. Display index is set by the parameter.</para>
 				/// <para>As Logger is a global logging system, if it has been set earlier, this won't overwrite its settings.</para>
 				/// </summary>
 				/// <param name="{std::string}">Logger logging output.</param>
 				/// <param name="{std::string}">Configuration path.</param>
-				//GameCore(const std::string&, const std::string&);
+				GameCore(const std::string&, const std::string&, const size_t = 0);
 
 				/// <summary>
 				/// <para>Copy reference constructor.</para>
@@ -168,33 +158,6 @@ namespace LSW {
 				const Interface::Display& get_display() const;
 			};
 
-
-			/// <summary>
-			/// <para>Template minimal part. 99.9% of the Display don't need to be a template, so...</para>
-			/// <para>This sets Target<> template access so a non-template can use template without needing full template.</para>
-			/// </summary>
-			template<size_t u>
-			class GameCoreT : public GameCore {
-				using GameCore::share;
-			public:
-				/// <summary>
-				/// <para>Start Logger and Config directly.</para>
-				/// <para>As Logger is a global logging system, if it has been set earlier, this won't overwrite its settings.</para>
-				/// </summary>
-				/// <param name="{std::string}">Logger logging output.</param>
-				/// <param name="{std::string}">Configuration path.</param>
-				GameCoreT(const std::string&, const std::string&);
-			};
-
-			/// <summary>
-			/// <para>Generate a GameCore with index set (Display needs a index so Target<> works).</para>
-			/// <para>Start Logger and Config directly with arguments.</para>
-			/// <para>As Logger is a global logging system, if it has been set earlier, this won't overwrite its settings.</para>
-			/// </summary>
-			/// <param name="{std::string}">Logger logging output.</param>
-			/// <param name="{std::string}">Configuration path.</param>
-			template<size_t u>
-			GameCore generate_gamecore(const std::string&, const std::string&);
 		}
 	}
 }

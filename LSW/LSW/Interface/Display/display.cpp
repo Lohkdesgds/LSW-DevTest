@@ -81,7 +81,7 @@ namespace LSW {
 
 					auto cam_cpy = camera_f();
 
-					targ_set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
+					targ.set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
 
 					while (keep()) {
 
@@ -99,7 +99,7 @@ namespace LSW {
 							check_dbuf = false;
 							if (double_buffering <= 0.0)
 							{
-								targ_set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
+								targ.set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
 								dbuffer.reset();
 								refresh_camera = true;
 							}
@@ -107,7 +107,7 @@ namespace LSW {
 								Bitmap ref;
 								ref.force(al_get_backbuffer(disp.get()));
 								refresh_camera |= 2 == dbuffer.copy_attributes(ref, false, double_buffering);
-								targ_set(dbuffer);
+								targ.set(dbuffer);
 							}
 
 						}
@@ -118,7 +118,7 @@ namespace LSW {
 							std::lock_guard<std::mutex> cam_m_luck(cam_m);
 							cam_cpy = camera_f();
 							if (refresh_camera && cam_cpy) {
-								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(targ_get());
+								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(targ.get());
 								//refresh_camera = false;
 								cam_cpy->classic_refresh();
 
@@ -132,7 +132,7 @@ namespace LSW {
 							once_tasks.clear();
 						}
 
-						targ_apply(); // apply(), get() -> Bitmap, set(const Bitmap&), 
+						targ.apply(); // apply(), get() -> Bitmap, set(const Bitmap&), 
 
 						black.clear_to_this();
 
@@ -173,7 +173,7 @@ namespace LSW {
 							fixed_default_camera.apply();
 							dbuffer.draw(0, 0, get_width(), get_height());
 							al_flip_display();
-							targ_apply();
+							targ.apply();
 						}
 						else {
 							al_set_target_backbuffer(disp.get());
@@ -198,8 +198,6 @@ namespace LSW {
 						
 			void Display::_reset_display_and_path()
 			{
-				//if (pathing.paths_set().size()) pathing.apply();
-
 				Tools::AutoLock sync(sync_threads);
 
 				al_set_new_display_flags(new_display_flags_apply);
@@ -232,7 +230,7 @@ namespace LSW {
 				al_set_window_constraints(disp.get(), display::minimum_display_size[0], display::minimum_display_size[1], 0, 0); // minimum size 640,480, max not defined
 
 				{
-					targ_set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
+					targ.set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
 				}
 				al_inhibit_screensaver(true);
 
@@ -270,7 +268,7 @@ namespace LSW {
 				}
 			}
 						
-			Display::Display()
+			Display::Display(const size_t nind) : targ(nind)
 			{
 				Handling::init_basic();
 				Handling::init_graphics();

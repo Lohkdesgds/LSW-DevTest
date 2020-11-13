@@ -147,10 +147,11 @@ namespace LSW {
 
 				if (instantaneous || std::chrono::system_clock::now().time_since_epoch() > delta_t) // do update string
 				{
+					Interface::Target targ(get_direct<uintptr_t>(sprite::e_uintptrt::INDEX_TARGET_IN_USE));
 					set(text::e_chronomillis_readonly::LAST_UPDATE_BITMAP, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()) + std::chrono::milliseconds(instantaneous ? 0 : (unsigned long long)(1000.0 / ups_val)));
 
 					if (use_buffer) {
-						if (scale_buff <= 0.0 || !buff.copy_attributes(targ_get(), true, scale_buff)) { // ensure loaded
+						if (scale_buff <= 0.0 || !buff.copy_attributes(targ.get(), true, scale_buff)) { // ensure loaded
 							throw Handling::Abort(__FUNCSIG__, "Failed to copy reference's attributes and generate bitmap.", Handling::abort::abort_level::GIVEUP);
 						}
 					}
@@ -170,7 +171,7 @@ namespace LSW {
 						cpy.classic_update(buff);
 						_draw_text(cpy);
 
-						targ_apply();
+						targ.apply();
 					}
 					else buff.reset();
 				}

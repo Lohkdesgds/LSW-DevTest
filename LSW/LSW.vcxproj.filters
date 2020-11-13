@@ -173,6 +173,9 @@
     <Filter Include="LSW\1. Tools\Resource">
       <UniqueIdentifier>{12ee796f-4e5b-4e8d-9ed4-5a7d0859388c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{a13893d5-1488-4c07-9ec6-da8bb1b6cb13}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -273,6 +276,9 @@
     </ClCompile>
     <ClCompile Include="LSW\Work\Text\text.cpp">
       <Filter>LSW\3. Work\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Target\target.cpp">
+      <Filter>LSW\2. Interface\Target</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -422,9 +428,6 @@
     <ClInclude Include="LSW\Tools\Stopwatch\stopwatch.h">
       <Filter>LSW\1. Tools\StopWatch</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Target\target.h">
-      <Filter>LSW\2. Interface\Target</Filter>
-    </ClInclude>
     <ClInclude Include="LSW\Tools\AdvancedShared\advancedshared.ipp">
       <Filter>LSW\1. Tools\AdvancedShared</Filter>
     </ClInclude>
@@ -458,23 +461,14 @@
     <ClInclude Include="LSW\Tools\Resource\resource.ipp">
       <Filter>LSW\1. Tools\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Display\display.ipp">
-      <Filter>LSW\2. Interface\Display</Filter>
-    </ClInclude>
     <ClInclude Include="LSW\Work\GameCore\gamecore.ipp">
       <Filter>LSW\3. Work\GameCore</Filter>
     </ClInclude>
     <ClInclude Include="LSW\Interface\Config\config.ipp">
       <Filter>LSW\2. Interface\Config</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Target\target.ipp">
+    <ClInclude Include="LSW\Interface\Target\target.h">
       <Filter>LSW\2. Interface\Target</Filter>
-    </ClInclude>
-    <ClInclude Include="LSW\Work\Block\block.ipp">
-      <Filter>LSW\3. Work\Block</Filter>
-    </ClInclude>
-    <ClInclude Include="LSW\Work\Text\text.ipp">
-      <Filter>LSW\3. Work\Text</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

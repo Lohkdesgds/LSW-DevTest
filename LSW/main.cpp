@@ -16,6 +16,7 @@ const std::string resource_url = "https://www.dropbox.com/s/tuc0mu4eotoh7ay/data
 
 const std::string music_test_inner_path = "musics/music_alt.ogg";
 const int font_size_set = 200;
+const bool need_texture_update = false;// if I change something, set to true
 
 
 void check_file_download(Work::GameCore&);
@@ -97,7 +98,7 @@ int thr0() {
 int main() {
 #endif
 
-	Work::GameCore core(Work::generate_gamecore<0>(logpath, configpath));
+	Work::GameCore core(logpath, configpath);
 
 	Logger logg;
 
@@ -122,7 +123,7 @@ int main() {
 	pathmngr_debug(core, pather);
 
 
-	Tools::SuperResource<Work::BlockT<0>> blocks;
+	Tools::SuperResource<Work::Block> blocks;
 
 	auto working_on = core.get_display().add_once_task([pather] {
 		Logger logg;
@@ -214,14 +215,14 @@ int main() {
 		return -1;
 	}
 
-	Work::Block* blk0 = blocks.create("_test_block");
-	Work::Block* blk1 = blocks.create("_test_block2");
-	Work::Block* blk_mouse = blocks.create("_test_block_mouse");
-	Work::Block* blk3 = blocks.create("_test_col");
-	Work::Block* blk_height = blocks.create("_test_slidex");
-	Work::Block* blk_zoom = blocks.create("_test_slidezoom");
-	Work::Block* blk_width = blocks.create("_test_slidey");
-	Work::Block* blk_switch = blocks.create("_test_switch");
+	auto blk0 = blocks.create("_test_block");
+	auto blk1 = blocks.create("_test_block2");
+	auto blk_mouse = blocks.create("_test_block_mouse");
+	auto blk3 = blocks.create("_test_col");
+	auto blk_height = blocks.create("_test_slidex");
+	auto blk_zoom = blocks.create("_test_slidezoom");
+	auto blk_width = blocks.create("_test_slidey");
+	auto blk_switch = blocks.create("_test_switch");
 
 	blk0->insert(lmao);
 	blk_mouse->insert(mouse);
@@ -351,16 +352,16 @@ int main() {
 
 
 	Work::Collisioner overlay_control(core.get_config());
-	overlay_control.insert(*blk_height);
-	overlay_control.insert(*blk_width);
-	overlay_control.insert(*blk_switch);
-	overlay_control.insert(*blk_zoom);
+	overlay_control.insert(blk_height);
+	overlay_control.insert(blk_width);
+	overlay_control.insert(blk_switch);
+	overlay_control.insert(blk_zoom);
 
 	Work::Collisioner collision_control(core.get_config());
-	collision_control.insert(*blk0);
-	collision_control.insert(*blk_mouse);
-	collision_control.insert(*blk3);
-	collision_control.insert(*blk1);
+	collision_control.insert(blk0);
+	collision_control.insert(blk_mouse);
+	collision_control.insert(blk3);
+	collision_control.insert(blk1);
 
 	collision_control.start(1.0 / 20);
 	overlay_control.start(1.0 / 10);
@@ -375,7 +376,7 @@ int main() {
 
 
 	Tools::SuperResource<Font> source_font;
-	Tools::SuperResource<Work::TextT<0>> texts;
+	Tools::SuperResource<Work::Text> texts;
 
 	Tools::Resource<Interface::Font> sfont;
 	if (!source_font.get("DEFAULT", sfont)) {
@@ -384,14 +385,14 @@ int main() {
 			return -1;
 	}
 
-	Work::Text* txt0 = texts.create("_line0");
-	Work::Text* txtdebug = texts.create("_line4");
-	Work::Text* txtu = texts.create("_lineu");
+	auto txt0 = texts.create("_line0");
+	auto txtdebug = texts.create("_line4");
+	auto txtu = texts.create("_lineu");
 
-	Work::Text* txtmouse = texts.create("_follow_mouse_test");
+	auto txtmouse = texts.create("_follow_mouse_test");
 
-	Work::Text* txtf0 = texts.create("_follow_0");
-	Work::Text* txtf1 = texts.create("_follow_1");
+	auto txtf0 = texts.create("_follow_0");
+	auto txtf1 = texts.create("_follow_1");
 
 	txt0->set(sfont);
 	txtdebug->set(sfont);
@@ -518,8 +519,8 @@ int main() {
 	txtmouse->set<double>(Work::sprite::e_double::TARG_ROTATION, [] {return 90.0 * al_get_time(); });
 
 
-	overlay_control.insert(*txtdebug);
-	overlay_control.insert(*txt0);
+	overlay_control.insert(txtdebug);
+	overlay_control.insert(txt0);
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - TEXTS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
@@ -837,7 +838,7 @@ void check_file_download(Work::GameCore& core)
 
 		bool download_this = false;
 #ifndef _DEBUG
-		if (core.get_config().has(Work::gamecore::conf_versioning, "automatic version")) {
+		if (need_texture_update && core.get_config().has(Work::gamecore::conf_versioning, "automatic version")) {
 			download_this |= core.get_config().get(Work::gamecore::conf_versioning, "automatic version") != Work::version_app;
 		}
 #endif

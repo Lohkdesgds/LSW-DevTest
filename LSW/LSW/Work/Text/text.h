@@ -59,9 +59,9 @@ namespace LSW {
 
 			/// <summary>
 			/// <para>Text is a Sprite_Base + Font with various features.</para>
-			/// <para>The template is the index you want to use this in. Target<> will match this anywhere.</para>
+			/// <para>If you use custom index, please change the sprite::e_uintptr_t::INDEX_TARGET_IN_USE.</para>
 			/// </summary>
-			class Text : protected Interface::TargetInterface, public Sprite_Base, public Tools::SuperFunctionalMap<std::chrono::milliseconds>, public Tools::SuperFunctionalMap<Tools::Cstring>, public Tools::SuperFunctionalMap<Sprite_Base> {
+			class Text : public Sprite_Base, public Tools::SuperFunctionalMap<std::chrono::milliseconds>, public Tools::SuperFunctionalMap<Tools::Cstring>, public Tools::SuperFunctionalMap<Sprite_Base> {
 
 				Interface::Font fontt;
 				Interface::Bitmap buff;
@@ -131,27 +131,6 @@ namespace LSW {
 
 			};
 
-			/// <summary>
-			/// <para>Template minimal part. 99.9% of the Block don't need to be a template, so...</para>
-			/// <para>This sets Target<> template access so a non-template can use template without needing full template.</para>
-			/// </summary>
-			template<size_t u>
-			class TextT : public Text {
-				Interface::Target<u> _targ;
-				void targ_set(const Interface::Bitmap&);
-				void targ_set(const std::function<Interface::Bitmap(void)>&);
-				void targ_apply();
-				Interface::Bitmap targ_get();
-			};
-
-			/// <summary>
-			/// <para>Generate a Block resource (so you can use it anywhere) using a specific Target index.</para>
-			/// </summary>
-			template<size_t u>
-			Tools::Resource<Text> generate_block();
-
 		}
 	}
 }
-
-#include "text.ipp"

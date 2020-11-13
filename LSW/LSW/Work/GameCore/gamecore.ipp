@@ -63,23 +63,6 @@ namespace LSW {
 				return outtt;//std::to_string(year) + std::to_string(monthn) + std::to_string(day) + std::to_string(hour) + std::to_string(min);
 			}
 
-			template<size_t u>
-			GameCoreT<u>::GameCoreT(const std::string& a, const std::string& b) : GameCore(true)
-			{
-				auto sr = std::make_shared<GameCore::shared>();
-				sr->display = Interface::generate_display<u>();
-				sr->_force_logg_path = a;
-				sr->_force_conf_path = b;
-				sr->_force_after_load = true;
-				_assert(std::move(sr));
-			}
-
-			template<size_t u>
-			GameCore generate_gamecore(const std::string& lo, const std::string& co)
-			{
-				GameCoreT<u> ho(lo, co); // set Display by itself
-				return std::move(ho); // no worry about forgetting the virtual func.
-			}
 		}
 	}
 }

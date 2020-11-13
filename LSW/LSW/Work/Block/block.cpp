@@ -14,7 +14,8 @@ namespace LSW {
 					if (const double _dd = get_direct<double>(block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
 						set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + block::default_delta_t_frame_delay));
 
-						for (auto& i : bitmaps) i.copy_attributes(targ_get(), true);
+						Interface::Target targ(get_direct<uintptr_t>(sprite::e_uintptrt::INDEX_TARGET_IN_USE));
+						for (auto& i : bitmaps) i.copy_attributes(targ.get(), true);
 					}
 				}
 
