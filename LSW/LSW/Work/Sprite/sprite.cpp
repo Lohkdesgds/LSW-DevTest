@@ -1,6 +1,5 @@
 #include "sprite.h"
 
-
 namespace LSW {
 	namespace v5 {
 		namespace Work {
@@ -477,7 +476,6 @@ namespace LSW {
 
 				}
 
-
 				double scale_x, scale_y;
 
 				scale_x = get_direct<double>(sprite::e_double::SCALE_G) * get_direct<double>(sprite::e_double::SCALE_X);
@@ -487,6 +485,7 @@ namespace LSW {
 
 				think_task(nowgo);
 			}
+
 		}
 	}
 }

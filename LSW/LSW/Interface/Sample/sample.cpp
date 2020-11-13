@@ -36,11 +36,6 @@ namespace LSW {
 				return file_sample == u.file_sample;
 			}
 
-			/*bool Sample::operator==(ALLEGRO_SAMPLE*& u) const
-			{
-				return file_sample.get() == u;
-			}*/
-
 			bool Sample::exists() const
 			{
 				return file_sample.get();

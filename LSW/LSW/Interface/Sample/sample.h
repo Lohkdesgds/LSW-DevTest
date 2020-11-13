@@ -50,7 +50,6 @@ namespace LSW {
 				/// <param name="{Sample}">Other Sample.</param>
 				/// <returns>{bool} True if they are the same.</returns>
 				bool operator==(const Sample&) const;
-				//bool operator==(ALLEGRO_SAMPLE*&) const;
 
 				/// <summary>
 				/// <para>Is this ready and/or loaded?</para>

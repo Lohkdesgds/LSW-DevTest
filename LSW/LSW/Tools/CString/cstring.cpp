@@ -3,14 +3,17 @@
 namespace LSW {
 	namespace v5 {
 		namespace Tools {
+
 			Cstring::Cstring(const Cstring& c)
 			{
 				*this = c;
 			}
+			
 			Cstring::Cstring(Cstring&& m) noexcept
 			{
 				*this = std::move(m);
 			}
+			
 			const size_t Cstring::find(const char c) const
 			{
 				for (size_t p = 0; p < str.size(); p++) {
@@ -106,27 +109,33 @@ namespace LSW {
 				return cpy;
 			}
 
-			char_c Cstring::pop() {
+			char_c Cstring::pop()
+			{
 				if (str.size() > 0) {
 					char_c cpy = str.back();
 					str.erase(str.end()-1);
-					if (str.length() > 0) last_added_color = str.back().cr;
+					if (str.size() > 0) last_added_color = str.back().cr;
 					return cpy;
 				}
 				else return char_c();
 			}
-			size_t Cstring::size() const {
+			
+			size_t Cstring::size() const
+			{
 				return str.size();
 			}
 
-			Cstring& Cstring::append(const Cstring& oth) {
+			Cstring& Cstring::append(const Cstring& oth)
+			{
 				//str.clear();
-				for (auto& i : oth) str += i;
+				for (auto& i : oth) str.push_back(i);
 				last_added_color = oth.last_added_color;
 
 				return *this;
 			}
-			Cstring& Cstring::append(const std::string& rstr) {
+
+			Cstring& Cstring::append(const std::string& rstr)
+			{
 				//str.clear();
 				if (!rstr.size()) return *this;
 				cstring::C curr_color = last_added_color;
@@ -184,6 +193,7 @@ namespace LSW {
 				last_added_color = str.back().cr;
 				return *this;
 			}
+
 			Cstring& Cstring::append(const float& a)
 			{
 				char temp[32];
@@ -233,60 +243,70 @@ namespace LSW {
 				append(u);
 			}
 
-			std::basic_string<char_c>::iterator Cstring::begin()
+			std::vector<char_c>::iterator Cstring::begin()
 			{
 				return str.begin();
 			}
 
-			std::basic_string<char_c>::iterator Cstring::end()
+			std::vector<char_c>::iterator Cstring::end()
 			{
 				return str.end();
 			}
 
-			std::basic_string<char_c>::const_iterator Cstring::begin() const
+			std::vector<char_c>::const_iterator Cstring::begin() const
 			{
 				return str.begin();
 			}
 
-			std::basic_string<char_c>::const_iterator Cstring::end() const
+			std::vector<char_c>::const_iterator Cstring::end() const
 			{
 				return str.end();
 			}
 
-			char_c& Cstring::operator[](const size_t p) {
+			char_c& Cstring::operator[](const size_t p)
+			{
 				if (p >= size()) throw Handling::Abort(__FUNCSIG__, "Out of range");
 				return str[p];
 			}
-			const char_c& Cstring::operator[](const size_t p) const {
+			
+			const char_c& Cstring::operator[](const size_t p) const
+			{
 				if (p >= size()) throw Handling::Abort(__FUNCSIG__, "Out of range");
 				return str[p];
 			}
+			
 			const char_c& Cstring::front() const
 			{
 				if (size() == 0) throw Handling::Abort(__FUNCSIG__, "Empty string doesn't have front()!");
 				return (*this)[0];
 			}
+			
 			const char_c& Cstring::back() const
 			{
 				if (size() == 0) throw Handling::Abort(__FUNCSIG__, "Empty string doesn't have back()!");
 				return (*this)[size()-1];
 			}
+			
 			void Cstring::clear()
 			{
 				str.clear();
 			}
+			
 			char_c* Cstring::data()
 			{
 				return str.data();
 			}
+			
 			const char_c* Cstring::data() const
 			{
 				return str.data();
 			}
+			
 			const cstring::C& Cstring::next_color() const
 			{
 				return last_added_color;
 			}
+			
 			Cstring Cstring::filter_ascii_range(const char a, const char b) const
 			{
 				Cstring nstr;
@@ -304,6 +324,7 @@ namespace LSW {
 				Cstring conv = str;
 				return conv + cstr;
 			}
-}
+
+		}
 	}
 }

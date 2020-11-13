@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../../Tools/Common/common.h"
+#include "../../Tools/Resource/resource.h"
 #include "../../Interface/Bitmap/bitmap.h"
+#include "../../Interface/Target/target.h"
 #include "../Sprite/sprite.h"
 
 #undef max
@@ -10,7 +12,7 @@ namespace LSW {
 	namespace v5 {
 		namespace Work {
 
-			
+
 			namespace block {
 
 				enum class e_chronomillis_readonly { LAST_FRAME, LAST_TIE_FRAME_VERIFICATION };
@@ -42,8 +44,9 @@ namespace LSW {
 
 			/// <summary>
 			/// <para>A Sprite_Base with Bitmaps.</para>
+			/// <para>The template is the index you want to use this in. Target<> will match this anywhere.</para>
 			/// </summary>
-			class Block : public Sprite_Base, public Tools::SuperFunctionalMap<std::chrono::milliseconds> { // Sprite_Base already has others included!!!!!!!
+			class Block : protected Interface::TargetInterface, public Sprite_Base, public Tools::SuperFunctionalMap<std::chrono::milliseconds> { // Sprite_Base already has others included!!!!!!!
 
 				// bitmap internally uses shared_ptr so no worries!
 				std::vector<Interface::Bitmap> bitmaps;
@@ -76,7 +79,7 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{Block}">The one to move attributes from.</param>
 				Block(Block&&);
-				
+
 				/// <summary>
 				/// <para>Reference a Block (not a copy).</para>
 				/// </summary>
@@ -110,7 +113,27 @@ namespace LSW {
 				size_t remove(const std::function<bool(const Interface::Bitmap&)>);
 			};
 
+			/// <summary>
+			/// <para>Template minimal part. 99.9% of the Block don't need to be a template, so...</para>
+			/// <para>This sets Target<> template access so a non-template can use template without needing full template.</para>
+			/// </summary>
+			template<size_t u>
+			class BlockT : public Block {
+				Interface::Target<u> _targ;
+				void targ_set(const Interface::Bitmap&);
+				void targ_set(const std::function<Interface::Bitmap(void)>&);
+				void targ_apply();
+				Interface::Bitmap targ_get();
+			};
+
+			/// <summary>
+			/// <para>Generate a Block resource (so you can use it anywhere) using a specific Target index.</para>
+			/// </summary>
+			template<size_t u>
+			Tools::Resource<Block> generate_block();
 
 		}
 	}
 }
+
+#include "block.ipp"

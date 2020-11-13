@@ -93,6 +93,7 @@ namespace LSW {
 				/// </summary>
 				void signal_all();
 			};
+
 		}
 	}
 }

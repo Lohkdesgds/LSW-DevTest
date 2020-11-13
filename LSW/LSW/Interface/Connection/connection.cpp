@@ -4,7 +4,6 @@ namespace LSW {
 	namespace v5 {
 		namespace Interface {
 
-
 			_unprocessed_pack::_unprocessed_pack(const std::string& s)
 			{
 				data = std::move(s);
@@ -136,7 +135,7 @@ namespace LSW {
 					else if (alt_generate_auto) {
 						pack = alt_generate_auto();
 						if (pack.empty()) {
-							std::this_thread::sleep_for(connection::min_delay_no_tasks);
+							//std::this_thread::sleep_for(connection::min_delay_no_tasks); // SuperThread handles this now
 							continue;
 						}
 						//debug(common + "(auto) tasked.");
@@ -144,7 +143,7 @@ namespace LSW {
 					else {
 						Tools::AutoLock luck(packs_sending_m);
 						if (packs_sending.size() == 0) {
-							std::this_thread::sleep_for(connection::min_delay_no_tasks);
+							//std::this_thread::sleep_for(connection::min_delay_no_tasks); // SuperThread handles this now
 							continue;
 						}
 						else {

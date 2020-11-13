@@ -4,9 +4,6 @@ namespace LSW {
 	namespace v5 {
 		namespace Interface {
 
-
-
-
 			Camera::Camera(const Camera& c)
 			{
 				t = c.t;
@@ -90,6 +87,7 @@ namespace LSW {
 			{
 				return cl_2d;
 			}
+			
 			classic_2d& Camera::get_classic()
 			{
 				return cl_2d;

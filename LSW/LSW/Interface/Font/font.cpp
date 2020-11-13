@@ -114,16 +114,6 @@ namespace LSW {
 				return quick() == o.quick();
 			}
 
-			/*
-			const bool Font::operator==(const ALLEGRO_FONT*& o) const
-			{
-				return quick() == o;
-			}
-			ALLEGRO_FONT* Font::operator*()
-			{
-				return quick();
-			}*/
-
 			int Font::get_line_ascent() const
 			{
 				if (auto q = quick(); q) return al_get_font_ascent(q);
@@ -147,6 +137,7 @@ namespace LSW {
 				if (auto q = quick(); q) return al_get_text_width(q, str);
 				return -1;
 			}
+
 			int Font::get_width(Tools::Cstring str) const
 			{
 				if (auto q = quick(); q) return al_get_text_width(q, str.s_str().c_str());
@@ -182,6 +173,7 @@ namespace LSW {
 					}
 				}
 			}
+
 		}
 	}
 }

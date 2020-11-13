@@ -47,6 +47,13 @@ namespace LSW {
 			std::vector<std::string> generate_string_format(const std::string, const size_t, const size_t = 0);
 
 			/// <summary>
+			/// <para>Project set to unicode? This may be useful. Emojis and special characters won't work properly.</para>
+			/// </summary>
+			/// <param name="{std::string}">A basic simple string.</param>
+			/// <returns>{std::wstring} Converted string.</returns>
+			std::wstring force_unicode(const std::string&);
+
+			/// <summary>
 			/// <para>Gets the thread ID.</para>
 			/// <returns>{uint64_t} The thread ID.</returns>
 			// gets Thread ID
@@ -141,7 +148,7 @@ namespace LSW {
 			* * * * * * * * * * */
 
 			// like autocast, but for type
-			template<typename T> using r_cast_t = std::conditional_t<std::is_pointer<T>::value || std::is_array<T>::value, std::add_pointer_t<std::remove_all_extents_t<std::remove_cvref_t<std::remove_pointer_t<T>>>>, std::remove_all_extents_t<std::remove_cvref_t<std::remove_pointer_t<T>>>>;
+			template<typename T> using r_cast_t = std::conditional_t<std::is_pointer<T>::value || std::is_array<T>::value, std::add_pointer_t<std::remove_all_extents_t<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<T>>>>>, std::remove_all_extents_t<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<T>>>>>;
 
 
 			template<typename, typename = void>

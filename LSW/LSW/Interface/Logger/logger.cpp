@@ -7,8 +7,6 @@ namespace LSW {
 
 			Logger::__idata Logger::g;
 
-
-
 			FormatAs::FormatAs(const std::string& form)
 			{
 				if (form.find('%') == std::string::npos) throw Handling::Abort(__FUNCSIG__, "Invalid FORMAT! You have to use something like %d or %05.3lf as on a printf!");
@@ -64,28 +62,13 @@ namespace LSW {
 			void Logger::print_start()
 			{
 				Tools::Cstring str;
-				/*char temp[26];
 
-				time_t rawtime;
-				tm ti;
-
-				time(&rawtime);
-				localtime_s(&ti, &rawtime);
-				//ti = localtime(&rawtime);
-
-				sprintf_s(temp, "[%02d/%02d/%02d-%02d:%02d:%02d]", (ti.tm_year + 1900) % 100, ti.tm_mon + 1, ti.tm_mday, ti.tm_hour, ti.tm_min, ti.tm_sec);*/
-
-				/*SYSTEMTIME t;
-				GetLocalTime(&t);
-				auto ss = sprintf_s(temp, "[%02d/%02d/%02d-%02d:%02d:%02d]", t.wYear % 100, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond);*/
 				if (!g.fp && g.file_write_enabled) {
 					str.append("&4[&eFILEERRR&4]");
 				}
 				str += Tools::cstring::C::GOLD;
 				str.append(_generate_date());
-				/*for (size_t pp = 0; pp < ss; pp++) {
-					str.push_back({ temp[pp], cstring::C::GOLD });
-				}*/
+
 				print(str);
 			}
 
@@ -95,7 +78,9 @@ namespace LSW {
 				if (g.sendd) g.sendd(g.last_str);
 				//g.memline_s.clear();
 			}
-			void Logger::print(const Tools::Cstring& cstr) {
+
+			void Logger::print(const Tools::Cstring& cstr) 
+			{
 				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 				int last_clr_c = -1;
 				for (auto& i : cstr) {
@@ -107,7 +92,9 @@ namespace LSW {
 					putchar(i.ch);
 				}
 			}
-			void Logger::fprint(FILE*& fp, const Tools::Cstring& cstr) {
+			
+			void Logger::fprint(FILE*& fp, const Tools::Cstring& cstr) 
+			{
 				if (!fp) return;
 				for (auto& i : cstr) {
 					fputc(i.ch, fp);
@@ -136,6 +123,7 @@ namespace LSW {
 
 				g.m.unlock();
 			}
+			
 			void Logger::flush()
 			{
 				if (g.fp) {
@@ -144,35 +132,45 @@ namespace LSW {
 					g.m.unlock();
 				}
 			}
+			
 			void Logger::debug_write_to_file(const bool b)
 			{
 				g.debug_to_file = b;
 			}
+			
 			void Logger::_debug(const std::string& whr, const std::string& str)
 			{
 				// https://docs.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-outputdebugstringw
 				// "Applications should send very minimal debug output and provide a way for the user to enable or disable its use." -> it disables the feature if in release mode then.
 #ifdef _DEBUG
 				g.dbgm.lock();
+#ifdef UNICODE
+				OutputDebugString(Tools::force_unicode("@\tLSWv5\t>\t" + _generate_date() + "\t\t\t" + whr + ": " + str + "\n").c_str());
+#else
 				OutputDebugString(("@\tLSWv5\t>\t" + _generate_date() + "\t\t\t" + whr + ": " + str + "\n").c_str());
+#endif
 				g.dbgm.unlock();
 #endif
 				Logger logg;
 				if (g.debug_to_file) logg << L::SLF << whr << "&7" << str << L::ELF;
 				else				 logg << L::SL  << whr << "&7" << str << L::EL;
 			}
+			
 			void Logger::hook(std::function<void(const Tools::Cstring&)> f)
 			{
 				g.sendd = f;
 			}
+			
 			void Logger::unhook()
 			{
 				hook(std::function<void(const Tools::Cstring&)>());
 			}
+			
 			const Tools::Cstring& Logger::get_last_line() const
 			{
 				return g.last_str;
 			}
+			
 			Logger& Logger::operator<<(const L& u)
 			{
 				switch (u)
@@ -232,6 +230,7 @@ namespace LSW {
 				g.memline_s += clstr;
 				return *this;
 			}
+			
 			Logger& Logger::operator<<(const std::string& o) // don't forget template lmao
 			{
 				Tools::Cstring cstr;
@@ -240,14 +239,17 @@ namespace LSW {
 				cstr = (format + o).c_str();
 				return (this->operator<<(cstr));
 			}
+			
 			Logger& Logger::operator<<(const char o[])
 			{
 				return (this->operator<<(std::string(o)));
 			}
+			
 			Logger& Logger::operator<<(const char& o)
 			{
 				return (this->operator<<(std::string(&o, 1)));
 			}
+			
 			Logger& Logger::operator<<(const int& o)
 			{
 				std::string buf;
@@ -264,6 +266,7 @@ namespace LSW {
 
 				return (this->operator<<(buf));
 			}
+			
 			Logger& Logger::operator<<(const float& o)
 			{
 				std::string buf;
@@ -280,6 +283,7 @@ namespace LSW {
 
 				return (this->operator<<(buf));
 			}
+			
 			Logger& Logger::operator<<(const double& o)
 			{
 				std::string buf;
@@ -296,6 +300,7 @@ namespace LSW {
 
 				return (this->operator<<(buf));
 			}
+			
 			Logger& Logger::operator<<(const unsigned& o)
 			{
 				std::string buf;
@@ -312,6 +317,7 @@ namespace LSW {
 
 				return (this->operator<<(buf));
 			}
+			
 			Logger& Logger::operator<<(const long& o)
 			{
 				std::string buf;
@@ -328,6 +334,7 @@ namespace LSW {
 
 				return (this->operator<<(buf));
 			}
+			
 			Logger& Logger::operator<<(const long long& o)
 			{
 				std::string buf;
@@ -344,6 +351,7 @@ namespace LSW {
 
 				return (this->operator<<(buf));
 			}
+			
 			Logger& Logger::operator<<(const size_t& o)
 			{
 				std::string buf;
@@ -360,47 +368,6 @@ namespace LSW {
 
 				return (this->operator<<(buf));
 			}
-
-			/*const Tools::Cstring fsr(Tools::Cstring fname_pretty, const E situation)
-			{
-				if (fname_pretty.size() < logger::len_class) {
-					for (size_t p = fname_pretty.size(); p < logger::len_class; p++)
-					{
-						fname_pretty += '_';
-					}
-				}
-				else {
-					for (size_t p = fname_pretty.size(); p > logger::len_class; p--)
-					{
-						fname_pretty.pop();
-					}
-				}
-
-				for (auto& i : fname_pretty) i.ch = ::toupper(i.ch);
-
-				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-				Tools::Cstring back_str;
-
-				switch (situation) {
-				case E::INFO:
-					back_str = "&2[INFO]";
-					break;
-				case E::WARN:
-					back_str = "&c[WARN]";
-					break;
-				case E::ERRR:
-					back_str = "&4[ERRR]";
-					break;
-				case E::DEBUG:
-					back_str = "&5[DEBG]";
-					break;
-				}
-
-				back_str += "&8[" + fname_pretty + "&8]&f ";
-
-				return back_str; // convert
-			}*/
-
 
 			const std::string _fsr(const size_t l, const std::string& fp, const std::string& func, const E e)
 			{
@@ -426,8 +393,10 @@ namespace LSW {
 						[&] { auto s = std::string(fp); auto p = s.rfind('\\'); p = ((p != std::string::npos) ? p : s.rfind('/')); return ("&a" + ((p != std::string::npos && ((p + 1) < s.length())) ? s.substr(p + 1) : s)); }(),
 						logger::macro_file_siz
 					).c_str(),
-					Tools::fixed_size_string(func, logger::macro_func_siz).c_str());
+					Tools::fixed_size_string(func, logger::macro_func_siz).c_str()
+				);
 			}
+
 		}
 	}
 }

@@ -10,6 +10,7 @@ namespace LSW {
 				playing = std::shared_ptr<ALLEGRO_SAMPLE_INSTANCE>(s, [](ALLEGRO_SAMPLE_INSTANCE*& b) { if (al_is_system_installed() && b) { al_destroy_sample_instance(b); b = nullptr; } });
 				return playing.get();
 			}
+			
 			Track::Track()
 			{
 				Handling::init_basic();
@@ -173,6 +174,6 @@ namespace LSW {
 				al_set_sample_instance_playmode(playing.get(), static_cast<ALLEGRO_PLAYMODE>(mode));
 			}
 
-}
+		}
 	}
 }

@@ -36,14 +36,17 @@ namespace LSW {
 
                 CloseHandle(piProcInfo.hProcess);
             }
+
             Launcher::~Launcher()
             {
                 stop();
             }
+            
             void Launcher::hook_output(const std::function<void(const std::string&)> f)
             {
                 prunt = f;
             }
+            
             bool Launcher::launch(const std::string& cmd)
             {
                 saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -120,6 +123,7 @@ namespace LSW {
                     autosav = nullptr;
                 }*/
             }
+
         }
     }
 }

@@ -29,22 +29,16 @@ namespace LSW {
 			/// <para>SuperMap is a std::map like class, but one that uses SuperPair as pairs.</para>
 			/// <para>SuperPairs allow multiple different keys to result in a same value, and each value to have different key combinations.</para>
 			/// </summary>
-			/// <typeparam name="T"></typeparam>
 			template<typename T>
 			class SuperMap {
 				std::vector<SuperPair<T>> sps;
 			public:
 				SuperMap() = default;
-				~SuperMap() {
-					sps.clear();
-				}
 
 				/// <summary>
 				/// <para>Clears the map.</para>
 				/// </summary>
-				void clear() {
-					sps.clear();
-				}
+				void clear();
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -58,46 +52,32 @@ namespace LSW {
 				/// <para>Sets a list of multiple SuperPairs.</para>
 				/// </summary>
 				/// <param name="{initializer_list}">A initializer list of SuperPairs.</param>
-				SuperMap(std::initializer_list<SuperPair<T>> spTi)
-				{
-					add(spTi);
-				}
+				SuperMap(std::initializer_list<SuperPair<T>>);
 
 				/// <summary>
 				/// <para>Copy constructor.</para>
 				/// </summary>
 				/// <param name="{SuperMap}">The other SuperMap to copy.</param>
-				SuperMap(const SuperMap& mp)
-				{
-					add(mp);
-				}
+				SuperMap(const SuperMap&);
 
 				/// <summary>
 				/// <para>Move constructor.</para>
 				/// </summary>
 				/// <param name="{SuperMap}">The other SuperMap to move.</param>
-				SuperMap(SuperMap&& mp)
-				{
-					sps = std::move(mp.sps);
-				}
+				SuperMap(SuperMap&&);
 
 				/// <summary>
 				/// <para>Copy operator.</para>
 				/// </summary>
 				/// <param name="{SuperMap}">The other SuperMap to copy.</param>
-				void operator=(const SuperMap& mp)
-				{
-					add(mp);
-				}
+				void operator=(const SuperMap&);
 
 				/// <summary>
 				/// <para>Move operator.</para>
 				/// </summary>
 				/// <param name="{SuperMap}">The other SuperMap to move.</param>
-				void operator=(SuperMap&& mp)
-				{
-					sps = std::move(mp.sps);
-				}
+				void operator=(SuperMap&&);
+
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -111,97 +91,75 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{SuperMap}">The SuperMap being added.</param>
 				/// <returns></returns>
-				void add(const SuperMap& mp)
-				{
-					for (auto& i : mp.sps) {
-						SuperPair<T> spp;
-						spp = i;
-						add(spp);
-					}
-				}
+				void add(const SuperMap&);
 
 				/// <summary>
 				/// <para>Move a SuperMap into this SuperMap.</para>
 				/// </summary>
 				/// <param name="{SuperMap}">The SuperMap being moved.</param>
 				/// <returns></returns>
-				void add(SuperMap&& mp)
-				{
-					for (auto& i : mp.sps) {
-						add(std::move(i));
-					}
-				}
+				void add(SuperMap&&);
 
 				/// <summary>
 				/// <para>Adds a initializer list of multiple SuperPairs.</para>
 				/// </summary>
 				/// <param name="{initializer_list}">A initializer list of SuperPairs.</param>
-				void add(std::initializer_list<SuperPair<T>> spTi) {
-					for (auto& i : spTi) {
-						add(i);
-					}
-				}
+				void add(std::initializer_list<SuperPair<T>>);
 
 				/// <summary>
 				/// <para>Adds a single SuperPair.</para>
 				/// </summary>
 				/// <param name="{SuperPair}">A SuperPair to add.</param>
-				void add(const SuperPair<T>& sp) {
-					sps.push_back(sp);
-				}
+				void add(const SuperPair<T>&);
 
 				/// <summary>
 				/// <para>Moves a single SuperPair.</para>
 				/// </summary>
 				/// <param name="{SuperPair}">A SuperPair to move.</param>
-				void add(SuperPair<T>&& sp) {
-					sps.push_back(std::move(sp));
-				}
-
+				void add(SuperPair<T>&&);
 
 				/// <summary>
 				/// <para>Begin of the vector of SuperPairs.</para>
 				/// </summary>
 				/// <returns>{iterator} Begin iterator.</returns>
-				auto begin() { return sps.begin(); }
+				auto begin();
 
 				/// <summary>
 				/// <para>End of the vector of SuperPairs.</para>
 				/// </summary>
 				/// <returns>{iterator} End iterator.</returns>
-				auto end() { return sps.end(); }
+				auto end();
 
 				/// <summary>
 				/// <para>Begin of the vector of SuperPairs.</para>
 				/// </summary>
 				/// <returns>{iterator} Begin iterator.</returns>
-				auto begin() const { return sps.begin(); }
+				auto begin() const;
 
 				/// <summary>
 				/// <para>End of the vector of SuperPairs.</para>
 				/// </summary>
 				/// <returns>{iterator} End iterator.</returns>
-				auto end() const { return sps.end(); }
-
+				auto end() const;
 
 				/// <summary>
 				/// <para>The size of the internal vector of SuperPairs.</para>
 				/// </summary>
 				/// <returns>{size_t} Vector size.</returns>
-				const size_t size() const { return sps.size(); }
+				size_t size() const;
 
 				/// <summary>
 				/// <para>Erases a specific position of the internal vector of SuperPairs.</para>
 				/// </summary>
 				/// <param name="{size_t}">The position to be deleted.</param>
-				void erase(const size_t start) { if (start < size()) sps.erase(sps.begin() + start); }
+				void erase(const size_t);
 
 				/// <summary>
 				/// <para>Erases an amount of SuperPairs of the internal vector.</para>
 				/// </summary>
 				/// <param name="{size_t}">The first position to be deleted.</param>
 				/// <param name="{size_t}">The last position to be deleted.</param>
-				void erase(const size_t start, const size_t end) { if (start < end && start + end < size()) sps.erase(sps.begin() + start, sps.begin() + end); }
+				void erase(const size_t, const size_t);
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -217,33 +175,7 @@ namespace LSW {
 				/// <param name="{K}">A key.</param>
 				/// <returns>{SuperPair} The SuperPair with that key.</returns>
 				template<typename K>
-				SuperPair<T>* get_pair(K key) {
-					for (auto& i : sps) if (i.has_type(key)) return &i;
-					return nullptr;
-				}
-
-				/// <summary>
-				/// <para>Gets a SuperPair based on key if matches.</para>
-				/// </summary>
-				/// <param name="{K}">A key.</param>
-				/// <returns>{SuperPair} The SuperPair with that key.</returns>
-				/*template<typename K, size_t size_o>
-				SuperPair<T>* get_pair(K(&key)[size_o]) {
-					for (auto& i : sps) if (T* ptr; ptr = i(key, size_o)) return &i;
-					return nullptr;
-				}*/
-
-				/// <summary>
-				/// <para>Gets a SuperPair based on key if matches.</para>
-				/// </summary>
-				/// <param name="{K}">A key.</param>
-				/// <param name="{size_t}">The key length.</param>
-				/// <returns>{SuperPair} The SuperPair with that key.</returns>
-				/*template<typename K>
-				SuperPair<T>* get_pair(K* key, size_t size) {
-					for (auto& i : sps) if (T* ptr; ptr = i(key, size)) return &i;
-					return nullptr;
-				}*/
+				SuperPair<T>* get_pair(const K&);
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -259,12 +191,7 @@ namespace LSW {
 				/// <param name="{K}">The key.</param>
 				/// <returns>{T} The value, if match, else nullptr.</returns>
 				template<typename K>
-				T* operator[](K key) {
-					for (auto& i : sps) {
-						if (i.has_type(key)) return i[key];
-					}
-					return nullptr;
-				}
+				T* operator[](const K&);
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -280,14 +207,11 @@ namespace LSW {
 				/// <param name="{K}">The key.</param>
 				/// <returns>{T} The value, if match, else nullptr.</returns>
 				template<typename K>
-				const T* operator[](K key) const {
-					for (auto& i : sps) {
-						if (i.has_type(key)) return i[key];
-					}
-					return nullptr;
-				}
+				const T* operator[](const K&) const;
 			};
 
 		}
 	}
 }
+
+#include "supermap.ipp"

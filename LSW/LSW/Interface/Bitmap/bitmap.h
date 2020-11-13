@@ -23,14 +23,6 @@ namespace LSW {
 				static bool first_time;
 
 				Tools::AdvancedShared<ALLEGRO_BITMAP> bitmap_orig;
-				static Tools::AdvancedShared<ALLEGRO_BITMAP> target_orig;
-				static std::function<ALLEGRO_BITMAP*(void)> dynamic_reference;
-
-				static ALLEGRO_BITMAP* get_global_reference();
-
-				//std::function<ALLEGRO_BITMAP*(void)> bitmap; // has shared ptr there
-				//static std::function<ALLEGRO_BITMAP*(void)> target;
-				bool use_target_as_it = false;
 
 				// set new at bitmap (set(al_load_bitmap...) or something like that)
 				bool set(ALLEGRO_BITMAP*);
@@ -80,14 +72,6 @@ namespace LSW {
 				int copy_attributes(const Bitmap&, const bool = true, const double = 1.0);
 
 				/// <summary>
-				/// <para>Creates a Bitmap with the exact size of the reference Bitmap if needed. Sub bitmaps will fail.</para>
-				/// </summary>
-				/// <param name="{bool}">Redraw this into new this if new? (sets reference as target after copy).</param>
-				/// <param name="{float}">Proportion (scalable based on reference, 1.0 means 100%).</param>
-				/// <returns>{int} 0 fail, 1 good, 2 had to resize.</returns>
-				int copy_reference_attributes(const bool = true, const double = 1.0);
-
-				/// <summary>
 				/// <para>If you change default bitmap flags or recreated display, call this so everyone is converted to new standards.</para>
 				/// <para>ALLEGRO_VIDEO_BITMAP is forced by default.</para>
 				/// </summary>
@@ -100,8 +84,6 @@ namespace LSW {
 				/// <param name="{int}">Its height.</param>
 				/// <returns>{bool} True if success.</returns>
 				bool create(const int, const int);
-				// from, posx, posy, width, height
-				//bool create_sub(ALLEGRO_BITMAP*, const int, const int, const int, const int);
 
 				/// <summary>
 				/// <para>Creates a sub-bitmap (a trimmed reference of a Bitmap).</para>
@@ -112,7 +94,7 @@ namespace LSW {
 				/// <param name="{int}">Position Y (top left is 0).</param>
 				/// <param name="{int}">Width.</param>
 				/// <param name="{int}">Height.</param>
-				/// <returns></returns>
+				/// <returns>{bool} True if success.</returns>
 				bool create_sub(const Bitmap&, const int, const int, const int, const int);
 
 				/// <summary>
@@ -173,15 +155,6 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{RAW BITMAP}">The RAW BITMAP.</param>
 				void force(ALLEGRO_BITMAP*);
-
-				/// <summary>
-				/// <para>Copy global target to this Bitmap (reference).</para>
-				/// </summary>
-				/// <param name="{bool}">True sets this as target Bitmap reference.</param>
-				void be_reference_to_target(const bool);
-
-				// from
-				//bool clone(ALLEGRO_BITMAP*);
 
 				/// <summary>
 				/// <para>Clones a Bitmap (not reference).</para>
@@ -369,36 +342,8 @@ namespace LSW {
 				/// <para>Set this as the target (so you can draw others into this).</para>
 				/// </summary>
 				void set_as_target() const;
-
-				/// <summary>
-				/// <para>Set REFERENCE as the target.</para>
-				/// </summary>
-				void set_reference_as_target() const;
-
-				/// <summary>
-				/// <para>Gets if there's any reference target set (REFERENCE != TARGET, more like a global reference).</para>
-				/// <para>False probably means there's just a Display as target (or no Display set yet).</para>
-				/// </summary>
-				/// <returns>{bool} True if there's a target set.</returns>
-				bool has_global_reference_set() const;
-
-				/// <summary>
-				/// <para>Set this as a copy of the current target (if any) (REFERENCE != TARGET, more like a global reference).</para>
-				/// </summary>
-				void copy_reference_to_this();
-
-				/// <summary>
-				/// <para>Set this as reference to everybody and as the main target.</para>
-				/// </summary>
-				void set_this_as_reference();
-
-				/// <summary>
-				/// <para>Sets a custom function to return the global target (REFERENCE != TARGET, more like a global reference).</para>
-				/// <para>IT WON'T DEALLOC THE BITMAPS THE FUNCTION GIVE. DEALLOC YOURSELF!</para>
-				/// </summary>
-				/// <param name="{std::function}">A function that returns a RAW BITMAP.</param>
-				static void set_custom_reference(std::function<ALLEGRO_BITMAP* (void)>);
 			};
+
 		}
 	}
 }

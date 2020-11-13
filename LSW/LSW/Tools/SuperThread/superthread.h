@@ -28,10 +28,14 @@ namespace LSW {
 			// function that returns TRUE if you should KEEP RUNNING.
 			using boolThreadF = std::function<bool(void)>;
 
+			/// <summary>
+			/// <para>A thread class with many tools for good performance and control.</para>
+			/// </summary>
 			template<typename T>
 			class SuperThreadT {
 				ALLEGRO_THREAD* thr = nullptr;
 				bool _thread_done_flag = true;
+				bool _die_already = false;
 				Promise<T> promise;
 				superthread::performance_mode perform{}; // balanced
 
@@ -51,6 +55,9 @@ namespace LSW {
 				/// <para>Initialize necessary stuff.</para>
 				/// </summary>
 				SuperThreadT();
+
+				SuperThreadT(const SuperThreadT&) = delete;
+				SuperThreadT(SuperThreadT&&) = delete;
 
 				/// <summary>
 				/// <para>Constructor that sets directly the performance mode.</para>
@@ -115,197 +122,9 @@ namespace LSW {
 				bool running() const;
 			};
 
-
-			// IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION - IMPLEMENTATION //
-
-
-			template<typename T>
-			template<typename Q, std::enable_if_t<!std::is_void_v<Q>, int>>
-			void SuperThreadT<T>::_set_promise_forced()
-			{
-				promise.set_value(T{});
-			}
-
-
-			template<typename T>
-			template<typename Q, std::enable_if_t<std::is_void_v<Q>, int>>
-			void SuperThreadT<T>::_set_promise_forced()
-			{
-				promise.set_value();
-			}
-
-
-			template<typename T>
-			inline void SuperThreadT<T>::_perf()
-			{
-				switch (perform) {
-				case superthread::performance_mode::BALANCED:
-					std::this_thread::yield();
-					std::this_thread::sleep_for(std::chrono::microseconds(500)); // top 2000 loops
-					std::this_thread::yield();
-					break;
-				case superthread::performance_mode::LOW_POWER:
-					std::this_thread::yield();
-					std::this_thread::sleep_for(std::chrono::milliseconds(2)); // top 500 loops
-					std::this_thread::yield();
-					break;
-				case superthread::performance_mode::VERY_LOW_POWER:
-					std::this_thread::yield();
-					std::this_thread::sleep_for(std::chrono::milliseconds(8)); // top 125 loops
-					std::this_thread::yield();
-					break;
-				case superthread::performance_mode::PERFORMANCE:
-					std::this_thread::yield();
-					std::this_thread::sleep_for(std::chrono::microseconds(100)); // top 10000 loops
-					std::this_thread::yield();
-					break;
-				case superthread::performance_mode::HIGH_PERFORMANCE:
-					std::this_thread::yield(); // sync
-					break;
-				}
-			}
-
-			template<typename T>
-			inline void* SuperThreadT<T>::__run_i_al(ALLEGRO_THREAD* thr, void* arg)
-			{
-				if (!arg) throw Handling::Abort(__FUNCSIG__, "Invalid thread argument internally!");
-				Promise<T>* f = (Promise<T>*)arg;
-				f->work(); // has !al_get_thread_should_stop(thr) internally
-				return thr;
-			}
-
-			template<typename T>
-			inline SuperThreadT<T>::SuperThreadT()
-			{
-				Handling::init_basic();
-			}
-
-			template<typename T>
-			SuperThreadT<T>::SuperThreadT(const superthread::performance_mode& m)
-			{
-				Handling::init_basic();
-				set_performance_mode(m);
-			}
-
-			template<typename T>
-			SuperThreadT<T>::SuperThreadT(const std::function<T(boolThreadF)> f)
-			{
-				Handling::init_basic();
-				set(f);
-			}
-
-			template<typename T>
-			SuperThreadT<T>::~SuperThreadT()
-			{
-				kill();
-			}
-
-
-			template<typename T>
-			template<typename Q, std::enable_if_t<!std::is_void_v<Q>, int>>
-			void SuperThreadT<T>::set(const std::function<T(boolThreadF)> f)
-			{
-				join();
-				promise = std::move(Promise<T>([&,f] {
-					try {
-						_thread_done_flag = false;
-						T cpy = f([&] { _perf(); return !al_get_thread_should_stop(thr); });
-						_thread_done_flag = true;
-						return std::move(cpy);
-					}
-					catch (const Handling::Abort& e) { // for now. later: save and get elsewhere
-						std::cout << "Exception at SuperThread #" << Tools::get_thread_id() << ": " << e.what() << std::endl;
-					}
-					catch (...) { // for now. later: save and get elsewhere
-						std::cout << "Unknown exception at SuperThread #" << Tools::get_thread_id() << "." << std::endl;
-					}
-					return T{};
-				}));
-			}
-
-			template<typename T>
-			template<typename Q, std::enable_if_t<std::is_void_v<Q>, int>>
-			void SuperThreadT<T>::set(const std::function<T(boolThreadF)> f)
-			{
-				join();
-				promise = std::move(Promise<T>([&, f] {
-					try {
-						_thread_done_flag = false;
-						f([&] { _perf(); return !al_get_thread_should_stop(thr); });
-						_thread_done_flag = true;
-					}
-					catch (const Handling::Abort& e) { // for now. later: save and get elsewhere
-						std::cout << "Exception at SuperThread #" << Tools::get_thread_id() << ": " << e.what() << std::endl;
-					}
-					catch (...) { // for now. later: save and get elsewhere
-						std::cout << "Unknown exception at SuperThread #" << Tools::get_thread_id() << "." << std::endl;
-					}
-				}));
-			}
-
-			template<typename T>
-			Future<T> SuperThreadT<T>::start()
-			{
-				join();
-				Future<T> fut = promise.get_future();
-				thr = al_create_thread(__run_i_al, &promise);
-				al_start_thread(thr);
-				
-				return fut;
-			}
-
-			template<typename T>
-			inline void SuperThreadT<T>::set_performance_mode(const superthread::performance_mode& mode)
-			{
-				perform = mode;
-			}
-
-			template<typename T>
-			void SuperThreadT<T>::stop()
-			{
-				if (thr) al_set_thread_should_stop(thr);
-			}
-
-			template<typename T>
-			void SuperThreadT<T>::join()
-			{
-				if (thr) {
-					//al_set_thread_should_stop(thr);
-					al_join_thread(thr, nullptr);
-					while (!_thread_done_flag) std::this_thread::sleep_for(std::chrono::milliseconds(20));
-					al_destroy_thread(thr);
-					if (!promise.has_set()) _set_promise_forced();
-					thr = nullptr;
-				}
-			}
-
-			template<typename T>
-			void SuperThreadT<T>::kill()
-			{
-				if (thr) {
-					al_set_thread_should_stop(thr);
-					if (_thread_done_flag) {
-						if (!promise.has_set()) _set_promise_forced();
-						al_join_thread(thr, nullptr);
-						al_destroy_thread(thr);
-						thr = nullptr;
-					}
-					else { // might be internally blocked or the user is crazy and wants to kill it anyways.
-						al_destroy_thread(thr);
-						thr = nullptr;
-						if (!promise.has_set()) _set_promise_forced();
-						_thread_done_flag = true;
-					}
-				}
-			}
-
-			template<typename T>
-			bool SuperThreadT<T>::running() const
-			{
-				return thr && !_thread_done_flag;
-			}
-
 			using SuperThread = SuperThreadT<void>;
 		}
 	}
 }
+
+#include "superthread.ipp"

@@ -202,6 +202,7 @@ namespace LSW {
 				/// <param name="{play_mode}">New mode.</param>
 				void set_play_mode(const track::play_mode);
 			};
+
 		}
 	}
 }

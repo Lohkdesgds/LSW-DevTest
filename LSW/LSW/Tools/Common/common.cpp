@@ -18,7 +18,6 @@ namespace LSW {
 				return distrib(gen);
 			}
 
-
 			std::vector<std::string> generate_string_format(const std::string format, const size_t max, const size_t startat)
 			{
 				std::vector<std::string> rett;
@@ -67,12 +66,21 @@ namespace LSW {
 
 				return rett;
 			}
+
+			std::wstring force_unicode(const std::string& s)
+			{
+				std::wstring _b;
+				for (auto& i : s) _b += static_cast<wchar_t>(i);
+				return std::move(_b);
+			}
+
 			uint64_t get_thread_id()
 			{
 				std::stringstream ss;
 				ss << std::this_thread::get_id();
 				return std::stoull(ss.str());
 			}
+
 			std::vector<bool> translate_binary(const int v, const size_t lim)
 			{
 				std::vector<bool> b;
@@ -84,7 +92,9 @@ namespace LSW {
 
 				return b;
 			}
-			std::string byte_auto_string(double end, const size_t t, const bool space) {
+
+			std::string byte_auto_string(double end, const size_t t, const bool space)
+			{
 				int prefix = -1;
 
 				while (prefix < (common::known_size_len - 1) && (end /= (1e3)) >= 1.0)
@@ -108,11 +118,13 @@ namespace LSW {
 			{
 				return sin(gotten * 3.1415) * prop;
 			}
+
 			const unsigned int random()
 			{
 				static custom_random _rand_class; // sorry
 				return _rand_class.random();
 			}
+			
 			std::string generate_random_unique_string()
 			{
 				auto cool_n = random() % 1000; // 3 digits max
@@ -121,8 +133,8 @@ namespace LSW {
 				char sign[32];
 				sprintf_s(sign, "%010u%03u", now_c, cool_n);
 				return sign;
-
 			}
+
 			std::vector<std::pair<std::string, std::string>> break_lines_config(const std::string str, const std::string spr, const std::string comment, const std::string endline)
 			{
 				std::vector<std::pair<std::string, std::string>> vectu;
@@ -175,7 +187,8 @@ namespace LSW {
 				return str;
 			}
 
-			std::string sprintf_a(const char* format, ...) {
+			std::string sprintf_a(const char* format, ...)
+			{
 				std::string str;
 
 				va_list args;
@@ -193,6 +206,7 @@ namespace LSW {
 				str.shrink_to_fit(); // clean up the rest of it (won't clear after it)
 				return str;
 			}
+
 		}
 	}
 }

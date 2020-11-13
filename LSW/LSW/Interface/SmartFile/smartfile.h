@@ -99,6 +99,7 @@ namespace LSW {
 			/// <param name="{std::string}">Path.</param>
 			/// <returns></returns>
 			int64_t quick_get_file_size(std::string);
+
 		}
 	}
 }

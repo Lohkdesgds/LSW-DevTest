@@ -150,7 +150,7 @@ namespace LSW {
 					set(text::e_chronomillis_readonly::LAST_UPDATE_BITMAP, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()) + std::chrono::milliseconds(instantaneous ? 0 : (unsigned long long)(1000.0 / ups_val)));
 
 					if (use_buffer) {
-						if (scale_buff <= 0.0 || !buff.copy_reference_attributes(true, scale_buff)) { // ensure loaded
+						if (scale_buff <= 0.0 || !buff.copy_attributes(targ_get(), true, scale_buff)) { // ensure loaded
 							throw Handling::Abort(__FUNCSIG__, "Failed to copy reference's attributes and generate bitmap.", Handling::abort::abort_level::GIVEUP);
 						}
 					}
@@ -169,7 +169,8 @@ namespace LSW {
 						auto cpy = ruler;
 						cpy.classic_update(buff);
 						_draw_text(cpy);
-						buff.set_reference_as_target();
+
+						targ_apply();
 					}
 					else buff.reset();
 				}
@@ -177,7 +178,7 @@ namespace LSW {
 				if (!use_buffer) {
 					_draw_text(ruler);
 				}
-				else if (!buff.empty()){ // same as Block
+				else if (!buff.empty()) { // same as Block
 					ruler.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
 					ruler.apply();
 
@@ -185,12 +186,12 @@ namespace LSW {
 				}
 
 			}
-
+						
 			void Text::think_task(const int u)
 			{
 				_think_lines(); // this way so if drawing thread can also do this if needed
 			}
-
+						
 			Text::Text() : Sprite_Base()
 			{
 				set<std::chrono::milliseconds>(text::e_chronomillis_readonly_defaults);
@@ -205,17 +206,17 @@ namespace LSW {
 				set(text::e_chronomillis_readonly::LAST_UPDATE_BITMAP, MILLI_NOW);
 				set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
 			}
-
+						
 			Text::Text(const Text& other) : Sprite_Base(other)
 			{
 				*this = other;
 			}
-			
+						
 			Text::Text(Text&& other) : Sprite_Base(std::move(other))
 			{
 				*this = std::move(other);
 			}
-
+						
 			void Text::operator=(const Text& oth)
 			{
 				this->Sprite_Base::operator=(oth);
@@ -227,7 +228,7 @@ namespace LSW {
 				set<Tools::Cstring>(oth.get<Tools::Cstring>());
 				set<Sprite_Base>(oth.get<Sprite_Base>());
 			}
-
+			
 			void Text::operator=(Text&& oth)
 			{
 				this->Sprite_Base::operator=(std::move(oth));
@@ -239,7 +240,7 @@ namespace LSW {
 				set<Tools::Cstring>(std::move(oth.get<Tools::Cstring>()));
 				set<Sprite_Base>(std::move(oth.get<Sprite_Base>()));
 			}
-
+			
 			void Text::clone(const Text& oth)
 			{
 				this->Sprite_Base::clone(oth);
@@ -251,7 +252,7 @@ namespace LSW {
 				set<Tools::Cstring>(*oth.get<Tools::Cstring>());
 				set<Sprite_Base>(*oth.get<Sprite_Base>());
 			}
-
+						
 			void Text::set(const Interface::Font& f)
 			{
 				fontt = f;

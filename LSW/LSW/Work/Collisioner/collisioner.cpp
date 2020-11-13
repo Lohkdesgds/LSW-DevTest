@@ -4,8 +4,6 @@ namespace LSW {
 	namespace v5 {
 		namespace Work {
 
-
-
 			void Collisioner::task_collision()
 			{
 				Tools::AutoLock luck(sprites_m);

@@ -4,9 +4,13 @@ namespace LSW {
 	namespace v5 {
 		namespace Work {
 
+			void GameCore::_assert(std::shared_ptr<GameCore::shared>&& u)
+			{
+				if (!u) throw Handling::Abort(__FUNCSIG__, "Please generate a GameCore via generate_gamecore<>()!");
+				share = std::move(u);
+			}
 
-
-			GameCore::GameCore(const std::string& logg_p, const std::string& conf_p)
+			void GameCore::_setup(const std::string& logg_p, const std::string& conf_p)
 			{
 				Tools::AutoLock luck(share->m);
 				if (!share->loaded) {
@@ -59,22 +63,22 @@ namespace LSW {
 
 					share->logg.debug_write_to_file(share->conf.get_as<bool>(gamecore::conf_debug, "debug_to_file"));
 
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_width"); k != 0)			share->display.set_width(k);
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_height"); k != 0)			share->display.set_height(k);
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "display_flags"); k != 0)			share->display.set_new_flags(k);
-					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "limit_framerate_to"); k != 0)		share->display.set_fps_cap(k);
-					if (auto k = share->conf.get_as<double>(gamecore::conf_displaying, "doublebuffer_scale"); k > 0.0)	share->display.set_double_buffering_scale(k);
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_width"); k != 0)			share->display->set_width(k);
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "screen_height"); k != 0)			share->display->set_height(k);
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "display_flags"); k != 0)			share->display->set_new_flags(k);
+					if (auto k = share->conf.get_as<int>(gamecore::conf_displaying, "limit_framerate_to"); k != 0)		share->display->set_fps_cap(k);
+					if (auto k = share->conf.get_as<double>(gamecore::conf_displaying, "doublebuffer_scale"); k > 0.0)	share->display->set_double_buffering_scale(k);
 
-					share->display.hide_mouse(share->conf.get_as<bool>(gamecore::conf_displaying, "hidemouse"));
-					share->display.set_vsync(share->conf.get_as<bool>(gamecore::conf_displaying, "vsync"));
+					share->display->hide_mouse(share->conf.get_as<bool>(gamecore::conf_displaying, "hidemouse"));
+					share->display->set_vsync(share->conf.get_as<bool>(gamecore::conf_displaying, "vsync"));
 
-					share->display.init();
+					share->display->init();
 
-					while (!share->display.display_ready()) std::this_thread::sleep_for(std::chrono::milliseconds(250));
+					while (!share->display->display_ready()) std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 					share->check_sources.set_delta(gamecore::delta_checking_s);
 					share->update_mouse.set_delta(gamecore::delta_mouse_s);
-					share->latest_display_source = share->display.get_event_source();
+					share->latest_display_source = share->display->get_event_source();
 
 					// SHHHH share->events.set_mode(Interface::eventhandler::handling_mode::NO_BUFFER_SKIP);
 					share->events.add(share->check_sources);
@@ -102,7 +106,7 @@ namespace LSW {
 									ry *= bufsc;
 								}
 
-								if (auto camnow = share->display.get_current_camera(); camnow) {
+								if (auto camnow = share->display->get_current_camera(); camnow) {
 									Interface::Camera inv = *camnow;
 									inv.invert();
 									inv.transform(x, y);
@@ -120,13 +124,13 @@ namespace LSW {
 								}
 							}
 							else if (ev.timer_event().source == share->check_sources) {
-								if (share->latest_display_source != share->display.get_event_source()) {
+								if (share->latest_display_source != share->display->get_event_source()) {
 									Interface::Logger logg;
 
 									debug("Display event registering refresh! Display has changed/updated.");
 
 									share->events.remove(share->latest_display_source);
-									share->latest_display_source = share->display.get_event_source();
+									share->latest_display_source = share->display->get_event_source();
 									share->events.add(share->latest_display_source);
 								}
 							}
@@ -134,6 +138,8 @@ namespace LSW {
 							break;
 						case ALLEGRO_EVENT_MOUSE_AXES:
 						{
+							if (ev.mouse_event().display != share->display) break;
+
 							share->_m_x = ev.mouse_event().x;
 							share->_m_y = ev.mouse_event().y;
 							share->_m_newdata = true;
@@ -141,6 +147,8 @@ namespace LSW {
 							break;
 						case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
 						{
+							if (ev.mouse_event().display != share->display) break;
+
 							std::string bb = "b" + std::to_string(ev.mouse_event().button);
 							share->conf.set(gamecore::conf_mouse_memory, "down_latest", (int)(1 + ev.mouse_event().button));
 							auto _press = share->conf.get_as<unsigned>(gamecore::conf_mouse_memory, "press_count");
@@ -150,6 +158,8 @@ namespace LSW {
 							break;
 						case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
 						{
+							if (ev.mouse_event().display != share->display) break;
+
 							std::string bb = "b" + std::to_string(ev.mouse_event().button);
 							share->conf.set(gamecore::conf_mouse_memory, "down_latest", -(int)(1 + ev.mouse_event().button));
 							auto _press = share->conf.get_as<unsigned>(gamecore::conf_mouse_memory, "press_count");
@@ -159,6 +169,8 @@ namespace LSW {
 							break;
 						case ALLEGRO_EVENT_DISPLAY_CLOSE:
 						{
+							if (ev.display_event().source != share->display) break;
+
 							Interface::Logger logg;
 							debug("Close app called.");
 
@@ -166,7 +178,7 @@ namespace LSW {
 						}
 							break;
 						}
-						});
+					});
 
 
 					share->update_mouse.start();
@@ -181,14 +193,26 @@ namespace LSW {
 				}
 			}
 
+			GameCore::GameCore(const bool ignore)
+			{
+				if (!ignore && share->display.empty()) throw Handling::Abort(__FUNCSIG__, "You're not supposed to create this directly. Please call generate_gamecore<>()!");
+			}
+
+			GameCore::GameCore()
+			{
+				if (!share) throw Handling::Abort(__FUNCSIG__, "You're not supposed to create this directly. Please call generate_gamecore<>()!");
+			}
+
 			GameCore::GameCore(const GameCore& b)
 			{
 				*this = b;
+				if (!share) throw Handling::Abort(__FUNCSIG__, "Please generate a GameCore via generate_gamecore<>()!");
 			}
 
 			GameCore::GameCore(GameCore&& m)
 			{
 				*this = std::move(m);
+				if (!share) throw Handling::Abort(__FUNCSIG__, "Please generate a GameCore via generate_gamecore<>()!");
 			}
 
 			void GameCore::shutdown()
@@ -207,16 +231,16 @@ namespace LSW {
 				share->conf.set(gamecore::conf_audio, "volume", share->mixer.get_gain());
 				share->mixer.mute(true);
 
-				share->conf.set(gamecore::conf_displaying, "screen_width", share->display.get_width());
-				share->conf.set(gamecore::conf_displaying, "screen_height", share->display.get_height());
-				share->conf.set(gamecore::conf_displaying, "display_flags", share->display.get_flags());
-				share->conf.set(gamecore::conf_displaying, "limit_framerate_to", share->display.get_fps_cap());
-				share->conf.set(gamecore::conf_displaying, "vsync", share->display.get_vsync());
-				share->conf.set(gamecore::conf_displaying, "doublebuffer_scale", share->display.get_current_buffering_scale());
+				share->conf.set(gamecore::conf_displaying, "screen_width", share->display->get_width());
+				share->conf.set(gamecore::conf_displaying, "screen_height", share->display->get_height());
+				share->conf.set(gamecore::conf_displaying, "display_flags", share->display->get_flags());
+				share->conf.set(gamecore::conf_displaying, "limit_framerate_to", share->display->get_fps_cap());
+				share->conf.set(gamecore::conf_displaying, "vsync", share->display->get_vsync());
+				share->conf.set(gamecore::conf_displaying, "doublebuffer_scale", share->display->get_current_buffering_scale());
 
 				share->conf.flush();
 
-				share->display.deinit();
+				share->display->deinit();
 
 				share->closed = true;
 				share->loaded = false;
@@ -234,14 +258,26 @@ namespace LSW {
 
 			void GameCore::operator=(const GameCore& b)
 			{
-				if (!share->closed) shutdown();
+				if (share && !share->closed) shutdown();
 				share = b.share;
+				if (share->_force_after_load) {
+					share->_force_after_load = false;
+					_setup(share->_force_logg_path, share->_force_conf_path);
+					share->_force_logg_path.clear();
+					share->_force_conf_path.clear();
+				}
 			}
 
 			void GameCore::operator=(GameCore&& m)
 			{
-				if (!share->closed) shutdown();
-				share = std::move(m.share);
+				if (share && !share->closed) shutdown();
+				share = std::move(m.share); // bugs?
+				if (share->_force_after_load) {
+					share->_force_after_load = false;
+					_setup(share->_force_logg_path, share->_force_conf_path);
+					share->_force_logg_path.clear();
+					share->_force_conf_path.clear();
+				}
 			}
 
 			Interface::Config& GameCore::get_config()

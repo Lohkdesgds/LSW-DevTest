@@ -3,6 +3,7 @@
 namespace LSW {
 	namespace v5 {
 		namespace Interface {
+			
 			void Config::_set(section& i, const std::string& key, const std::string& val)
 			{
 				if (key.empty() || val.empty()) return;
@@ -16,6 +17,7 @@ namespace LSW {
 				i.key_and_value.push_back({ key, val });
 				return;
 			}
+			
 			Config::section& Config::_get_to_set(const std::string& sec, const config::config_section_mode mode)
 			{
 				for (auto& i : conff) {
@@ -26,6 +28,7 @@ namespace LSW {
 				conff.push_back({ mode, sec });
 				return conff.back();
 			}
+
 			const Config::section& Config::_get(const std::string& sec) const
 			{
 				for (auto& i : conff) {
@@ -36,6 +39,7 @@ namespace LSW {
 				throw Handling::Abort(__FUNCSIG__, "There is no section called " + sec + "!", Handling::abort::abort_level::GIVEUP);
 				return conff.front();
 			}
+
 			bool Config::_has(const std::string& sec) const
 			{
 				for (auto& i : conff) {
@@ -43,6 +47,7 @@ namespace LSW {
 				}
 				return false;
 			}
+
 			Config::Config(Config&& c) noexcept
 			{
 				path = std::move(c.path);
@@ -210,27 +215,6 @@ namespace LSW {
 				return false;
 			}
 
-
-
-			/*void Config::set(const std::string& sec, const std::string& key, const std::string& val, config::config_section_mode mode)
-			{
-				auto& u = _get_to_set(sec, mode);
-				_set(u, key, val);
-				u.mode = mode;
-			}
-
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<std::string>& vals, const config::config_section_mode mode)
-			{
-				std::string res;
-				for (auto& i : vals) {
-					for (auto& j : i) if (j == ';') throw Handling::Abort(__FUNCSIG__, "Invalid character ';' in multiple values configuration!");
-					res += i + ';';
-				}
-				set(sec, key, "{" + res + "}", mode);
-			}*/
-
-
-
 			void Config::set(const std::string& sec, const std::string& key, const std::string& val)
 			{
 				auto& u = _get_to_set(sec);
@@ -302,7 +286,7 @@ namespace LSW {
 				set(sec, key, "{" + res + "}");
 			}
 
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<bool>& vals) 
+			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<bool>& vals)
 			{
 				std::string res;
 				for (auto& i : vals) {
@@ -311,70 +295,8 @@ namespace LSW {
 				if (res.length() > 1) res.pop_back();
 				set(sec, key, "{" + res + "}");
 			}
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<char>& vals) 
-			{
-				std::string res;
-				for (auto& i : vals) {
-					res += std::to_string(i) + ';';
-				}
-				if (res.length() > 1) res.pop_back();
-				set(sec, key, "{" + res + "}");
-			}
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<int>& vals) 
-			{
-				std::string res;
-				for (auto& i : vals) {
-					res += std::to_string(i) + ';';
-				}
-				if (res.length() > 1) res.pop_back();
-				set(sec, key, "{" + res + "}");
-			}
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<float>& vals) 
-			{
-				std::string res;
-				for (auto& i : vals) {
-					res += std::to_string(i) + ';';
-				}
-				if (res.length() > 1) res.pop_back();
-				set(sec, key, "{" + res + "}");
-			}
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<double>& vals)
-			{
-				std::string res;
-				for (auto& i : vals) {
-					res += std::to_string(i) + ';';
-				}
-				if (res.length() > 1) res.pop_back();
-				set(sec, key, "{" + res + "}");
-			}
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<unsigned>& vals) 
-			{
-				std::string res;
-				for (auto& i : vals) {
-					res += std::to_string(i) + ';';
-				}
-				if (res.length() > 1) res.pop_back();
-				set(sec, key, "{" + res + "}");
-			}
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<long>& vals) 
-			{
-				std::string res;
-				for (auto& i : vals) {
-					res += std::to_string(i) + ';';
-				}
-				if (res.length() > 1) res.pop_back();
-				set(sec, key, "{" + res + "}");
-			}
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<long long>& vals)
-			{
-				std::string res;
-				for (auto& i : vals) {
-					res += std::to_string(i) + ';';
-				}
-				if (res.length() > 1) res.pop_back();
-				set(sec, key, "{" + res + "}");
-			}
-			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<size_t>& vals) 
+
+			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<char>& vals)
 			{
 				std::string res;
 				for (auto& i : vals) {
@@ -384,6 +306,75 @@ namespace LSW {
 				set(sec, key, "{" + res + "}");
 			}
 
+			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<int>& vals)
+			{
+				std::string res;
+				for (auto& i : vals) {
+					res += std::to_string(i) + ';';
+				}
+				if (res.length() > 1) res.pop_back();
+				set(sec, key, "{" + res + "}");
+			}
+
+			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<float>& vals)
+			{
+				std::string res;
+				for (auto& i : vals) {
+					res += std::to_string(i) + ';';
+				}
+				if (res.length() > 1) res.pop_back();
+				set(sec, key, "{" + res + "}");
+			}
+
+			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<double>& vals)
+			{
+				std::string res;
+				for (auto& i : vals) {
+					res += std::to_string(i) + ';';
+				}
+				if (res.length() > 1) res.pop_back();
+				set(sec, key, "{" + res + "}");
+			}
+
+			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<unsigned>& vals)
+			{
+				std::string res;
+				for (auto& i : vals) {
+					res += std::to_string(i) + ';';
+				}
+				if (res.length() > 1) res.pop_back();
+				set(sec, key, "{" + res + "}");
+			}
+
+			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<long>& vals)
+			{
+				std::string res;
+				for (auto& i : vals) {
+					res += std::to_string(i) + ';';
+				}
+				if (res.length() > 1) res.pop_back();
+				set(sec, key, "{" + res + "}");
+			}
+
+			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<long long>& vals)
+			{
+				std::string res;
+				for (auto& i : vals) {
+					res += std::to_string(i) + ';';
+				}
+				if (res.length() > 1) res.pop_back();
+				set(sec, key, "{" + res + "}");
+			}
+
+			void Config::set(const std::string& sec, const std::string& key, const std::initializer_list<size_t>& vals)
+			{
+				std::string res;
+				for (auto& i : vals) {
+					res += std::to_string(i) + ';';
+				}
+				if (res.length() > 1) res.pop_back();
+				set(sec, key, "{" + res + "}");
+			}
 
 			void Config::comment(const std::string& sec, std::string comment)
 			{
@@ -415,34 +406,6 @@ namespace LSW {
 				return "";
 			}
 
-			/*std::vector<std::string> Config::get_array(const std::string& sec, const std::string& key)
-			{
-				std::vector<std::string> found;
-				for (auto& i : conff) {
-					if (sec == i.section_name) {
-						for (auto& j : i.key_and_value) {
-							if (j.first == key) {
-								auto& str = j.second;
-								if (str.empty() || str.front() != '{' || str.back() != '}') throw Handling::Abort(__FUNCSIG__, "Fatal error trying to recover array-type config. It is not an array or it is invalid.");
-
-								str.erase(str.begin());
-								str.pop_back();
-
-								std::stringstream ss(str);
-								std::string _buf;
-
-								while (std::getline(ss, _buf, ';')) {
-									found.push_back(_buf);
-								}
-
-								return std::move(found);
-							}
-						}
-					}
-				}
-				return found;
-			}*/
-
 			void Config::operator=(Config&& c) noexcept
 			{
 				path = std::move(c.path);
@@ -450,118 +413,6 @@ namespace LSW {
 				conff = std::move(c.conff);
 			}
 
-
-			/*
-			Config::config_data::config_data(const std::string& str)
-			{
-				Handling::init_basic();
-				path = str;
-				if (!path.empty()) {
-					if (!(conf = al_load_config_file(str.c_str()))) throw Handling::Abort(__FUNCSIG__, "Cannot open config file!");
-				}
-				else {
-					if (!(conf = al_create_config())) throw Handling::Abort(__FUNCSIG__, "Cannot create config file!");
-				}
-			}
-
-			Config::config_data::~config_data()
-			{
-				save();
-				if (conf){
-					al_destroy_config(conf);
-					conf = nullptr;
-				}
-			}
-
-			void Config::config_data::save()
-			{
-				if (conf && !path.empty()) {
-					al_save_config_file(path.c_str(), conf);
-				}
-			}
-
-			Config::Config(Config&& c) noexcept
-			{
-				conf = std::move(c.conf);
-			}
-
-			bool Config::load(std::string pth)
-			{
-				Handling::handle_path(pth);
-				try {
-					conf = std::make_shared<config_data>(pth);
-				}
-				catch (Handling::Abort a)
-				{
-					conf = std::make_shared<config_data>();
-					save_at(pth);
-					flush();
-				}
-				return conf && conf->conf;
-			}
-
-			void Config::create()
-			{
-				conf = std::make_shared<config_data>();
-			}
-
-			void Config::save_at(std::string newpath)
-			{
-				if (conf) {
-					Handling::handle_path(newpath);
-					conf->path = newpath;
-				}
-			}
-
-			void Config::close()
-			{
-				flush();
-				conf.reset();
-			}
-
-			void Config::flush()
-			{
-				conf->save();
-			}
-
-			void Config::set(const std::string& section, const std::string& key, const std::string& value)
-			{
-				if (!conf || !conf->conf) throw Handling::Abort(__FUNCSIG__, "Config is invalid");
-
-				al_set_config_value(conf->conf, section.c_str(), key.c_str(), value.c_str());
-			}
-
-			void Config::comment(const std::string& section, std::string comment)
-			{
-				if (!conf || !conf->conf) throw Handling::Abort(__FUNCSIG__, "Config is invalid");
-
-				for (auto& i : comment) {
-					if (i == '\n') i = ' ';
-					else if (i == '#') i = '%';
-				}
-				// do your thing
-
-				al_add_config_comment(conf->conf, section.c_str(), comment.c_str());
-			}
-			std::string Config::get(const std::string& section, const std::string& key)
-			{
-				if (!conf || !conf->conf) throw Handling::Abort(__FUNCSIG__, "Config is invalid");
-
-				return al_get_config_value(conf->conf, section.c_str(), key.c_str());
-			}
-			void Config::operator=(Config&& c) noexcept
-			{
-				conf = std::move(c.conf);
-			}
-			Config& Config::operator+(const Config& c)
-			{
-				if (!conf || !conf->conf || !c.conf || !c.conf->conf) throw Handling::Abort(__FUNCSIG__, "Config is invalid");
-
-				al_merge_config_into(conf->conf, c.conf->conf);
-
-				return *this;
-			}
-			*/
 		}
 	}
 }

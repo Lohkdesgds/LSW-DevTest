@@ -16,10 +16,9 @@ Some might depend on Handling-classified headers.
 #include "SuperPair/superpair.h"
 #include "SuperMap/supermap.h"
 #include "SuperFunctionalMap/superfunctionalmap.h"
+#include "Resource/resource.h"
 #include "SuperResource/superresource.h"
 #include "SuperThread/superthread.h"
-#include "SuperTimer/supertimer.h"
 
 #include "Hash/hash.h"
 #include "Launcher/launcher.h"
-#include "AutoAbort/autoabort.h"

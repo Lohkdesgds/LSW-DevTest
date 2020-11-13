@@ -4,8 +4,6 @@ namespace LSW {
 	namespace v5 {
 		namespace Tools {
 
-
-
 			void Stopwatch::prepare(const size_t res)
 			{
 				stops.resize(res);

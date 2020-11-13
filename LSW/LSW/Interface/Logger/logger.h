@@ -170,7 +170,6 @@ namespace LSW {
 				/// <returns>{Cstring} The string</returns>
 				const Tools::Cstring& get_last_line() const;
 
-
 				/// <summary>
 				/// <para>Operator to write.</para>
 				/// </summary>

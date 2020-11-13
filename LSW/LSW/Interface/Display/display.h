@@ -4,6 +4,7 @@
 #include "../../Handling/Initialize/initialize.h"
 #include "../../Tools/SuperThread/superthread.h"
 #include "../../Tools/Future/future.h"
+#include "../../Tools/Resource/resource.h"
 #include "../../Tools/SuperMutex/supermutex.h"
 #include "../../Tools/Common/common.h"
 #include "../../Tools/Any/any.h"
@@ -12,6 +13,7 @@
 #include "../EventTimer/eventtimer.h"
 #include "../EventCustom/eventcustom.h"
 #include "../Bitmap/bitmap.h"
+#include "../Target/target.h"
 #include "../Font/font.h"
 #include "../Camera/camera.h"
 #include "../Logger/logger.h"
@@ -36,7 +38,11 @@ namespace LSW {
 
 			using DisplayTask = std::function<void(const Camera&)>;
 
-			class Display {
+			/// <summary>
+			/// <para>Display is the window used to draw stuff.</para>
+			/// <para>You can't create directly because this uses Target<> template. Use generate_display<>() to generate a Display of index defined by the call.</para>
+			/// </summary>
+			class Display : protected TargetInterface {
 				int new_display_flags_apply = display::default_new_display_flags;
 				int new_display_refresh_rate = 0; // not set
 				int new_resolution[2] = { display::minimum_display_size[0], display::minimum_display_size[1] };
@@ -54,7 +60,7 @@ namespace LSW {
 				DisplayStrongPtr disp;
 				Bitmap dbuffer;
 				EventHandler display_events{ Tools::superthread::performance_mode::LOW_POWER };
-				
+
 				//PathManager pathing;
 				Tools::SuperThreadT<bool> thr{ Tools::superthread::performance_mode::HIGH_PERFORMANCE };
 
@@ -70,8 +76,6 @@ namespace LSW {
 				Tools::FastFunction<std::shared_ptr<Camera>> camera_f;
 				bool refresh_camera = false;
 
-				Bitmap get_buffer_ref();
-
 				bool thread_run(Tools::boolThreadF);
 
 				void _reset_display_and_path();
@@ -83,11 +87,6 @@ namespace LSW {
 				~Display();
 
 				/// <summary>
-				/// <para>Sets Bitmap's reference as the display buffer or bitmap buffer (this is set by default once, based on settings).</para>
-				/// </summary>
-				void fix_internal_bitmap_reference();
-
-				/// <summary>
 				/// <para>Start drawing thread.</para>
 				/// </summary>
 				/// <returns>{Future} A Future that you can .wait() or .then() when display is closed.</returns>
@@ -95,6 +94,13 @@ namespace LSW {
 
 				//path is global now. change later to local so this makes sense
 				//void set_path(const PathManager&);
+
+				/// <summary>
+				/// <para>See if an event was from this Display using .source.</para>
+				/// </summary>
+				/// <param name="{RAW DISPLAY}">A RAW DISPLAY pointer.</param>
+				/// <returns>{bool} True if this is the source.</returns>
+				bool operator==(ALLEGRO_DISPLAY*) const;
 
 				/// <summary>
 				/// <para>Stops the thread and join.</para>
@@ -294,10 +300,37 @@ namespace LSW {
 				/// <returns>{size_t} Number of errors since init.</returns>
 				size_t debug_errors_unexpected() const;
 			};
-			
 
 			
+			bool operator==(ALLEGRO_DISPLAY*, const Display&);
+			bool operator!=(ALLEGRO_DISPLAY*, const Display&);
+
+			/// <summary>
+			/// <para>Template minimal part. 99.9% of the Display don't need to be a template, so...</para>
+			/// <para>This sets Target<> template access so a non-template can use template without needing full template.</para>
+			/// </summary>
+			template<size_t u>
+			class DisplayT : protected Display {
+				Target<u> _targ;
+				void targ_set(const Bitmap&);
+				void targ_set(const std::function<Bitmap(void)>&);
+				void targ_apply();
+				Bitmap targ_get();
+			};
+
+			template<size_t u>
+			bool operator==(ALLEGRO_DISPLAY*, const DisplayT<u>&);
+			template<size_t u>
+			bool operator!=(ALLEGRO_DISPLAY*, const DisplayT<u>&);
+
+			/// <summary>
+			/// <para>Generate a Display resource (so you can use it anywhere) using a specific Target index.</para>
+			/// </summary>
+			template<size_t u>
+			Tools::Resource<Display> generate_display();
 
 		}
 	}
 }
+
+#include "display.ipp"

@@ -4,37 +4,17 @@
 namespace LSW {
 	namespace v5 {
 		namespace Work {
-
-			
+						
 			void Block::draw_task(Interface::Camera& c)
 			{
 				if (bitmaps.empty()) return;
-
 				{
 					const auto delta_t = get_direct<std::chrono::milliseconds>(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION);
 
 					if (const double _dd = get_direct<double>(block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
 						set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + block::default_delta_t_frame_delay));
-												
-						/*if (!reference.empty()) {
-							int tx = reference.get_width() * _dd;
-							int ty = reference.get_height() * _dd;
 
-							for (auto& i : bitmaps) {
-								int _w = i.get_width();
-								int _h = i.get_height();
-								if (_w == tx && _h == ty) continue; // no need to "reload"
-
-								Interface::Bitmap now;
-								now.create(tx, ty);
-
-								now.set_as_target();
-								if (i) i.draw(0, 0, tx, ty);
-								i = std::move(now); // unloads automatically
-							}
-							reference.set_as_target();
-						}*/
-						for (auto& i : bitmaps) i.copy_reference_attributes(true);
+						for (auto& i : bitmaps) i.copy_attributes(targ_get(), true);
 					}
 				}
 
@@ -107,7 +87,7 @@ namespace LSW {
 				}
 
 			}
-
+						
 			Block::Block() : Sprite_Base()
 			{
 				//reference.be_reference_to_target(true);
@@ -120,9 +100,9 @@ namespace LSW {
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
-
+						
 			Block::Block(const Block& other) : Sprite_Base(other)
-			{	
+			{
 				*this = other;
 			}
 			
@@ -130,7 +110,7 @@ namespace LSW {
 			{
 				*this = std::move(other);
 			}
-
+			
 			void Block::operator=(const Block& oth)
 			{
 				this->Sprite_Base::operator=(oth);
@@ -143,7 +123,7 @@ namespace LSW {
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
-
+			
 			void Block::operator=(Block&& other)
 			{
 				this->Sprite_Base::operator=(std::move(other));
@@ -156,7 +136,7 @@ namespace LSW {
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
-
+			
 			void Block::clone(const Block& other)
 			{
 				this->Sprite_Base::clone(other);
@@ -169,12 +149,12 @@ namespace LSW {
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
 				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
-
+			
 			void Block::insert(const Interface::Bitmap& bmp)
 			{
 				bitmaps.push_back(bmp);
 			}
-
+			
 			size_t Block::remove(const std::function<bool(const Interface::Bitmap&)> remf)
 			{
 				size_t match = 0;

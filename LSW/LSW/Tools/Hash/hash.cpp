@@ -136,6 +136,7 @@ namespace LSW {
                     sprintf_s(buf + (long long)i * 2, 2 * imported::_SHA256::DIGEST_SIZE + 1 - ((long long)i * 2), "%02x", digest[i]);
                 return std::string(buf);
             }
+
             std::string sha256_f(std::string fpath)
             {
                 Handling::interpret_path(fpath);

@@ -34,7 +34,7 @@ namespace LSW {
 			namespace connection {
 				constexpr int default_port = 42069;
 				constexpr unsigned package_size = 1 << 8;
-				const std::chrono::milliseconds min_delay_no_tasks = std::chrono::milliseconds(5);
+				//const std::chrono::milliseconds min_delay_no_tasks = std::chrono::milliseconds(5);
 				const double pinging_time = 2.0; // seconds
 				enum class _internal_tasks {NOT_IT,
 					PING,PONG // both sides will task this, no reason to send back result

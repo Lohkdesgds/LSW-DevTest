@@ -36,9 +36,6 @@ namespace LSW {
 			public:
 				PathManager();
 				~PathManager();
-
-				// disable PathManager everywhere
-				//void disable_all() const;
 				
 				/// <summary>
 				/// <para>Add a new file (like a zip) or directory to relative path.</para>
@@ -61,9 +58,6 @@ namespace LSW {
 				/// <para>Cancel and go back to default way.</para>
 				/// </summary>
 				void unapply() const;
-
-				// dir like cmd dir
-				//void dir();
 
 				/// <summary>
 				/// <para>All paths set and ready.</para>

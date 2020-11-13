@@ -12,12 +12,14 @@ namespace LSW {
 				m.unlock();
 				return true;
 			}
+
 			void SuperMutex::weird_mtx::unlock()
 			{
 				m.lock();
 				locked = false;
 				m.unlock();
 			}
+			
 			bool SuperMutex::weird_mtx::is_locked() const
 			{
 				return locked;
@@ -33,6 +35,7 @@ namespace LSW {
 					} while (!mu.try_lock());
 				}
 			}
+			
 			void SuperMutex::unlock()
 			{
 				if (mu.is_locked()) {
@@ -56,10 +59,12 @@ namespace LSW {
 				}
 				else hasunlocked = true;
 			}
+			
 			AutoLock::~AutoLock()
 			{
 				if (!hasunlocked) you.unlock();
 			}
+			
 			void AutoLock::unlock()
 			{
 				if (!hasunlocked) {
@@ -67,6 +72,7 @@ namespace LSW {
 					you.unlock();
 				}
 			}
+			
 			void AutoLock::lock()
 			{
 				if (hasunlocked) {
@@ -82,14 +88,17 @@ namespace LSW {
 				if (max_t == 0) cond.wait(ul);
 				else cond.wait_for(ul, std::chrono::milliseconds(max_t));
 			}
+			
 			void Waiter::signal_one()
 			{
 				cond.notify_one();
 			}
+			
 			void Waiter::signal_all()
 			{
 				cond.notify_all();
 			}
+
 		}
 	}
 }

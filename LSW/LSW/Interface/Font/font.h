@@ -57,8 +57,7 @@ namespace LSW {
 				/// <param name="{char*}">Path to font.</param>
 				/// <param name="{int}">Size (1:1 in Camera, in units per EM; use negative for pixels in height).</param>
 				/// <param name="{int}">Flags.</param>
-				/// <returns></returns>
-				// load common font, with size and flags
+				/// <returns>{bool} True if success.</returns>
 				bool load(const char*, const int = 75, const int = 0);
 
 				/// <summary>
@@ -79,8 +78,6 @@ namespace LSW {
 				/// <param name="{Font}">Another Font.</param>
 				/// <returns>{bool} True if pointers are the same (Same Font with different sizes are not equal!).</returns>
 				const bool operator==(const Font&) const;
-				//const bool operator==(const ALLEGRO_FONT*&) const;
-				//ALLEGRO_FONT* operator*();
 
 				/// <summary>
 				/// <para>Height of the top part of the font.</para>
@@ -132,10 +129,6 @@ namespace LSW {
 				/// <param name="{int}">Flags.</param>
 				/// <param name="{CString*}">Colored String.</param>
 				void draw(const float, const float, const int, Tools::Cstring) const;
-
-				// todo
-				//void draw(ALLEGRO_COLOR, const float, const float, const float, const int, Cstring);
-
 			};
 
 		}

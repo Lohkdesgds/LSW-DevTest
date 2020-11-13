@@ -35,9 +35,6 @@
     <Filter Include="LSW\1. Tools\SuperThread">
       <UniqueIdentifier>{06306b83-3bad-44bc-a4be-0b72801eee69}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW\1. Tools\SuperTimer">
-      <UniqueIdentifier>{df83b913-e843-4d5b-bb34-c423da712ec6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="LSW\1. Tools\CString">
       <UniqueIdentifier>{c6681046-74b9-4286-8b08-21bb70693757}</UniqueIdentifier>
     </Filter>
@@ -128,9 +125,6 @@
     <Filter Include="LSW\2. Interface\EventCustom">
       <UniqueIdentifier>{2986811a-91ea-4eaa-8f37-2aff7f146d46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW\1. Tools\AutoAbort">
-      <UniqueIdentifier>{efd2d73c-c782-4edb-951c-79851b4bd6a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="LSW\3. Work">
       <UniqueIdentifier>{dfe9b131-0a42-44ff-923a-1b5b9de4a8f6}</UniqueIdentifier>
     </Filter>
@@ -173,6 +167,12 @@
     <Filter Include="LSW\1. Tools\StopWatch">
       <UniqueIdentifier>{af135940-468b-4e16-8a07-1d47c8f9f337}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\2. Interface\Target">
+      <UniqueIdentifier>{b41f0223-8828-49a4-ac78-802cc74227e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\1. Tools\Resource">
+      <UniqueIdentifier>{12ee796f-4e5b-4e8d-9ed4-5a7d0859388c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -204,9 +204,6 @@
     </ClCompile>
     <ClCompile Include="LSW\Tools\SuperMutex\supermutex.cpp">
       <Filter>LSW\1. Tools\SuperMutex</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Display\display.cpp">
-      <Filter>LSW\2. Interface\Display</Filter>
     </ClCompile>
     <ClCompile Include="LSW\Interface\Bitmap\bitmap.cpp">
       <Filter>LSW\2. Interface\Bitmap</Filter>
@@ -256,9 +253,6 @@
     <ClCompile Include="LSW\Interface\EventCustom\eventcustom.cpp">
       <Filter>LSW\2. Interface\EventCustom</Filter>
     </ClCompile>
-    <ClCompile Include="LSW\Tools\AutoAbort\autoabort.cpp">
-      <Filter>LSW\1. Tools\AutoAbort</Filter>
-    </ClCompile>
     <ClCompile Include="LSW\Work\Sprite\sprite.cpp">
       <Filter>LSW\3. Work\Sprite</Filter>
     </ClCompile>
@@ -271,11 +265,14 @@
     <ClCompile Include="LSW\Work\Collisioner\collisioner.cpp">
       <Filter>LSW\3. Work\Collisioner</Filter>
     </ClCompile>
-    <ClCompile Include="LSW\Work\Text\text.cpp">
-      <Filter>LSW\3. Work\Text</Filter>
-    </ClCompile>
     <ClCompile Include="LSW\Tools\Stopwatch\stopwatch.cpp">
       <Filter>LSW\1. Tools\StopWatch</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Display\display.cpp">
+      <Filter>LSW\2. Interface\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Work\Text\text.cpp">
+      <Filter>LSW\3. Work\Text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -310,9 +307,6 @@
     </ClInclude>
     <ClInclude Include="LSW\Tools\Launcher\launcher.h">
       <Filter>LSW\1. Tools\Launcher</Filter>
-    </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperTimer\supertimer.h">
-      <Filter>LSW\1. Tools\SuperTimer</Filter>
     </ClInclude>
     <ClInclude Include="LSW\Interface\Logger\logger.h">
       <Filter>LSW\2. Interface\Logger</Filter>
@@ -401,9 +395,6 @@
     <ClInclude Include="LSW\Interface\EventCustom\eventcustom.h">
       <Filter>LSW\2. Interface\EventCustom</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\AutoAbort\autoabort.h">
-      <Filter>LSW\1. Tools\AutoAbort</Filter>
-    </ClInclude>
     <ClInclude Include="LSW\Work\Work.h">
       <Filter>LSW\3. Work\_include</Filter>
     </ClInclude>
@@ -430,6 +421,60 @@
     </ClInclude>
     <ClInclude Include="LSW\Tools\Stopwatch\stopwatch.h">
       <Filter>LSW\1. Tools\StopWatch</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Target\target.h">
+      <Filter>LSW\2. Interface\Target</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\AdvancedShared\advancedshared.ipp">
+      <Filter>LSW\1. Tools\AdvancedShared</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Any\any.ipp">
+      <Filter>LSW\1. Tools\Any</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\FastFunction\fastfunction.ipp">
+      <Filter>LSW\1. Tools\FastFunction</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Future\future.ipp">
+      <Filter>LSW\1. Tools\Future</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperFunctionalMap\superfunctionalmap.ipp">
+      <Filter>LSW\1. Tools\SuperFunctionalMap</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperMap\supermap.ipp">
+      <Filter>LSW\1. Tools\SuperMap</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperPair\superpair.ipp">
+      <Filter>LSW\1. Tools\SuperPair</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperResource\superresource.ipp">
+      <Filter>LSW\1. Tools\SuperResource</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\SuperThread\superthread.ipp">
+      <Filter>LSW\1. Tools\SuperThread</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Resource\resource.h">
+      <Filter>LSW\1. Tools\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Tools\Resource\resource.ipp">
+      <Filter>LSW\1. Tools\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Display\display.ipp">
+      <Filter>LSW\2. Interface\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\GameCore\gamecore.ipp">
+      <Filter>LSW\3. Work\GameCore</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Config\config.ipp">
+      <Filter>LSW\2. Interface\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Target\target.ipp">
+      <Filter>LSW\2. Interface\Target</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\Block\block.ipp">
+      <Filter>LSW\3. Work\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\Text\text.ipp">
+      <Filter>LSW\3. Work\Text</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

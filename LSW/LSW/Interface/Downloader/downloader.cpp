@@ -3,6 +3,7 @@
 namespace LSW {
 	namespace v5 {
 		namespace Interface {
+
 			bool Downloader::_get(const std::string& url, std::function<bool(void)> run)
 			{
 #ifdef UNICODE
@@ -35,14 +36,17 @@ namespace LSW {
 				InternetCloseHandle(connect);
 				return run();
 			}
+
 			Downloader::~Downloader()
 			{
 				thr.join();
 			}
+			
 			bool Downloader::get(const std::string& url)
 			{
 				return _get(url, [] {return true; });
 			}
+			
 			Tools::Future<std::shared_ptr<std::string>> Downloader::get_async(const std::string& url)
 			{
 				if (thr.running()) return Tools::fake_future<std::shared_ptr<std::string>>(std::shared_ptr<std::string>());
@@ -50,14 +54,17 @@ namespace LSW {
 				thr.set([&, url](Tools::boolThreadF f) { _get(url, f); return buf; });
 				return thr.start();
 			}
+			
 			size_t Downloader::bytes_read() const
 			{
 				return TotalBytesRead;
 			}
+			
 			const std::string& Downloader::read() const
 			{
 				return *buf.get();
 			}
+
 		}
 	}
 }

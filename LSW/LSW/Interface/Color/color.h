@@ -79,6 +79,10 @@ namespace LSW {
 				/// <returns>{float} ALPHA data.</returns>
 				float get_a() const;
 
+				/// <summary>
+				/// <para>The target will be filled with this color.</para>
+				/// </summary>
+				void clear_to_this() const;
 
 				/// <summary>
 				/// <para>Move operator.</para>
@@ -92,6 +96,7 @@ namespace LSW {
 				/// <param name="{Color}">Color to copy from.</param>
 				Color& operator=(const Color& c);
 			};
+
 		}
 	}
 }

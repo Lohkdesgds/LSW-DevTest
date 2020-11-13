@@ -5,8 +5,6 @@ namespace LSW {
 	namespace v5 {
 		namespace Interface {
 
-
-
 			void EventCustom::start_as_custom()
 			{
 				core = std::shared_ptr<ALLEGRO_EVENT_SOURCE>(

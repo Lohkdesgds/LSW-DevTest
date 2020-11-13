@@ -48,16 +48,12 @@ namespace LSW {
 					physfs_initialized_once = true;
 				}
 			}
+			
 			PathManager::~PathManager()
 			{
 				unapply();
 			}
-			/*void PathManager::disable_all() const
-			{
-				PHYSFS_deinit();
-				physfs_initialized_once = false;
-			}*/
-
+			
 			void PathManager::add_path(std::string s)
 			{
 				Handling::interpret_path(s);
@@ -71,7 +67,6 @@ namespace LSW {
 				//if (prunt) prunt("Removed path '" + s + "' successfully.");
 			}
 
-
 			void PathManager::apply() const
 			{
 				al_set_physfs_file_interface();
@@ -83,30 +78,6 @@ namespace LSW {
 				al_set_standard_file_interface();
 				//if (prunt) prunt("Removed PathManager on current thread #" + std::to_string(Tools::get_thread_id()));
 			}
-
-			/*void PathManager::dir()
-			{
-				std::string raw_paths;
-				std::string files;
-
-				auto listpath = PHYSFS_getSearchPath();
-				for (auto i = listpath; *i != NULL; i++) {
-					raw_paths += std::string(*i) + ", ";
-				}
-				if (raw_paths.length() > 1) for (short u = 0; u < 2; u++) raw_paths.pop_back();
-				PHYSFS_freeList(listpath);
-
-
-				files = read_directory();
-
-				//if (files.length() > 1) for (short u = 0; u < 2; u++) { files.pop_back(); } // last ", "
-				//_clearPath(files);
-
-				//if (prunt) {
-				//	prunt("Paths added: " + raw_paths);
-				//	prunt("Files found: " + files);
-				//}
-			}*/
 
 			std::vector<std::string> PathManager::paths_set() const
 			{

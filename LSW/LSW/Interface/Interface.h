@@ -7,13 +7,14 @@
 #include "EventCustom/eventcustom.h"
 #include "EventTimer/eventtimer.h"
 #include "Connection/connection.h"
-#include "Camera/camera.h"
 #include "Config/config.h"
 
 #include "SmartFile/smartfile.h"
 #include "PathManager/pathmanager.h"
 
 #include "Bitmap/bitmap.h"
+#include "Target/target.h"
+#include "Camera/camera.h"
 #include "Font/font.h"
 #include "Display/display.h"
 

@@ -1,27 +1,22 @@
 #include "display.h"
 
+
 namespace LSW {
 	namespace v5 {
 		namespace Interface {
-
+			
 			Tools::SuperMutex Display::sync_threads;
-
-			Bitmap Display::get_buffer_ref()
-			{
-				if (!dbuffer.empty()) return dbuffer;
-				Bitmap b;
-				b.force(al_get_backbuffer(disp.get()));
-				return b;
-			}
+			
 			bool Display::thread_run(Tools::boolThreadF keep)
 			{
 				bool verynice = true;
 				bool redraw = false;
 				bool regen_disp_pls = false;
 				bool check_dbuf = false;
-				
+
 				Camera fixed_default_camera;
 				fixed_default_camera.identity();
+				Color black(0.0f, 0.0f, 0.0f, 1.0f);
 
 
 				bool was_vsync = should_vsync;
@@ -79,17 +74,19 @@ namespace LSW {
 					{
 						check_dbuf = true;
 					}
-				});
+					});
 
 				try {
 					thread_init();
 
 					auto cam_cpy = camera_f();
 
+					targ_set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
+
 					while (keep()) {
 
 						if (fps_cap) {
-							while (!redraw && fps_cap) std::this_thread::sleep_for(std::chrono::milliseconds(1)); // up to 500 fps good cap, 1000 limit
+							while (!redraw && fps_cap && keep()) std::this_thread::sleep_for(std::chrono::milliseconds(1)); // up to 500 fps good cap, 1000 limit
 							redraw = false;
 						}
 						if (regen_disp_pls) {
@@ -102,7 +99,7 @@ namespace LSW {
 							check_dbuf = false;
 							if (double_buffering <= 0.0)
 							{
-								fix_internal_bitmap_reference();
+								targ_set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
 								dbuffer.reset();
 								refresh_camera = true;
 							}
@@ -110,19 +107,18 @@ namespace LSW {
 								Bitmap ref;
 								ref.force(al_get_backbuffer(disp.get()));
 								refresh_camera |= 2 == dbuffer.copy_attributes(ref, false, double_buffering);
-								fix_internal_bitmap_reference();
+								targ_set(dbuffer);
 							}
-							dbuffer.set_reference_as_target();
+
 						}
 
 						frames++;
 
 						if (refresh_camera) {
-							fix_internal_bitmap_reference();
 							std::lock_guard<std::mutex> cam_m_luck(cam_m);
 							cam_cpy = camera_f();
 							if (refresh_camera && cam_cpy) {
-								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(get_buffer_ref());
+								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(targ_get());
 								//refresh_camera = false;
 								cam_cpy->classic_refresh();
 
@@ -136,7 +132,9 @@ namespace LSW {
 							once_tasks.clear();
 						}
 
-						al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
+						targ_apply(); // apply(), get() -> Bitmap, set(const Bitmap&), 
+
+						black.clear_to_this();
 
 						/*draw_tasks_m.lock();
 						for (auto& i : draw_tasks) i.second();
@@ -175,7 +173,7 @@ namespace LSW {
 							fixed_default_camera.apply();
 							dbuffer.draw(0, 0, get_width(), get_height());
 							al_flip_display();
-							dbuffer.set_reference_as_target();
+							targ_apply();
 						}
 						else {
 							al_set_target_backbuffer(disp.get());
@@ -197,6 +195,7 @@ namespace LSW {
 
 				return verynice;
 			}
+						
 			void Display::_reset_display_and_path()
 			{
 				//if (pathing.paths_set().size()) pathing.apply();
@@ -232,7 +231,9 @@ namespace LSW {
 				al_apply_window_constraints(disp.get(), true);
 				al_set_window_constraints(disp.get(), display::minimum_display_size[0], display::minimum_display_size[1], 0, 0); // minimum size 640,480, max not defined
 
-				fix_internal_bitmap_reference();
+				{
+					targ_set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
+				}
 				al_inhibit_screensaver(true);
 
 
@@ -241,15 +242,16 @@ namespace LSW {
 
 
 				display_events.add(Event(al_get_display_event_source(disp.get())));
-				
+
 				display_events.set_run_autostart([&](const RawEvent& ev) {
 
-					if (ev.type() == ALLEGRO_EVENT_DISPLAY_RESIZE) {
+					if (ev.type() == ALLEGRO_EVENT_DISPLAY_RESIZE && ev.display_event().source == disp.get()) {
 						al_acknowledge_resize(disp.get());
 						refresh_camera = true;
 					}
 				});
 			}
+			
 			void Display::thread_init()
 			{
 				fails_out_of_range = fails_unexpected = 0;
@@ -258,6 +260,7 @@ namespace LSW {
 
 				refresh_camera = true;
 			}
+			
 			void Display::thread_deinit()
 			{
 				display_events.stop();
@@ -266,94 +269,102 @@ namespace LSW {
 					disp = nullptr;
 				}
 			}
+						
 			Display::Display()
 			{
 				Handling::init_basic();
 				Handling::init_graphics();
 				Handling::init_font();
 			}
+						
 			Display::~Display()
 			{
 				deinit();
 			}
-			void Display::fix_internal_bitmap_reference()
-			{
-				if (double_buffering <= 0.0 || dbuffer.empty()) {
-					std::weak_ptr<ALLEGRO_DISPLAY> a = disp; // won't lock display
-					Bitmap::set_custom_reference([a]() -> ALLEGRO_BITMAP* {
-						if (auto d = a.lock(); d.get())
-							return al_get_backbuffer(d.get());
-						return nullptr;
-						});
-				}
-				else {
-					dbuffer.set_this_as_reference();
-				}
-			}
+						
 			Tools::Future<bool> Display::init()
 			{
 				thr.join();
 				thr.set([&](Tools::boolThreadF f) {return thread_run(f); });
 				return std::move(thr.start());
 			}
+						
+			bool Display::operator==(ALLEGRO_DISPLAY* ptr) const 
+			{
+				return disp ? (disp.get() == ptr) : false;
+			}
+						
 			void Display::deinit()
 			{
 				thr.stop();
 				thr.join();
 			}
+						
 			void Display::set_stop()
 			{
 				thr.stop();
 			}
+						
 			void Display::set_double_buffering_scale(const double bufs)
 			{
 				double_buffering = bufs > 8.0 ? 8.0 : (bufs < 0.0 ? 0.0 : bufs);
 			}
+						
 			double Display::get_current_buffering_scale() const
 			{
 				return double_buffering;
 			}
+						
 			void Display::set_camera(std::shared_ptr<Camera> cam)
 			{
 				std::lock_guard<std::mutex> luck(cam_m);
 				camera_f = cam;
 				refresh_camera = true;
 			}
+						
 			void Display::set_camera(std::function<std::shared_ptr<Camera>(void)> f)
 			{
 				std::lock_guard<std::mutex> luck(cam_m);
 				camera_f = f;
 				refresh_camera = true;
 			}
+						
 			void Display::set_fps_cap(const size_t cap)
 			{
 				fps_cap = cap;
 			}
+			
 			std::shared_ptr<Camera> Display::get_current_camera()
 			{
 				return camera_f();
 			}
+						
 			bool Display::running() const
 			{
 				return disp.operator bool();
 			}
+						
 			void Display::set_new_flags(const int flags)
 			{
 				new_display_flags_apply = flags;
 				if (!disp) is_fullscreen = (new_display_flags_apply & ALLEGRO_FULLSCREEN || new_display_flags_apply & ALLEGRO_FULLSCREEN_WINDOW);
 			}
+						
 			int Display::get_flags() const
 			{
 				return disp.get() ? al_get_display_flags(disp.get()) : new_display_flags_apply;
 			}
+						
 			const int Display::get_width() const
 			{
 				return disp.get() ? al_get_display_width(disp.get()) : new_resolution[0];
 			}
+						
 			const int Display::get_height() const
 			{
 				return disp.get() ? al_get_display_height(disp.get()) : new_resolution[1];
 			}
+						
 			void Display::set_width(const int xx)
 			{
 				if (xx >= display::minimum_display_size[0]) {
@@ -361,6 +372,7 @@ namespace LSW {
 					if (disp.get()) al_resize_display(disp.get(), new_resolution[0], get_height());
 				}
 			}
+						
 			void Display::set_height(const int yy)
 			{
 				if (yy >= display::minimum_display_size[1]) {
@@ -368,34 +380,41 @@ namespace LSW {
 					if (disp.get()) al_resize_display(disp.get(), get_width(), new_resolution[1]);
 				}
 			}
+						
 			void Display::set_new_refresh_rate(const int hz)
 			{
 				new_display_refresh_rate = hz;
 			}
+						
 			int Display::get_refresh_rate() const
 			{
 				return disp.get() ? al_get_display_refresh_rate(disp.get()) : new_display_refresh_rate;
 			}
+						
 			void Display::set_vsync(const bool vs, const bool force)
 			{
 				should_vsync = vs;
 				force_vsync_refresh = force;
 			}
+						
 			bool Display::get_vsync() const
 			{
 				return should_vsync;
 			}
+						
 			bool Display::toggle_fullscreen()
 			{
 				is_fullscreen = !is_fullscreen;
 				if (disp.get()) al_toggle_display_flag(disp.get(), ALLEGRO_FULLSCREEN_WINDOW, is_fullscreen);
 				return is_fullscreen;
 			}
+						
 			void Display::set_fullscreen(const bool fullscr)
 			{
 				is_fullscreen = fullscr;
 				if (disp.get()) al_toggle_display_flag(disp.get(), ALLEGRO_FULLSCREEN_WINDOW, is_fullscreen);
 			}
+						
 			void Display::hide_mouse(const bool hid)
 			{
 				if (disp.get()) {
@@ -404,31 +423,34 @@ namespace LSW {
 				}
 				hide_mouse_new = hid;
 			}
-
+						
 			void Display::set_refresh_camera()
 			{
 				refresh_camera = true;
 			}
-			
+						
 			bool Display::display_ready() const
 			{
 				return disp.get();
 			}
+						
 			size_t Display::get_fps_cap() const
 			{
 				return fps_cap;
 			}
+						
 			Tools::Future<DisplayAnySPtr> Display::add_once_task(DisplayAnyFSPtr tsk)
 			{
 				Tools::Promise<DisplayAnySPtr> my_future(tsk);
 				Tools::Future<DisplayAnySPtr> future = std::move(my_future.get_future());
 
 				Tools::AutoLock luck(once_tasks_m);
-				
+
 				once_tasks.emplace_back(std::move(my_future));
-				
+
 				return std::move(future);
 			}
+						
 			size_t Display::add_draw_task(DisplayTask tsk)
 			{
 				Tools::AutoLock luck(draw_tasks_m);
@@ -438,6 +460,7 @@ namespace LSW {
 
 				return this_task;
 			}
+						
 			DisplayTask Display::remove_draw_task(const size_t tskid)
 			{
 				DisplayTask task;
@@ -452,6 +475,7 @@ namespace LSW {
 				}
 				return task;
 			}
+						
 			Event Display::get_event_source() const
 			{
 				if (disp) {
@@ -459,18 +483,32 @@ namespace LSW {
 				}
 				return Event();
 			}
+						
 			size_t Display::get_frames_per_second() const
 			{
 				return frames_per_second;
 			}
+						
 			size_t Display::debug_errors_out_of_range_skip() const
 			{
 				return fails_out_of_range;
 			}
+						
 			size_t Display::debug_errors_unexpected() const
 			{
 				return fails_unexpected;
 			}
+						
+			bool operator==(ALLEGRO_DISPLAY* u, const Display& d)
+			{
+				return d.operator==(u);
+			}
+			
+			bool operator!=(ALLEGRO_DISPLAY* u, const Display& d)
+			{
+				return !d.operator==(u);
+			}
+
 		}
 	}
 }

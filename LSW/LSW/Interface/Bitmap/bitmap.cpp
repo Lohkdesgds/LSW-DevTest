@@ -5,17 +5,6 @@ namespace LSW {
 		namespace Interface {
 
 			bool Bitmap::first_time = true;
-			std::function<ALLEGRO_BITMAP*(void)> Bitmap::dynamic_reference;
-			Tools::AdvancedShared<ALLEGRO_BITMAP> Bitmap::target_orig;
-
-
-			ALLEGRO_BITMAP* Bitmap::get_global_reference()
-			{
-				if (dynamic_reference) {
-					return dynamic_reference();
-				}
-				return target_orig;
-			}
 
 			bool Bitmap::set(ALLEGRO_BITMAP* nptr)
 			{
@@ -28,6 +17,7 @@ namespace LSW {
 				}
 				return !bitmap_orig.null();
 			}
+
 			bool Bitmap::set_nodel(ALLEGRO_BITMAP* nptr)
 			{
 				if (!nptr) return false;
@@ -42,13 +32,14 @@ namespace LSW {
 
 			ALLEGRO_BITMAP* Bitmap::quick() const
 			{
-				if (use_target_as_it) return get_global_reference() ? get_global_reference() : nullptr;
+				//if (use_target_as_it) return get_global_reference() ? get_global_reference() : nullptr;
 				if (!bitmap_orig.null()) return bitmap_orig.get();
 				return nullptr;
 			}
+
 			ALLEGRO_BITMAP* Bitmap::quick()
 			{
-				if (use_target_as_it) return get_global_reference() ? get_global_reference() : nullptr;
+				//if (use_target_as_it) return get_global_reference() ? get_global_reference() : nullptr;
 				if (!bitmap_orig.null()) return bitmap_orig.get();
 				return nullptr;
 			}
@@ -92,13 +83,13 @@ namespace LSW {
 			void Bitmap::operator=(const Bitmap& oth)
 			{
 				bitmap_orig = oth.bitmap_orig;
-				use_target_as_it = oth.use_target_as_it;
+				//use_target_as_it = oth.use_target_as_it;
 			}
 
 			void Bitmap::operator=(Bitmap&& oth)
 			{
 				bitmap_orig = std::move(oth.bitmap_orig);
-				use_target_as_it = oth.use_target_as_it;
+				//use_target_as_it = oth.use_target_as_it;
 			}
 
 			int Bitmap::copy_attributes(const Bitmap& rf, const bool cpy, const double prop)
@@ -115,9 +106,10 @@ namespace LSW {
 					secure.set(al_create_bitmap(sx, sy));
 
 					if (cpy && quick()) {
+						ALLEGRO_BITMAP* shh = al_get_target_bitmap();
 						secure.set_as_target();
 						draw(0, 0, get_width(), get_height(), 0, 0, sx, sy);
-						set_reference_as_target();
+						if (shh) al_set_target_bitmap(shh);
 					}
 					*this = std::move(secure);
 
@@ -126,20 +118,8 @@ namespace LSW {
 				return 1;
 			}
 
-			int Bitmap::copy_reference_attributes(const bool cpy, const double prop)
-			{
-				if (is_sub()) return 0;
-				Bitmap reference;
-				reference.be_reference_to_target(true);
-				return copy_attributes(reference, cpy, prop);
-			}
-
 			void Bitmap::check_bitmaps_memory()
 			{
-				/*int ff = al_get_new_bitmap_flags();
-				ff &= ~ALLEGRO_MEMORY_BITMAP;
-				ff |= ALLEGRO_VIDEO_BITMAP;
-				al_set_new_bitmap_flags(ff);*/ // convert does this already duh
 				al_convert_memory_bitmaps();
 			}
 
@@ -150,14 +130,6 @@ namespace LSW {
 				}
 				return false;
 			}
-
-			/*bool Bitmap::create_sub(ALLEGRO_BITMAP* o, const int x, const int y, const int w, const int h)
-			{
-				if (!bitmap) {
-					return set(al_create_sub_bitmap(o, x, y, w, h));
-				}
-				return false;
-			}*/
 
 			bool Bitmap::create_sub(const Bitmap& o, const int x, const int y, const int w, const int h)
 			{
@@ -174,12 +146,12 @@ namespace LSW {
 
 			Bitmap::operator bool() const
 			{
-				return !(use_target_as_it ? !get_global_reference() : !bitmap_orig); // ikr but visual studio doesnt
+				return !(!bitmap_orig); // ikr but visual studio doesnt
 			}
 
 			const bool Bitmap::operator!() const
 			{
-				return use_target_as_it ? !get_global_reference() : !bitmap_orig;
+				return !bitmap_orig;
 			}
 
 			const bool Bitmap::operator==(Bitmap& o) const
@@ -189,7 +161,7 @@ namespace LSW {
 
 			const bool Bitmap::empty() const
 			{
-				return use_target_as_it ? !get_global_reference() : !bitmap_orig;
+				return !bitmap_orig;
 			}
 
 			void Bitmap::set_new_bitmap_flags(const int flags)
@@ -217,11 +189,6 @@ namespace LSW {
 			void Bitmap::force(ALLEGRO_BITMAP* b)
 			{
 				if (b) set_nodel(b);
-			}
-
-			void Bitmap::be_reference_to_target(const bool b)
-			{
-				use_target_as_it = b;
 			}
 
 			bool Bitmap::clone(const Bitmap& o)
@@ -352,33 +319,6 @@ namespace LSW {
 				}
 			}
 
-			void Bitmap::set_reference_as_target() const
-			{
-				if (auto cpy = get_global_reference(); cpy) al_set_target_bitmap(cpy);
-			}
-
-			bool Bitmap::has_global_reference_set() const
-			{
-				return get_global_reference() ? get_global_reference() : false;
-			}
-
-			void Bitmap::copy_reference_to_this()
-			{
-				if (auto q = quick(); q) {
-					bitmap_orig = get_global_reference();
-				}
-			}
-			void Bitmap::set_this_as_reference()
-			{
-				target_orig = bitmap_orig;
-				dynamic_reference = std::function<ALLEGRO_BITMAP*(void)>();
-			}
-			void Bitmap::set_custom_reference(std::function<ALLEGRO_BITMAP*(void)> f)
-			{
-				if (f()) {
-					dynamic_reference = f;
-				}
-			}
 		}
 	}
 }

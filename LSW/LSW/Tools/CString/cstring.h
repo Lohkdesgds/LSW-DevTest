@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <vector>
 
 #include "../../Handling/Abort/abort.h"
 
@@ -16,10 +16,11 @@ namespace LSW {
 				char ch = '\0';
 				cstring::C cr = cstring::C::WHITE;
 				const bool operator==(const char_c o) const { return ch == o.ch && cr == o.cr; }
+				const bool operator!=(const char_c o) const { return ch != o.ch || cr != o.cr; }
 			};
 
 			class Cstring {
-				std::basic_string<char_c> str;
+				std::vector<char_c> str;
 				cstring::C last_added_color = cstring::C::WHITE; /// THIS CHANGES WITH +=, clear(), pop() and stuff!
 			public:
 				Cstring() = default;
@@ -245,25 +246,25 @@ namespace LSW {
 				/// <para>Begin iterator.</para>
 				/// </summary>
 				/// <returns>{iterator} Begin iterator.</returns>
-				std::basic_string<char_c>::iterator begin();
+				std::vector<char_c>::iterator begin();
 
 				/// <summary>
 				/// <para>End iterator.</para>
 				/// </summary>
 				/// <returns>{iterator} End iterator.</returns>
-				std::basic_string<char_c>::iterator end();
+				std::vector<char_c>::iterator end();
 
 				/// <summary>
 				/// <para>Begin iterator.</para>
 				/// </summary>
 				/// <returns>{iterator} Begin iterator.</returns>
-				std::basic_string<char_c>::const_iterator begin() const;
+				std::vector<char_c>::const_iterator begin() const;
 
 				/// <summary>
 				/// <para>End iterator.</para>
 				/// </summary>
 				/// <returns>{iterator} End iterator.</returns>
-				std::basic_string<char_c>::const_iterator end() const;
+				std::vector<char_c>::const_iterator end() const;
 
 
 				/// <summary>

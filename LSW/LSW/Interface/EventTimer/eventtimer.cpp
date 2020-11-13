@@ -5,8 +5,6 @@ namespace LSW {
 	namespace v5 {
 		namespace Interface {
 
-
-
 			void EventTimer::init_timer()
 			{
 				tim = std::shared_ptr<ALLEGRO_TIMER>(

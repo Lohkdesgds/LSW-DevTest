@@ -1,10 +1,8 @@
 #include "voice.h"
 
-
 namespace LSW {
 	namespace v5 {
 		namespace Interface {
-
 
 			bool Voice::set(ALLEGRO_VOICE* s)
 			{
@@ -33,6 +31,7 @@ namespace LSW {
 			{
 				return device.get();
 			}
+
 		}
 	}
 }

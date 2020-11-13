@@ -26,15 +26,6 @@ namespace LSW {
 	namespace v5 {
 		namespace Tools {
 
-			/*************************************************************************************
-
-				# SuperPair: V7.0A
-				> Many keys to a same position
-				> Direct SuperMap: [arg] match someone? get key then lmao
-				> PASSED 20200822
-
-			**************************************************************************************/
-
 			/// <summary>
 			/// <para>SuperPair is something like std::pair, but it holds a value to any multiple keys.</para>
 			/// </summary>
@@ -45,21 +36,13 @@ namespace LSW {
 
 				// SUPER HANDLE //
 				template<typename K, typename... Args>
-				inline void handleInput(K& ref, Args... args)
-				{
-					set(ref);
-					handleInput(args...);
-				}
+				void handleInput(K&, Args...);
 				template<typename K>
-				inline void handleInput(K& ref)
-				{
-					set(ref);
-				}
+				void handleInput(K&);
 				// SUPER HANDLE //
 
 			public:
 				SuperPair() = default;
-				~SuperPair() { keys.clear(); }
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -73,19 +56,13 @@ namespace LSW {
 				/// <para>Copy constructor.</para>
 				/// </summary>
 				/// <param name="{SuperPair}">A SuperPair of the same type to copy.</param>
-				template<typename K>
-				SuperPair(const SuperPair<K>& sp) {
-					*this = sp;
-				}
+				SuperPair(const SuperPair&);
 
 				/// <summary>
 				/// <para>Move constructor.</para>
 				/// </summary>
 				/// <param name="{SuperPair}">A SuperPair of the same type to move.</param>
-				template<typename K>
-				SuperPair(SuperPair<K>&& sp) {
-					*this = std::move(sp);
-				}
+				SuperPair(SuperPair&&);
 
 				/// <summary>
 				/// <para>A way to set the value and some keys already.</para>
@@ -93,41 +70,25 @@ namespace LSW {
 				/// <param name="{T}">The value it will hold.</param>
 				/// <param name="{Args...}">Keys to the value.</param>
 				template<typename... Args>
-				SuperPair(const T& val, Args... args)
-				{
-					holding = val;
-					handleInput(args...);
-				}
+				SuperPair(const T&, Args...);
 
 				/// <summary>
 				/// <para>A way to set the value already.</para>
 				/// </summary>
 				/// <param name="{T}">The value it will hold.</param>
-				SuperPair(const T& val)
-				{
-					holding = val;
-				}
+				SuperPair(const T&);
 
 				/// <summary>
 				/// <para>Copy operator.</para>
 				/// </summary>
 				/// <param name="{SuperPair}">A SuperPair of the same type to copy.</param>
-				template<typename K>
-				void operator=(const SuperPair<K>& sp) {
-					
-					keys = sp.keys;
-					holding = sp.holding;
-				}
+				void operator=(const SuperPair&);
 
 				/// <summary>
 				/// <para>Move operator.</para>
 				/// </summary>
 				/// <param name="{SuperPair}">A SuperPair of the same type to move.</param>
-				template<typename K>
-				void operator=(SuperPair<K>&& sp) {
-					keys = std::move(sp.keys);
-					holding = std::move(sp.holding);
-				}
+				void operator=(SuperPair&&);
 
 
 
@@ -142,25 +103,19 @@ namespace LSW {
 				/// <para>Sets the internal value directly.</para>
 				/// </summary>
 				/// <param name="{T}">The value to be set.</param>
-				void set_value(const T& nval) {
-					holding = nval;
-				}
+				void set_value(const T&);
 
 				/// <summary>
 				/// <para>Gets the value it's holding.</para>
 				/// </summary>
 				/// <returns>{T} The value's reference.</returns>
-				T& get_value() {
-					return holding;
-				}
+				T& get_value();
 
 				/// <summary>
 				/// <para>Gets the value it's holding.</para>
 				/// </summary>
 				/// <returns>{T} The value's reference.</returns>
-				const T& get_value() const {
-					return holding;
-				}
+				const T& get_value() const;
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -174,40 +129,20 @@ namespace LSW {
 				/// <para>Sets or updates a key.</para>
 				/// </summary>
 				/// <param name="{Q}">A key.</param>
-				template<typename Q>
-				void set(Q nkey) {
-					for (auto& i : keys) {
-						if (i.type() == typeid(r_cast_t<Q>(nkey))) {
-							i = r_cast_t<Q>(nkey);
-						}
-					}
-					std::any lol = r_cast_t<Q>(nkey);
-					keys.push_back(lol);
-				}
+				template<typename Q, std::enable_if_t<!std::is_same_v<r_cast_t<Q>, char*>, int> = 0>
+				void set(const Q&);
 
 				/// <summary>
 				/// <para>Sets or updates a key.</para>
 				/// </summary>
 				/// <param name="{char*}">A key.</param>
-				template<>
-				void set(const char* nkey) {
-					set((char*)nkey);
-				}
+				void set(const char*);
 
 				/// <summary>
 				/// <para>Sets or updates a key.</para>
 				/// </summary>
 				/// <param name="{char*}">A key.</param>
-				template<>
-				void set(char* nkey) {
-					for (auto& i : keys) {
-						if (i.type() == typeid(std::string)) {
-							i = std::string(nkey);
-						}
-					}
-					std::any lol = std::string(nkey);
-					keys.push_back(lol);
-				}
+				void set(char*);
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -222,44 +157,22 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{Q}">A key.</param>
 				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
-				template<typename Q>
-				T* operator[](Q key)
-				{
-					for (auto& i : keys) {
-						if (i.type() == typeid(key)) {
-							if (std::any_cast<r_cast_t<Q>>(i) == key)
-								return &holding;
-						}
-					}
-					return nullptr;
-				}
+				template<typename Q, std::enable_if_t<!std::is_same_v<r_cast_t<Q>, char*>,int> = 0>
+				T* operator[](const Q&);
 
 				/// <summary>
 				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
 				/// </summary>
 				/// <param name="{char*}">A key.</param>
 				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
-				template<>
-				T* operator[](const char* key) {
-					return (*this)[(char*)key];
-				}
+				T* operator[](const char*);
 
 				/// <summary>
 				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
 				/// </summary>
 				/// <param name="{char*}">A key.</param>
 				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
-				template<>
-				T* operator[](char* key)
-				{
-					for (auto& i : keys) {
-						if (i.type() == typeid(std::string)) {
-							if (std::any_cast<std::string>(i) == key)
-								return &holding;
-						}
-					}
-					return nullptr;
-				}
+				T* operator[](char*);
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -274,44 +187,22 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{Q}">A key.</param>
 				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
-				template<typename Q>
-				const T* operator[](Q key) const
-				{
-					for (auto& i : keys) {
-						if (i.type() == typeid(key)) {
-							if (std::any_cast<r_cast_t<Q>>(i) == key)
-								return &holding;
-						}
-					}
-					return nullptr;
-				}
+				template<typename Q, std::enable_if_t<!std::is_same_v<r_cast_t<Q>, char*>, int> = 0>
+				const T* operator[](const Q&) const;
 
 				/// <summary>
 				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
 				/// </summary>
 				/// <param name="{char*}">A key.</param>
 				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
-				template<>
-				const T* operator[](const char* key) const {
-					return (*this)[(char*)key];
-				}
+				const T* operator[](const char*) const;
 
 				/// <summary>
 				/// <para>If match, returns the pointer to value, else returns nullptr.</para>
 				/// </summary>
 				/// <param name="{char*}">A key.</param>
 				/// <returns>{T} The value pointer or nullptr if the key doesn't match or doesn't exist.</returns>
-				template<>
-				const T* operator[](char* key) const
-				{
-					for (auto& i : keys) {
-						if (i.type() == typeid(std::string)) {
-							if (std::any_cast<std::string>(i) == key)
-								return &holding;
-						}
-					}
-					return nullptr;
-				}
+				const T* operator[](char*) const;
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -326,15 +217,7 @@ namespace LSW {
 				/// <para># PS: CHAR* and CONST CHAR* are transformed to std::string when they're set. You won't find char* type.</para>
 				/// </summary>
 				template<typename Q>
-				void remove() {
-					for (size_t p = 0; p < keys.size(); p++) {
-						if (keys[p].type() == typeid(r_cast_t<Q>))
-						{
-							keys.erase(keys.begin() + p);
-							return;
-						}
-					}
-				}
+				void remove();
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -350,46 +233,26 @@ namespace LSW {
 				/// </summary>
 				/// <returns>{bool} True if there is one of this type.</returns>
 				template<typename Q>
-				bool has_type() const
-				{
-					for (auto& i : keys) if (i.type() == typeid(r_cast_t<Q>)) return true;
-					return false;
-				}
+				bool has_type() const;
 
 				/// <summary>
 				/// <para>Gets if there's this key there.</para>
 				/// </summary>
 				/// <returns>{bool} True if match.</returns>
-				template<typename Q>
-				bool has_type(Q key) const
-				{
-					for (auto& i : keys) {
-						if (i.type() == typeid(key)) {
-							if (std::any_cast<r_cast_t<Q>>(i) == key) return true;
-						}
-					}
-					return false;
-				}
+				template<typename Q, std::enable_if_t<!std::is_same_v<r_cast_t<Q>, char*>, int> = 0>
+				bool has_type(const Q& key) const;
 
 				/// <summary>
 				/// <para>Gets if there's this key there.</para>
 				/// </summary>
 				/// <returns>{bool} True if match.</returns>
-				template<>
-				bool has_type(const char* key) const
-				{
-					return has_type(std::string(key));
-				}
+				bool has_type(const char* key) const;
 
 				/// <summary>
 				/// <para>Gets if there's this key there.</para>
 				/// </summary>
 				/// <returns>{bool} True if match.</returns>
-				template<>
-				bool has_type(char* key) const
-				{
-					return has_type(std::string(key));
-				}
+				bool has_type(char* key) const;
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -398,7 +261,6 @@ namespace LSW {
 
 				* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 				/// <summary>
 				/// <para>Gets the key of type K.</para>
 				/// <para># PS: CHAR* and CONST CHAR* are transformed to std::string when they're set. You won't find char* type.</para>
@@ -406,17 +268,10 @@ namespace LSW {
 				/// <param name="{K}">The variable to be set with the value.</param>
 				/// <returns></returns>
 				template<typename K>
-				bool get_type(K& val) const {
-					for (auto& i : keys) {
-						if (i.type() == typeid(r_cast_t<K>))
-						{
-							val = std::any_cast<K>(i);
-							return true;
-						}
-					}
-					return false;
-				}
+				bool get_type(K& val) const;
 			};
 		}
 	}
 }
+
+#include "superpair.ipp"

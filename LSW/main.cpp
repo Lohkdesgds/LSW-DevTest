@@ -2,7 +2,8 @@
 
 #include <iostream>
 
-//#define TESTING_ALL
+#define TESTING_ALL
+//#define LOLTEST
 
 using namespace LSW::v5;
 using namespace LSW::v5::Interface;
@@ -14,22 +15,89 @@ const std::string datapath = "%appdata%/Lohk's Studios/TheBlast/data/data.zip";
 const std::string resource_url = "https://www.dropbox.com/s/tuc0mu4eotoh7ay/data.zip?dl=1";
 
 const std::string music_test_inner_path = "musics/music_alt.ogg";
+const int font_size_set = 200;
 
 
 void check_file_download(Work::GameCore&);
-void autoabort_test(Work::GameCore&);
 void multitask_test(Work::GameCore&);
 void socketsys_test(Work::GameCore&);
 void smartfile_test(Work::GameCore&);
 void pathmngr_debug(Work::GameCore&, const Interface::PathManager&);
 
+#ifdef LOLTEST
+int thr0();
 
-const int font_size_set = 200;
+template<size_t i>
+void random_thread(Tools::boolThreadF);
 
 int main() {
 
+	std::vector<Tools::SuperThread*> thrs;
+	thrs.push_back(new Tools::SuperThread([](auto) {thr0(); }));
+	thrs.push_back(new Tools::SuperThread([&](Tools::boolThreadF r) {random_thread<1>(r); }));
+	thrs.push_back(new Tools::SuperThread([&](Tools::boolThreadF r) {random_thread<2>(r); }));
+	thrs.push_back(new Tools::SuperThread([&](Tools::boolThreadF r) {random_thread<3>(r); }));
+	thrs.push_back(new Tools::SuperThread([&](Tools::boolThreadF r) {random_thread<4>(r); }));
+	thrs.push_back(new Tools::SuperThread([&](Tools::boolThreadF r) {random_thread<5>(r); }));
+	thrs.push_back(new Tools::SuperThread([&](Tools::boolThreadF r) {random_thread<6>(r); }));
+	thrs.push_back(new Tools::SuperThread([&](Tools::boolThreadF r) {random_thread<7>(r); }));
+	thrs.push_back(new Tools::SuperThread([&](Tools::boolThreadF r) {random_thread<8>(r); }));
 
-	Work::GameCore core(logpath, configpath);
+	for (auto& i : thrs) {
+		i->start();
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
+	for (auto& i : thrs) i->join();
+	for (auto& i : thrs) delete i;
+}
+
+template<size_t i>
+void random_thread(Tools::boolThreadF run) {
+	Display<i> woo;
+	Bitmap bmp;
+
+	const double dtp = 0.5345 * i;
+
+	Tools::SuperResource<Camera> cameras;	
+
+	auto cam = cameras.create("OTHERLOL");
+	cam->classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
+
+	woo.set_fps_cap(30);
+	woo.set_camera(cam);
+	woo.init();
+
+	auto working_on = woo.add_once_task([&] {
+		bmp.create(50, 50);
+		bmp.set_as_target();
+		Color(200, 100, 127).clear_to_this();
+		return 0;
+	});
+	working_on.wait();
+
+	woo.add_draw_task([&](auto) {
+		Color(
+			0.5f + 0.5f * static_cast<float>(sin(0.23 * (al_get_time() + dtp))),
+			0.5f + 0.5f * static_cast<float>(sin(0.37 * (al_get_time() + dtp))),
+			0.5f + 0.5f * static_cast<float>(sin(0.16 * (al_get_time() + dtp)))
+		).clear_to_this();
+			
+		bmp.draw(25, 25, 0.0f, 0.0f, 0.012f, 0.012f, dtp + al_get_time());
+	});
+
+	while (run()) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::yield();
+	}
+	woo.deinit();
+}
+
+int thr0() {
+#else
+int main() {
+#endif
+
+	Work::GameCore core(Work::generate_gamecore<0>(logpath, configpath));
 
 	Logger logg;
 
@@ -40,7 +108,7 @@ int main() {
 	check_file_download(core);
 
 #ifdef TESTING_ALL
-	autoabort_test(core);
+	//autoabort_test(core);
 	multitask_test(core);
 	socketsys_test(core);
 	smartfile_test(core);
@@ -54,7 +122,7 @@ int main() {
 	pathmngr_debug(core, pather);
 
 
-	Tools::SuperResource<Work::Block> blocks;
+	Tools::SuperResource<Work::BlockT<0>> blocks;
 
 	auto working_on = core.get_display().add_once_task([pather] {
 		Logger logg;
@@ -146,14 +214,14 @@ int main() {
 		return -1;
 	}
 
-	auto blk0 = blocks.create("_test_block");
-	auto blk1 = blocks.create("_test_block2");
-	auto blk_mouse = blocks.create("_test_block_mouse");
-	auto blk3 = blocks.create("_test_col");
-	auto blk_height = blocks.create("_test_slidex");
-	auto blk_zoom = blocks.create("_test_slidezoom");
-	auto blk_width = blocks.create("_test_slidey");
-	auto blk_switch = blocks.create("_test_switch");
+	Work::Block* blk0 = blocks.create("_test_block");
+	Work::Block* blk1 = blocks.create("_test_block2");
+	Work::Block* blk_mouse = blocks.create("_test_block_mouse");
+	Work::Block* blk3 = blocks.create("_test_col");
+	Work::Block* blk_height = blocks.create("_test_slidex");
+	Work::Block* blk_zoom = blocks.create("_test_slidezoom");
+	Work::Block* blk_width = blocks.create("_test_slidey");
+	Work::Block* blk_switch = blocks.create("_test_switch");
 
 	blk0->insert(lmao);
 	blk_mouse->insert(mouse);
@@ -283,16 +351,16 @@ int main() {
 
 
 	Work::Collisioner overlay_control(core.get_config());
-	overlay_control.insert(blk_height);
-	overlay_control.insert(blk_width);
-	overlay_control.insert(blk_switch);
-	overlay_control.insert(blk_zoom);
+	overlay_control.insert(*blk_height);
+	overlay_control.insert(*blk_width);
+	overlay_control.insert(*blk_switch);
+	overlay_control.insert(*blk_zoom);
 
 	Work::Collisioner collision_control(core.get_config());
-	collision_control.insert(blk0);
-	collision_control.insert(blk_mouse);
-	collision_control.insert(blk3);
-	collision_control.insert(blk1);
+	collision_control.insert(*blk0);
+	collision_control.insert(*blk_mouse);
+	collision_control.insert(*blk3);
+	collision_control.insert(*blk1);
 
 	collision_control.start(1.0 / 20);
 	overlay_control.start(1.0 / 10);
@@ -307,7 +375,7 @@ int main() {
 
 
 	Tools::SuperResource<Font> source_font;
-	Tools::SuperResource<Work::Text> texts;
+	Tools::SuperResource<Work::TextT<0>> texts;
 
 	Tools::Resource<Interface::Font> sfont;
 	if (!source_font.get("DEFAULT", sfont)) {
@@ -316,14 +384,14 @@ int main() {
 			return -1;
 	}
 
-	auto txt0 = texts.create("_line0");
-	auto txtdebug = texts.create("_line4");
-	auto txtu = texts.create("_lineu");
+	Work::Text* txt0 = texts.create("_line0");
+	Work::Text* txtdebug = texts.create("_line4");
+	Work::Text* txtu = texts.create("_lineu");
 
-	auto txtmouse = texts.create("_follow_mouse_test");
+	Work::Text* txtmouse = texts.create("_follow_mouse_test");
 
-	auto txtf0 = texts.create("_follow_0");
-	auto txtf1 = texts.create("_follow_1");
+	Work::Text* txtf0 = texts.create("_follow_0");
+	Work::Text* txtf1 = texts.create("_follow_1");
 
 	txt0->set(sfont);
 	txtdebug->set(sfont);
@@ -410,7 +478,7 @@ int main() {
 	txtf0->set(Work::sprite::e_double::SCALE_G, 0.15);
 	//txtf0->set(Work::sprite::e_double::SCALE_X, 0.6);
 	txtf0->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
-	txtf0->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, blk0);
+	txtf0->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, *blk0);
 	txtf0->set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 0.66);
 	txtf0->set(Work::text::e_double::UPDATES_PER_SECOND, 20.0);
 	txtf0->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(150, 100, 100));
@@ -424,7 +492,7 @@ int main() {
 	txtf1->set(Work::sprite::e_double::SCALE_G, 0.15);
 	txtf1->set(Work::sprite::e_double::SCALE_X, 0.85);
 	txtf1->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
-	txtf1->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, blk1);
+	txtf1->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, *blk1);
 	txtf1->set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 0.40);
 	txtf1->set(Work::text::e_double::UPDATES_PER_SECOND, 60.0);
 	txtf1->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(100, 100, 150));
@@ -438,7 +506,7 @@ int main() {
 	txtmouse->set(Work::sprite::e_double::SCALE_G, 0.12);
 	//txtmouse->set(Work::sprite::e_double::SCALE_X, 0.28);
 	txtmouse->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
-	txtmouse->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, blk_mouse);
+	txtmouse->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, *blk_mouse);
 	txtmouse->set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 0.80);
 	txtmouse->set(Work::text::e_double::UPDATES_PER_SECOND, 24.0);
 	txtmouse->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(0, 255, 255));
@@ -450,8 +518,8 @@ int main() {
 	txtmouse->set<double>(Work::sprite::e_double::TARG_ROTATION, [] {return 90.0 * al_get_time(); });
 
 
-	overlay_control.insert(txtdebug);
-	overlay_control.insert(txt0);
+	overlay_control.insert(*txtdebug);
+	overlay_control.insert(*txt0);
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - TEXTS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
@@ -817,66 +885,6 @@ void check_file_download(Work::GameCore& core)
 	}
 }
 
-void autoabort_test(Work::GameCore& core)
-{
-	Logger logg;
-
-	logg << L::SLF << fsr() << "&e> > > > > AUTOABORT TEST < < < < <" << L::ELF;
-	{
-		{
-			logg << L::SLF << fsr() << "Setting up thread mode=ASYNC_TIMEOUT_KILLTHISTHREADSELF_THEN_RUN 500 ms..." << L::ELF;
-
-			unsigned count = 0, copy = 0;
-			Tools::SuperThread on;
-			on.set([&](Tools::boolThreadF) {
-				Tools::AutoAbort aa(Tools::autoabort::abort_mode::ASYNC_TIMEOUT_KILLTHISTHREADSELF_THEN_RUN, 500, [&] {
-					copy = count;
-					});
-				while (1) {
-					count++;
-				}
-				});
-
-			logg << L::SLF << fsr() << "Waiting..." << L::ELF;
-
-			on.start();
-
-			while (copy == 0)
-				std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-			logg << L::SLF << fsr() << "Got results: Thread had " << count << " and abort copied " << copy << "." << L::ELF;
-
-			on.kill();
-		}
-		//{
-		//	logg << L::SLF << fsr() << "Setting up thread mode=ASYNC_TIMEOUT_RUN_THEN_KILLTHISTHREADSELF 500 ms..." << L::ELF;
-		//
-		//	unsigned count = 0, copy = 0;
-		//	Tools::SuperThread on;
-		//	on.set([&](Tools::boolThreadF) {
-		//		Tools::AutoAbort aa(Tools::autoabort::abort_mode::ASYNC_TIMEOUT_RUN_THEN_KILLTHISTHREADSELF, 500, [&] {
-		//			copy = count;
-		//		});
-		//		while (1) {
-		//			count++;
-		//		}
-		//	});
-		//
-		//	logg << L::SLF << fsr() << "Waiting..." << L::ELF;
-		//
-		//	on.start();
-		//
-		//	while (copy == 0)
-		//		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-		//
-		//	logg << L::SLF << fsr() << "Got results: Thread had " << count << " and abort copied " << copy << "." << L::ELF;
-		//
-		//	on.kill();
-		//} ///ref there [&] is invalid later at copy = count apparently
-	}
-	logg << L::SLF << fsr() << "&e> > > > > END OF AUTOABORT TEST < < < < <" << L::ELF;
-
-}
 
 void multitask_test(Work::GameCore& core)
 {

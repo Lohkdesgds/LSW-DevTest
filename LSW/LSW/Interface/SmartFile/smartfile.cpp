@@ -23,14 +23,17 @@ namespace LSW {
 				}
 				return "rb+";
 			}
+
 			SmartFile::SmartFile()
 			{
 				Handling::init_basic();
 			}
+			
 			SmartFile::~SmartFile()
 			{
 				close();
 			}
+			
 			bool SmartFile::open(std::string path, const smartfile::file_modes m)
 			{
 				eoff = false;
@@ -132,14 +135,12 @@ namespace LSW {
 				return al_fwrite(fp, buf.data(), s ? s : buf.size());
 			}
 
-
-
-
 			int64_t quick_get_file_size(std::string p) {
 				SmartFile f;
 				if (!f.open(p, smartfile::file_modes::READ)) return -1;
 				return f.total_size(); // close on destroy
 			}
+
 		}
 	}
 }

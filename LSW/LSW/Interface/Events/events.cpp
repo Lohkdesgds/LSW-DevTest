@@ -4,7 +4,6 @@ namespace LSW {
 	namespace v5 {
 		namespace Interface {
 
-
 			RawEvent::RawEvent(ALLEGRO_EVENT&& evx)
 			{
 				ev = std::move(evx);
@@ -15,25 +14,38 @@ namespace LSW {
 				return ev.type;
 			}
 
-			const ALLEGRO_DISPLAY_EVENT&  RawEvent::display_event() const {
+			const ALLEGRO_DISPLAY_EVENT&  RawEvent::display_event() const
+			{
 				return ev.display;
 			}
-			const ALLEGRO_JOYSTICK_EVENT& RawEvent::joystick_event() const {
+			
+			const ALLEGRO_JOYSTICK_EVENT& RawEvent::joystick_event() const 
+			{
 				return ev.joystick;
 			}
-			const ALLEGRO_KEYBOARD_EVENT& RawEvent::keyboard_event() const {
+			
+			const ALLEGRO_KEYBOARD_EVENT& RawEvent::keyboard_event() const 
+			{
 				return ev.keyboard;
 			}
-			const ALLEGRO_MOUSE_EVENT&    RawEvent::mouse_event() const {
+			
+			const ALLEGRO_MOUSE_EVENT&    RawEvent::mouse_event() const 
+			{
 				return ev.mouse;
 			}
-			const ALLEGRO_TIMER_EVENT&    RawEvent::timer_event() const {
+			
+			const ALLEGRO_TIMER_EVENT&    RawEvent::timer_event() const 
+			{
 				return ev.timer;
 			}
-			const ALLEGRO_TOUCH_EVENT&    RawEvent::touch_event() const {
+			
+			const ALLEGRO_TOUCH_EVENT&    RawEvent::touch_event() const 
+			{
 				return ev.touch;
 			}
-			const ALLEGRO_USER_EVENT&     RawEvent::user_event() const {
+			
+			const ALLEGRO_USER_EVENT&     RawEvent::user_event() const 
+			{
 				return ev.user;
 			}
 
@@ -76,6 +88,10 @@ namespace LSW {
 				return core.get() == e.core.get();
 			}
 
+			bool Event::operator!=(const Event& e) const
+			{
+				return !(*this == e);
+			}
 
 			const Event get_keyboard_event()
 			{
@@ -240,7 +256,6 @@ namespace LSW {
 				al_wait_for_event_timed(own_queue.get(), &ev, ww);
 				return ev;				
 			}
-
 
 			bool operator==(ALLEGRO_EVENT_SOURCE* f, const Event& e)
 			{

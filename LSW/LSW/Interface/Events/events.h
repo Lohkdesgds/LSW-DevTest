@@ -115,6 +115,13 @@ namespace LSW {
 				/// <returns>{bool} True if they are.</returns>
 				bool operator==(const Event&) const;
 
+				/// <summary>
+				/// <para>Compare if event source is the same.</para>
+				/// </summary>
+				/// <param name="{Event}">Another Event.</param>
+				/// <returns>{bool} True if they are NOT.</returns>
+				bool operator!=(const Event&) const;
+
 				friend class EventHandler;
 			};
 
