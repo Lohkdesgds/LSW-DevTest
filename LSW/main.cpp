@@ -2,7 +2,9 @@
 
 #include <iostream>
 
+#ifndef _DEBUG
 #define TESTING_ALL
+#endif
 //#define LOLTEST
 
 using namespace LSW::v5;
@@ -21,7 +23,7 @@ const bool need_texture_update = false;// if I change something, set to true
 
 void check_file_download(Work::GameCore&);
 void multitask_test(Work::GameCore&);
-void socketsys_test(Work::GameCore&);
+void socketsys_test(Work::GameCore&, double*);
 void smartfile_test(Work::GameCore&);
 void pathmngr_debug(Work::GameCore&, const Interface::PathManager&);
 
@@ -59,10 +61,7 @@ void random_thread(Tools::boolThreadF run) {
 
 	const double dtp = 0.5345 * i;
 
-	Tools::SuperResource<Camera> cameras;	
-
-	auto cam = cameras.create("OTHERLOL");
-	cam->classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
+	core.get_display().get_current_camera().classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
 
 	woo.set_fps_cap(30);
 	woo.set_camera(cam);
@@ -99,6 +98,80 @@ int main() {
 #endif
 
 	Work::GameCore core(logpath, configpath);
+	std::string _what_test = "Loading...";
+
+	Tools::SuperResource<Work::ProgressBar> progressbar_source;
+	Tools::SuperResource<Bitmap> bmps;
+	Tools::SuperResource<Font> source_font;
+	Tools::SuperResource<Work::Text> texts;
+
+	auto progress = progressbar_source.create("_load_progress");
+	progress->set(Work::progressbar::e_double::PROGRESS, 0.0);
+	progress->set(Work::progressbar::e_color::FOREGROUND_TOP_LEFT,		Interface::Color{67, 170, 185});
+	progress->set(Work::progressbar::e_color::FOREGROUND_BOTTOM_LEFT,	Interface::Color{51, 135, 142});
+	progress->set(Work::progressbar::e_color::FOREGROUND_TOP_RIGHT,		Interface::Color{95, 190, 236});
+	progress->set(Work::progressbar::e_color::FOREGROUND_BOTTOM_RIGHT,	Interface::Color{67, 155, 189});
+	progress->set(Work::progressbar::e_color::BACKGROUND_TOP_LEFT,		Interface::Color{9, 25, 50});
+	progress->set(Work::progressbar::e_color::BACKGROUND_BOTTOM_LEFT,	Interface::Color{4, 8, 29});
+	progress->set(Work::progressbar::e_color::BACKGROUND_TOP_RIGHT,		Interface::Color{16, 40, 55});
+	progress->set(Work::progressbar::e_color::BACKGROUND_BOTTOM_RIGHT,	Interface::Color{8, 17, 30});
+	progress->set(Work::progressbar::e_boolean::FIXED_BACKGROUND, true);
+	progress->set(Work::progressbar::e_double::BORDER_THICKNESS, 0.0); // disable
+	progress->set(Work::progressbar::e_double::SMOOTHNESS, 20.0);
+	//progress->set(Work::progressbar::e_double::BORDER_THICKNESS, 0.01);
+	//progress->set(Work::progressbar::e_double::BORDER_ROUNDNESS, 0.004);
+	//progress->set(Work::progressbar::e_double::BORDER_PROPORTION_X, 1.000);
+	//progress->set(Work::progressbar::e_double::BORDER_PROPORTION_Y, 1.025);
+	progress->set(Work::sprite::e_double::SCALE_G, 0.75);
+	progress->set(Work::sprite::e_double::SCALE_Y, 0.1);
+	progress->set(Work::sprite::e_double::TARG_POSX, 0.0);
+	progress->set(Work::sprite::e_double::TARG_POSY, 0.7);
+
+	auto _text_early = texts.create("__loading");
+	_text_early->set(Work::sprite::e_boolean::DRAW, false);
+	_text_early->set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	_text_early->set(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
+	_text_early->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return "&9" + _what_test; });
+	_text_early->set(Work::sprite::e_double::TARG_POSX, 0.0);
+	_text_early->set(Work::sprite::e_double::TARG_POSY, 0.58);
+	_text_early->set(Work::sprite::e_double::SCALE_G, 0.085);
+	_text_early->set(Work::sprite::e_double::SCALE_X, 1.27);
+	_text_early->set(Work::text::e_double::UPDATES_PER_SECOND, 60.0);
+	_text_early->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(55, 27, 100));
+	_text_early->set(Work::text::e_double::SHADOW_DISTANCE_X, 0.002);
+	_text_early->set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.002);
+	_text_early->set(Work::text::e_boolean::USE_COLOR_INSTEAD_OF_AUTO, true);
+	_text_early->set(Work::sprite::e_color::COLOR, Interface::Color(205, 230, 255));
+
+	auto _text_early2 = texts.create("__loading2");
+	_text_early2->set(Work::sprite::e_boolean::DRAW, false);
+	_text_early2->set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	_text_early2->set(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
+	_text_early2->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return "&f" + Tools::sprintf_a("%04.1lf%c", 100.0*progress->get_direct<double>(Work::progressbar::e_double_readonly::PROGRESS_SMOOTH), '%'); });
+	_text_early2->set(Work::sprite::e_double::TARG_POSX, 0.0);
+	_text_early2->set(Work::sprite::e_double::TARG_POSY, 0.7);
+	_text_early2->set(Work::sprite::e_double::SCALE_G, 0.055);
+	_text_early2->set(Work::sprite::e_double::SCALE_X, 1.2);
+	_text_early2->set(Work::text::e_double::UPDATES_PER_SECOND, 5.0);
+	_text_early2->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(55, 27, 100));
+	_text_early2->set(Work::text::e_double::SHADOW_DISTANCE_X, 0.0015);
+	_text_early2->set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.0015);
+	_text_early2->set(Work::text::e_boolean::USE_COLOR_INSTEAD_OF_AUTO, true);
+	_text_early2->set(Work::sprite::e_color::COLOR, Interface::Color(205, 230, 255));
+	_text_early2->set(Work::sprite::e_color::COLOR, Interface::Color(205, 230, 255));
+
+
+	auto _delete_drawtask = core.get_display().add_draw_task([&](const auto& cam) {
+		progress->draw(cam);
+		_text_early->draw(cam);
+		_text_early2->draw(cam);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	});
+
+	//progress->set<double>(Work::progressbar::e_double::TOP_BOTTOM_OFFSET, 0.1);
+
+	// test progressbar
+	//while (1) std::this_thread::sleep_for(std::chrono::seconds(5));
 
 	Logger logg;
 
@@ -106,34 +179,18 @@ int main() {
 	logg << L::SLF << fsr() << "&7#      &eThis is not a game yet, just a test.&7      #" << L::ELF;
 	logg << L::SLF << fsr() << "&7#======&7====================================&7======#" << L::ELF;
 
+
+	progress->set(Work::progressbar::e_double::PROGRESS, 5e-2);
+
 	check_file_download(core);
 
-#ifdef TESTING_ALL
-	//autoabort_test(core);
-	multitask_test(core);
-	socketsys_test(core);
-	smartfile_test(core);
-#endif
-
-	//core.get_display().set_double_buffering_scale(0.3);
-
+	// technically the test is later on, but whatever
 	Interface::PathManager pather;
 	pather.add_path(datapath);
 
-	pathmngr_debug(core, pather);
-
-
-	Tools::SuperResource<Work::Block> blocks;
-
-	auto working_on = core.get_display().add_once_task([pather] {
+	auto early_work = core.get_display().add_once_task([pather] {
 		Logger logg;
-		Tools::SuperResource<Bitmap> source;
 		Tools::SuperResource<Font> source_font;
-
-		auto atlas = source.create("ATLAS_GLOBAL");
-		auto lmao = source.create("_test");
-		auto dirt = source.create("_dirt");
-		auto mouse = source.create("_mouse");
 
 		auto foo = source_font.create("DEFAULT");
 
@@ -146,6 +203,80 @@ int main() {
 		else {
 			logg << L::SLF << fsr() << "Loaded font successfully." << L::ELF;
 		}
+		
+		pather.unapply();
+
+		return true;
+	});
+	early_work.wait();
+
+	Tools::Resource<Interface::Font> sfont;
+	if (!source_font.get("DEFAULT", sfont)) {
+		logg << L::SLF << fsr(E::ERRR) << "Font wasn't found somehow..." << L::ELF;
+		core.shutdown();
+		return -1;
+	}
+
+	_text_early->set(sfont);
+	_text_early->set(Work::sprite::e_boolean::DRAW, true);
+	_text_early2->set(sfont);
+	_text_early2->set(Work::sprite::e_boolean::DRAW, true);
+
+
+
+	progress->set(Work::progressbar::e_double::PROGRESS, 20e-2);
+
+#ifdef TESTING_ALL
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "MultiTask test...";
+
+	//autoabort_test(core);
+	multitask_test(core);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "Sockets test...";
+
+	{
+		double dd = 0.0;
+		progress->set<double>(Work::progressbar::e_double::PROGRESS, [&] {return 20e-2 + 50e-2 * dd; });
+
+		socketsys_test(core, &dd);
+	}
+
+	progress->set(Work::progressbar::e_double::PROGRESS, 73e-2);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "SmartFile test...";
+
+	smartfile_test(core);
+
+	progress->set(Work::progressbar::e_double::PROGRESS, 77e-2);
+#endif
+
+	//core.get_display().set_double_buffering_scale(0.3);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "PathManager Test...";
+
+	pathmngr_debug(core, pather);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "Loading textures...";
+
+	Tools::SuperResource<Work::Block> blocks;
+
+	auto working_on = core.get_display().add_once_task([pather] {
+		Logger logg;
+		Tools::SuperResource<Bitmap> source;
+
+		auto atlas = source.create("ATLAS_GLOBAL");
+		auto lmao = source.create("_test");
+		auto dirt = source.create("_dirt");
+		auto mouse = source.create("_mouse");
+
+		// use .zip
+		pather.apply();
 
 		atlas->load("atlas0.png");
 		bool gud = *atlas;
@@ -181,22 +312,20 @@ int main() {
 	
 	//auto got = working_on.get().get<Tools::Resource<Bitmap>>();
 
+	progress->set(Work::progressbar::e_double::PROGRESS, 80e-2);
+
 	working_on.wait();
 
-
-	Tools::SuperResource<Camera> cameras;
-
-	auto cam = cameras.create("DEFAULT");
-	cam->classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
-
-	core.get_display().set_camera(cam);
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "Done loading textures.";
 
 	bool __simple_texts = false;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - BLOCKS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "Generating Blocks...";
 
-	Tools::SuperResource<Bitmap> bmps;
 	Tools::Resource<Bitmap> lmao, dirt, mouse;
 
 	if (!bmps.get("_test", lmao)) {
@@ -232,9 +361,9 @@ int main() {
 	blk_zoom->insert(lmao);
 	blk_width->insert(lmao);
 	blk_switch->insert(dirt);
-	
 
-
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "Setting up Blocks...";
 
 
 	blk_switch->set(Work::sprite::e_double::TARG_POSX, 0.9);
@@ -261,7 +390,7 @@ int main() {
 
 	blk_height->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK, [&](const Tools::Any& ref) {
 		auto u = ref.get<std::array<double, 4>>();
-		cam->get_classic().y = u[3];
+		core.get_display().get_current_camera().get_classic().y = u[3];
 		core.get_display().set_refresh_camera();
 
 		Logger logg;
@@ -278,8 +407,8 @@ int main() {
 
 	blk_zoom->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK, [&](const Tools::Any& ref) {
 		auto u = ref.get<std::array<double, 4>>();
-		cam->get_classic().sx = pow(1.01 - u[3], 2.0);
-		cam->get_classic().sy = pow(1.01 - u[3], 2.0);
+		core.get_display().get_current_camera().get_classic().sx = pow(1.01 - u[3], 2.0);
+		core.get_display().get_current_camera().get_classic().sy = pow(1.01 - u[3], 2.0);
 		core.get_display().set_refresh_camera();
 
 		Logger logg;
@@ -296,7 +425,7 @@ int main() {
 
 	blk_width->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK, [&](const Tools::Any& ref) {
 		auto u = ref.get<std::array<double, 4>>();
-		cam->get_classic().x = u[2];
+		core.get_display().get_current_camera().get_classic().x = u[2];
 		core.get_display().set_refresh_camera();
 
 		Logger logg;
@@ -340,7 +469,7 @@ int main() {
 	blk_mouse->set<double>(Work::sprite::e_double::SCALE_G, 0.15);
 	blk_mouse->set<double>(Work::sprite::e_double::TARG_ROTATION, [] {return 30.0 * al_get_time(); });
 	blk_mouse->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
-	blk_mouse->set(Work::sprite::e_boolean::SHOWBOX, true);
+	//blk_mouse->set(Work::sprite::e_boolean::SHOWBOX, true);
 	//blk_mouse->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
 
 
@@ -348,7 +477,12 @@ int main() {
 	blk3->set<double>(Work::sprite::e_double::TARG_POSX, -0.65);
 	blk3->set<double>(Work::sprite::e_double::TARG_POSY, -0.5);
 	blk3->set<double>(Work::sprite::e_double::SCALE_G, 0.20);
-	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);blk3->set(Work::sprite::e_boolean::SHOWBOX, true);
+	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);
+	//blk3->set(Work::sprite::e_boolean::SHOWBOX, true);
+
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "Starting Blocks' Collisioner...";
 
 
 	Work::Collisioner overlay_control(core.get_config());
@@ -359,31 +493,24 @@ int main() {
 
 	Work::Collisioner collision_control(core.get_config());
 	collision_control.insert(blk0);
-	collision_control.insert(blk_mouse);
 	collision_control.insert(blk3);
 	collision_control.insert(blk1);
+	collision_control.insert(blk_mouse);
 
-	collision_control.start(1.0 / 20);
+	collision_control.start(1.0 / 15);
 	overlay_control.start(1.0 / 10);
 
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - BLOCKS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 
+	progress->set(Work::progressbar::e_double::PROGRESS, 90e-2);
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - TEXTS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "Generating Texts...";
 
-
-	Tools::SuperResource<Font> source_font;
-	Tools::SuperResource<Work::Text> texts;
-
-	Tools::Resource<Interface::Font> sfont;
-	if (!source_font.get("DEFAULT", sfont)) {
-		logg << L::SLF << fsr(E::ERRR) << "Font wasn't found somehow..." << L::ELF;
-			core.shutdown();
-			return -1;
-	}
 
 	auto txt0 = texts.create("_line0");
 	auto txtdebug = texts.create("_line4");
@@ -407,6 +534,9 @@ int main() {
 	txtmouse->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	txtf0->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	txtf1->set(Work::text::e_integer::FONT_SIZE, font_size_set);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	_what_test = "Setting up Texts...";
 
 
 	Tools::Stopwatch sw; // noo need to mutex, []{} is called in sync with draw
@@ -525,8 +655,14 @@ int main() {
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - TEXTS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 
+	progress->set(Work::progressbar::e_double::PROGRESS, 100e-2);
+
+	_what_test = "Setting up main camera...";
+
+	while (progress->get_direct<double>(Work::progressbar::e_double_readonly::PROGRESS_SMOOTH) < 98e-2) std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 	{
+		core.get_display().remove_draw_task(_delete_drawtask);
 
 		core.get_display().add_draw_task([=, &__c, &sw](const Camera& c) {
 			///got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
@@ -919,32 +1055,34 @@ void multitask_test(Work::GameCore& core)
 
 }
 
-void socketsys_test(Work::GameCore& core)
+void socketsys_test(Work::GameCore& core, double* progression)
 {
+	*progression = 0e-2;
 	Logger logg;
 
 	logg << L::SLF << fsr() << "&e> > > > > SOCKET TEST < < < < <" << L::ELF;
 	{
 		logg << L::SLF << fsr() << "Initializing host..." << L::ELF;
 
+		*progression = 05e-2;
 		Hosting host;
+		*progression = 10e-2;
 
 		logg << L::SLF << fsr() << "Initialized. Trying to create a client to connect to this host..." << L::ELF;
-
-		std::this_thread::sleep_for(std::chrono::seconds(1));
 
 		Connection client;
 		if (!client.connect()) {
 			logg << L::SLF << fsr() << "Deu ruim" << L::ELF;
+			*progression = 100e-2;
 		}
 		else {
-			logg << L::SLF << fsr() << "Yay success. Waiting a sec to send stuff to the host." << L::ELF;
+			*progression = 30e-2;
+			logg << L::SLF << fsr() << "Yay success." << L::ELF;
 
-			std::this_thread::sleep_for(std::chrono::seconds(1));
 
 			std::shared_ptr<Connection> host_c = host.get_connection(0);
 
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+			*progression = 40e-2;
 
 			const char* first_msg = "hello there my friend my name is Jonas and I'm here to test this thing out. If it has problems, it will show them now!";
 			const char* second_msg = "bananas de pijamas are nice tho. Just testing a little bit of code with some huge messages, as you can see. This is bigger than min buf for sure.";
@@ -953,10 +1091,12 @@ void socketsys_test(Work::GameCore& core)
 			logg << L::SLF << fsr() << "Trying to send from client to server..." << L::ELF;
 
 			client.send_package(first_msg);
+			*progression = 45e-2;
 
 			logg << L::SLF << fsr() << "Recovering data sent on server..." << L::ELF;
 
 			while (!host_c->has_package()) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			*progression = 50e-2;
 
 			auto res = host_c->get_next();
 
@@ -965,17 +1105,20 @@ void socketsys_test(Work::GameCore& core)
 			logg << L::SLF << fsr() << "Sending from server to client..." << L::ELF;
 
 			host_c->send_package(second_msg);
+			*progression = 55e-2;
 
 			while (!client.has_package()) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			*progression = 60e-2;
 
 			res = client.get_next();
 
 			logg << L::SLF << fsr() << "Did they match? " << ((res == second_msg) ? "YES" : "NO") << L::ELF;
 
-			for (size_t pingin = 0; pingin < 10; pingin++) {
+			for (size_t pingin = 0; pingin < 6; pingin++) {
 				logg << L::SLF << fsr() << "Local ping try #" << pingin << ": " << L::ELF;
 				logg << L::SLF << fsr() << "- Client: " << client.get_ping() << " ms" << L::ELF;
 				logg << L::SLF << fsr() << "- Server: " << host_c->get_ping() << " ms" << L::ELF;
+				*progression = 60e-2 + 40e-2 * ((pingin + 1) * 1.0 / 6);
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 			}
 		}

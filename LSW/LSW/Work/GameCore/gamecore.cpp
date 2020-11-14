@@ -33,30 +33,30 @@ namespace LSW {
 						share->conf.save_path(conf_p);
 					}
 
-					share->conf.ensure(gamecore::conf_versioning,	"automatic version",	version_app, Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_versioning, "automatic version", version_app, Interface::config::config_section_mode::SAVE);
 
 					// display settings
-					share->conf.ensure(gamecore::conf_displaying,	"screen_width",			1280,	Interface::config::config_section_mode::SAVE);
-					share->conf.ensure(gamecore::conf_displaying,	"screen_height",		720,	Interface::config::config_section_mode::SAVE);
-					share->conf.ensure(gamecore::conf_displaying,	"display_flags",		0,		Interface::config::config_section_mode::SAVE);
-					share->conf.ensure(gamecore::conf_displaying,	"limit_framerate_to",	0,		Interface::config::config_section_mode::SAVE);
-					share->conf.ensure(gamecore::conf_displaying,	"hidemouse",			true,	Interface::config::config_section_mode::SAVE);
-					share->conf.ensure(gamecore::conf_displaying,	"vsync",				false,	Interface::config::config_section_mode::SAVE);
-					share->conf.ensure(gamecore::conf_displaying,	"doublebuffer_scale",	0.0,	Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_displaying, "screen_width", 1280, Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_displaying, "screen_height", 720, Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_displaying, "display_flags", 0, Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_displaying, "limit_framerate_to", 0, Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_displaying, "hidemouse", true, Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_displaying, "vsync", false, Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_displaying, "doublebuffer_scale", 0.0, Interface::config::config_section_mode::SAVE);
 
 					// audio settings
-					share->conf.ensure(gamecore::conf_audio,		"volume",				0.5f,	Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_audio, "volume", 0.5f, Interface::config::config_section_mode::SAVE);
 
 					// debug settings
-					share->conf.ensure(gamecore::conf_debug,		"debug_to_file",		true,	Interface::config::config_section_mode::SAVE);
+					share->conf.ensure(gamecore::conf_debug, "debug_to_file", true, Interface::config::config_section_mode::SAVE);
 
 					// mouse (memory) ### TIED TO SPRITE!
-					share->conf.ensure(gamecore::conf_mouse_memory, "x",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
-					share->conf.ensure(gamecore::conf_mouse_memory, "y",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
-					share->conf.ensure(gamecore::conf_mouse_memory, "rx",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
-					share->conf.ensure(gamecore::conf_mouse_memory, "ry",					0.0f,	Interface::config::config_section_mode::MEMORY_ONLY);
-					share->conf.ensure(gamecore::conf_mouse_memory, "press_count",			0u,		Interface::config::config_section_mode::MEMORY_ONLY);
-					share->conf.ensure(gamecore::conf_mouse_memory, "down_latest",			-1,		Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "x", 0.0f, Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "y", 0.0f, Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "rx", 0.0f, Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "ry", 0.0f, Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "press_count", 0u, Interface::config::config_section_mode::MEMORY_ONLY);
+					share->conf.ensure(gamecore::conf_mouse_memory, "down_latest", -1, Interface::config::config_section_mode::MEMORY_ONLY);
 					// set "b0" ... as mouse buttons (bool)
 
 
@@ -78,6 +78,13 @@ namespace LSW {
 					share->display.init();
 
 					while (!share->display.display_ready()) std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
+				
+					{
+						Interface::Camera _builtin_camera;
+						_builtin_camera.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
+						share->display.set_camera(_builtin_camera);
+					}
 
 					share->check_sources.set_delta(gamecore::delta_checking_s);
 					share->update_mouse.set_delta(gamecore::delta_mouse_s);
@@ -108,25 +115,25 @@ namespace LSW {
 									rx *= bufsc;
 									ry *= bufsc;
 								}
+	
+								
+								Interface::Camera inv = share->display.get_current_camera();
+								inv.invert();
+								inv.transform(x, y);
+								Interface::Camera cninv = share->display.get_current_camera();
+								cninv.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
+								cninv.invert();
+								cninv.transform(rx, ry);
+								//logg << L::SL << fsr() << "Mouse axis: [" << ev.mouse_event().x << ";" << ev.mouse_event().y << "] " << FormatAs("%.4f") << x << ";" << FormatAs("%.4f") << y << L::EL;
 
-								if (auto camnow = share->display.get_current_camera(); camnow) {
-									Interface::Camera inv = *camnow;
-									inv.invert();
-									inv.transform(x, y);
-									Interface::Camera cninv = *camnow;
-									cninv.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
-									cninv.invert();
-									cninv.transform(rx, ry);
-									//logg << L::SL << fsr() << "Mouse axis: [" << ev.mouse_event().x << ";" << ev.mouse_event().y << "] " << FormatAs("%.4f") << x << ";" << FormatAs("%.4f") << y << L::EL;
-
-									share->conf.set(gamecore::conf_mouse_memory, Interface::config::config_section_mode::MEMORY_ONLY);
-									share->conf.set(gamecore::conf_mouse_memory, "x", x);
-									share->conf.set(gamecore::conf_mouse_memory, "y", y);
-									share->conf.set(gamecore::conf_mouse_memory, "rx", rx);
-									share->conf.set(gamecore::conf_mouse_memory, "ry", ry);
-								}
+								share->conf.set(gamecore::conf_mouse_memory, Interface::config::config_section_mode::MEMORY_ONLY);
+								share->conf.set(gamecore::conf_mouse_memory, "x", x);
+								share->conf.set(gamecore::conf_mouse_memory, "y", y);
+								share->conf.set(gamecore::conf_mouse_memory, "rx", rx);
+								share->conf.set(gamecore::conf_mouse_memory, "ry", ry);
 							}
-							else if (ev.timer_event().source == share->check_sources) {
+							else if (ev.timer_event().source == share->check_sources)
+							{
 								if (share->latest_display_source != share->display.get_event_source()) {
 									Interface::Logger logg;
 
@@ -146,6 +153,8 @@ namespace LSW {
 							share->_m_x = ev.mouse_event().x;
 							share->_m_y = ev.mouse_event().y;
 							share->_m_newdata = true;
+
+							//share->display.move_mouse_to(0.0, 0.0);
 						}
 							break;
 						case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:

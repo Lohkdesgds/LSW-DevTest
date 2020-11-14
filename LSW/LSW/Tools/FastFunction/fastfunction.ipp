@@ -1,3 +1,4 @@
+#include "fastfunction.h"
 #pragma once
 
 namespace LSW {
@@ -82,6 +83,23 @@ namespace LSW {
 					return ref;
 				}
 				return ref;
+			}
+
+			template<typename T>
+			inline T& FastFunction<T>::get_ref()
+			{
+				if (using_gen) {
+					std::lock_guard<std::mutex> l(gen_use);
+					ref = gen();
+					return ref;
+				}
+				return ref;
+			}
+
+			template<typename T>
+			inline bool FastFunction<T>::is_function() const
+			{
+				return using_gen;
 			}
 
 			template<typename T>

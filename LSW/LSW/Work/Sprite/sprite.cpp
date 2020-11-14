@@ -236,11 +236,13 @@ namespace LSW {
 					set(sprite::e_double_readonly::ROTATION, targ_rotation);
 					set(sprite::e_double_readonly::POSX, real_targ_posx);
 					set(sprite::e_double_readonly::POSY, real_targ_posy);
+					set(sprite::e_double_readonly::PERC_CALC_SMOOTH, 0.0);
 				}
 				else {
 					set(sprite::e_double_readonly::ROTATION, (1.0 - perc_run) * rotation_v + perc_run * targ_rotation);
 					set(sprite::e_double_readonly::POSX, (1.0 - perc_run) * posx_v + perc_run * targ_posx);
 					set(sprite::e_double_readonly::POSY, (1.0 - perc_run) * posy_v + perc_run * targ_posy);
+					set(sprite::e_double_readonly::PERC_CALC_SMOOTH, perc_run);
 				}
 
 				if (is_eq(sprite::e_boolean::SHOWBOX, true)) {
@@ -317,30 +319,30 @@ namespace LSW {
 					double sum_dy = 0.0;
 
 					if (nowgo & static_cast<int>(sprite::e_direction::SOUTH)) {
-						if (get_direct<double>(sprite::e_double_readonly::SPEED_Y) < 0.0) {
-							set(sprite::e_double_readonly::SPEED_Y, -roughness * get_direct<double>(sprite::e_double::ELASTICITY_Y) * get_direct<double>(sprite::e_double_readonly::SPEED_Y));
+						if (get_direct<double>(sprite::e_double_readonly::SPEED_Y) <= 0.0) {
+							set(sprite::e_double_readonly::SPEED_Y, 0.0);// sprite::minimum_sprite_accel_collision* get_direct<double>(sprite::e_double::ELASTICITY_Y));
 							//set(sprite::e_double::ACCELERATION_Y, sprite::minimum_sprite_accel_collision);
 						}
 						sum_dy = fabs(easy_collision.dy_max);
 					}
 					else if (nowgo & static_cast<int>(sprite::e_direction::NORTH)) {
-						if (get_direct<double>(sprite::e_double_readonly::SPEED_Y) > 0.0) {
-							set(sprite::e_double_readonly::SPEED_Y, -roughness * get_direct<double>(sprite::e_double::ELASTICITY_Y) * get_direct<double>(sprite::e_double_readonly::SPEED_Y));
+						if (get_direct<double>(sprite::e_double_readonly::SPEED_Y) >= 0.0) {
+							set(sprite::e_double_readonly::SPEED_Y, 0.0); //-sprite::minimum_sprite_accel_collision * get_direct<double>(sprite::e_double::ELASTICITY_Y));
 							//set(sprite::e_double::ACCELERATION_Y, -sprite::minimum_sprite_accel_collision);
 						}
 						sum_dy = -fabs(easy_collision.dy_max);
 					}
 
 					if (nowgo & static_cast<int>(sprite::e_direction::EAST)) {
-						if (get_direct<double>(sprite::e_double_readonly::SPEED_X) < 0.0) {
-							set(sprite::e_double_readonly::SPEED_X, -roughness * get_direct<double>(sprite::e_double::ELASTICITY_X) * get_direct<double>(sprite::e_double_readonly::SPEED_X));
+						if (get_direct<double>(sprite::e_double_readonly::SPEED_X) <= 0.0) {
+							set(sprite::e_double_readonly::SPEED_X, 0.0); // sprite::minimum_sprite_accel_collision * get_direct<double>(sprite::e_double::ELASTICITY_X));
 							//set(sprite::e_double::ACCELERATION_X, sprite::minimum_sprite_accel_collision);
 						}
 						sum_dx = fabs(easy_collision.dx_max);
 					}
 					else if (nowgo & static_cast<int>(sprite::e_direction::WEST)) {
-						if (get_direct<double>(sprite::e_double_readonly::SPEED_X) > 0.0) {
-							set(sprite::e_double_readonly::SPEED_X, -roughness * get_direct<double>(sprite::e_double::ELASTICITY_X) * get_direct<double>(sprite::e_double_readonly::SPEED_X));
+						if (get_direct<double>(sprite::e_double_readonly::SPEED_X) >= 0.0) {
+							set(sprite::e_double_readonly::SPEED_X, 0.0); //-sprite::minimum_sprite_accel_collision * get_direct<double>(sprite::e_double::ELASTICITY_X));
 							//set(sprite::e_double::ACCELERATION_X, -sprite::minimum_sprite_accel_collision);
 						}
 						sum_dx = -fabs(easy_collision.dx_max);
@@ -350,15 +352,27 @@ namespace LSW {
 					const auto targ_posy_c = get_direct<double>(sprite::e_double::TARG_POSY);
 					const auto speed_x_c = get_direct<double>(sprite::e_double_readonly::SPEED_X);
 					const auto speed_y_c = get_direct<double>(sprite::e_double_readonly::SPEED_Y);
+					const auto accel_x = get_direct<double>(sprite::e_double::ACCELERATION_X);
+					const auto accel_y = get_direct<double>(sprite::e_double::ACCELERATION_Y);
 
 
 					set<double>(sprite::e_double::TARG_POSX, targ_posx_c + speed_x_c + sum_dx);
-					set<double>(sprite::e_double_readonly::PROJECTED_POSX, targ_posx_c + speed_x_c + 2.0 * (sum_dx));
-					set(sprite::e_double_readonly::SPEED_X, (get_direct<double>(sprite::e_double_readonly::SPEED_X) + get_direct<double>(sprite::e_double::ACCELERATION_X)) * roughness);
+					set<double>(sprite::e_double_readonly::PROJECTED_POSX, targ_posx_c + speed_x_c + 2.0 * sum_dx);
 
+					// has to go west and accel help? good, else nah
+					//if ((nowgo & static_cast<int>(sprite::e_direction::WEST) && accel_x <= 0.0) || (nowgo & static_cast<int>(sprite::e_direction::EAST) && accel_x >= 0.0)) {
+					set(sprite::e_double_readonly::SPEED_X, (speed_x_c + get_direct<double>(sprite::e_double::ACCELERATION_X)) * roughness * get_direct<double>(sprite::e_double::ELASTICITY_X));
+					//}
+					
 					set<double>(sprite::e_double::TARG_POSY, targ_posy_c + speed_y_c + sum_dy);
-					set<double>(sprite::e_double_readonly::PROJECTED_POSY, targ_posy_c + speed_y_c + 2.0 * (sum_dy));
-					set(sprite::e_double_readonly::SPEED_Y, (get_direct<double>(sprite::e_double_readonly::SPEED_Y) + get_direct<double>(sprite::e_double::ACCELERATION_Y)) * roughness);
+					set<double>(sprite::e_double_readonly::PROJECTED_POSY, targ_posy_c + speed_y_c + 2.0 * sum_dy);
+
+					// has to go north and accel help? good, else nah
+					//if ((nowgo & static_cast<int>(sprite::e_direction::NORTH) && accel_y <= 0.0) || (nowgo & static_cast<int>(sprite::e_direction::SOUTH) && accel_y >= 0.0)) {
+					set(sprite::e_double_readonly::SPEED_Y, (speed_y_c + get_direct<double>(sprite::e_double::ACCELERATION_Y)) * roughness * get_direct<double>(sprite::e_double::ELASTICITY_Y));
+					//}
+
+
 
 					/*if (auto spr = (get_direct<double>(sprite::e_double::SPEED_ROTATION])(); spr != 0.0) {
 						double act = (get_direct<double>(sprite::e_double::TARG_ROTATION])();

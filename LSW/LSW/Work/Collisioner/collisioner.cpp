@@ -16,7 +16,8 @@ namespace LSW {
 
 				for (auto& i : sprites) {
 					i.get().update_and_clear(conf, true); // process positioning
-
+				}
+				for (auto& i : sprites) {
 					for (const auto& j : sprites) {
 						if (!i.get().is_eq<uintptr_t>(sprite::e_uintptrt::DATA_FROM, j))
 							i.get().collide(j, true);

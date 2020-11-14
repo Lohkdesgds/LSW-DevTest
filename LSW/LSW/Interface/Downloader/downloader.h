@@ -25,7 +25,7 @@ namespace LSW {
 
 			class Downloader {
 				std::shared_ptr<std::string> buf = std::make_shared<std::string>();
-				Tools::SuperThreadT<std::shared_ptr<std::string>> thr;
+				Tools::SuperThreadT<std::shared_ptr<std::string>> thr{ Tools::superthread::performance_mode::PERFORMANCE };
 				size_t TotalBytesRead = 0;
 
 				bool _get(const std::string&, std::function<bool(void)>);

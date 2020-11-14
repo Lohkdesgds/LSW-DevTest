@@ -38,7 +38,7 @@ namespace LSW {
 				COL_MINDIST_... = the distance it has to move in ... (on a collision tick)
 				...UPDATE... = automatic smoothing based on collision calls
 				*/
-				enum class e_double_readonly { SPEED_X, SPEED_Y, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */, LAST_DRAW, LAST_UPDATE, UPDATE_DELTA, POSX, POSY, PROJECTED_POSX, PROJECTED_POSY, ROTATION/*, COL_MINDIST_X, COL_MINDIST_Y*/, MOUSE_CLICK_LAST_X, MOUSE_CLICK_LAST_Y };
+				enum class e_double_readonly { PERC_CALC_SMOOTH, SPEED_X, SPEED_Y, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */, LAST_DRAW, LAST_UPDATE, UPDATE_DELTA, POSX, POSY, PROJECTED_POSX, PROJECTED_POSY, ROTATION/*, COL_MINDIST_X, COL_MINDIST_Y*/, MOUSE_CLICK_LAST_X, MOUSE_CLICK_LAST_Y };
 				enum class e_boolean_readonly { COLLISION_MOUSE_PRESSED, COLLISION_MOUSE_CLICK, COLLISION_COLLIDED /* related to: LAST_COLLISION_TIME */, INVALIDATE_MOUSE_NOMOVE };
 				enum class e_tief_readonly { LAST_STATE };
 
@@ -87,7 +87,7 @@ namespace LSW {
 				using functional = std::function<void(const Tools::Any&)>;
 
 
-				constexpr double minimum_sprite_accel_collision = 1e-4;
+				constexpr double minimum_sprite_accel_collision = 1e-3;
 				constexpr double game_collision_oversize = 1e-3;
 				constexpr double maximum_time_between_collisions = 1.0; // sec, used for smoothness too
 				constexpr double move_accept_move_max_as_none = 0.025; // click event, how much movement is considered no move? (around the point, +/-)
@@ -97,6 +97,7 @@ namespace LSW {
 				};
 
 				const Tools::SuperMap<Tools::FastFunction<double>> e_double_defaults = {
+					{0.0,															(e_double_readonly::PERC_CALC_SMOOTH),				("perc_calc_smooth")},
 					{0.0,															(e_double_readonly::SPEED_X),						("speed_x")},
 					{0.0,															(e_double_readonly::SPEED_Y),						("speed_y")},
 					{0.0,															(e_double_readonly::LAST_COLLISION_TIME),			("last_collision_time")},
@@ -124,7 +125,7 @@ namespace LSW {
 					{0.3,															(e_double::SPEEDXY_LIMIT),							("speed_limit")},
 					{0.85,															(e_double::ELASTICITY_X),							("elasticity_x")},
 					{0.85,															(e_double::ELASTICITY_Y),							("elasticity_y")},
-					{0.9999,														(e_double::ROUGHNESS),								("roughness")}
+					{0.98,															(e_double::ROUGHNESS),								("roughness")}
 				};
 
 				const Tools::SuperMap<Tools::FastFunction<bool>> e_boolean_defaults = {

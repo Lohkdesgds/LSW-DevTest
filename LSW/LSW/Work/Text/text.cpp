@@ -54,6 +54,7 @@ namespace LSW {
 				const auto s_dist_x = get_direct<double>(text::e_double::SHADOW_DISTANCE_X);
 				const auto s_dist_y = get_direct<double>(text::e_double::SHADOW_DISTANCE_Y);
 				const auto s_col = get_direct<Interface::Color>(text::e_color::SHADOW_COLOR);
+				const auto n_col = get_direct<Interface::Color>(sprite::e_color::COLOR);
 				const auto mode = get_direct<int>(text::e_integer::STRING_MODE);
 				const auto scale_g = get_direct<double>(sprite::e_double::SCALE_G);
 				const auto scale_x = get_direct<double>(sprite::e_double::SCALE_X);
@@ -62,6 +63,7 @@ namespace LSW {
 				const auto posy = get_direct<double>(sprite::e_double_readonly::POSY);
 				const auto font_siz = get_direct<int>(text::e_integer::FONT_SIZE);
 				const auto lineadj = get_direct<double>(text::e_double::LINE_ADJUST);
+				const auto force_color = get_direct<bool>(text::e_boolean::USE_COLOR_INSTEAD_OF_AUTO);
 
 				const double t_rotation_rad = get_direct<double>(sprite::e_double_readonly::ROTATION) * ALLEGRO_PI / 180.0;
 				double p_rotation_rad = 0.0;
@@ -117,7 +119,12 @@ namespace LSW {
 						fontt.draw(s_col, 0.0, height * (o - 0.5), mode, i.s_str().c_str());
 						ruler.apply();
 					}
-					fontt.draw(0.0, height * (o - 0.5), mode, i);
+					if (force_color) {
+						fontt.draw(n_col, 0.0, height * (o - 0.5), mode, i.s_str().c_str());
+					}
+					else {
+						fontt.draw(0.0, height * (o - 0.5), mode, i);
+					}
 				}
 
 

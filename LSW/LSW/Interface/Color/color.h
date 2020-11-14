@@ -85,15 +85,10 @@ namespace LSW {
 				void clear_to_this() const;
 
 				/// <summary>
-				/// <para>Move operator.</para>
-				/// </summary>
-				/// <param name="{Color}">Color to move from.</param>
-				Color& operator=(Color&&);
-
-				/// <summary>
 				/// <para>Copy operator.</para>
 				/// </summary>
 				/// <param name="{Color}">Color to copy from.</param>
+				/// <returns>{Color} itself.</returns>
 				Color& operator=(const Color& c);
 			};
 

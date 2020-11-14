@@ -176,6 +176,12 @@
     <Filter Include="test">
       <UniqueIdentifier>{a13893d5-1488-4c07-9ec6-da8bb1b6cb13}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\3. Work\ProgressBar">
+      <UniqueIdentifier>{15fb7401-e1b6-4f1e-8823-07e50487039d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\2. Interface\Vertex">
+      <UniqueIdentifier>{ef76e91c-1c32-4d65-acdf-1944858f3ca1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -279,6 +285,12 @@
     </ClCompile>
     <ClCompile Include="LSW\Interface\Target\target.cpp">
       <Filter>LSW\2. Interface\Target</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Work\ProgressBar\progressbar.cpp">
+      <Filter>LSW\3. Work\ProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="LSW\Interface\Vertex\vertex.cpp">
+      <Filter>LSW\2. Interface\Vertex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -469,6 +481,12 @@
     </ClInclude>
     <ClInclude Include="LSW\Interface\Target\target.h">
       <Filter>LSW\2. Interface\Target</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Work\ProgressBar\progressbar.h">
+      <Filter>LSW\3. Work\ProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="LSW\Interface\Vertex\vertex.h">
+      <Filter>LSW\2. Interface\Vertex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

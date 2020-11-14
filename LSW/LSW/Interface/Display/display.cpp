@@ -74,12 +74,15 @@ namespace LSW {
 					{
 						check_dbuf = true;
 					}
-					});
+				});
 
 				try {
 					thread_init();
 
-					auto cam_cpy = camera_f();
+					if (camera_fu) {
+						std::lock_guard<std::mutex> luck(camfu_m);
+						cam_latest = camera_fu();
+					}
 
 					targ.set([&] { Bitmap b; b.force(disp ? al_get_backbuffer(disp.get()) : nullptr); return b; });
 
@@ -115,12 +118,15 @@ namespace LSW {
 						frames++;
 
 						if (refresh_camera) {
-							std::lock_guard<std::mutex> cam_m_luck(cam_m);
-							cam_cpy = camera_f();
-							if (refresh_camera && cam_cpy) {
-								if (refresh_camera) refresh_camera = !cam_cpy->classic_update(targ.get());
+							std::lock_guard<std::mutex> cam_m_luck(camfu_m);
+							if (refresh_camera) {
+								if (camera_fu) {
+									std::lock_guard<std::mutex> luck(camfu_m);
+									cam_latest = camera_fu();
+								}
+								if (refresh_camera) refresh_camera = !cam_latest.classic_update(targ.get());
 								//refresh_camera = false;
-								cam_cpy->classic_refresh();
+								cam_latest.classic_refresh();
 
 								Bitmap::check_bitmaps_memory();
 							}
@@ -134,38 +140,36 @@ namespace LSW {
 
 						targ.apply(); // apply(), get() -> Bitmap, set(const Bitmap&), 
 
-						black.clear_to_this();
-
 						/*draw_tasks_m.lock();
 						for (auto& i : draw_tasks) i.second();
 						draw_tasks_m.unlock();*/
 
-						// has to have cam
-						if (cam_cpy.get()) {
-							cam_cpy->apply();
-							try {
-								for (size_t p = 0; p < draw_tasks.size(); p++) draw_tasks.at(p).second(*cam_cpy);
-							}
+						cam_latest.apply();
+
+						black.clear_to_this();
+
+						try {
+							for (size_t p = 0; p < draw_tasks.size(); p++) draw_tasks.at(p).second(cam_latest);
+						}
 #ifdef _DEBUG
-							catch (const std::out_of_range& e) { // I know sometimes it WILL be out of range if you change the draw_tasks size, but mutex costs A LOT (from 5000+ fps to ~300 fps), so just ignore out of range...
-								std::cout << "__INTERNAL__ __SKIP__ OUT OF RANGE ERROR AT DRAW_TASKS: " << e.what() << std::endl;
+						catch (const std::out_of_range& e) { // I know sometimes it WILL be out of range if you change the draw_tasks size, but mutex costs A LOT (from 5000+ fps to ~300 fps), so just ignore out of range...
+							std::cout << "__INTERNAL__ __SKIP__ OUT OF RANGE ERROR AT DRAW_TASKS: " << e.what() << std::endl;
 #else
-							catch (const std::out_of_range&) {
+						catch (const std::out_of_range&) {
 #endif
-								fails_out_of_range++;
-							}
-							catch (Handling::Abort a) {
+							fails_out_of_range++;
+						}
+						catch (Handling::Abort a) {
 #ifdef _DEBUG
-								std::cout << "__INTERNAL__ __SKIP__ ERROR AT DRAW_TASKS: " << a.what() << std::endl;
+							std::cout << "__INTERNAL__ __SKIP__ ERROR AT DRAW_TASKS: " << a.what() << std::endl;
 #endif
-								fails_unexpected++;
-							}
-							catch (...) { // probably can skip (later: add counter by time)
+							fails_unexpected++;
+						}
+						catch (...) { // probably can skip (later: add counter by time)
 #ifdef _DEBUG
-								std::cout << "__INTERNAL__ __SKIP__ UNKNOWN ERROR AT DRAW_TASKS" << std::endl;
+							std::cout << "__INTERNAL__ __SKIP__ UNKNOWN ERROR AT DRAW_TASKS" << std::endl;
 #endif
-								fails_unexpected++;
-							}
+							fails_unexpected++;
 						}
 
 						if (!dbuffer.empty()) {
@@ -273,6 +277,7 @@ namespace LSW {
 				Handling::init_basic();
 				Handling::init_graphics();
 				Handling::init_font();
+				cam_latest.classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
 			}
 						
 			Display::~Display()
@@ -298,6 +303,14 @@ namespace LSW {
 				thr.join();
 			}
 						
+			bool Display::move_mouse_to(const double x, const double y)
+			{
+				if (disp) {
+					return al_set_mouse_xy(disp.get(), get_width() * (0.5 * (x + 1.0)), get_height() * (0.5 * (y + 1.0)));
+				}
+				return false;
+			}
+
 			void Display::set_stop()
 			{
 				thr.stop();
@@ -313,17 +326,17 @@ namespace LSW {
 				return double_buffering;
 			}
 						
-			void Display::set_camera(std::shared_ptr<Camera> cam)
+			void Display::set_camera(const Camera& cam)
 			{
-				std::lock_guard<std::mutex> luck(cam_m);
-				camera_f = cam;
+				std::lock_guard<std::mutex> luck(camfu_m);
+				camera_fu = std::function<Camera(void)>();
 				refresh_camera = true;
 			}
-						
-			void Display::set_camera(std::function<std::shared_ptr<Camera>(void)> f)
+
+			void Display::set_camera(std::function<Camera(void)> f)
 			{
-				std::lock_guard<std::mutex> luck(cam_m);
-				camera_f = f;
+				std::lock_guard<std::mutex> luck(camfu_m);
+				camera_fu = f;
 				refresh_camera = true;
 			}
 						
@@ -332,9 +345,10 @@ namespace LSW {
 				fps_cap = cap;
 			}
 			
-			std::shared_ptr<Camera> Display::get_current_camera()
+			Camera& Display::get_current_camera()
 			{
-				return camera_f();
+				if (camera_fu) throw Handling::Abort(__FUNCSIG__, "Camera is set as a FUNCTION. You can't reference this! Not secure!");
+				return cam_latest;
 			}
 						
 			bool Display::running() const

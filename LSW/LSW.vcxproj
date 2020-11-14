@@ -219,6 +219,7 @@
     <ClCompile Include="LSW\Interface\SmartFile\smartfile.cpp" />
     <ClCompile Include="LSW\Interface\Target\target.cpp" />
     <ClCompile Include="LSW\Interface\Track\track.cpp" />
+    <ClCompile Include="LSW\Interface\Vertex\vertex.cpp" />
     <ClCompile Include="LSW\Interface\Voice\voice.cpp" />
     <ClCompile Include="LSW\Tools\Common\common.cpp" />
     <ClCompile Include="LSW\Tools\CString\cstring.cpp" />
@@ -229,6 +230,7 @@
     <ClCompile Include="LSW\Work\Block\block.cpp" />
     <ClCompile Include="LSW\Work\Collisioner\collisioner.cpp" />
     <ClCompile Include="LSW\Work\GameCore\gamecore.cpp" />
+    <ClCompile Include="LSW\Work\ProgressBar\progressbar.cpp" />
     <ClCompile Include="LSW\Work\Sprite\sprite.cpp" />
     <ClCompile Include="LSW\Work\Text\text.cpp" />
     <ClCompile Include="main.cpp" />
@@ -264,6 +266,7 @@
     <ClInclude Include="LSW\Interface\SmartFile\smartfile.h" />
     <ClInclude Include="LSW\Interface\Target\target.h" />
     <ClInclude Include="LSW\Interface\Track\track.h" />
+    <ClInclude Include="LSW\Interface\Vertex\vertex.h" />
     <ClInclude Include="LSW\Interface\Voice\voice.h" />
     <ClInclude Include="LSW\LSWv5.h" />
     <ClInclude Include="LSW\Tools\AdvancedShared\advancedshared.h" />
@@ -297,6 +300,7 @@
     <ClInclude Include="LSW\Work\Collisioner\collisioner.h" />
     <ClInclude Include="LSW\Work\GameCore\gamecore.h" />
     <ClInclude Include="LSW\Work\GameCore\gamecore.ipp" />
+    <ClInclude Include="LSW\Work\ProgressBar\progressbar.h" />
     <ClInclude Include="LSW\Work\Sprite\sprite.h" />
     <ClInclude Include="LSW\Work\Text\text.h" />
     <ClInclude Include="LSW\Work\Work.h" />

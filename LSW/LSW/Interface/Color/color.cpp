@@ -90,15 +90,6 @@ namespace LSW {
 				al_clear_to_color(*this);
 			}
 
-			Color& Color::operator=(Color&& old)
-			{
-				this->r = old.r;
-				this->g = old.g;
-				this->b = old.b;
-				this->a = old.a;
-				return *this;
-			}
-			
 			Color& Color::operator=(const Color& old)
 			{
 				this->r = old.r;

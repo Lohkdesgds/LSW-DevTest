@@ -73,9 +73,10 @@ namespace LSW {
 				std::vector<Tools::Promise<DisplayAnySPtr>> once_tasks; // change later to a class that manages ALLEGRO_BITMAP*
 				Tools::SuperMutex once_tasks_m;
 
-				std::mutex cam_m;
+				std::mutex camfu_m;
 				//std::shared_ptr<Camera> camera;
-				Tools::FastFunction<std::shared_ptr<Camera>> camera_f;
+				std::function<Camera(void)> camera_fu;
+				Camera cam_latest;
 				bool refresh_camera = false;
 
 				bool thread_run(Tools::boolThreadF);
@@ -115,6 +116,15 @@ namespace LSW {
 				void deinit();
 
 				/// <summary>
+				/// <para>Try to warp mouse to a point in screen. Range: [-1.0, 1.0], being -1,-1 the top left corner.</para>
+				/// <para>Causes event ALLEGRO_EVENT_MOUSE_WARPED.</para>
+				/// </summary>
+				/// <param name="{double}">X coordinate [-1.0, 1.0].</param>
+				/// <param name="{double}">Y coordinate [-1.0, 1.0].</param>
+				/// <returns>{bool} True if worked.</returns>
+				bool move_mouse_to(const double, const double);
+
+				/// <summary>
 				/// <para>Set the drawing thread to stop (no lock).</para>
 				/// </summary>
 				void set_stop();
@@ -136,13 +146,13 @@ namespace LSW {
 				/// <para>Set a Camera to be applied to drawing thread.</para>
 				/// </summary>
 				/// <param name="{std::shared_ptr}">The Camera smart pointer.</param>
-				void set_camera(std::shared_ptr<Camera>);
+				void set_camera(const Camera&);
 
 				/// <summary>
 				/// <para>Set a function that gives a valid Camera to be applied to drawing thread.</para>
 				/// </summary>
 				/// <param name="{std::function}">The function that returns a Camera pointer.</param>
-				void set_camera(std::function<std::shared_ptr<Camera>(void)>);
+				void set_camera(std::function<Camera(void)>);
 
 				/// <summary>
 				/// <para>Limits the framerate to up to this value.</para>
@@ -154,7 +164,7 @@ namespace LSW {
 				/// <para>Gets the latest camera set in this Display (via set_camera).</para>
 				/// </summary>
 				/// <returns>{std::shared_ptr} The Camera.</returns>
-				std::shared_ptr<Camera> get_current_camera();
+				Camera& get_current_camera();
 
 				/// <summary>
 				/// <para>Gets if drawing thread exists and it's running (the display itself might not exist, try display_ready()).</para>

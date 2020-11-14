@@ -82,6 +82,19 @@ namespace LSW {
 				T get();
 
 				/// <summary>
+				/// <para>Get the reference (if function, call function and return, else variable directly).</para>
+				/// <para>USE AT YOUR OWN RISK! If it's function-based, object may change while you try to change stuff!</para>
+				/// </summary>
+				/// <returns>{T} The actual reference.</returns>
+				T& get_ref();
+
+				/// <summary>
+				/// <para>Whether using function or not.</para>
+				/// </summary>
+				/// <returns>{bool} True if using function to generate objects.</returns>
+				bool is_function() const;
+
+				/// <summary>
 				/// <para>Get the function itself (can be empty or not up to date if direct).</para>
 				/// </summary>
 				/// <returns>{std::function} Last function seen.</returns>

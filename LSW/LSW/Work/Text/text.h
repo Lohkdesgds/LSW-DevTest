@@ -23,7 +23,7 @@ namespace LSW {
 				enum class e_double { SHADOW_DISTANCE_X, SHADOW_DISTANCE_Y, TEXT_UPDATE_TIME, BUFFER_SCALE_RESOLUTION, UPDATES_PER_SECOND, LINE_ADJUST };
 				enum class e_color { SHADOW_COLOR };
 				enum class e_integer { STRING_MODE, FONT_SIZE };
-				enum class e_boolean { USE_BITMAP_BUFFER };
+				enum class e_boolean { USE_BITMAP_BUFFER, USE_COLOR_INSTEAD_OF_AUTO /*auto: &6gold&1blue*/ };
 				enum class e_sprite_ref { FOLLOWING };
 
 				const Tools::SuperMap<Tools::FastFunction<std::chrono::milliseconds>>		e_chronomillis_readonly_defaults = {
@@ -48,7 +48,8 @@ namespace LSW {
 					{75,																										(e_integer::FONT_SIZE),									("font_size")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<bool>>							e_boolean_defaults = {
-					{false,																										(e_boolean::USE_BITMAP_BUFFER),							("use_bitmap_buffer")}
+					{false,																										(e_boolean::USE_BITMAP_BUFFER),							("use_bitmap_buffer")},
+					{false,																										(e_boolean::USE_COLOR_INSTEAD_OF_AUTO),					("use_color_instead_of_auto")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<Sprite_Base>>						e_sprite_ref_defaults = {
 					{Sprite_Base(),																								(e_sprite_ref::FOLLOWING),								("following")}

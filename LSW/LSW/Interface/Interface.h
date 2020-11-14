@@ -3,6 +3,7 @@
 #include "Logger/logger.h"
 #include "Downloader/downloader.h"
 #include "Color/color.h"
+#include "Vertex/vertex.h"
 #include "Events/events.h"
 #include "EventCustom/eventcustom.h"
 #include "EventTimer/eventtimer.h"
