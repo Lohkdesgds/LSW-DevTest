@@ -1,12 +1,8 @@
-#define LSW_NOT_USING_LIB
 #include "../LSW_final/LSW/LSWv5.h"
 
-#include <iostream>
+// this is just a stable copy, not the original main
 
-#ifndef _DEBUG
-#define TESTING_ALL
-#endif
-//#define LOLTEST
+#include <iostream>
 
 using namespace LSW::v5;
 using namespace LSW::v5::Interface;
@@ -28,75 +24,7 @@ void socketsys_test(Work::GameCore&, double*);
 void smartfile_test(Work::GameCore&);
 void pathmngr_debug(Work::GameCore&, const Interface::PathManager&);
 
-#ifdef LOLTEST
-int thr0();
-
-template<size_t i>
-void random_thread(Tools::boolThreadF);
-
 int main() {
-
-	std::vector<Tools::SuperThread<>*> thrs;
-	thrs.push_back(new Tools::SuperThread<>([](auto) {thr0(); }));
-	thrs.push_back(new Tools::SuperThread<>([&](Tools::boolThreadF r) {random_thread<1>(r); }));
-	thrs.push_back(new Tools::SuperThread<>([&](Tools::boolThreadF r) {random_thread<2>(r); }));
-	thrs.push_back(new Tools::SuperThread<>([&](Tools::boolThreadF r) {random_thread<3>(r); }));
-	thrs.push_back(new Tools::SuperThread<>([&](Tools::boolThreadF r) {random_thread<4>(r); }));
-	thrs.push_back(new Tools::SuperThread<>([&](Tools::boolThreadF r) {random_thread<5>(r); }));
-	thrs.push_back(new Tools::SuperThread<>([&](Tools::boolThreadF r) {random_thread<6>(r); }));
-	thrs.push_back(new Tools::SuperThread<>([&](Tools::boolThreadF r) {random_thread<7>(r); }));
-	thrs.push_back(new Tools::SuperThread<>([&](Tools::boolThreadF r) {random_thread<8>(r); }));
-
-	for (auto& i : thrs) {
-		i->start();
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	}
-	for (auto& i : thrs) i->join();
-	for (auto& i : thrs) delete i;
-}
-
-template<size_t i>
-void random_thread(Tools::boolThreadF run) {
-	Display<i> woo;
-	Bitmap bmp;
-
-	const double dtp = 0.5345 * i;
-
-	core.get_display().get_current_camera().classic_transform(0.0, 0.0, 1.0, 1.0, 0.0);
-
-	woo.set_fps_cap(30);
-	woo.set_camera(cam);
-	woo.init();
-
-	auto working_on = woo.add_once_task([&] {
-		bmp.create(50, 50);
-		bmp.set_as_target();
-		Color(200, 100, 127).clear_to_this();
-		return 0;
-	});
-	working_on.wait();
-
-	woo.add_draw_task([&](auto) {
-		Color(
-			0.5f + 0.5f * static_cast<float>(sin(0.23 * (al_get_time() + dtp))),
-			0.5f + 0.5f * static_cast<float>(sin(0.37 * (al_get_time() + dtp))),
-			0.5f + 0.5f * static_cast<float>(sin(0.16 * (al_get_time() + dtp)))
-		).clear_to_this();
-			
-		bmp.draw(25, 25, 0.0f, 0.0f, 0.012f, 0.012f, dtp + al_get_time());
-	});
-
-	while (run()) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		std::this_thread::yield();
-	}
-	woo.deinit();
-}
-
-int thr0() {
-#else
-int main() {
-#endif
 
 	Work::GameCore core(logpath, configpath);
 	std::string _what_test = "Loading";
@@ -108,14 +36,14 @@ int main() {
 
 	auto progress = progressbar_source.create("_load_progress");
 	progress->set(Work::progressbar::e_double::PROGRESS, 0.0);
-	progress->set(Work::progressbar::e_color::FOREGROUND_TOP_LEFT,		Interface::Color{67, 170, 185});
-	progress->set(Work::progressbar::e_color::FOREGROUND_BOTTOM_LEFT,	Interface::Color{51, 135, 142});
-	progress->set(Work::progressbar::e_color::FOREGROUND_TOP_RIGHT,		Interface::Color{95, 190, 236});
-	progress->set(Work::progressbar::e_color::FOREGROUND_BOTTOM_RIGHT,	Interface::Color{67, 155, 189});
-	progress->set(Work::progressbar::e_color::BACKGROUND_TOP_LEFT,		Interface::Color{9, 25, 50});
-	progress->set(Work::progressbar::e_color::BACKGROUND_BOTTOM_LEFT,	Interface::Color{4, 8, 29});
-	progress->set(Work::progressbar::e_color::BACKGROUND_TOP_RIGHT,		Interface::Color{16, 40, 55});
-	progress->set(Work::progressbar::e_color::BACKGROUND_BOTTOM_RIGHT,	Interface::Color{8, 17, 30});
+	progress->set(Work::progressbar::e_color::FOREGROUND_TOP_LEFT, Interface::Color{ 67, 170, 185 });
+	progress->set(Work::progressbar::e_color::FOREGROUND_BOTTOM_LEFT, Interface::Color{ 51, 135, 142 });
+	progress->set(Work::progressbar::e_color::FOREGROUND_TOP_RIGHT, Interface::Color{ 95, 190, 236 });
+	progress->set(Work::progressbar::e_color::FOREGROUND_BOTTOM_RIGHT, Interface::Color{ 67, 155, 189 });
+	progress->set(Work::progressbar::e_color::BACKGROUND_TOP_LEFT, Interface::Color{ 9, 25, 50 });
+	progress->set(Work::progressbar::e_color::BACKGROUND_BOTTOM_LEFT, Interface::Color{ 4, 8, 29 });
+	progress->set(Work::progressbar::e_color::BACKGROUND_TOP_RIGHT, Interface::Color{ 16, 40, 55 });
+	progress->set(Work::progressbar::e_color::BACKGROUND_BOTTOM_RIGHT, Interface::Color{ 8, 17, 30 });
 	progress->set(Work::progressbar::e_boolean::FIXED_BACKGROUND, true);
 	progress->set(Work::progressbar::e_double::BORDER_THICKNESS, 0.0); // disable
 	progress->set(Work::progressbar::e_double::SMOOTHNESS, 50.0);
@@ -148,7 +76,7 @@ int main() {
 	_text_early2->set(Work::sprite::e_boolean::DRAW, false);
 	_text_early2->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	_text_early2->set(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
-	_text_early2->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return "&f" + Tools::sprintf_a("%04.1lf%c", 100.0*progress->get_direct<double>(Work::progressbar::e_double_readonly::PROGRESS_SMOOTH), '%'); });
+	_text_early2->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return "&f" + Tools::sprintf_a("%04.1lf%c", 100.0 * progress->get_direct<double>(Work::progressbar::e_double_readonly::PROGRESS_SMOOTH), '%'); });
 	_text_early2->set(Work::sprite::e_double::TARG_POSX, 0.0);
 	_text_early2->set(Work::sprite::e_double::TARG_POSY, 0.7);
 	_text_early2->set(Work::sprite::e_double::SCALE_G, 0.055);
@@ -167,7 +95,7 @@ int main() {
 		_text_early->draw(cam);
 		_text_early2->draw(cam);
 		std::this_thread::sleep_for(std::chrono::milliseconds(15));
-	});
+		});
 
 	//progress->set<double>(Work::progressbar::e_double::TOP_BOTTOM_OFFSET, 0.1);
 
@@ -204,11 +132,11 @@ int main() {
 		else {
 			logg << L::SLF << fsr() << "Loaded font successfully." << L::ELF;
 		}
-		
+
 		pather.unapply();
 
 		return true;
-	});
+		});
 	early_work.wait();
 
 	Tools::Resource<Interface::Font> sfont;
@@ -226,34 +154,6 @@ int main() {
 
 
 	progress->set(Work::progressbar::e_double::PROGRESS, 10e-2);
-
-#ifdef TESTING_ALL
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
-	_what_test = "MultiTask test";
-
-	//autoabort_test(core);
-	multitask_test(core);
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
-	_what_test = "Sockets test";
-
-	{
-		double dd = 0.0;
-		progress->set<double>(Work::progressbar::e_double::PROGRESS, [&] {return 20e-2 + 60e-2 * dd; });
-
-		socketsys_test(core, &dd);
-	}
-
-	progress->set(Work::progressbar::e_double::PROGRESS, 80e-2);
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
-	_what_test = "SmartFile test";
-
-	smartfile_test(core);
-
-	progress->set(Work::progressbar::e_double::PROGRESS, 85e-2);
-#endif
 
 	//core.get_display().set_double_buffering_scale(0.3);
 
@@ -309,8 +209,8 @@ int main() {
 		pather.unapply();
 
 		return true;
-	});
-	
+		});
+
 	//auto got = working_on.get().get<Tools::Resource<Bitmap>>();
 
 	progress->set(Work::progressbar::e_double::PROGRESS, 90e-2);
@@ -378,7 +278,7 @@ int main() {
 
 		Logger logg;
 		logg << L::SL << fsr() << "SWITCH TEXT " << (__simple_texts ? "Y" : "N") << L::EL;
-	});
+		});
 
 
 	blk_height->set(Work::sprite::e_double::TARG_POSX, 0.99);
@@ -396,7 +296,7 @@ int main() {
 
 		Logger logg;
 		logg << L::SL << fsr() << "Y set to " << u[3] << L::EL;
-	});
+		});
 
 	blk_zoom->set(Work::sprite::e_double::TARG_POSX, -0.99);
 	blk_zoom->set(Work::sprite::e_double::TARG_POSY, 0.0);
@@ -414,7 +314,7 @@ int main() {
 
 		Logger logg;
 		logg << L::SL << fsr() << "Zoom set to " << pow(1.01 - u[3], 2.0) << "x" << L::EL;
-	});
+		});
 
 	blk_width->set(Work::sprite::e_double::TARG_POSX, 0.0);
 	blk_width->set(Work::sprite::e_double::TARG_POSY, 0.99);
@@ -431,7 +331,7 @@ int main() {
 
 		Logger logg;
 		logg << L::SL << fsr() << "X set to " << u[2] << L::EL;
-	});
+		});
 
 
 
@@ -452,17 +352,8 @@ int main() {
 
 	blk0->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](auto) {
 		Logger logg;
-#ifdef _DEBUG
-		logg << L::SL << fsr() << "Clicked." << L::EL;
-
-		logg << L::SL << fsr() << "0 UPDATE_DELTA: " << blk0->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
-		logg << L::SL << fsr() << "2 UPDATE_DELTA: " << blk_mouse->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
-		logg << L::SL << fsr() << "3 UPDATE_DELTA: " << blk3->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
-		logg << L::SL << fsr() << "4 UPDATE_DELTA: " << blk1->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
-#else
 		logg << L::SL << fsr() << "Uau vc sabe clicar, boa!" << L::EL;
-#endif
-	});
+		});
 
 
 	blk_mouse->set<double>(Work::sprite::e_double::TARG_POSX, [&] { return core.get_config().get_as<double>("mouse", "x"); });
@@ -545,7 +436,7 @@ int main() {
 	size_t __c = 0;
 
 
-	txt0->set<Tools::Cstring>(Work::text::e_cstring::STRING, 
+	txt0->set<Tools::Cstring>(Work::text::e_cstring::STRING,
 		[&core, &collision_control, &overlay_control, &__simple_texts] {
 			return (__simple_texts ? ("&a" + std::to_string(core.get_display().get_frames_per_second())) : (
 				"&5FPS: &a" + std::to_string(core.get_display().get_frames_per_second()) + (core.get_display().get_fps_cap() ? (" / " + std::to_string(core.get_display().get_fps_cap()) + " (limit)") : "") + (core.get_display().get_vsync() ? (" &6VSYNC SET") : " &bVSYNC UNSET") + "\n" +
@@ -571,9 +462,9 @@ int main() {
 
 	txtdebug->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] {
 		if (!__c) return std::string("&9Debug sync lost, please wait.");
-		return 
+		return
 			"&9DEBUG BMP/TEXT DRAW:\n" + sw.generate_table() + "\n&eTotal time draw: " + sw.get_string_between(0, sw.last_point_valid());
-	});
+		});
 	txtdebug->set(Work::sprite::e_double::TARG_POSX, -1.0);
 	txtdebug->set(Work::sprite::e_double::TARG_POSY, -0.69);
 	txtdebug->set(Work::sprite::e_double::SCALE_G, 0.052);
@@ -670,7 +561,7 @@ int main() {
 
 		core.get_display().add_draw_task([=, &__c, &sw](const Camera& c) {
 			///got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
-			
+
 			if (!__c) sw.start(); // 0
 			blk0->draw(c);
 			if (!__c) sw.click_one(); // 1
@@ -703,43 +594,7 @@ int main() {
 
 			if (++__c > 200) __c = 0;
 
-			/*
-			Tools::Stopwatch sw;
-			sw.prepare(14);
-
-			sw.start(); // 0
-			blk0->draw(c);
-			sw.click_one(); // 1
-			blk1->draw(c);
-			sw.click_one(); // 2
-			blk_mouse->draw(c);
-			sw.click_one(); // 3
-			blk3->draw(c);
-			sw.click_one(); // 4
-			blk_height->draw(c);
-			sw.click_one(); // 5
-			blk_width->draw(c);
-			sw.click_one(); // 6
-			txt0->draw(c);
-			sw.click_one(); // 7
-			txt1->draw(c);
-			sw.click_one(); // 8
-			txt2->draw(c);
-			sw.click_one(); // 9
-			txt3->draw(c);
-			sw.click_one(); // 10
-			txtu->draw(c);
-			sw.click_one(); // 11
-			txtf0->draw(c);
-			sw.click_one(); // 12
-			txtf1->draw(c);
-			sw.click_one(); // ...
-
-			Logger logg;
-			logg << L::SL << fsr() << "Stopwatch said:\n" << sw.generate_table() << L::EL;
-			*/
-
-		});
+			});
 	}
 
 	Tools::SuperResource<Track> tracks;
@@ -767,7 +622,7 @@ int main() {
 	pather.unapply();
 
 
-	
+
 	EventHandler fullscreen;
 	fullscreen.add(get_keyboard_event());
 	fullscreen.set_run_autostart([&](const RawEvent& ev) {
@@ -780,14 +635,14 @@ int main() {
 				logg << L::SL << fsr() << "Toggle Fullscreen called" << L::EL;
 				core.get_display().toggle_fullscreen();
 			}
-				break;
+			break;
 			case ALLEGRO_KEY_F:
 			{
 				logg << L::SL << fsr() << "Current FPS: &a" << core.get_display().get_frames_per_second() << L::EL;
 				logg << L::SL << fsr() << "&eOut of range errors: &7" << core.get_display().debug_errors_out_of_range_skip() << L::EL;
 				logg << L::SL << fsr() << "&eUnexpected errors: &7" << core.get_display().debug_errors_unexpected() << L::EL;
 			}
-				break;
+			break;
 			case ALLEGRO_KEY_P:
 			{
 				logg << L::SL << fsr() << "Play/Pause button called" << L::EL;
@@ -796,7 +651,7 @@ int main() {
 					else track->play();
 				}
 			}
-				break;
+			break;
 			case ALLEGRO_KEY_R:
 			{
 				logg << L::SL << fsr() << "Reverse/Continuous button called" << L::EL;
@@ -804,7 +659,7 @@ int main() {
 					track->set_speed(-track->get_speed());
 				}
 			}
-				break;
+			break;
 			case ALLEGRO_KEY_MINUS:
 			{
 				logg << L::SL << fsr() << "SlowDown button called" << L::EL;
@@ -813,7 +668,7 @@ int main() {
 					logg << L::SL << fsr() << "Now speed = " << track->get_speed() << "x" << L::EL;
 				}
 			}
-				break;
+			break;
 			case ALLEGRO_KEY_EQUALS:
 			{
 				logg << L::SL << fsr() << "Accel button called" << L::EL;
@@ -822,7 +677,7 @@ int main() {
 					logg << L::SL << fsr() << "Now speed = " << track->get_speed() << "x" << L::EL;
 				}
 			}
-				break;
+			break;
 			case ALLEGRO_KEY_PAD_MINUS:
 			{
 				logg << L::SL << fsr() << "PAD- button called" << L::EL;
@@ -832,7 +687,7 @@ int main() {
 
 				logg << L::SL << fsr() << "Now volume = " << vol << "." << L::EL;
 			}
-				break;
+			break;
 			case ALLEGRO_KEY_PAD_PLUS:
 			{
 				logg << L::SL << fsr() << "PAD+ button called" << L::EL;
@@ -842,7 +697,7 @@ int main() {
 
 				logg << L::SL << fsr() << "Now volume = " << vol << "." << L::EL;
 			}
-				break;
+			break;
 			case ALLEGRO_KEY_COMMA: // ,
 			{
 				logg << L::SL << fsr() << "< called, reducing fps cap by 5..." << L::EL;
@@ -850,22 +705,22 @@ int main() {
 				if (d.get_fps_cap() >= 5) d.set_fps_cap(d.get_fps_cap() - 5);
 				else d.set_fps_cap(0);
 			}
-				break;
+			break;
 			case ALLEGRO_KEY_FULLSTOP: // .
 			{
 				logg << L::SL << fsr() << "> called, raising fps cap by 5..." << L::EL;
 				auto& d = core.get_display();
 				d.set_fps_cap(d.get_fps_cap() + 5);
 			}
-				break;
-			case ALLEGRO_KEY_V: 
+			break;
+			case ALLEGRO_KEY_V:
 			{
 				logg << L::SL << fsr() << "V called, vsync switch (reopen app to set)." << L::EL;
 				auto& d = core.get_display();
 				d.set_vsync(!d.get_vsync());
 			}
-				break;
-			case ALLEGRO_KEY_L: 
+			break;
+			case ALLEGRO_KEY_L:
 			{
 				auto dbuffs = core.get_display().get_current_buffering_scale();
 				if (dbuffs >= 0.05) {
@@ -878,16 +733,16 @@ int main() {
 					logg << L::SL << fsr() << "L called, but already disabled double buffering!" << L::EL;
 				}
 			}
-				break;
-			case ALLEGRO_KEY_O: 
+			break;
+			case ALLEGRO_KEY_O:
 			{
 				auto dbuffs = core.get_display().get_current_buffering_scale();
 				dbuffs += 0.05;
 				logg << L::SL << fsr() << "O called, trying to increase dbuffer to " << Tools::sprintf_a("%.0lf", 100.0 * dbuffs) << "%..." << L::EL;
 				core.get_display().set_double_buffering_scale(dbuffs);
 			}
-				break;
-			case ALLEGRO_KEY_F1: 
+			break;
+			case ALLEGRO_KEY_F1:
 			{
 				auto d = 1.0 / collision_control.get_speed();
 				if (d < 0.0) {
@@ -911,8 +766,8 @@ int main() {
 				logg << L::SL << fsr() << "Slowing down collision system, now at " << (int)d << " tps." << L::EL;
 				collision_control.set_speed(1.0 / d);
 			}
-				break;
-			case ALLEGRO_KEY_F2: 
+			break;
+			case ALLEGRO_KEY_F2:
 			{
 				auto d = 1.0 / collision_control.get_speed();
 				if (d < 0.0) {
@@ -935,16 +790,16 @@ int main() {
 				logg << L::SL << fsr() << "Accelerating collision system, now at " << (int)d << " tps." << L::EL;
 				collision_control.set_speed(1.0 / d);
 			}
-				break;
+			break;
 			default:
 			{
 				logg << L::SL << fsr() << "KEY pressed: &5" << ev.keyboard_event().keycode << L::EL;
 			}
-				break;
+			break;
 			}
 			break;
 		}
-	});
+		});
 
 	core.yield();
 
@@ -966,7 +821,7 @@ int main() {
 	return 0;
 }
 
-void check_file_download(Work::GameCore& core)
+void check_file_download(Work::GameCore & core)
 {
 	Logger logg;
 
@@ -977,11 +832,10 @@ void check_file_download(Work::GameCore& core)
 		core.get_config().set("registry", "times_open", val + 1);
 
 		bool download_this = false;
-#ifndef _DEBUG
+
 		if (need_texture_update && core.get_config().has(Work::gamecore::conf_versioning, "automatic version")) {
 			download_this |= core.get_config().get(Work::gamecore::conf_versioning, "automatic version") != Work::version_app;
 		}
-#endif
 
 		std::string cpy = datapath;
 		Handling::handle_path(cpy);
@@ -990,7 +844,7 @@ void check_file_download(Work::GameCore& core)
 		if (download_this) {// || (val % 15 == 0 && !val)
 			//if (size <= 0) logg << L::SLF << fsr() << "&cData files not found." << L::ELF;
 			//else logg << L::SLF << fsr() << "&5After 15 times opening/closing, I'll update the zip just to be sure." << L::ELF;
-						
+
 			logg << L::SLF << fsr() << "&cNew version or file not found. Downloading latest resource pack..." << L::ELF;
 
 			logg << L::SLF << fsr() << "Downloading..." << L::ELF;
@@ -999,7 +853,7 @@ void check_file_download(Work::GameCore& core)
 			auto fut = down.get_async(resource_url);
 
 			while (!fut.get_ready(1000)) {
-				logg << L::SLF << fsr()  << "This may take a while, please wait... (downloaded " << Tools::byte_auto_string(down.bytes_read()) << "b)" << L::ELF;
+				logg << L::SLF << fsr() << "This may take a while, please wait... (downloaded " << Tools::byte_auto_string(down.bytes_read()) << "b)" << L::ELF;
 			}
 
 			logg << L::SLF << fsr() << "Opening file to save downloaded zip (size " << Tools::byte_auto_string(down.bytes_read()) << "b)..." << L::ELF;
@@ -1027,7 +881,7 @@ void check_file_download(Work::GameCore& core)
 }
 
 
-void multitask_test(Work::GameCore& core)
+void multitask_test(Work::GameCore & core)
 {
 	Logger logg;
 
@@ -1059,7 +913,7 @@ void multitask_test(Work::GameCore& core)
 
 }
 
-void socketsys_test(Work::GameCore& core, double* progression)
+void socketsys_test(Work::GameCore & core, double* progression)
 {
 	*progression = 0e-2;
 	Logger logg;
@@ -1131,7 +985,7 @@ void socketsys_test(Work::GameCore& core, double* progression)
 
 }
 
-void smartfile_test(Work::GameCore& core)
+void smartfile_test(Work::GameCore & core)
 {
 	Logger logg;
 
@@ -1178,7 +1032,7 @@ void smartfile_test(Work::GameCore& core)
 
 }
 
-void pathmngr_debug(Work::GameCore& core, const Interface::PathManager& pather)
+void pathmngr_debug(Work::GameCore & core, const Interface::PathManager & pather)
 {
 	Logger logg;
 

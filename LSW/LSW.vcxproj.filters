@@ -1,6 +1,122 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Handling\Abort\abort.cpp">
+      <Filter>LSW\0. Handling\Abort</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Handling\Initialize\initialize.cpp">
+      <Filter>LSW\0. Handling\Initialize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Tools\CString\cstring.cpp">
+      <Filter>LSW\1. Tools\CString</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Handling\Path\path.cpp">
+      <Filter>LSW\0. Handling\Path</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Tools\Common\common.cpp">
+      <Filter>LSW\1. Tools\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Tools\Hash\hash.cpp">
+      <Filter>LSW\1. Tools\Hash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Tools\Launcher\launcher.cpp">
+      <Filter>LSW\1. Tools\Launcher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Logger\logger.cpp">
+      <Filter>LSW\2. Interface\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Tools\SuperMutex\supermutex.cpp">
+      <Filter>LSW\1. Tools\SuperMutex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Bitmap\bitmap.cpp">
+      <Filter>LSW\2. Interface\Bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Color\color.cpp">
+      <Filter>LSW\2. Interface\Color</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Font\font.cpp">
+      <Filter>LSW\2. Interface\Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Events\events.cpp">
+      <Filter>LSW\2. Interface\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Camera\camera.cpp">
+      <Filter>LSW\2. Interface\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Config\config.cpp">
+      <Filter>LSW\2. Interface\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Downloader\downloader.cpp">
+      <Filter>LSW\2. Interface\Downloader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Voice\voice.cpp">
+      <Filter>LSW\2. Interface\Voice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Mixer\mixer.cpp">
+      <Filter>LSW\2. Interface\Mixer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Track\track.cpp">
+      <Filter>LSW\2. Interface\Track</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Sample\sample.cpp">
+      <Filter>LSW\2. Interface\Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Connection\connection.cpp">
+      <Filter>LSW\2. Interface\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\SmartFile\smartfile.cpp">
+      <Filter>LSW\2. Interface\SmartFile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\PathManager\pathmanager.cpp">
+      <Filter>LSW\2. Interface\PathManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\EventTimer\eventtimer.cpp">
+      <Filter>LSW\2. Interface\EventTimer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\EventCustom\eventcustom.cpp">
+      <Filter>LSW\2. Interface\EventCustom</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\Sprite\sprite.cpp">
+      <Filter>LSW\3. Work\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\GameCore\gamecore.cpp">
+      <Filter>LSW\3. Work\GameCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\Block\block.cpp">
+      <Filter>LSW\3. Work\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\Collisioner\collisioner.cpp">
+      <Filter>LSW\3. Work\Collisioner</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Tools\Stopwatch\stopwatch.cpp">
+      <Filter>LSW\1. Tools\StopWatch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Display\display.cpp">
+      <Filter>LSW\2. Interface\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\Text\text.cpp">
+      <Filter>LSW\3. Work\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Target\target.cpp">
+      <Filter>LSW\2. Interface\Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\ProgressBar\progressbar.cpp">
+      <Filter>LSW\3. Work\ProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Interface\Vertex\vertex.cpp">
+      <Filter>LSW\2. Interface\Vertex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Tools\SuperThread\superthread.cpp">
+      <Filter>LSW\1. Tools\SuperThread</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
@@ -173,9 +289,6 @@
     <Filter Include="LSW\1. Tools\Resource">
       <UniqueIdentifier>{12ee796f-4e5b-4e8d-9ed4-5a7d0859388c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="test">
-      <UniqueIdentifier>{a13893d5-1488-4c07-9ec6-da8bb1b6cb13}</UniqueIdentifier>
-    </Filter>
     <Filter Include="LSW\3. Work\ProgressBar">
       <UniqueIdentifier>{15fb7401-e1b6-4f1e-8823-07e50487039d}</UniqueIdentifier>
     </Filter>
@@ -184,308 +297,187 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Handling\Abort\abort.cpp">
-      <Filter>LSW\0. Handling\Abort</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Handling\Initialize\initialize.cpp">
-      <Filter>LSW\0. Handling\Initialize</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Tools\CString\cstring.cpp">
-      <Filter>LSW\1. Tools\CString</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Handling\Path\path.cpp">
-      <Filter>LSW\0. Handling\Path</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Tools\Common\common.cpp">
-      <Filter>LSW\1. Tools\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Tools\Hash\hash.cpp">
-      <Filter>LSW\1. Tools\Hash</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Tools\Launcher\launcher.cpp">
-      <Filter>LSW\1. Tools\Launcher</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Logger\logger.cpp">
-      <Filter>LSW\2. Interface\Logger</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Tools\SuperMutex\supermutex.cpp">
-      <Filter>LSW\1. Tools\SuperMutex</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Bitmap\bitmap.cpp">
-      <Filter>LSW\2. Interface\Bitmap</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Color\color.cpp">
-      <Filter>LSW\2. Interface\Color</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Font\font.cpp">
-      <Filter>LSW\2. Interface\Font</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Events\events.cpp">
-      <Filter>LSW\2. Interface\Events</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Camera\camera.cpp">
-      <Filter>LSW\2. Interface\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Config\config.cpp">
-      <Filter>LSW\2. Interface\Config</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Downloader\downloader.cpp">
-      <Filter>LSW\2. Interface\Downloader</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Voice\voice.cpp">
-      <Filter>LSW\2. Interface\Voice</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Mixer\mixer.cpp">
-      <Filter>LSW\2. Interface\Mixer</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Track\track.cpp">
-      <Filter>LSW\2. Interface\Track</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Sample\sample.cpp">
-      <Filter>LSW\2. Interface\Sample</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Connection\connection.cpp">
-      <Filter>LSW\2. Interface\Connection</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\SmartFile\smartfile.cpp">
-      <Filter>LSW\2. Interface\SmartFile</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\PathManager\pathmanager.cpp">
-      <Filter>LSW\2. Interface\PathManager</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\EventTimer\eventtimer.cpp">
-      <Filter>LSW\2. Interface\EventTimer</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\EventCustom\eventcustom.cpp">
-      <Filter>LSW\2. Interface\EventCustom</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Work\Sprite\sprite.cpp">
-      <Filter>LSW\3. Work\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Work\GameCore\gamecore.cpp">
-      <Filter>LSW\3. Work\GameCore</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Work\Block\block.cpp">
-      <Filter>LSW\3. Work\Block</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Work\Collisioner\collisioner.cpp">
-      <Filter>LSW\3. Work\Collisioner</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Tools\Stopwatch\stopwatch.cpp">
-      <Filter>LSW\1. Tools\StopWatch</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Display\display.cpp">
-      <Filter>LSW\2. Interface\Display</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Work\Text\text.cpp">
-      <Filter>LSW\3. Work\Text</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Target\target.cpp">
-      <Filter>LSW\2. Interface\Target</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Work\ProgressBar\progressbar.cpp">
-      <Filter>LSW\3. Work\ProgressBar</Filter>
-    </ClCompile>
-    <ClCompile Include="LSW\Interface\Vertex\vertex.cpp">
-      <Filter>LSW\2. Interface\Vertex</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="older_tests.txt">
-      <Filter>Source Files</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="LSW\Handling\Abort\abort.h">
+    <ClInclude Include="..\LSW_final\LSW\Handling\Abort\abort.h">
       <Filter>LSW\0. Handling\Abort</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Handling\Initialize\initialize.h">
+    <ClInclude Include="..\LSW_final\LSW\Handling\Initialize\initialize.h">
       <Filter>LSW\0. Handling\Initialize</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\CString\cstring.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\CString\cstring.h">
       <Filter>LSW\1. Tools\CString</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Handling\Path\path.h">
+    <ClInclude Include="..\LSW_final\LSW\Handling\Path\path.h">
       <Filter>LSW\0. Handling\Path</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Common\common.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Common\common.h">
       <Filter>LSW\1. Tools\Common</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Tools.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Tools.h">
       <Filter>LSW\1. Tools\_include</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Hash\hash.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Hash\hash.h">
       <Filter>LSW\1. Tools\Hash</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Launcher\launcher.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Launcher\launcher.h">
       <Filter>LSW\1. Tools\Launcher</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Logger\logger.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Logger\logger.h">
       <Filter>LSW\2. Interface\Logger</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperThread\superthread.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperThread\superthread.h">
       <Filter>LSW\1. Tools\SuperThread</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperResource\superresource.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperResource\superresource.h">
       <Filter>LSW\1. Tools\SuperResource</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperMutex\supermutex.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperMutex\supermutex.h">
       <Filter>LSW\1. Tools\SuperMutex</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperMap\supermap.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperMap\supermap.h">
       <Filter>LSW\1. Tools\SuperMap</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperPair\superpair.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperPair\superpair.h">
       <Filter>LSW\1. Tools\SuperPair</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Interface.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Interface.h">
       <Filter>LSW\2. Interface\_include</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\LSWv5.h">
+    <ClInclude Include="..\LSW_final\LSW\LSWv5.h">
       <Filter>LSW</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Handling\Handling.h">
+    <ClInclude Include="..\LSW_final\LSW\Handling\Handling.h">
       <Filter>LSW\0. Handling\_include</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperFunctionalMap\superfunctionalmap.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperFunctionalMap\superfunctionalmap.h">
       <Filter>LSW\1. Tools\SuperFunctionalMap</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Future\future.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Future\future.h">
       <Filter>LSW\1. Tools\Future</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Display\display.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Display\display.h">
       <Filter>LSW\2. Interface\Display</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Bitmap\bitmap.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Bitmap\bitmap.h">
       <Filter>LSW\2. Interface\Bitmap</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Color\color.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Color\color.h">
       <Filter>LSW\2. Interface\Color</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Font\font.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Font\font.h">
       <Filter>LSW\2. Interface\Font</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Any\any.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Any\any.h">
       <Filter>LSW\1. Tools\Any</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Events\events.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Events\events.h">
       <Filter>LSW\2. Interface\Events</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Camera\camera.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Camera\camera.h">
       <Filter>LSW\2. Interface\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Config\config.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Config\config.h">
       <Filter>LSW\2. Interface\Config</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Downloader\downloader.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Downloader\downloader.h">
       <Filter>LSW\2. Interface\Downloader</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Voice\voice.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Voice\voice.h">
       <Filter>LSW\2. Interface\Voice</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Mixer\mixer.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Mixer\mixer.h">
       <Filter>LSW\2. Interface\Mixer</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Track\track.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Track\track.h">
       <Filter>LSW\2. Interface\Track</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Sample\sample.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Sample\sample.h">
       <Filter>LSW\2. Interface\Sample</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Connection\connection.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Connection\connection.h">
       <Filter>LSW\2. Interface\Connection</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\SmartFile\smartfile.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\SmartFile\smartfile.h">
       <Filter>LSW\2. Interface\SmartFile</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\PathManager\pathmanager.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\PathManager\pathmanager.h">
       <Filter>LSW\2. Interface\PathManager</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\EventTimer\eventtimer.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\EventTimer\eventtimer.h">
       <Filter>LSW\2. Interface\EventTimer</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\EventCustom\eventcustom.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\EventCustom\eventcustom.h">
       <Filter>LSW\2. Interface\EventCustom</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Work\Work.h">
+    <ClInclude Include="..\LSW_final\LSW\Work\Work.h">
       <Filter>LSW\3. Work\_include</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Work\Sprite\sprite.h">
+    <ClInclude Include="..\LSW_final\LSW\Work\Sprite\sprite.h">
       <Filter>LSW\3. Work\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Work\GameCore\gamecore.h">
+    <ClInclude Include="..\LSW_final\LSW\Work\GameCore\gamecore.h">
       <Filter>LSW\3. Work\GameCore</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\AdvancedShared\advancedshared.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\AdvancedShared\advancedshared.h">
       <Filter>LSW\1. Tools\AdvancedShared</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Work\Block\block.h">
+    <ClInclude Include="..\LSW_final\LSW\Work\Block\block.h">
       <Filter>LSW\3. Work\Block</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Work\Collisioner\collisioner.h">
+    <ClInclude Include="..\LSW_final\LSW\Work\Collisioner\collisioner.h">
       <Filter>LSW\3. Work\Collisioner</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\FastFunction\fastfunction.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\FastFunction\fastfunction.h">
       <Filter>LSW\1. Tools\FastFunction</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Work\Text\text.h">
+    <ClInclude Include="..\LSW_final\LSW\Work\Text\text.h">
       <Filter>LSW\3. Work\Text</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Stopwatch\stopwatch.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Stopwatch\stopwatch.h">
       <Filter>LSW\1. Tools\StopWatch</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\AdvancedShared\advancedshared.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\AdvancedShared\advancedshared.ipp">
       <Filter>LSW\1. Tools\AdvancedShared</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Any\any.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Any\any.ipp">
       <Filter>LSW\1. Tools\Any</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\FastFunction\fastfunction.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\FastFunction\fastfunction.ipp">
       <Filter>LSW\1. Tools\FastFunction</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Future\future.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Future\future.ipp">
       <Filter>LSW\1. Tools\Future</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperFunctionalMap\superfunctionalmap.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperFunctionalMap\superfunctionalmap.ipp">
       <Filter>LSW\1. Tools\SuperFunctionalMap</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperMap\supermap.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperMap\supermap.ipp">
       <Filter>LSW\1. Tools\SuperMap</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperPair\superpair.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperPair\superpair.ipp">
       <Filter>LSW\1. Tools\SuperPair</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperResource\superresource.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperResource\superresource.ipp">
       <Filter>LSW\1. Tools\SuperResource</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\SuperThread\superthread.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\SuperThread\superthread.ipp">
       <Filter>LSW\1. Tools\SuperThread</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Resource\resource.h">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Resource\resource.h">
       <Filter>LSW\1. Tools\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Tools\Resource\resource.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Tools\Resource\resource.ipp">
       <Filter>LSW\1. Tools\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Work\GameCore\gamecore.ipp">
-      <Filter>LSW\3. Work\GameCore</Filter>
-    </ClInclude>
-    <ClInclude Include="LSW\Interface\Config\config.ipp">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Config\config.ipp">
       <Filter>LSW\2. Interface\Config</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Target\target.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Target\target.h">
       <Filter>LSW\2. Interface\Target</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Work\ProgressBar\progressbar.h">
+    <ClInclude Include="..\LSW_final\LSW\Work\ProgressBar\progressbar.h">
       <Filter>LSW\3. Work\ProgressBar</Filter>
     </ClInclude>
-    <ClInclude Include="LSW\Interface\Vertex\vertex.h">
+    <ClInclude Include="..\LSW_final\LSW\Interface\Vertex\vertex.h">
       <Filter>LSW\2. Interface\Vertex</Filter>
     </ClInclude>
   </ItemGroup>
