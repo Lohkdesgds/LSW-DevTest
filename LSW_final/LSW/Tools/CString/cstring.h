@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../../Handling/Abort/abort.h"
+#include "../Common/common.h"
 
 namespace LSW {
 	namespace v5 {
@@ -19,9 +20,14 @@ namespace LSW {
 				const bool operator!=(const char_c o) const { return ch != o.ch || cr != o.cr; }
 			};
 
+			/// <summary>
+			/// <para>String, but with colors. Only 16 colors are supported. &HEX translates to color, like "&1Blue &4Red &6Gold &fstrings".</para>
+			/// </summary>
 			class Cstring {
 				std::vector<char_c> str;
 				cstring::C last_added_color = cstring::C::WHITE; /// THIS CHANGES WITH +=, clear(), pop() and stuff!
+
+				Cstring _update(const Cstring&);
 			public:
 				Cstring() = default;
 
@@ -41,10 +47,17 @@ namespace LSW {
 				/// <para>Constructor copy.</para>
 				/// </summary>
 				/// <param name="{T}">Copies if possible.</param>
-				template<typename T> Cstring(const T& u) {
+				template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
+				Cstring(const T& u) {
 					clear();
 					append(u);
 				}
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{char*}">Copies if possible.</param>
+				Cstring(const char* u);
 
 				/// <summary>
 				/// <para>Search for a char.</para>
@@ -88,8 +101,6 @@ namespace LSW {
 				/// <returns>{size_t} Position or -1 if not found.</returns>
 				const size_t find(const Cstring&) const;
 
-
-
 				/// <summary>
 				/// <para>Trim the Cstring.</para>
 				/// </summary>
@@ -104,7 +115,6 @@ namespace LSW {
 				/// <returns>{std::string} The string.</returns>
 				std::string s_str() const;
 
-
 				/// <summary>
 				/// <para>Pops out the back.</para>
 				/// </summary>
@@ -112,11 +122,30 @@ namespace LSW {
 				char_c pop();
 
 				/// <summary>
+				/// <para>Pops out the back, but ensures to not break a utf8 combined char.</para>
+				/// </summary>
+				void pop_utf8();
+
+				/// <summary>
 				/// <para>The size of the string.</para>
 				/// </summary>
 				/// <returns>{size_t} The string size.</returns>
 				size_t size() const;
 
+				/// <summary>
+				/// <para>Are there some &4Colors not processed? You can try to refresh itself.</para>
+				/// </summary>
+				Cstring& refresh();
+
+				/// <summary>
+				/// <para>Appends a type T string.</para>
+				/// </summary>
+				/// <param name="{T}">The T to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				/*template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
+				Cstring& append(const T& u) {
+					return this->append(std::to_string(u));
+				}*/
 
 				/// <summary>
 				/// <para>Appends strings.</para>
@@ -124,17 +153,6 @@ namespace LSW {
 				/// <param name="{Cstring}">The string to append.</param>
 				/// <returns>{Cstring} Itself.</returns>
 				Cstring& append(const Cstring&);
-
-				/// <summary>
-				/// <para>Appends char string.</para>
-				/// </summary>
-				/// <param name="{char[]}">The string to append.</param>
-				/// <returns>{Cstring} Itself.</returns>
-				template<size_t siz>
-				Cstring& append(const char(&oth)[siz]) {
-					std::string aa = oth;
-					return (this->operator+=(aa));
-				}
 
 				/// <summary>
 				/// <para>Appends string.</para>
@@ -186,42 +204,54 @@ namespace LSW {
 				Cstring& append(const cstring::C&);
 
 				/// <summary>
-				/// <para>Appends a type T string.</para>
-				/// </summary>
-				/// <param name="{T}">The T to append.</param>
-				/// <returns>{Cstring} Itself.</returns>
-				template<typename T>
-				Cstring& append(const T& u) {
-					return this->append(std::to_string(u));
-				}
-
-				/// <summary>
 				/// <para>Appends a type T.</para>
 				/// </summary>
 				/// <param name="{T}">The T to append.</param>
 				/// <returns>{Cstring} Itself.</returns>
-				template<typename T> Cstring& operator+=(const T& u) {
+				template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
+				Cstring& operator+=(const T& u) {
 					return this->append(u);
 				};
+
+				/// <summary>
+				/// <para>Appends a type char*.</para>
+				/// </summary>
+				/// <param name="{char*}">The string to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring& operator+=(const char*);
 
 				/// <summary>
 				/// <para>Appends a type T.</para>
 				/// </summary>
 				/// <param name="{T}">The T to append.</param>
 				/// <returns>{Cstring} Result.</returns>
-				template<typename T> Cstring operator+(const T& u) {
+				template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
+				Cstring operator+(const T& u) const {
 					Cstring a = *this;
 					return a.append(u);
 				};
+				/// <summary>
+				/// <para>Appends a type char*.</para>
+				/// </summary>
+				/// <param name="{char*}">The string to append.</param>
+				/// <returns>{Cstring} Result.</returns>
+				Cstring operator+(const char*) const;
 
 				/// <summary>
 				/// <para>Clears and set T as value.</para>
 				/// </summary>
 				/// <param name="{T}">The T to set.</param>
-				template<typename T> void operator=(const T& u) {
+				template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
+				void operator=(const T& u) {
 					clear();
 					append(u);
 				};
+
+				/// <summary>
+				/// <para>Clears and set char* as value.</para>
+				/// </summary>
+				/// <param name="{char*}">The string to set.</param>
+				void operator=(const char*);
 
 				/// <summary>
 				/// <para>Copy operator.</para>
@@ -326,9 +356,6 @@ namespace LSW {
 				Cstring filter_ascii_range(const char = 32, const char = 126) const;
 			};
 
-
-			//Cstring operator+(const char[], const Cstring&);
-			Cstring operator+(const std::string&, const Cstring&);
 		}
 	}
 }

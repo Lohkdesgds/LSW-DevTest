@@ -129,7 +129,6 @@ namespace LSW {
 				was_col = false;
 			}
 
-
 			Sprite_Base::Sprite_Base()
 			{
 				Handling::init_basic();
@@ -195,7 +194,7 @@ namespace LSW {
 				if (!run_anyway && get_direct<uintptr_t>(sprite::e_uintptrt::DATA_FROM) != (uintptr_t)this) return;  // only original copy should update parameters
 				if (is_eq(sprite::e_boolean::DRAW, false)) return;
 
-				//if (is_eq(sprite::e_boolean::SHOWBOX, true) || is_eq(sprite::e_boolean::SHOWDOT, true)) {
+				//if (is_eq(sprite::e_boolean::DRAW_COLOR_BOX, true) || is_eq(sprite::e_boolean::DRAW_DOT, true)) {
 
 				const auto affected_by_cam = get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM);
 				const auto targ_rotation = get_direct<double>(sprite::e_double::TARG_ROTATION);
@@ -245,31 +244,37 @@ namespace LSW {
 					set(sprite::e_double_readonly::PERC_CALC_SMOOTH, perc_run);
 				}
 
-				if (is_eq(sprite::e_boolean::SHOWBOX, true)) {
+				const double calculated_scale_x = scale_g * scale_x;
+				const double calculated_scale_y = scale_g * scale_y;
 
-					const double calculated_scale_x = scale_g * scale_x;
-					const double calculated_scale_y = scale_g * scale_y;
+				if (is_eq(sprite::e_boolean::DRAW_COLOR_BOX, true)) {
 
 					al_draw_filled_rectangle(
 						/* X1: */ real_targ_posx - calculated_scale_x * 0.5,
 						/* Y1: */ real_targ_posy - calculated_scale_y * 0.5,
 						/* X2: */ real_targ_posx + calculated_scale_x * 0.5,
 						/* Y2: */ real_targ_posy + calculated_scale_y * 0.5,
-						al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
+						get_direct<Interface::Color>(sprite::e_color::COLOR) //al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90)
+					);
+				}
+				if (is_eq(sprite::e_boolean::DRAW_DEBUG_BOX, true)) {
+
 					al_draw_filled_rectangle(
 						/* X1: */ real_targ_posx - calculated_scale_x * 0.515,
 						/* Y1: */ real_targ_posy - calculated_scale_y * 0.515,
 						/* X2: */ real_targ_posx + calculated_scale_x * 0.515,
 						/* Y2: */ real_targ_posy + calculated_scale_y * 0.515,
-						al_map_rgba(180, easy_collision.was_col ? 90 : 180, easy_collision.was_col ? 90 : 180, 180));
+						Interface::Color(180, easy_collision.was_col ? 90 : 180, easy_collision.was_col ? 90 : 180, 180)
+					);
 				}
 
-				if (is_eq(sprite::e_boolean::SHOWDOT, true)) {
+				if (is_eq(sprite::e_boolean::DRAW_DOT, true)) {
 					al_draw_filled_circle(
 						/* X1: */ posx_v,
 						/* X1: */ posy_v,
 						/* SCL */ 0.05f,
-						al_map_rgba(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90));
+						Interface::Color(90, easy_collision.was_col ? 45 : 90, easy_collision.was_col ? 45 : 90, 90)
+					);
 				}
 				//}
 					
@@ -423,6 +428,8 @@ namespace LSW {
 					sprite::e_tie_functional last_state = get_direct<sprite::e_tie_functional>(sprite::e_tief_readonly::LAST_STATE);
 					sprite::e_tie_functional new_state{};
 
+					const bool old_was_mouse = (static_cast<int>(last_state) >= static_cast<int>(sprite::e_tie_functional::_MOUSE_BEGIN)) && (static_cast<int>(last_state) <= static_cast<int>(sprite::e_tie_functional::_MOUSE_END));
+
 					if (mouse_collide) {
 						if (is_mouse_pressed) {
 							new_state = sprite::e_tie_functional::COLLISION_MOUSE_CLICK;
@@ -442,12 +449,20 @@ namespace LSW {
 						new_state = sprite::e_tie_functional::COLLISION_NONE;
 					}
 
+					const bool new_is_mouse = (static_cast<int>(new_state) >= static_cast<int>(sprite::e_tie_functional::_MOUSE_BEGIN)) && (static_cast<int>(new_state) <= static_cast<int>(sprite::e_tie_functional::_MOUSE_END));
+
 					set(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE, get_direct<bool>(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE) || (fabs(m[0] - mouse_b4[0]) >= sprite::move_accept_move_max_as_none) || (fabs(m[1] - mouse_b4[1]) >= sprite::move_accept_move_max_as_none));
 
 					if (new_state != last_state) {
 
 						Tools::Any ref;
-						if ((static_cast<int>(new_state) >= static_cast<int>(sprite::e_tie_functional::_MOUSE_BEGIN)) && (static_cast<int>(new_state) <= static_cast<int>(sprite::e_tie_functional::_MOUSE_END))) ref = m;
+						if (new_is_mouse) ref = m;
+
+						// if was mouse, hm
+						if (old_was_mouse && !new_is_mouse) {
+							if (auto f = get_direct<sprite::functional>(sprite::e_tie_functional::COLLISION_MOUSE_OFF); f) f(ref);
+							this->mouse_event(sprite::e_tie_functional::COLLISION_MOUSE_OFF, ref);
+						}
 
 						if (!invalid_nomove) {
 							switch (new_state) {
@@ -455,6 +470,7 @@ namespace LSW {
 							{
 								if (!get_direct<bool>(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE)) {
 									if (auto f = get_direct<sprite::functional>(sprite::e_tie_functional::COLLISION_MOUSE_CLICK_NOMOVE); f) f(ref);
+									this->mouse_event(sprite::e_tie_functional::COLLISION_MOUSE_CLICK_NOMOVE, ref);
 								}
 
 								set(sprite::e_double_readonly::MOUSE_CLICK_LAST_X, m[0]);
@@ -466,6 +482,7 @@ namespace LSW {
 							{
 								if (!get_direct<bool>(sprite::e_boolean_readonly::INVALIDATE_MOUSE_NOMOVE)) {
 									if (auto f = get_direct<sprite::functional>(sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK_NOMOVE); f) f(ref);
+									this->mouse_event(sprite::e_tie_functional::COLLISION_MOUSE_UNCLICK_NOMOVE, ref);
 								}
 
 								set(sprite::e_double_readonly::MOUSE_CLICK_LAST_X, m[0]);
@@ -479,6 +496,7 @@ namespace LSW {
 						set<sprite::e_tie_functional>(sprite::e_tief_readonly::LAST_STATE, new_state);
 
 						if (auto f = get_direct<sprite::functional>(new_state); !avoid_trigger && f) f(ref);
+						this->mouse_event(new_state, ref);
 					}
 
 

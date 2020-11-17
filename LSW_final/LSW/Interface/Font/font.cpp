@@ -152,11 +152,24 @@ namespace LSW {
 			void Font::draw(const float x, const float y, const int f, Tools::Cstring s) const
 			{
 				if (auto q = quick(); q) {
+					double compensate = 0.0;
+					if (f != 0) {
+						switch (f) {
+						case ALLEGRO_ALIGN_CENTER:
+							compensate = 0.5;
+							break;
+						case ALLEGRO_ALIGN_RIGHT:
+							compensate = 1.0;
+							break;
+						}
+					}
+
+
 					std::string thebuff;
-					int offset_x_f = 0;
+					int offset_x_f = - compensate * al_get_text_width(q, s.s_str().c_str());
 					Tools::char_c* data_ = s.data();
 
-					for (size_t p = 0; p < s.size();/* p++*/) { // p++ there
+					for (size_t p = 0; p < s.size();/* p++*/) { // p++ there down vvv
 
 						auto clr_now = hex(static_cast<int>(data_->cr));
 
@@ -166,7 +179,7 @@ namespace LSW {
 							p++;
 						}
 
-						al_draw_text(q, clr_now, offset_x_f + x, y, f, thebuff.c_str());
+						al_draw_text(q, clr_now, offset_x_f + x, y, 0, thebuff.c_str());
 
 						offset_x_f += al_get_text_width(q, thebuff.c_str());
 						thebuff.clear();

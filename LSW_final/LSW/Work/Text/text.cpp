@@ -8,6 +8,11 @@ namespace LSW {
 			{
 				const auto delta_t = get_direct<std::chrono::milliseconds>(text::e_chronomillis_readonly::LAST_UPDATE_STRING);
 				const auto ups_val = get_direct<double>(text::e_double::UPDATES_PER_SECOND);
+				const auto max_length_total = get_direct<int>(text::e_integer::TOTAL_TEXT_MAX_LENGTH);
+				const auto max_length_line = get_direct<int>(text::e_integer::LINE_MAX_LENGTH);
+				const auto max_lines = get_direct<int>(text::e_integer::MAX_LINES_AMOUNT);
+
+				//TOTAL_TEXT_MAX_LENGTH, LINE_MAX_LENGTH, MAX_LINES_AMOUNT
 
 				bool instantaneous = ups_val <= 0.0;
 
@@ -18,23 +23,32 @@ namespace LSW {
 					set(text::e_chronomillis_readonly::LAST_UPDATE_STRING, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()) + std::chrono::milliseconds(instantaneous ? 0 : (unsigned long long)(1000.0 / ups_val)));
 
 					auto p_str = get_direct<Tools::Cstring>(text::e_cstring::STRING);
-					//_buf_lines.clear();
+					if (max_length_total && p_str.size() > static_cast<size_t>(max_length_total)) {
+						p_str = p_str.substr(0, max_length_total);
+						if (!get_direct<Tools::Cstring&>(text::e_cstring::STRING)->is_function()) set(text::e_cstring::STRING, p_str);
+					}
 
 					size_t arrp = 0;
 
 					size_t pos = 0;
 					while ((pos = p_str.find('\n')) != std::string::npos) {
 
+						if (max_length_line) pos = pos > static_cast<size_t>(max_length_line) ? max_length_line : pos;
+
 						if (arrp < _buf_lines.size()) {
 							_buf_lines[arrp] = std::move(p_str.substr(0, pos));
 						}
-						else _buf_lines.push_back(std::move(p_str.substr(0, pos)));
+						else if (!max_lines || arrp < static_cast<size_t>(max_lines)) _buf_lines.push_back(std::move(p_str.substr(0, pos)));
+						else break;
 						arrp++;
 
-						if (pos + 1 >= p_str.size()) break;
+						if (pos >= p_str.size()) {
+							p_str.clear();
+							break;
+						}
 						p_str = std::move(p_str.substr(pos + 1));
 					}
-					if (p_str.size() > 0) {
+					if (p_str.size() > 0 && (arrp < static_cast<size_t>(max_lines) || !max_lines)) {
 						if (arrp < _buf_lines.size()) {
 							_buf_lines[arrp] = std::move(p_str);
 						}
@@ -47,6 +61,8 @@ namespace LSW {
 			
 			void Text::_draw_text(Interface::Camera& ruler)
 			{
+				if (!_buf_lines.size()) return; // nothing to draw
+
 				double off_x = 0.0;
 				double off_y = 0.0;
 
@@ -56,6 +72,7 @@ namespace LSW {
 				const auto s_col = get_direct<Interface::Color>(text::e_color::SHADOW_COLOR);
 				const auto n_col = get_direct<Interface::Color>(sprite::e_color::COLOR);
 				const auto mode = get_direct<int>(text::e_integer::STRING_MODE);
+				const auto mode_y = get_direct<int>(text::e_integer::STRING_Y_MODE);
 				const auto scale_g = get_direct<double>(sprite::e_double::SCALE_G);
 				const auto scale_x = get_direct<double>(sprite::e_double::SCALE_X);
 				const auto scale_y = get_direct<double>(sprite::e_double::SCALE_Y);
@@ -71,10 +88,11 @@ namespace LSW {
 				if (font_siz <= 0) throw Handling::Abort(__FUNCSIG__, "Invalid font size! Please fix text::e_integer::FONT_SIZE.", Handling::abort::abort_level::GIVEUP);
 
 				{
-					auto fl = get_direct<Sprite_Base>(text::e_sprite_ref::FOLLOWING);
+					auto fl = get_direct<Sprite_Base>(text::e_sprite_ref::FOLLOWING); // safer
 					fl.get(sprite::e_double_readonly::POSX, off_x);
 					fl.get(sprite::e_double_readonly::POSY, off_y);
 					fl.get(sprite::e_double_readonly::ROTATION, p_rotation_rad);
+					//set(sprite::e_boolean::AFFECTED_BY_CAM, fl.get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM));
 					p_rotation_rad *= ALLEGRO_PI / 180.0;
 				}
 
@@ -109,26 +127,28 @@ namespace LSW {
 				ruler.apply();
 
 
+				const double compensate = 0.5 * fontt.get_line_height();
 				const double height = lineadj * fontt.get_line_height();
+				const double y_offset = mode_y == 0 ? 0 : (mode_y == static_cast<int>(text::e_text_y_modes::CENTER) ? (0.5 * height * (_buf_lines.size() - 1)) : (height * (_buf_lines.size() - 1)));
 
 				for (size_t o = 0; o < _buf_lines.size(); o++) {
 					const auto& i = _buf_lines[o];
 
 					if (should_care_about_shadow) {
 						shadow_cam.apply();
-						fontt.draw(s_col, 0.0, height * (o - 0.5), mode, i.s_str().c_str());
+						fontt.draw(s_col, 0.0, -compensate + height * o - y_offset, mode, i.s_str().c_str());
 						ruler.apply();
 					}
 					if (force_color) {
-						fontt.draw(n_col, 0.0, height * (o - 0.5), mode, i.s_str().c_str());
+						fontt.draw(n_col, 0.0, -compensate + height * o - y_offset, mode, i.s_str().c_str());
 					}
 					else {
-						fontt.draw(0.0, height * (o - 0.5), mode, i);
+						fontt.draw(0.0, -compensate + height * o - y_offset, mode, i);
 					}
 				}
 
 
-				if (is_eq(sprite::e_boolean::SHOWDOT, true)) {
+				if (is_eq(sprite::e_boolean::DRAW_DOT, true)) {
 					al_draw_filled_circle(
 						/* X1: */ 0.0,
 						/* Y1: */ 0.0,

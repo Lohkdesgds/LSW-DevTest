@@ -15,7 +15,7 @@ namespace LSW {
 			namespace block {
 
 				enum class e_chronomillis_readonly { LAST_FRAME, LAST_TIE_FRAME_VERIFICATION };
-				enum class e_sizet { FRAME };
+				enum class e_uintptr_t { FRAME };
 				enum class e_boolean { SET_FRAME_VALUE_READONLY };
 				enum class e_double { FRAMES_PER_SECOND, TIE_SIZE_TO_DISPLAY_PROPORTION };
 
@@ -23,8 +23,8 @@ namespace LSW {
 					{std::chrono::milliseconds(0),																		(e_chronomillis_readonly::LAST_FRAME),					("last_frame")},
 					{std::chrono::milliseconds(0),																		(e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION),	("last_tie_verification")}
 				};
-				const Tools::SuperMap<Tools::FastFunction<size_t>>		e_sizet_defaults = {
-					{(size_t)0,																							(e_sizet::FRAME),										("frame")}
+				const Tools::SuperMap<Tools::FastFunction<uintptr_t>>		e_uintptr_t_defaults = {
+					{(uintptr_t)0,																						(e_uintptr_t::FRAME),									("frame")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<bool>>		e_boolean_defaults = {
 					{false,																								(e_boolean::SET_FRAME_VALUE_READONLY),					("set_frame_readonly")}
@@ -45,7 +45,7 @@ namespace LSW {
 			/// <para>A Sprite_Base with Bitmaps.</para>
 			/// <para>If you use custom index, please change the sprite::e_uintptr_t::INDEX_TARGET_IN_USE.</para>
 			/// </summary>
-			class Block : public Sprite_Base, public Tools::SuperFunctionalMap<std::chrono::milliseconds> { // Sprite_Base already has others included!!!!!!!
+			class Block : public Sprite_Base, public Tools::SuperFunctionalMap<std::chrono::milliseconds> {
 
 				// bitmap internally uses shared_ptr so no worries!
 				std::vector<Interface::Bitmap> bitmaps;
@@ -53,11 +53,11 @@ namespace LSW {
 				//Interface::Bitmap reference;
 
 				void draw_task(Interface::Camera&);
-				void think_task(const int) {}
 			public:
 				using Sprite_Base::set;
 				using Sprite_Base::get;
 				using Sprite_Base::get_direct;
+				using Sprite_Base::operator=;
 				using Tools::SuperFunctionalMap<std::chrono::milliseconds>::set;
 				using Tools::SuperFunctionalMap<std::chrono::milliseconds>::get;
 				using Tools::SuperFunctionalMap<std::chrono::milliseconds>::get_direct;

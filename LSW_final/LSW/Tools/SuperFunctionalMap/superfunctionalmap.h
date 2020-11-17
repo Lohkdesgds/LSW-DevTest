@@ -129,6 +129,14 @@ namespace LSW {
 				/// <returns>{std::function*} Not nullptr if the function was found.</returns>
 				template<typename Ret, typename Arg1, typename Compare = r_cast_t<std::remove_pointer_t<Ret>>, std::enable_if_t<(std::is_pointer<Ret>::value && std::is_same<Compare, BaseType>::value), int> = 0>
 				std::function<Compare(void)>* get_direct(const Arg1&);
+
+				/// <summary>
+				/// <para>Gets the exact holding value reference from Key.</para>
+				/// </summary>
+				/// <param name="{Arg1}">A key.</param>
+				/// <returns>{std::function*} Not nullptr if the function was found.</returns>
+				template<typename Ret, typename Arg1, typename Compare = r_cast_t<std::remove_pointer_t<Ret>>, std::enable_if_t<(std::is_reference<Ret>::value && std::is_same<Compare, BaseType>::value), int> = 0>
+				FastFunction<Compare>* get_direct(const Arg1&);
 			};
 
 		}

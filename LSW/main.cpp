@@ -105,6 +105,7 @@ int main() {
 	Tools::SuperResource<Bitmap> bmps;
 	Tools::SuperResource<Font> source_font;
 	Tools::SuperResource<Work::Text> texts;
+	Tools::SuperResource<Work::Button> buttons;
 
 	auto progress = progressbar_source.create("_load_progress");
 	progress->set(Work::progressbar::e_double::PROGRESS, 0.0);
@@ -322,8 +323,40 @@ int main() {
 
 	bool __simple_texts = false;
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - BLOCKS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	Work::TextInput testtin;
+	testtin.get_text().set(sfont);
+	testtin.get_text().set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	testtin.get_text().set<Tools::Cstring>(Work::text::e_cstring::STRING, "insert here");
+	//testtin.get_text().set(Work::sprite::e_double::TARG_POSY, 0.1);
+	testtin.get_text().set(Work::sprite::e_double::SCALE_G, 0.12);
+	testtin.get_text().set(Work::sprite::e_double::SCALE_X, 0.85);
+	testtin.get_text().set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
+	testtin.get_text().set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 1.00);
+	testtin.get_text().set(Work::text::e_double::UPDATES_PER_SECOND, 15.0);
+	testtin.get_text().set(Work::text::e_color::SHADOW_COLOR, Interface::Color(100, 100, 150));
+	testtin.get_text().set(Work::text::e_double::SHADOW_DISTANCE_X, 0.005);
+	testtin.get_text().set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.005);
+	testtin.get_text().set(Work::text::e_boolean::USE_BITMAP_BUFFER, true);
+	testtin.get_text().set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	testtin.get_text().set(Work::text::e_integer::STRING_Y_MODE, static_cast<int>(Work::text::e_text_y_modes::CENTER));
+	testtin.get_text().set(Work::text::e_double::LINE_ADJUST, 0.68);
+	testtin.main().set(Work::textinput::e_boolean::ENTER_BREAK_LINE, true);
+	testtin.main().set<Work::sprite::functional>(Work::textinput::e_tie_functional::SAVED_STRING, [](const Tools::Any& str) {
+		Logger logg;
+		logg << L::SL << fsr() << "Saved string: " << str.get<Tools::Cstring>() << L::EL;
+	});
+
+	testtin.get_block().set(Work::sprite::e_double::TARG_POSX, 0.2);
+	testtin.get_block().set(Work::sprite::e_double::TARG_POSY, -0.6);
+	testtin.get_block().set(Work::sprite::e_double::SCALE_G, 0.25);
+	testtin.get_block().set(Work::sprite::e_double::SCALE_X, 2.5);
+	testtin.get_block().set<Interface::Color>(Work::sprite::e_color::COLOR, Interface::Color(180, 180, 180, 90));
+	testtin.get_block().set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	testtin.get_block().set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
+	testtin.get_block().set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~~~~~~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - BLOCKS&BUTTONS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	_what_test = "Generating Blocks";
 
@@ -352,7 +385,7 @@ int main() {
 	auto blk_height = blocks.create("_test_slidex");
 	auto blk_zoom = blocks.create("_test_slidezoom");
 	auto blk_width = blocks.create("_test_slidey");
-	auto blk_switch = blocks.create("_test_switch");
+	auto btn_switch = buttons.create("_test_switch");
 
 	blk0->insert(lmao);
 	blk_mouse->insert(mouse);
@@ -361,23 +394,40 @@ int main() {
 	blk_height->insert(lmao);
 	blk_zoom->insert(lmao);
 	blk_width->insert(lmao);
-	blk_switch->insert(dirt);
+	//btn_switch->insert(dirt);
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	_what_test = "Setting up Blocks";
 
 
-	blk_switch->set(Work::sprite::e_double::TARG_POSX, 0.9);
-	blk_switch->set(Work::sprite::e_double::TARG_POSY, -0.9);
-	blk_switch->set(Work::sprite::e_double::SCALE_G, 0.1);
-	blk_switch->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
-	blk_switch->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+	btn_switch->get_text().set(sfont);
+	btn_switch->get_text().set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	btn_switch->get_text().set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return __simple_texts ? "&6SWITCH" : "&dSWITCH"; });
+	//btn_switch->get_text().set(Work::sprite::e_double::TARG_POSY, 0.1);
+	btn_switch->get_text().set(Work::sprite::e_double::SCALE_G, 0.10);
+	btn_switch->get_text().set(Work::sprite::e_double::SCALE_X, 0.85);
+	btn_switch->get_text().set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
+	btn_switch->get_text().set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 0.40);
+	btn_switch->get_text().set(Work::text::e_double::UPDATES_PER_SECOND, 1.0);
+	btn_switch->get_text().set(Work::text::e_color::SHADOW_COLOR, Interface::Color(100, 100, 150));
+	btn_switch->get_text().set(Work::text::e_double::SHADOW_DISTANCE_X, 0.005);
+	btn_switch->get_text().set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.005);
+	btn_switch->get_text().set(Work::text::e_boolean::USE_BITMAP_BUFFER, true);
+	btn_switch->get_text().set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
 
-	blk_switch->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](const Tools::Any& ref) {
+	btn_switch->get_block().set(Work::sprite::e_double::TARG_POSX, 0.9);
+	btn_switch->get_block().set(Work::sprite::e_double::TARG_POSY, -0.9);
+	btn_switch->get_block().set(Work::sprite::e_double::SCALE_G, 0.1);
+	btn_switch->get_block().set(Work::sprite::e_double::SCALE_X, 1.35);
+	btn_switch->get_block().set<Interface::Color>(Work::sprite::e_color::COLOR, [&] { return Interface::Color(__simple_texts ? 127 : 75, __simple_texts ? 140 : 45, __simple_texts ? 95 : 75); });
+	btn_switch->get_block().set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	btn_switch->get_block().set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
+	btn_switch->get_block().set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+	btn_switch->get_block().set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](const Tools::Any& ref) {
 		__simple_texts = !__simple_texts;
 
 		Logger logg;
-		logg << L::SL << fsr() << "SWITCH TEXT " << (__simple_texts ? "Y" : "N") << L::EL;
+		logg << L::SL << fsr() << "SWITCH TEXT " << (!__simple_texts ? "Y" : "N") << L::EL;
 	});
 
 
@@ -470,7 +520,7 @@ int main() {
 	blk_mouse->set<double>(Work::sprite::e_double::SCALE_G, 0.15);
 	blk_mouse->set<double>(Work::sprite::e_double::TARG_ROTATION, [] {return 30.0 * al_get_time(); });
 	blk_mouse->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
-	//blk_mouse->set(Work::sprite::e_boolean::SHOWBOX, true);
+	//blk_mouse->set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
 	//blk_mouse->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
 
 
@@ -479,7 +529,7 @@ int main() {
 	blk3->set<double>(Work::sprite::e_double::TARG_POSY, -0.5);
 	blk3->set<double>(Work::sprite::e_double::SCALE_G, 0.20);
 	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);
-	//blk3->set(Work::sprite::e_boolean::SHOWBOX, true);
+	//blk3->set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
 
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -489,8 +539,9 @@ int main() {
 	Work::Collisioner overlay_control(core.get_config());
 	overlay_control.insert(blk_height);
 	overlay_control.insert(blk_width);
-	overlay_control.insert(blk_switch);
+	overlay_control.insert(btn_switch->get_block());
 	overlay_control.insert(blk_zoom);
+	overlay_control.insert(testtin.get_block());
 
 	Work::Collisioner collision_control(core.get_config());
 	collision_control.insert(blk0);
@@ -606,9 +657,7 @@ int main() {
 
 	txtf0->set<Tools::Cstring>(Work::text::e_cstring::STRING, [] { std::string t = "FOLLOW 0 HYPE"; return t.substr(0, (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 500) % (10 + t.length())); });
 	txtf0->set(Work::sprite::e_double::TARG_POSX, 0.0);
-	//txtf0->set(Work::sprite::e_double::TARG_POSY, -0.1);
 	txtf0->set(Work::sprite::e_double::SCALE_G, 0.15);
-	//txtf0->set(Work::sprite::e_double::SCALE_X, 0.6);
 	txtf0->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
 	txtf0->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, *blk0);
 	txtf0->set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 0.66);
@@ -620,7 +669,6 @@ int main() {
 
 	txtf1->set<Tools::Cstring>(Work::text::e_cstring::STRING, "FOLLOW 1 HYPERSMOOTH 60 FPS");
 	txtf1->set(Work::sprite::e_double::TARG_POSX, 0.0);
-	//txtf1->set(Work::sprite::e_double::TARG_POSY, -0.1);
 	txtf1->set(Work::sprite::e_double::SCALE_G, 0.15);
 	txtf1->set(Work::sprite::e_double::SCALE_X, 0.85);
 	txtf1->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
@@ -668,7 +716,7 @@ int main() {
 	{
 		core.get_display().remove_draw_task(_delete_drawtask);
 
-		core.get_display().add_draw_task([=, &__c, &sw](const Camera& c) {
+		core.get_display().add_draw_task([=, &__c, &sw, &testtin](const Camera& c) {
 			///got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
 			
 			if (!__c) sw.start(); // 0
@@ -684,7 +732,7 @@ int main() {
 			if (!__c) sw.click_one(); // 5
 			blk_width->draw(c);
 			if (!__c) sw.click_one(); // 6
-			blk_switch->draw(c);
+			btn_switch->draw(c);
 			if (!__c) sw.click_one(); // 7
 			blk_zoom->draw(c);
 			if (!__c) sw.click_one(); // 8
@@ -700,6 +748,7 @@ int main() {
 			if (!__c) sw.click_one(); // 13
 			txtdebug->draw(c);
 			if (!__c) sw.click_one(); // 14
+			testtin.draw(c);
 
 			if (++__c > 200) __c = 0;
 
@@ -767,7 +816,7 @@ int main() {
 	pather.unapply();
 
 
-	
+	/*
 	EventHandler fullscreen;
 	fullscreen.add(get_keyboard_event());
 	fullscreen.set_run_autostart([&](const RawEvent& ev) {
@@ -945,7 +994,7 @@ int main() {
 			break;
 		}
 	});
-
+	*/
 	core.yield();
 
 	collision_control.set_stop();

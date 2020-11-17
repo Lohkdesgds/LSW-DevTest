@@ -17,6 +17,9 @@ namespace LSW {
 				constexpr size_t buf_size = 1 << 3; // small because if big it will wait too much to flush
 			}
 
+			/// <summary>
+			/// <para>This can launch an app and get its output for as long as it runs.</para>
+			/// </summary>
 			class Launcher {
 				HANDLE g_hChildStd_OUT_Rd = nullptr;
 				HANDLE g_hChildStd_OUT_Wr = nullptr;

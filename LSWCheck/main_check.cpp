@@ -33,6 +33,7 @@ int main() {
 	Tools::SuperResource<Bitmap> bmps;
 	Tools::SuperResource<Font> source_font;
 	Tools::SuperResource<Work::Text> texts;
+	Tools::SuperResource<Work::Button> buttons;
 
 	auto progress = progressbar_source.create("_load_progress");
 	progress->set(Work::progressbar::e_double::PROGRESS, 0.0);
@@ -155,6 +156,34 @@ int main() {
 
 	progress->set(Work::progressbar::e_double::PROGRESS, 10e-2);
 
+#ifdef TESTING_ALL
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	_what_test = "MultiTask test";
+
+	//autoabort_test(core);
+	multitask_test(core);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	_what_test = "Sockets test";
+
+	{
+		double dd = 0.0;
+		progress->set<double>(Work::progressbar::e_double::PROGRESS, [&] {return 20e-2 + 60e-2 * dd; });
+
+		socketsys_test(core, &dd);
+	}
+
+	progress->set(Work::progressbar::e_double::PROGRESS, 80e-2);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	_what_test = "SmartFile test";
+
+	smartfile_test(core);
+
+	progress->set(Work::progressbar::e_double::PROGRESS, 85e-2);
+#endif
+
 	//core.get_display().set_double_buffering_scale(0.3);
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -222,8 +251,40 @@ int main() {
 
 	bool __simple_texts = false;
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - BLOCKS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	Work::TextInput testtin;
+	testtin.get_text().set(sfont);
+	testtin.get_text().set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	testtin.get_text().set<Tools::Cstring>(Work::text::e_cstring::STRING, "insert here");
+	//testtin.get_text().set(Work::sprite::e_double::TARG_POSY, 0.1);
+	testtin.get_text().set(Work::sprite::e_double::SCALE_G, 0.12);
+	testtin.get_text().set(Work::sprite::e_double::SCALE_X, 0.85);
+	testtin.get_text().set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
+	testtin.get_text().set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 1.00);
+	testtin.get_text().set(Work::text::e_double::UPDATES_PER_SECOND, 15.0);
+	testtin.get_text().set(Work::text::e_color::SHADOW_COLOR, Interface::Color(100, 100, 150));
+	testtin.get_text().set(Work::text::e_double::SHADOW_DISTANCE_X, 0.005);
+	testtin.get_text().set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.005);
+	testtin.get_text().set(Work::text::e_boolean::USE_BITMAP_BUFFER, true);
+	testtin.get_text().set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	testtin.get_text().set(Work::text::e_integer::STRING_Y_MODE, static_cast<int>(Work::text::e_text_y_modes::CENTER));
+	testtin.get_text().set(Work::text::e_double::LINE_ADJUST, 0.68);
+	testtin.main().set(Work::textinput::e_boolean::ENTER_BREAK_LINE, true);
+	testtin.main().set<Work::sprite::functional>(Work::textinput::e_tie_functional::SAVED_STRING, [](const Tools::Any& str) {
+		Logger logg;
+		logg << L::SL << fsr() << "Saved string: " << str.get<Tools::Cstring>() << L::EL;
+		});
+
+	testtin.get_block().set(Work::sprite::e_double::TARG_POSX, 0.2);
+	testtin.get_block().set(Work::sprite::e_double::TARG_POSY, -0.6);
+	testtin.get_block().set(Work::sprite::e_double::SCALE_G, 0.25);
+	testtin.get_block().set(Work::sprite::e_double::SCALE_X, 2.5);
+	testtin.get_block().set<Interface::Color>(Work::sprite::e_color::COLOR, Interface::Color(180, 180, 180, 90));
+	testtin.get_block().set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	testtin.get_block().set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
+	testtin.get_block().set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~~~~~~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - BLOCKS&BUTTONS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	_what_test = "Generating Blocks";
 
@@ -252,7 +313,7 @@ int main() {
 	auto blk_height = blocks.create("_test_slidex");
 	auto blk_zoom = blocks.create("_test_slidezoom");
 	auto blk_width = blocks.create("_test_slidey");
-	auto blk_switch = blocks.create("_test_switch");
+	auto btn_switch = buttons.create("_test_switch");
 
 	blk0->insert(lmao);
 	blk_mouse->insert(mouse);
@@ -261,23 +322,40 @@ int main() {
 	blk_height->insert(lmao);
 	blk_zoom->insert(lmao);
 	blk_width->insert(lmao);
-	blk_switch->insert(dirt);
+	//btn_switch->insert(dirt);
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	_what_test = "Setting up Blocks";
 
 
-	blk_switch->set(Work::sprite::e_double::TARG_POSX, 0.9);
-	blk_switch->set(Work::sprite::e_double::TARG_POSY, -0.9);
-	blk_switch->set(Work::sprite::e_double::SCALE_G, 0.1);
-	blk_switch->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
-	blk_switch->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+	btn_switch->get_text().set(sfont);
+	btn_switch->get_text().set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	btn_switch->get_text().set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return __simple_texts ? "&6SWITCH" : "&dSWITCH"; });
+	//btn_switch->get_text().set(Work::sprite::e_double::TARG_POSY, 0.1);
+	btn_switch->get_text().set(Work::sprite::e_double::SCALE_G, 0.10);
+	btn_switch->get_text().set(Work::sprite::e_double::SCALE_X, 0.85);
+	btn_switch->get_text().set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
+	btn_switch->get_text().set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 0.40);
+	btn_switch->get_text().set(Work::text::e_double::UPDATES_PER_SECOND, 1.0);
+	btn_switch->get_text().set(Work::text::e_color::SHADOW_COLOR, Interface::Color(100, 100, 150));
+	btn_switch->get_text().set(Work::text::e_double::SHADOW_DISTANCE_X, 0.005);
+	btn_switch->get_text().set(Work::text::e_double::SHADOW_DISTANCE_Y, 0.005);
+	btn_switch->get_text().set(Work::text::e_boolean::USE_BITMAP_BUFFER, true);
+	btn_switch->get_text().set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
 
-	blk_switch->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](const Tools::Any& ref) {
+	btn_switch->get_block().set(Work::sprite::e_double::TARG_POSX, 0.9);
+	btn_switch->get_block().set(Work::sprite::e_double::TARG_POSY, -0.9);
+	btn_switch->get_block().set(Work::sprite::e_double::SCALE_G, 0.1);
+	btn_switch->get_block().set(Work::sprite::e_double::SCALE_X, 1.35);
+	btn_switch->get_block().set<Interface::Color>(Work::sprite::e_color::COLOR, [&] { return Interface::Color(__simple_texts ? 127 : 75, __simple_texts ? 140 : 45, __simple_texts ? 95 : 75); });
+	btn_switch->get_block().set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	btn_switch->get_block().set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
+	btn_switch->get_block().set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
+	btn_switch->get_block().set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](const Tools::Any& ref) {
 		__simple_texts = !__simple_texts;
 
 		Logger logg;
-		logg << L::SL << fsr() << "SWITCH TEXT " << (__simple_texts ? "Y" : "N") << L::EL;
+		logg << L::SL << fsr() << "SWITCH TEXT " << (!__simple_texts ? "Y" : "N") << L::EL;
 		});
 
 
@@ -352,7 +430,16 @@ int main() {
 
 	blk0->set<Work::sprite::functional>(Work::sprite::e_tie_functional::COLLISION_MOUSE_CLICK, [&](auto) {
 		Logger logg;
+#ifdef _DEBUG
+		logg << L::SL << fsr() << "Clicked." << L::EL;
+
+		logg << L::SL << fsr() << "0 UPDATE_DELTA: " << blk0->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+		logg << L::SL << fsr() << "2 UPDATE_DELTA: " << blk_mouse->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+		logg << L::SL << fsr() << "3 UPDATE_DELTA: " << blk3->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+		logg << L::SL << fsr() << "4 UPDATE_DELTA: " << blk1->get_direct<double>(Work::sprite::e_double_readonly::UPDATE_DELTA) << L::EL;
+#else
 		logg << L::SL << fsr() << "Uau vc sabe clicar, boa!" << L::EL;
+#endif
 		});
 
 
@@ -361,7 +448,7 @@ int main() {
 	blk_mouse->set<double>(Work::sprite::e_double::SCALE_G, 0.15);
 	blk_mouse->set<double>(Work::sprite::e_double::TARG_ROTATION, [] {return 30.0 * al_get_time(); });
 	blk_mouse->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
-	//blk_mouse->set(Work::sprite::e_boolean::SHOWBOX, true);
+	//blk_mouse->set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
 	//blk_mouse->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
 
 
@@ -370,7 +457,7 @@ int main() {
 	blk3->set<double>(Work::sprite::e_double::TARG_POSY, -0.5);
 	blk3->set<double>(Work::sprite::e_double::SCALE_G, 0.20);
 	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);
-	//blk3->set(Work::sprite::e_boolean::SHOWBOX, true);
+	//blk3->set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
 
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -380,8 +467,9 @@ int main() {
 	Work::Collisioner overlay_control(core.get_config());
 	overlay_control.insert(blk_height);
 	overlay_control.insert(blk_width);
-	overlay_control.insert(blk_switch);
+	overlay_control.insert(btn_switch->get_block());
 	overlay_control.insert(blk_zoom);
+	overlay_control.insert(testtin.get_block());
 
 	Work::Collisioner collision_control(core.get_config());
 	collision_control.insert(blk0);
@@ -497,9 +585,7 @@ int main() {
 
 	txtf0->set<Tools::Cstring>(Work::text::e_cstring::STRING, [] { std::string t = "FOLLOW 0 HYPE"; return t.substr(0, (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() / 500) % (10 + t.length())); });
 	txtf0->set(Work::sprite::e_double::TARG_POSX, 0.0);
-	//txtf0->set(Work::sprite::e_double::TARG_POSY, -0.1);
 	txtf0->set(Work::sprite::e_double::SCALE_G, 0.15);
-	//txtf0->set(Work::sprite::e_double::SCALE_X, 0.6);
 	txtf0->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
 	txtf0->set<Work::Sprite_Base>(Work::text::e_sprite_ref::FOLLOWING, *blk0);
 	txtf0->set(Work::text::e_double::BUFFER_SCALE_RESOLUTION, 0.66);
@@ -511,7 +597,6 @@ int main() {
 
 	txtf1->set<Tools::Cstring>(Work::text::e_cstring::STRING, "FOLLOW 1 HYPERSMOOTH 60 FPS");
 	txtf1->set(Work::sprite::e_double::TARG_POSX, 0.0);
-	//txtf1->set(Work::sprite::e_double::TARG_POSY, -0.1);
 	txtf1->set(Work::sprite::e_double::SCALE_G, 0.15);
 	txtf1->set(Work::sprite::e_double::SCALE_X, 0.85);
 	txtf1->set<int>(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
@@ -559,7 +644,7 @@ int main() {
 	{
 		core.get_display().remove_draw_task(_delete_drawtask);
 
-		core.get_display().add_draw_task([=, &__c, &sw](const Camera& c) {
+		core.get_display().add_draw_task([=, &__c, &sw, &testtin](const Camera& c) {
 			///got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
 
 			if (!__c) sw.start(); // 0
@@ -575,7 +660,7 @@ int main() {
 			if (!__c) sw.click_one(); // 5
 			blk_width->draw(c);
 			if (!__c) sw.click_one(); // 6
-			blk_switch->draw(c);
+			btn_switch->draw(c);
 			if (!__c) sw.click_one(); // 7
 			blk_zoom->draw(c);
 			if (!__c) sw.click_one(); // 8
@@ -591,8 +676,45 @@ int main() {
 			if (!__c) sw.click_one(); // 13
 			txtdebug->draw(c);
 			if (!__c) sw.click_one(); // 14
+			testtin.draw(c);
 
 			if (++__c > 200) __c = 0;
+
+			/*
+			Tools::Stopwatch sw;
+			sw.prepare(14);
+
+			sw.start(); // 0
+			blk0->draw(c);
+			sw.click_one(); // 1
+			blk1->draw(c);
+			sw.click_one(); // 2
+			blk_mouse->draw(c);
+			sw.click_one(); // 3
+			blk3->draw(c);
+			sw.click_one(); // 4
+			blk_height->draw(c);
+			sw.click_one(); // 5
+			blk_width->draw(c);
+			sw.click_one(); // 6
+			txt0->draw(c);
+			sw.click_one(); // 7
+			txt1->draw(c);
+			sw.click_one(); // 8
+			txt2->draw(c);
+			sw.click_one(); // 9
+			txt3->draw(c);
+			sw.click_one(); // 10
+			txtu->draw(c);
+			sw.click_one(); // 11
+			txtf0->draw(c);
+			sw.click_one(); // 12
+			txtf1->draw(c);
+			sw.click_one(); // ...
+
+			Logger logg;
+			logg << L::SL << fsr() << "Stopwatch said:\n" << sw.generate_table() << L::EL;
+			*/
 
 			});
 	}
@@ -622,7 +744,7 @@ int main() {
 	pather.unapply();
 
 
-
+	/*
 	EventHandler fullscreen;
 	fullscreen.add(get_keyboard_event());
 	fullscreen.set_run_autostart([&](const RawEvent& ev) {
@@ -635,14 +757,14 @@ int main() {
 				logg << L::SL << fsr() << "Toggle Fullscreen called" << L::EL;
 				core.get_display().toggle_fullscreen();
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_F:
 			{
 				logg << L::SL << fsr() << "Current FPS: &a" << core.get_display().get_frames_per_second() << L::EL;
 				logg << L::SL << fsr() << "&eOut of range errors: &7" << core.get_display().debug_errors_out_of_range_skip() << L::EL;
 				logg << L::SL << fsr() << "&eUnexpected errors: &7" << core.get_display().debug_errors_unexpected() << L::EL;
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_P:
 			{
 				logg << L::SL << fsr() << "Play/Pause button called" << L::EL;
@@ -651,7 +773,7 @@ int main() {
 					else track->play();
 				}
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_R:
 			{
 				logg << L::SL << fsr() << "Reverse/Continuous button called" << L::EL;
@@ -659,7 +781,7 @@ int main() {
 					track->set_speed(-track->get_speed());
 				}
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_MINUS:
 			{
 				logg << L::SL << fsr() << "SlowDown button called" << L::EL;
@@ -668,7 +790,7 @@ int main() {
 					logg << L::SL << fsr() << "Now speed = " << track->get_speed() << "x" << L::EL;
 				}
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_EQUALS:
 			{
 				logg << L::SL << fsr() << "Accel button called" << L::EL;
@@ -677,7 +799,7 @@ int main() {
 					logg << L::SL << fsr() << "Now speed = " << track->get_speed() << "x" << L::EL;
 				}
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_PAD_MINUS:
 			{
 				logg << L::SL << fsr() << "PAD- button called" << L::EL;
@@ -687,7 +809,7 @@ int main() {
 
 				logg << L::SL << fsr() << "Now volume = " << vol << "." << L::EL;
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_PAD_PLUS:
 			{
 				logg << L::SL << fsr() << "PAD+ button called" << L::EL;
@@ -697,7 +819,7 @@ int main() {
 
 				logg << L::SL << fsr() << "Now volume = " << vol << "." << L::EL;
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_COMMA: // ,
 			{
 				logg << L::SL << fsr() << "< called, reducing fps cap by 5..." << L::EL;
@@ -705,21 +827,21 @@ int main() {
 				if (d.get_fps_cap() >= 5) d.set_fps_cap(d.get_fps_cap() - 5);
 				else d.set_fps_cap(0);
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_FULLSTOP: // .
 			{
 				logg << L::SL << fsr() << "> called, raising fps cap by 5..." << L::EL;
 				auto& d = core.get_display();
 				d.set_fps_cap(d.get_fps_cap() + 5);
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_V:
 			{
 				logg << L::SL << fsr() << "V called, vsync switch (reopen app to set)." << L::EL;
 				auto& d = core.get_display();
 				d.set_vsync(!d.get_vsync());
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_L:
 			{
 				auto dbuffs = core.get_display().get_current_buffering_scale();
@@ -733,7 +855,7 @@ int main() {
 					logg << L::SL << fsr() << "L called, but already disabled double buffering!" << L::EL;
 				}
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_O:
 			{
 				auto dbuffs = core.get_display().get_current_buffering_scale();
@@ -741,7 +863,7 @@ int main() {
 				logg << L::SL << fsr() << "O called, trying to increase dbuffer to " << Tools::sprintf_a("%.0lf", 100.0 * dbuffs) << "%..." << L::EL;
 				core.get_display().set_double_buffering_scale(dbuffs);
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_F1:
 			{
 				auto d = 1.0 / collision_control.get_speed();
@@ -766,7 +888,7 @@ int main() {
 				logg << L::SL << fsr() << "Slowing down collision system, now at " << (int)d << " tps." << L::EL;
 				collision_control.set_speed(1.0 / d);
 			}
-			break;
+				break;
 			case ALLEGRO_KEY_F2:
 			{
 				auto d = 1.0 / collision_control.get_speed();
@@ -790,17 +912,17 @@ int main() {
 				logg << L::SL << fsr() << "Accelerating collision system, now at " << (int)d << " tps." << L::EL;
 				collision_control.set_speed(1.0 / d);
 			}
-			break;
+				break;
 			default:
 			{
 				logg << L::SL << fsr() << "KEY pressed: &5" << ev.keyboard_event().keycode << L::EL;
 			}
-			break;
+				break;
 			}
 			break;
 		}
-		});
-
+	});
+	*/
 	core.yield();
 
 	collision_control.set_stop();
@@ -821,7 +943,7 @@ int main() {
 	return 0;
 }
 
-void check_file_download(Work::GameCore & core)
+void check_file_download(Work::GameCore& core)
 {
 	Logger logg;
 
@@ -832,10 +954,11 @@ void check_file_download(Work::GameCore & core)
 		core.get_config().set("registry", "times_open", val + 1);
 
 		bool download_this = false;
-
+#ifndef _DEBUG
 		if (need_texture_update && core.get_config().has(Work::gamecore::conf_versioning, "automatic version")) {
 			download_this |= core.get_config().get(Work::gamecore::conf_versioning, "automatic version") != Work::version_app;
 		}
+#endif
 
 		std::string cpy = datapath;
 		Handling::handle_path(cpy);
@@ -881,7 +1004,7 @@ void check_file_download(Work::GameCore & core)
 }
 
 
-void multitask_test(Work::GameCore & core)
+void multitask_test(Work::GameCore& core)
 {
 	Logger logg;
 
@@ -913,7 +1036,7 @@ void multitask_test(Work::GameCore & core)
 
 }
 
-void socketsys_test(Work::GameCore & core, double* progression)
+void socketsys_test(Work::GameCore& core, double* progression)
 {
 	*progression = 0e-2;
 	Logger logg;
@@ -985,7 +1108,7 @@ void socketsys_test(Work::GameCore & core, double* progression)
 
 }
 
-void smartfile_test(Work::GameCore & core)
+void smartfile_test(Work::GameCore& core)
 {
 	Logger logg;
 
@@ -1032,7 +1155,7 @@ void smartfile_test(Work::GameCore & core)
 
 }
 
-void pathmngr_debug(Work::GameCore & core, const Interface::PathManager & pather)
+void pathmngr_debug(Work::GameCore& core, const Interface::PathManager& pather)
 {
 	Logger logg;
 

@@ -8,6 +8,7 @@
 #include <thread>
 #include <random>
 #include <stdarg.h>
+#include <limits.h>
 
 #include "../../Handling/Abort/abort.h"
 
@@ -26,6 +27,23 @@ namespace LSW {
 				constexpr int known_size_len = 8;
 				inline const char* known_size_ends[known_size_len] = { "k", "M", "G", "T", "P", "E", "Z", "Y" };
 			}
+
+			/* * * * * * * * * * *
+			 >>>> CAST TOOLS <<<<
+			* * * * * * * * * * */
+
+			// like autocast, but for type
+			template<typename T> using r_cast_t = std::conditional_t<std::is_pointer<T>::value || std::is_array<T>::value, std::add_pointer_t<std::remove_all_extents_t<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<T>>>>>, std::remove_all_extents_t<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<T>>>>>;
+
+
+			template<typename, typename = void>
+			constexpr bool is_type_complete_v = false;
+
+			template<typename T>
+			constexpr bool is_type_complete_v
+				<T, std::void_t<decltype(sizeof(T))>> = true;
+
+			//// end of cast tools ////
 
 			class custom_random {
 				std::random_device rd;
@@ -120,13 +138,6 @@ namespace LSW {
 			std::vector<std::pair<std::string, std::string>> break_lines_config(const std::string, const std::string = ":= ", const std::string = "#", const std::string = "\r\n");
 
 			/// <summary>
-			/// <para>Direct strnlen_s, automatic limit.</para>
-			/// </summary>
-			/// <param name="{char[]}">The string (char array)</param>
-			/// <returns>{size_t} Length of the string.</returns>
-			template<size_t N> inline const size_t strlen_s(char(&str)[N]) { return strnlen_s(str, N); }
-
-			/// <summary>
 			/// <para>Do you want a fixed sized string? If smaller, characters are added; else, sliced.</para>
 			/// </summary>
 			/// <param name="{std::string}">Original string.</param>
@@ -143,25 +154,6 @@ namespace LSW {
 			/// <param name="{...}">The arguments.</param>
 			/// <returns>{std::string} Returns the string generated.</returns>
 			std::string sprintf_a(const char*, ...);
-
-			/* * * * * * * * * * *
-			 >>>> CAST TOOLS <<<<
-			* * * * * * * * * * */
-
-			// like autocast, but for type
-			template<typename T> using r_cast_t = std::conditional_t<std::is_pointer<T>::value || std::is_array<T>::value, std::add_pointer_t<std::remove_all_extents_t<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<T>>>>>, std::remove_all_extents_t<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<T>>>>>;
-
-
-			template<typename, typename = void>
-			constexpr bool is_type_complete_v = false;
-
-			template<typename T>
-			constexpr bool is_type_complete_v
-				<T, std::void_t<decltype(sizeof(T))>> = true;
-
-			// regress (go back to main) cast
-			/*template<typename Base, typename Cust = r_cast_t<Base>>
-			inline Cust r_cast(Base b) noexcept { if (std::is_pointer_v<Base> || std::is_array_v<Base>) return s_cast<Cust*>(b); return s_cast<Cust>(b); }*/
 
 		}
 	}

@@ -45,7 +45,7 @@ namespace LSW {
 
 				enum class e_string { ID };
 				enum class e_double { TARG_POSX, TARG_POSY, SCALE_X, SCALE_Y, SCALE_G, CENTER_X, CENTER_Y, TARG_ROTATION, ACCELERATION_X, ACCELERATION_Y, SPEEDXY_LIMIT, ELASTICITY_X, ELASTICITY_Y, ROUGHNESS };
-				enum class e_boolean { DRAW, USE_COLOR, AFFECTED_BY_CAM, SHOWDOT, SHOWBOX, RESPECT_CAMERA_LIMITS /*Readonly means no collision or acceleration, just f()*/ };
+				enum class e_boolean { DRAW, USE_COLOR, AFFECTED_BY_CAM, DRAW_DOT, DRAW_COLOR_BOX, DRAW_DEBUG_BOX, RESPECT_CAMERA_LIMITS /*Readonly means no collision or acceleration, just f()*/ };
 				enum class e_integer { COLLISION_MODE };
 				enum class e_color { COLOR };
 				enum class e_uintptrt { DATA_FROM, INDEX_TARGET_IN_USE }; // == size_t
@@ -73,7 +73,9 @@ namespace LSW {
 				enum class e_tie_functional { 
 					COLLISION_NONE = 0,
 					DELAYED_WORK_AUTODEL,
+
 					COLLISION_MOUSE_ON,
+					COLLISION_MOUSE_OFF,
 					COLLISION_MOUSE_CLICK,
 					COLLISION_MOUSE_UNCLICK,
 					COLLISION_MOUSE_CLICK_NOMOVE, // also triggers CLICK above, may overwrite sprite::e_tief_readonly::LAST_STATE
@@ -138,8 +140,9 @@ namespace LSW {
 					{true,															(e_boolean::DRAW),									("draw")},
 					{false,															(e_boolean::USE_COLOR),								("use_color")},
 					{true,															(e_boolean::AFFECTED_BY_CAM),						("affected_by_camera")},
-					{false,															(e_boolean::SHOWDOT),								("show_dot")}, // shows dot where it will be drawn
-					{false,															(e_boolean::SHOWBOX),								("show_box")}, // shows rectangle where collision updated (latest update)
+					{false,															(e_boolean::DRAW_DOT),								("draw_dot")}, // shows dot where it will be drawn
+					{false,															(e_boolean::DRAW_COLOR_BOX),						("draw_color_box")}, // box with COLOR
+					{false,															(e_boolean::DRAW_DEBUG_BOX),						("draw_debug_box")}, // shows rectangle where collision updated (latest update)
 					{true,															(e_boolean::RESPECT_CAMERA_LIMITS),					("respect_camera_limits")}
 				};
 
@@ -213,6 +216,14 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{int}">The collision result direction (e_direction combination).</param>
 				virtual void think_task(const int) {}
+
+				/// <summary>
+				/// <para>Set this as your mouse event function (Sprite_Base's update_and_clear will call this).</para>
+				/// </summary>
+				/// <param name="{sprite::e_tie_functional}">Latest event (trigger once per change).</param>
+				/// <param name="{Tools::Any}">It depends on the event.</param>
+				virtual void mouse_event(const sprite::e_tie_functional, const Tools::Any&) {}
+
 			public:
 				using Tools::SuperFunctionalMap<double>::set;
 				using Tools::SuperFunctionalMap<double>::get;
@@ -295,8 +306,7 @@ namespace LSW {
 				/// <para>Calculate and draw this (calls derived class implementation of draw_task. PLEASE DON'T OVERRIDE THIS).</para>
 				/// </summary>
 				/// <param name="{Camera}">Reference camera used in draw, properties may change it to default.</param>
-				/// <param name="{bool}">Do collision even though this is a copy (if it is)?</param>
-				/// <returns></returns>
+				/// <param name="{bool}">Do draw even though this is a copy (if it is)?</param>
 				void draw(const Interface::Camera&, const bool = false);
 
 				/// <summary>

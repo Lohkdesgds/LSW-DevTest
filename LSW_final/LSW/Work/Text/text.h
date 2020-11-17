@@ -22,7 +22,7 @@ namespace LSW {
 				enum class e_cstring { STRING };
 				enum class e_double { SHADOW_DISTANCE_X, SHADOW_DISTANCE_Y, TEXT_UPDATE_TIME, BUFFER_SCALE_RESOLUTION, UPDATES_PER_SECOND, LINE_ADJUST };
 				enum class e_color { SHADOW_COLOR };
-				enum class e_integer { STRING_MODE, FONT_SIZE };
+				enum class e_integer { STRING_MODE, STRING_Y_MODE, FONT_SIZE, TOTAL_TEXT_MAX_LENGTH, LINE_MAX_LENGTH, MAX_LINES_AMOUNT };
 				enum class e_boolean { USE_BITMAP_BUFFER, USE_COLOR_INSTEAD_OF_AUTO /*auto: &6gold&1blue*/ };
 				enum class e_sprite_ref { FOLLOWING };
 
@@ -45,7 +45,11 @@ namespace LSW {
 				};
 				const Tools::SuperMap<Tools::FastFunction<int>>								e_integer_defaults = {
 					{0,																											(e_integer::STRING_MODE),								("string_mode")},
-					{75,																										(e_integer::FONT_SIZE),									("font_size")}
+					{0,																											(e_integer::STRING_Y_MODE),								("string_y_mode")},
+					{75,																										(e_integer::FONT_SIZE),									("font_size")},
+					{0,																											(e_integer::TOTAL_TEXT_MAX_LENGTH),						("total_text_max_length")},
+					{0,																											(e_integer::LINE_MAX_LENGTH),							("line_max_length")},
+					{0,																											(e_integer::MAX_LINES_AMOUNT),							("max_lines_amount")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<bool>>							e_boolean_defaults = {
 					{false,																										(e_boolean::USE_BITMAP_BUFFER),							("use_bitmap_buffer")},
@@ -56,11 +60,13 @@ namespace LSW {
 				};
 
 				enum class e_text_modes { LEFT, CENTER, RIGHT };
+				enum class e_text_y_modes { TOP, CENTER, BOTTOM };
 			}
 
 			/// <summary>
 			/// <para>Text is a Sprite_Base + Font with various features.</para>
 			/// <para>If you use custom index, please change the sprite::e_uintptr_t::INDEX_TARGET_IN_USE.</para>
+			/// <para>If you're using FOLLOWING, the sprite::e_boolean::AFFECTED_BY_CAM will be set as the target's value.</para>
 			/// </summary>
 			class Text : public Sprite_Base, public Tools::SuperFunctionalMap<std::chrono::milliseconds>, public Tools::SuperFunctionalMap<Tools::Cstring>, public Tools::SuperFunctionalMap<Sprite_Base> {
 
@@ -78,6 +84,7 @@ namespace LSW {
 				using Sprite_Base::set;
 				using Sprite_Base::get;
 				using Sprite_Base::get_direct;
+				using Sprite_Base::operator=;
 				using Tools::SuperFunctionalMap<std::chrono::milliseconds>::set;
 				using Tools::SuperFunctionalMap<std::chrono::milliseconds>::get;
 				using Tools::SuperFunctionalMap<std::chrono::milliseconds>::get_direct;

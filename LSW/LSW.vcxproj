@@ -235,10 +235,12 @@
     <ClCompile Include="..\LSW_final\LSW\Tools\SuperMutex\supermutex.cpp" />
     <ClCompile Include="..\LSW_final\LSW\Tools\SuperThread\superthread.cpp" />
     <ClCompile Include="..\LSW_final\LSW\Work\Block\block.cpp" />
+    <ClCompile Include="..\LSW_final\LSW\Work\Button\button.cpp" />
     <ClCompile Include="..\LSW_final\LSW\Work\Collisioner\collisioner.cpp" />
     <ClCompile Include="..\LSW_final\LSW\Work\GameCore\gamecore.cpp" />
     <ClCompile Include="..\LSW_final\LSW\Work\ProgressBar\progressbar.cpp" />
     <ClCompile Include="..\LSW_final\LSW\Work\Sprite\sprite.cpp" />
+    <ClCompile Include="..\LSW_final\LSW\Work\TextInput\textinput.cpp" />
     <ClCompile Include="..\LSW_final\LSW\Work\Text\text.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -301,10 +303,12 @@
     <ClInclude Include="..\LSW_final\LSW\Tools\SuperThread\superthread.ipp" />
     <ClInclude Include="..\LSW_final\LSW\Tools\Tools.h" />
     <ClInclude Include="..\LSW_final\LSW\Work\Block\block.h" />
+    <ClInclude Include="..\LSW_final\LSW\Work\Button\button.h" />
     <ClInclude Include="..\LSW_final\LSW\Work\Collisioner\collisioner.h" />
     <ClInclude Include="..\LSW_final\LSW\Work\GameCore\gamecore.h" />
     <ClInclude Include="..\LSW_final\LSW\Work\ProgressBar\progressbar.h" />
     <ClInclude Include="..\LSW_final\LSW\Work\Sprite\sprite.h" />
+    <ClInclude Include="..\LSW_final\LSW\Work\TextInput\textinput.h" />
     <ClInclude Include="..\LSW_final\LSW\Work\Text\text.h" />
     <ClInclude Include="..\LSW_final\LSW\Work\Work.h" />
   </ItemGroup>

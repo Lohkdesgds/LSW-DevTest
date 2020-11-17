@@ -4,6 +4,66 @@ namespace LSW {
 	namespace v5 {
 		namespace Tools {
 
+			Cstring Cstring::_update(const Cstring& rstr)
+			{
+				if (!rstr.size()) return Cstring{};
+				cstring::C curr_color = rstr.front().cr;
+				bool apply_new = false; // maybe add new color in line different than the one that was there when this became true, this = false?
+				Cstring finalt;
+				bool ignore_once = false;
+				bool percentage_c = false;
+				bool has_backslash_to_add = false;
+
+				for (auto& i : rstr) {
+					has_backslash_to_add = false;
+
+					if (i.ch == '&' && !ignore_once) {
+						percentage_c = true;
+						continue;
+					}
+
+					if (i.ch == '\\' && !ignore_once) {
+						ignore_once = true;
+						continue;
+					}
+					else {
+						if (ignore_once && (i.ch != '&' && i.ch != '\\')) has_backslash_to_add = true;
+						ignore_once = false;
+					}
+
+					if (percentage_c) { // &color (0-9,a-f)
+						percentage_c = false;
+						char k = toupper(i.ch);
+						if (k >= '0' && k <= '9') {
+							curr_color = static_cast<cstring::C>(k - '0');
+							last_added_color = curr_color;
+							apply_new = true;
+						}
+						else if (k >= 'A' && k <= 'F') {
+							curr_color = static_cast<cstring::C>(k - 'A' + 10);
+							last_added_color = curr_color;
+							apply_new = true;
+						}
+						else {
+							finalt.push_back({ '&', apply_new ? curr_color : i.cr }); // wasn't &color, so + &
+							finalt.push_back({ i.ch, apply_new ? curr_color : i.cr });
+						}
+						continue;
+					}
+
+					if (has_backslash_to_add) finalt.push_back({ '\\', apply_new ? curr_color : i.cr });
+					finalt.push_back({ i.ch, apply_new ? curr_color : i.cr });
+				}
+				if (percentage_c) {
+					finalt.push_back({ '&', apply_new ? curr_color : rstr.back().cr });
+				}
+				if (ignore_once) {
+					finalt.push_back({ '\\', apply_new ? curr_color : rstr.back().cr });
+				}
+
+				return std::move(finalt);
+			}
+			
 			Cstring::Cstring(const Cstring& c)
 			{
 				*this = c;
@@ -14,6 +74,12 @@ namespace LSW {
 				*this = std::move(m);
 			}
 			
+			Cstring::Cstring(const char* u)
+			{
+				clear();
+				append(u);
+			}
+
 			const size_t Cstring::find(const char c) const
 			{
 				for (size_t p = 0; p < str.size(); p++) {
@@ -119,10 +185,30 @@ namespace LSW {
 				}
 				else return char_c();
 			}
+
+			void Cstring::pop_utf8()
+			{
+				if (str.size() > 0) {
+					auto cp = str.data() + str.size();
+					
+					while (--cp >= str.data() && ((cp->ch & 0b10000000) && !(cp->ch & 0b01000000))) { last_added_color = cp->cr; }
+					
+					if (cp >= str.data())
+						str.resize(cp - str.data());
+
+					if (size()) last_added_color = back().cr;
+				}
+			}
 			
 			size_t Cstring::size() const
 			{
 				return str.size();
+			}
+
+			Cstring& Cstring::refresh()
+			{
+				*this = _update(*this);
+				return *this;
 			}
 
 			Cstring& Cstring::append(const Cstring& oth)
@@ -181,6 +267,12 @@ namespace LSW {
 					if (has_backslash_to_add) str.push_back({ '\\', curr_color });
 					append({ i, curr_color });
 				}
+				if (percentage_c) {
+					append({ '&', curr_color });
+				}
+				if (ignore_once) {
+					append({ '\\', curr_color });
+				}
 
 				//auto& cpyy = str.at(str.size() - 1);
 
@@ -224,6 +316,23 @@ namespace LSW {
 			{
 				last_added_color = c;
 				return *this;
+			}
+
+			Cstring& Cstring::operator+=(const char* u)
+			{
+				return this->append(u);
+			}
+
+			Cstring Cstring::operator+(const char* u) const
+			{
+				Cstring a = *this;
+				return a.append(u);
+			}
+
+			void Cstring::operator=(const char* u)
+			{
+				clear();
+				append(u);
 			}
 
 			void Cstring::operator=(const Cstring& c)

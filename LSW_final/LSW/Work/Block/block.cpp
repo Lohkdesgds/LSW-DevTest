@@ -19,7 +19,7 @@ namespace LSW {
 					}
 				}
 
-				size_t frame = get_direct<size_t>(block::e_sizet::FRAME);
+				size_t frame = static_cast<size_t>(get_direct<uintptr_t>(block::e_uintptr_t::FRAME));
 
 				if (!get_direct<bool>(block::e_boolean::SET_FRAME_VALUE_READONLY)) {
 
@@ -45,7 +45,7 @@ namespace LSW {
 
 					set<std::chrono::milliseconds>(block::e_chronomillis_readonly::LAST_FRAME, last_time);
 
-					set(block::e_sizet::FRAME, frame);
+					set(block::e_uintptr_t::FRAME, frame);
 				}
 				if (frame >= bitmaps.size()) frame = static_cast<int>(bitmaps.size() - 1);
 
@@ -95,7 +95,7 @@ namespace LSW {
 
 				set<double>(block::e_double_defaults);
 				set<bool>(block::e_boolean_defaults);
-				set<size_t>(block::e_sizet_defaults); // same as uintptr_t
+				set<uintptr_t>(block::e_uintptr_t_defaults); // same as uintptr_t
 				set<std::chrono::milliseconds>(block::e_chronomillis_readonly_defaults);
 
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);

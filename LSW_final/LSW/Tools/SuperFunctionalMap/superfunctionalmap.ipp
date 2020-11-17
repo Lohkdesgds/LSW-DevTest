@@ -107,8 +107,18 @@ namespace LSW {
 			template<typename Ret, typename Arg1, typename Compare, std::enable_if_t<(std::is_pointer<Ret>::value&& std::is_same<Compare, BaseType>::value), int>>
 			inline std::function<Compare(void)>* SuperFunctionalMap<BaseType>::get_direct(const Arg1& arg1)
 			{
-				if (auto* ptr = (*map)(arg1); ptr) {
+				if (auto* ptr = (*map)[arg1]; ptr) {
 					return ptr->get_f();
+				}
+				return nullptr;
+			}
+
+			template<typename BaseType>
+			template<typename Ret, typename Arg1, typename Compare, std::enable_if_t<(std::is_reference<Ret>::value&& std::is_same<Compare, BaseType>::value), int>>
+			inline FastFunction<Compare>* SuperFunctionalMap<BaseType>::get_direct(const Arg1& arg1)
+			{
+				if (auto* ptr = (*map)[arg1]; ptr) {
+					return ptr;
 				}
 				return nullptr;
 			}

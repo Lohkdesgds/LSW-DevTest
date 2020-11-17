@@ -112,6 +112,12 @@
     <ClCompile Include="..\LSW_final\LSW\Tools\SuperThread\superthread.cpp">
       <Filter>LSW\1. Tools\SuperThread</Filter>
     </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\Button\button.cpp">
+      <Filter>LSW\3. Work\Button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\TextInput\textinput.cpp">
+      <Filter>LSW\3. Work\TextInput</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -294,6 +300,9 @@
     </Filter>
     <Filter Include="LSW\2. Interface\Vertex">
       <UniqueIdentifier>{ef76e91c-1c32-4d65-acdf-1944858f3ca1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LSW\3. Work\TextInput">
+      <UniqueIdentifier>{e01b41e2-8120-432a-a09e-d9559a77799d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -479,6 +488,12 @@
     </ClInclude>
     <ClInclude Include="..\LSW_final\LSW\Interface\Vertex\vertex.h">
       <Filter>LSW\2. Interface\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LSW_final\LSW\Work\Button\button.h">
+      <Filter>LSW\3. Work\Button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LSW_final\LSW\Work\TextInput\textinput.h">
+      <Filter>LSW\3. Work\TextInput</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
