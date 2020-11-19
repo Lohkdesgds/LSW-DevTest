@@ -32,12 +32,6 @@ namespace LSW {
 				Cstring() = default;
 
 				/// <summary>
-				/// <para>Copy constructor.</para>
-				/// </summary>
-				/// <param name="{Cstring}">Cstring to copy.</param>
-				Cstring(const Cstring&);
-
-				/// <summary>
 				/// <para>Move constructor.</para>
 				/// </summary>
 				/// <param name="{Cstring}">Cstring to move.</param>
@@ -46,18 +40,80 @@ namespace LSW {
 				/// <summary>
 				/// <para>Constructor copy.</para>
 				/// </summary>
-				/// <param name="{T}">Copies if possible.</param>
-				template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
-				Cstring(const T& u) {
-					clear();
-					append(u);
-				}
+				/// <param name="{Cstring}">The string to append.</param>
+				Cstring(const Cstring&);
 
 				/// <summary>
 				/// <para>Constructor copy.</para>
 				/// </summary>
-				/// <param name="{char*}">Copies if possible.</param>
-				Cstring(const char* u);
+				/// <param name="{std::string}">The string to append.</param>
+				Cstring(const std::string&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{char_c}">The char_c to append.</param>
+				Cstring(const char_c&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{float}">The float to append.</param>
+				Cstring(const float&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{double}">The double to append.</param>
+				Cstring(const double&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{char*}">The char* string to append.</param>
+				Cstring(const char*);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{char}">The char to append.</param>
+				Cstring(const char&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{int}">The char to append.</param>
+				Cstring(const int&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{unsigned}">The char to append.</param>
+				Cstring(const unsigned&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{long}">The char to append.</param>
+				Cstring(const long&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{long long}">The char to append.</param>
+				Cstring(const long long&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{unsigned long}">The char to append.</param>
+				Cstring(const unsigned long&);
+
+				/// <summary>
+				/// <para>Constructor copy.</para>
+				/// </summary>
+				/// <param name="{unsigned long long}">The char to append.</param>
+				Cstring(const unsigned long long&);
 
 				/// <summary>
 				/// <para>Search for a char.</para>
@@ -122,9 +178,22 @@ namespace LSW {
 				char_c pop();
 
 				/// <summary>
+				/// <para>Pops out the front.</para>
+				/// </summary>
+				/// <returns>{char_c} The char_c popped out.</returns>
+				char_c pop_front();
+
+				/// <summary>
 				/// <para>Pops out the back, but ensures to not break a utf8 combined char.</para>
 				/// </summary>
-				void pop_utf8();
+				/// <returns>{size_t} The unicode length popped out.</returns>
+				size_t pop_utf8();
+
+				/// <summary>
+				/// <para>Pops out the front, but ensures to not break a utf8 combined char.</para>
+				/// </summary>
+				/// <returns>{size_t} The unicode length popped out.</returns>
+				size_t pop_front_utf8();
 
 				/// <summary>
 				/// <para>The size of the string.</para>
@@ -133,19 +202,15 @@ namespace LSW {
 				size_t size() const;
 
 				/// <summary>
-				/// <para>Are there some &4Colors not processed? You can try to refresh itself.</para>
+				/// <para>The size of the string considering UTF8.</para>
 				/// </summary>
-				Cstring& refresh();
+				/// <returns>{size_t} The encoded string size.</returns>
+				size_t size_utf8() const;
 
 				/// <summary>
-				/// <para>Appends a type T string.</para>
+				/// <para>Are there some color codess not processed? You can try to refresh itself.</para>
 				/// </summary>
-				/// <param name="{T}">The T to append.</param>
-				/// <returns>{Cstring} Itself.</returns>
-				/*template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
-				Cstring& append(const T& u) {
-					return this->append(std::to_string(u));
-				}*/
+				Cstring& refresh();
 
 				/// <summary>
 				/// <para>Appends strings.</para>
@@ -204,54 +269,224 @@ namespace LSW {
 				Cstring& append(const cstring::C&);
 
 				/// <summary>
-				/// <para>Appends a type T.</para>
+				/// <para>Appends int.</para>
 				/// </summary>
-				/// <param name="{T}">The T to append.</param>
-				/// <returns>{Cstring} Itself.</returns>
-				template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
-				Cstring& operator+=(const T& u) {
-					return this->append(u);
-				};
+				/// <param name="{int}">The char to append.</param>
+				Cstring& append(const int&);
 
 				/// <summary>
-				/// <para>Appends a type char*.</para>
+				/// <para>Appends unsigned.</para>
 				/// </summary>
-				/// <param name="{char*}">The string to append.</param>
+				/// <param name="{unsigned}">The char to append.</param>
+				Cstring& append(const unsigned&);
+
+				/// <summary>
+				/// <para>Appends long.</para>
+				/// </summary>
+				/// <param name="{long}">The char to append.</param>
+				Cstring& append(const long&);
+
+				/// <summary>
+				/// <para>Appends long long.</para>
+				/// </summary>
+				/// <param name="{long long}">The char to append.</param>
+				Cstring& append(const long long&);
+
+				/// <summary>
+				/// <para>Appends unsigned long.</para>
+				/// </summary>
+				/// <param name="{unsigned long}">The char to append.</param>
+				Cstring& append(const unsigned long&);
+
+				/// <summary>
+				/// <para>Appends unsigned long long.</para>
+				/// </summary>
+				/// <param name="{unsigned long long}">The char to append.</param>
+				Cstring& append(const unsigned long long&);
+
+				/// <summary>
+				/// <para>Appends strings.</para>
+				/// </summary>
+				/// <param name="{Cstring}">The string to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring& operator+=(const Cstring&);
+
+				/// <summary>
+				/// <para>Appends string.</para>
+				/// </summary>
+				/// <param name="{std::string}">The string to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring& operator+=(const std::string&);
+
+				/// <summary>
+				/// <para>Appends a char_c.</para>
+				/// </summary>
+				/// <param name="{char_c}">The char_c to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring& operator+=(const char_c&);
+
+				/// <summary>
+				/// <para>Appends float.</para>
+				/// </summary>
+				/// <param name="{float}">The float to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring& operator+=(const float&);
+
+				/// <summary>
+				/// <para>Appends double.</para>
+				/// </summary>
+				/// <param name="{double}">The double to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring& operator+=(const double&);
+
+				/// <summary>
+				/// <para>Appends char* string.</para>
+				/// </summary>
+				/// <param name="{char*}">The char* string to append.</param>
 				/// <returns>{Cstring} Itself.</returns>
 				Cstring& operator+=(const char*);
 
 				/// <summary>
-				/// <para>Appends a type T.</para>
+				/// <para>Appends char.</para>
 				/// </summary>
-				/// <param name="{T}">The T to append.</param>
-				/// <returns>{Cstring} Result.</returns>
-				template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
-				Cstring operator+(const T& u) const {
-					Cstring a = *this;
-					return a.append(u);
-				};
+				/// <param name="{char}">The char to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring& operator+=(const char&);
+
 				/// <summary>
-				/// <para>Appends a type char*.</para>
+				/// <para>Sets last color as this one (the ones added later will have this color).</para>
 				/// </summary>
-				/// <param name="{char*}">The string to append.</param>
-				/// <returns>{Cstring} Result.</returns>
+				/// <param name="{cstring::C}">The color.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring& operator+=(const cstring::C&);
+
+				/// <summary>
+				/// <para>Appends int.</para>
+				/// </summary>
+				/// <param name="{int}">The char to append.</param>
+				Cstring& operator+=(const int&);
+
+				/// <summary>
+				/// <para>Appends unsigned.</para>
+				/// </summary>
+				/// <param name="{unsigned}">The char to append.</param>
+				Cstring& operator+=(const unsigned&);
+
+				/// <summary>
+				/// <para>Appends long.</para>
+				/// </summary>
+				/// <param name="{long}">The char to append.</param>
+				Cstring& operator+=(const long&);
+
+				/// <summary>
+				/// <para>Appends long long.</para>
+				/// </summary>
+				/// <param name="{long long}">The char to append.</param>
+				Cstring& operator+=(const long long&);
+
+				/// <summary>
+				/// <para>Appends unsigned long.</para>
+				/// </summary>
+				/// <param name="{unsigned long}">The char to append.</param>
+				Cstring& operator+=(const unsigned long&);
+
+				/// <summary>
+				/// <para>Appends unsigned long long.</para>
+				/// </summary>
+				/// <param name="{unsigned long long}">The char to append.</param>
+				Cstring& operator+=(const unsigned long long&);
+
+				/// <summary>
+				/// <para>Appends strings.</para>
+				/// </summary>
+				/// <param name="{Cstring}">The string to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring operator+(const Cstring&) const;
+
+				/// <summary>
+				/// <para>Appends string.</para>
+				/// </summary>
+				/// <param name="{std::string}">The string to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring operator+(const std::string&) const;
+
+				/// <summary>
+				/// <para>Appends a char_c.</para>
+				/// </summary>
+				/// <param name="{char_c}">The char_c to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring operator+(const char_c&) const;
+
+				/// <summary>
+				/// <para>Appends float.</para>
+				/// </summary>
+				/// <param name="{float}">The float to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring operator+(const float&) const;
+
+				/// <summary>
+				/// <para>Appends double.</para>
+				/// </summary>
+				/// <param name="{double}">The double to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring operator+(const double&) const;
+
+				/// <summary>
+				/// <para>Appends char* string.</para>
+				/// </summary>
+				/// <param name="{char*}">The char* string to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
 				Cstring operator+(const char*) const;
 
 				/// <summary>
-				/// <para>Clears and set T as value.</para>
+				/// <para>Appends char.</para>
 				/// </summary>
-				/// <param name="{T}">The T to set.</param>
-				template<typename T, std::enable_if_t<!std::is_same_v<Tools::r_cast_t<T>, char*>, int> = 0>
-				void operator=(const T& u) {
-					clear();
-					append(u);
-				};
+				/// <param name="{char}">The char to append.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring operator+(const char&) const;
 
 				/// <summary>
-				/// <para>Clears and set char* as value.</para>
+				/// <para>Sets last color as this one (the ones added later will have this color).</para>
 				/// </summary>
-				/// <param name="{char*}">The string to set.</param>
-				void operator=(const char*);
+				/// <param name="{cstring::C}">The color.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				Cstring operator+(const cstring::C&) const;
+
+				/// <summary>
+				/// <para>Appends int.</para>
+				/// </summary>
+				/// <param name="{int}">The char to append.</param>
+				Cstring operator+(const int&) const;
+
+				/// <summary>
+				/// <para>Appends unsigned.</para>
+				/// </summary>
+				/// <param name="{unsigned}">The char to append.</param>
+				Cstring operator+(const unsigned&) const;
+
+				/// <summary>
+				/// <para>Appends long.</para>
+				/// </summary>
+				/// <param name="{long}">The char to append.</param>
+				Cstring operator+(const long&) const;
+
+				/// <summary>
+				/// <para>Appends long long.</para>
+				/// </summary>
+				/// <param name="{long long}">The char to append.</param>
+				Cstring operator+(const long long&) const;
+
+				/// <summary>
+				/// <para>Appends unsigned long.</para>
+				/// </summary>
+				/// <param name="{unsigned long}">The char to append.</param>
+				Cstring operator+(const unsigned long&) const;
+
+				/// <summary>
+				/// <para>Appends unsigned long long.</para>
+				/// </summary>
+				/// <param name="{unsigned long long}">The char to append.</param>
+				Cstring operator+(const unsigned long long&) const;
 
 				/// <summary>
 				/// <para>Copy operator.</para>
@@ -266,11 +501,95 @@ namespace LSW {
 				void operator=(Cstring&&) noexcept;
 
 				/// <summary>
+				/// <para>Copy string.</para>
+				/// </summary>
+				/// <param name="{std::string}">The string to copy.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				void operator=(const std::string&);
+
+				/// <summary>
+				/// <para>Copy a char_c.</para>
+				/// </summary>
+				/// <param name="{char_c}">The char_c to copy.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				void operator=(const char_c&);
+
+				/// <summary>
+				/// <para>Copy float.</para>
+				/// </summary>
+				/// <param name="{float}">The float to copy.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				void operator=(const float&);
+
+				/// <summary>
+				/// <para>Copy double.</para>
+				/// </summary>
+				/// <param name="{double}">The double to copy.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				void operator=(const double&);
+
+				/// <summary>
+				/// <para>Copy char* string.</para>
+				/// </summary>
+				/// <param name="{char*}">The char* string to copy.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				void operator=(const char*);
+
+				/// <summary>
+				/// <para>Copy char.</para>
+				/// </summary>
+				/// <param name="{char}">The char to copy.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				void operator=(const char&);
+
+				/// <summary>
+				/// <para>Sets last color as this one (the ones added later will have this color).</para>
+				/// </summary>
+				/// <param name="{cstring::C}">The color.</param>
+				/// <returns>{Cstring} Itself.</returns>
+				void operator=(const cstring::C&);
+
+				/// <summary>
+				/// <para>Copy int.</para>
+				/// </summary>
+				/// <param name="{int}">The char to copy.</param>
+				void operator=(const int&);
+
+				/// <summary>
+				/// <para>Copy unsigned.</para>
+				/// </summary>
+				/// <param name="{unsigned}">The char to copy.</param>
+				void operator=(const unsigned&);
+
+				/// <summary>
+				/// <para>Copy long.</para>
+				/// </summary>
+				/// <param name="{long}">The char to copy.</param>
+				void operator=(const long&);
+
+				/// <summary>
+				/// <para>Copy long long.</para>
+				/// </summary>
+				/// <param name="{long long}">The char to copy.</param>
+				void operator=(const long long&);
+
+				/// <summary>
+				/// <para>Copy unsigned long.</para>
+				/// </summary>
+				/// <param name="{unsigned long}">The char to copy.</param>
+				void operator=(const unsigned long&);
+
+				/// <summary>
+				/// <para>Copy unsigned long long.</para>
+				/// </summary>
+				/// <param name="{unsigned long long}">The char to copy.</param>
+				void operator=(const unsigned long long&);
+
+				/// <summary>
 				/// <para>Appends a char_c.</para>
 				/// </summary>
 				/// <param name="{char_c}">The char_c to append.</param>
 				void push_back(char_c&&);
-
 
 				/// <summary>
 				/// <para>Begin iterator.</para>
@@ -295,7 +614,6 @@ namespace LSW {
 				/// </summary>
 				/// <returns>{iterator} End iterator.</returns>
 				std::vector<char_c>::const_iterator end() const;
-
 
 				/// <summary>
 				/// <para>Gets a specific char_c.</para>
@@ -322,7 +640,6 @@ namespace LSW {
 				/// </summary>
 				/// <returns>{char_c} The character.</returns>
 				const char_c& back() const;
-
 
 				/// <summary>
 				/// <para>Clears the memory.</para>

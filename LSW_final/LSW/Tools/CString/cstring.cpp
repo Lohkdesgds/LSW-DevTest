@@ -64,17 +64,83 @@ namespace LSW {
 				return std::move(finalt);
 			}
 			
-			Cstring::Cstring(const Cstring& c)
-			{
-				*this = c;
-			}
-			
 			Cstring::Cstring(Cstring&& m) noexcept
 			{
 				*this = std::move(m);
 			}
 			
+			Cstring::Cstring(const Cstring& c)
+			{
+				*this = c;
+			}
+
+			Cstring::Cstring(const std::string& u)
+			{
+				clear();
+				append(u);
+			}
+
+			Cstring::Cstring(const char_c& c)
+			{
+				clear();
+				append(c);
+			}
+
+			Cstring::Cstring(const float& u)
+			{
+				clear();
+				append(u);
+			}
+
+			Cstring::Cstring(const double& u)
+			{
+				clear();
+				append(u);
+			}
+
 			Cstring::Cstring(const char* u)
+			{
+				clear();
+				append(u);
+			}
+
+			Cstring::Cstring(const char& u)
+			{
+				clear();
+				append(u);
+			}
+
+			Cstring::Cstring(const int& u)
+			{
+				clear();
+				append(u);
+			}
+
+			Cstring::Cstring(const unsigned& u)
+			{
+				clear();
+				append(u);
+			}
+
+			Cstring::Cstring(const long& u)
+			{
+				clear();
+				append(u);
+			}
+
+			Cstring::Cstring(const long long& u)
+			{
+				clear();
+				append(u);
+			}
+
+			Cstring::Cstring(const unsigned long& u)
+			{
+				clear();
+				append(u);
+			}
+
+			Cstring::Cstring(const unsigned long long& u)
 			{
 				clear();
 				append(u);
@@ -186,23 +252,65 @@ namespace LSW {
 				else return char_c();
 			}
 
-			void Cstring::pop_utf8()
+			char_c Cstring::pop_front()
 			{
 				if (str.size() > 0) {
-					auto cp = str.data() + str.size();
-					
-					while (--cp >= str.data() && ((cp->ch & 0b10000000) && !(cp->ch & 0b01000000))) { last_added_color = cp->cr; }
-					
+					char_c cpy = str.front();
+					str.erase(str.begin());
+					if (str.size() > 0) last_added_color = str.back().cr;
+					return cpy;
+				}
+				else return char_c();
+			}
+
+			size_t Cstring::pop_utf8()
+			{
+				size_t pop_len = 0;
+				if (str.size() > 0) {
+					char_c* cp = str.data() + str.size();
+					pop_len++;
+
+					while (--cp >= str.data() && ((cp->ch & 0b10000000) && !(cp->ch & 0b01000000))) { pop_len++; last_added_color = cp->cr; }
+
 					if (cp >= str.data())
 						str.resize(cp - str.data());
 
 					if (size()) last_added_color = back().cr;
 				}
+				return pop_len;
+			}
+
+			size_t Cstring::pop_front_utf8()
+			{
+				// https://www.instructables.com/Programming--how-to-detect-and-read-UTF-8-charact/
+				size_t pop_len = 0;
+				if (str.size() > 0) {
+					char_c* cp = str.data();
+					pop_len = 1;
+
+					if (cp->ch & 0b10000000) { // detected
+						while (++cp < str.data() + str.size() && ((cp->ch & 0b10000000) && !(cp->ch & 0b01000000))) { pop_len++; last_added_color = cp->cr; }
+					}
+
+					if (cp >= str.data())
+						str.erase(str.begin(), str.begin() + pop_len);
+
+				}
+				return pop_len;
 			}
 			
 			size_t Cstring::size() const
 			{
 				return str.size();
+			}
+
+			size_t Cstring::size_utf8() const
+			{
+				size_t len = 0;
+				for (auto& i : str) {
+					if ((i.ch & 0xC0) != 0x80) ++len;
+				}
+				return len;
 			}
 
 			Cstring& Cstring::refresh()
@@ -288,18 +396,14 @@ namespace LSW {
 
 			Cstring& Cstring::append(const float& a)
 			{
-				char temp[32];
-				if (fabs(a) < 1e15) sprintf_s(temp, "%.3f", a);
-				else sprintf_s(temp, a > 0 ? "+++" : "---");
-				return this->append(std::string(temp));
+				if (fabs(a) < 1e30f) return this->append(Tools::sprintf_a("%.3f", a));
+				return this->append(a > 0 ? "+++" : "---");
 			}
 
 			Cstring& Cstring::append(const double& a)
 			{
-				char temp[32];
-				if (fabs(a) < 1e15) sprintf_s(temp, "%.5lf", a);
-				else sprintf_s(temp, a > 0 ? "+++" : "---");
-				return this->append(std::string(temp));
+				if (fabs(a) < 1e100) return this->append(Tools::sprintf_a("%.5lf", a));
+				return this->append(a > 0 ? "+++" : "---");
 			}
 
 			Cstring& Cstring::append(const char* a)
@@ -318,21 +422,188 @@ namespace LSW {
 				return *this;
 			}
 
-			Cstring& Cstring::operator+=(const char* u)
+			Cstring& Cstring::append(const int& a)
 			{
-				return this->append(u);
+				return this->append(std::to_string(a));
 			}
 
-			Cstring Cstring::operator+(const char* u) const
+			Cstring& Cstring::append(const unsigned& a)
 			{
-				Cstring a = *this;
-				return a.append(u);
+				return this->append(std::to_string(a));
 			}
 
-			void Cstring::operator=(const char* u)
+			Cstring& Cstring::append(const long& a)
 			{
-				clear();
-				append(u);
+				return this->append(std::to_string(a));
+			}
+
+			Cstring& Cstring::append(const long long& a)
+			{
+				return this->append(std::to_string(a));
+			}
+
+			Cstring& Cstring::append(const unsigned long& a)
+			{
+				return this->append(std::to_string(a));
+			}
+
+			Cstring& Cstring::append(const unsigned long long& a)
+			{
+				return this->append(std::to_string(a));
+			}
+
+			Cstring& Cstring::operator+=(const Cstring& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const std::string& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const char_c& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const float& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const double& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const char* a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const char& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const cstring::C& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const int& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const unsigned& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const long& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const long long& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const unsigned long& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring& Cstring::operator+=(const unsigned long long& a)
+			{
+				return this->append(a);
+			}
+
+			Cstring Cstring::operator+(const Cstring& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const std::string& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const char_c& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const float& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const double& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const char* a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const char& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const cstring::C& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const int& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const unsigned& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const long& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const long long& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const unsigned long& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
+			}
+
+			Cstring Cstring::operator+(const unsigned long long& a) const
+			{
+				Cstring u = *this;
+				return std::move(u.append(a));
 			}
 
 			void Cstring::operator=(const Cstring& c)
@@ -345,6 +616,84 @@ namespace LSW {
 			{
 				str = std::move(m.str);
 				last_added_color = std::move(last_added_color);
+			}
+
+			void Cstring::operator=(const std::string& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const char_c& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const float& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const double& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const char* a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const char& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const cstring::C& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const int& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const unsigned& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const long& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const long long& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const unsigned long& a)
+			{
+				str.clear();
+				append(a);
+			}
+
+			void Cstring::operator=(const unsigned long long& a)
+			{
+				str.clear();
+				append(a);
 			}
 
 			void Cstring::push_back(char_c&& u)

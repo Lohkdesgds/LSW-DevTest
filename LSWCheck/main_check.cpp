@@ -61,7 +61,7 @@ int main() {
 	_text_early->set(Work::sprite::e_boolean::DRAW, false);
 	_text_early->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	_text_early->set(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
-	_text_early->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return "&9" + _what_test + [] {std::string s; for (unsigned u = 0; u < ((int)(al_get_time() * 1.4)) % 3; u++) s += '.'; return '.' + s; }(); });
+	_text_early->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return "&9" + _what_test + [] {std::string s; for (int u = 0; u < ((int)(al_get_time() * 1.4)) % 3; u++) s += '.'; return '.' + s; }(); });
 	_text_early->set(Work::sprite::e_double::TARG_POSX, 0.0);
 	_text_early->set(Work::sprite::e_double::TARG_POSY, 0.58);
 	_text_early->set(Work::sprite::e_double::SCALE_G, 0.085);
@@ -268,6 +268,10 @@ int main() {
 	testtin.get_text().set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
 	testtin.get_text().set(Work::text::e_integer::STRING_Y_MODE, static_cast<int>(Work::text::e_text_y_modes::CENTER));
 	testtin.get_text().set(Work::text::e_double::LINE_ADJUST, 0.68);
+	testtin.get_text().set(Work::text::e_double::MAX_TEXT_LENGTH_SIZE, 0.5);
+	testtin.get_text().set(Work::text::e_integer::LINE_MAX_LENGTH, 50);
+	testtin.get_text().set(Work::text::e_integer::MAX_LINES_AMOUNT, 2);
+	testtin.get_text().set(Work::text::e_boolean::SCROLL_INSTEAD_OF_MAX_LEN_SIZE_BLOCK, false);
 	testtin.main().set(Work::textinput::e_boolean::ENTER_BREAK_LINE, true);
 	testtin.main().set<Work::sprite::functional>(Work::textinput::e_tie_functional::SAVED_STRING, [](const Tools::Any& str) {
 		Logger logg;

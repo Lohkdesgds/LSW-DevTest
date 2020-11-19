@@ -12,10 +12,10 @@ namespace LSW {
 		namespace Work {
 
 			namespace textinput {
-				enum class e_boolean_readonly { SELECTED };
+				enum class e_boolean_readonly { SELECTED, DISABLE_BLINK_TEMP };
 				enum class e_cstring_readonly { BUFFER };
 
-				enum class e_boolean { ENTER_BREAK_LINE };
+				enum class e_boolean { ENTER_BREAK_LINE, NON_AXIS_CANCEL_READING, NO_COLOR_TRANSLATION };
 
 				enum class e_tie_functional {
 					SAVED_STRING = 0 // expect Cstring
@@ -23,7 +23,10 @@ namespace LSW {
 
 				const Tools::SuperMap<Tools::FastFunction<bool>>		e_boolean_defaults = {
 					{false,							(e_boolean_readonly::SELECTED),					("selected")},
-					{false,							(e_boolean::ENTER_BREAK_LINE),					("enter_break_line")}
+					{false,							(e_boolean_readonly::DISABLE_BLINK_TEMP),		("disable_blink_temp")},
+					{false,							(e_boolean::ENTER_BREAK_LINE),					("enter_break_line")},
+					{false,							(e_boolean::NON_AXIS_CANCEL_READING),			("non_axis_cancel_reading")},
+					{false,							(e_boolean::NO_COLOR_TRANSLATION),				("no_color_translation")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<Tools::Cstring>>	e_cstring_defaults = {
 					{Tools::Cstring(),				(e_cstring_readonly::BUFFER),					("buffer")}
@@ -45,7 +48,7 @@ namespace LSW {
 			/// <para>- text::e_cstring::STRING (Text part, it will be overwritten)</para>
 			/// </summary>
 			class TextInput : protected Button {
-				Interface::Event keyboard_event;
+				Interface::Event kbev, msev;
 				Interface::EventHandler event_handler;
 
 				void _apply_latest();
@@ -61,9 +64,24 @@ namespace LSW {
 				using Button::get_block;
 				using Button::get_text;
 				using Block::update_and_clear;
-				
+
+				/// <summary>
+				/// <para>Gets the variable with textinput data.</para>
+				/// </summary>
+				/// <returns>{Text*} Current holder of its data.</returns>
 				Text& main();
+
+				/// <summary>
+				/// <para>Gets the variable with textinput data.</para>
+				/// </summary>
+				/// <returns>{Text*} Current holder of its data.</returns>
 				const Text& main() const;
+
+				/// <summary>
+				/// <para>As reading has several steps, this function was created.</para>
+				/// </summary>
+				/// <param name="{bool}">True to force "reading mode" (Like if you clicked it).</param>
+				void set_reading(const bool);
 
 				TextInput();
 				TextInput(TextInput&&) = delete;

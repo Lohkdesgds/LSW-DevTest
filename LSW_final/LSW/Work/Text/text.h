@@ -18,12 +18,13 @@ namespace LSW {
 			namespace text {
 
 				enum class e_chronomillis_readonly { LAST_UPDATE_BITMAP, LAST_UPDATE_STRING };
+				enum class e_boolean_readonly { REACHED_LIMIT };
 
 				enum class e_cstring { STRING };
-				enum class e_double { SHADOW_DISTANCE_X, SHADOW_DISTANCE_Y, TEXT_UPDATE_TIME, BUFFER_SCALE_RESOLUTION, UPDATES_PER_SECOND, LINE_ADJUST };
+				enum class e_double { SHADOW_DISTANCE_X, SHADOW_DISTANCE_Y, TEXT_UPDATE_TIME, BUFFER_SCALE_RESOLUTION, UPDATES_PER_SECOND, LINE_ADJUST, MAX_TEXT_LENGTH_SIZE };
 				enum class e_color { SHADOW_COLOR };
 				enum class e_integer { STRING_MODE, STRING_Y_MODE, FONT_SIZE, TOTAL_TEXT_MAX_LENGTH, LINE_MAX_LENGTH, MAX_LINES_AMOUNT };
-				enum class e_boolean { USE_BITMAP_BUFFER, USE_COLOR_INSTEAD_OF_AUTO /*auto: &6gold&1blue*/ };
+				enum class e_boolean { USE_BITMAP_BUFFER, USE_COLOR_INSTEAD_OF_AUTO /*auto: &6gold&1blue*/, SCROLL_INSTEAD_OF_MAX_LEN_SIZE_BLOCK /*on max length in "pixels" but not in bytes, scroll?*/ };
 				enum class e_sprite_ref { FOLLOWING };
 
 				const Tools::SuperMap<Tools::FastFunction<std::chrono::milliseconds>>		e_chronomillis_readonly_defaults = {
@@ -52,8 +53,10 @@ namespace LSW {
 					{0,																											(e_integer::MAX_LINES_AMOUNT),							("max_lines_amount")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<bool>>							e_boolean_defaults = {
+					{false,																										(e_boolean_readonly::REACHED_LIMIT),					("reached_limit")},
 					{false,																										(e_boolean::USE_BITMAP_BUFFER),							("use_bitmap_buffer")},
-					{false,																										(e_boolean::USE_COLOR_INSTEAD_OF_AUTO),					("use_color_instead_of_auto")}
+					{false,																										(e_boolean::USE_COLOR_INSTEAD_OF_AUTO),					("use_color_instead_of_auto")},
+					{true,																										(e_boolean::SCROLL_INSTEAD_OF_MAX_LEN_SIZE_BLOCK),		("scroll_instead_of_max_len_size_block")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<Sprite_Base>>						e_sprite_ref_defaults = {
 					{Sprite_Base(),																								(e_sprite_ref::FOLLOWING),								("following")}
@@ -136,6 +139,13 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{Font}">A Font.</param>
 				void set(const Interface::Font&);
+
+				/// <summary>
+				/// <para>Checks if this fits with the configuration set.</para>
+				/// </summary>
+				/// <param name="{Tools::Cstring}">String to set.</param>
+				/// <returns>{bool} True if this will be fully shown.</returns>
+				bool check_fit(Tools::Cstring) const;
 
 			};
 

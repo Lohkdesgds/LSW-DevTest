@@ -8,9 +8,11 @@ namespace LSW {
 			{
 				const auto delta_t = get_direct<std::chrono::milliseconds>(text::e_chronomillis_readonly::LAST_UPDATE_STRING);
 				const auto ups_val = get_direct<double>(text::e_double::UPDATES_PER_SECOND);
+				const auto max_length_line_size = get_direct<double>(text::e_double::MAX_TEXT_LENGTH_SIZE) * get_direct<int>(text::e_integer::FONT_SIZE) / (get_direct<double>(sprite::e_double::SCALE_G) * get_direct<double>(sprite::e_double::SCALE_X));
 				const auto max_length_total = get_direct<int>(text::e_integer::TOTAL_TEXT_MAX_LENGTH);
 				const auto max_length_line = get_direct<int>(text::e_integer::LINE_MAX_LENGTH);
 				const auto max_lines = get_direct<int>(text::e_integer::MAX_LINES_AMOUNT);
+				const auto scroll_on_line_limit = get_direct<bool>(text::e_boolean::SCROLL_INSTEAD_OF_MAX_LEN_SIZE_BLOCK);
 
 				//TOTAL_TEXT_MAX_LENGTH, LINE_MAX_LENGTH, MAX_LINES_AMOUNT
 
@@ -22,24 +24,41 @@ namespace LSW {
 					//if (get_direct<std::string>(sprite::e_string::ID) == "HEYO MAYO!") std::cout << "UPDATE\n";
 					set(text::e_chronomillis_readonly::LAST_UPDATE_STRING, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()) + std::chrono::milliseconds(instantaneous ? 0 : (unsigned long long)(1000.0 / ups_val)));
 
+					bool got_limited = false;
+
 					auto p_str = get_direct<Tools::Cstring>(text::e_cstring::STRING);
 					if (max_length_total && p_str.size() > static_cast<size_t>(max_length_total)) {
 						p_str = p_str.substr(0, max_length_total);
 						if (!get_direct<Tools::Cstring&>(text::e_cstring::STRING)->is_function()) set(text::e_cstring::STRING, p_str);
+						got_limited = true;
 					}
 
 					size_t arrp = 0;
 
 					size_t pos = 0;
-					while ((pos = p_str.find('\n')) != std::string::npos) {
+					while (((pos = p_str.find('\n')) != std::string::npos) || (max_length_line && p_str.size() > static_cast<size_t>(max_length_line)) || (max_length_line_size > 0.0 && fontt.get_width(p_str.s_str().c_str()) > max_length_line_size)) {
 
-						if (max_length_line) pos = pos > static_cast<size_t>(max_length_line) ? max_length_line : pos;
+						auto line = p_str.substr(0, pos);
+
+						if (max_length_line && line.size_utf8() > static_cast<size_t>(max_length_line)) {
+							while (line.size_utf8() > static_cast<size_t>(max_length_line)) line.pop_utf8();
+							pos = line.size();
+							if (pos) pos--; // last char is erased if not because of + 1 later there
+						}
+						if (max_length_line_size > 0.0 && !scroll_on_line_limit && fontt.get_width(line.s_str().c_str()) > max_length_line_size) {
+							while (fontt.get_width(line.s_str().c_str()) > max_length_line_size) line.pop_utf8();
+							pos = line.size();
+							if (pos) pos--; // last char is erased if not because of + 1 later there
+						}
 
 						if (arrp < _buf_lines.size()) {
-							_buf_lines[arrp] = std::move(p_str.substr(0, pos));
+							_buf_lines[arrp] = std::move(line);
 						}
-						else if (!max_lines || arrp < static_cast<size_t>(max_lines)) _buf_lines.push_back(std::move(p_str.substr(0, pos)));
-						else break;
+						else if (!max_lines || arrp < static_cast<size_t>(max_lines)) _buf_lines.push_back(std::move(line));
+						else {
+							got_limited = true;
+							break;
+						}
 						arrp++;
 
 						if (pos >= p_str.size()) {
@@ -48,14 +67,32 @@ namespace LSW {
 						}
 						p_str = std::move(p_str.substr(pos + 1));
 					}
-					if (p_str.size() > 0 && (arrp < static_cast<size_t>(max_lines) || !max_lines)) {
-						if (arrp < _buf_lines.size()) {
-							_buf_lines[arrp] = std::move(p_str);
+
+					if (p_str.size() > 0){
+						if (arrp < static_cast<size_t>(max_lines) || !max_lines) {
+							if (arrp < _buf_lines.size()) {
+								_buf_lines[arrp] = std::move(p_str);
+							}
+							else _buf_lines.push_back(std::move(p_str));
+							arrp++;
 						}
-						else _buf_lines.push_back(std::move(p_str));
-						arrp++;
+						else {
+							got_limited = true;
+						}
 					}
+					else if (arrp == static_cast<size_t>(max_lines)) {
+						got_limited = true;
+					}
+
 					_buf_lines.resize(arrp);
+
+					if (max_length_line_size > 0.0 && scroll_on_line_limit) {
+						for (auto& i : _buf_lines) {
+							while (fontt.get_width(i.s_str().c_str()) > max_length_line_size) i.pop_front_utf8();
+						}
+					}
+
+					set(text::e_boolean_readonly::REACHED_LIMIT, got_limited);
 				}
 			}
 			
@@ -285,6 +322,65 @@ namespace LSW {
 			{
 				fontt = f;
 			}
+
+			bool Text::check_fit(Tools::Cstring p_str) const
+			{
+				const auto max_length_line_size = get_direct<double>(text::e_double::MAX_TEXT_LENGTH_SIZE) * get_direct<int>(text::e_integer::FONT_SIZE) / (get_direct<double>(sprite::e_double::SCALE_G) * get_direct<double>(sprite::e_double::SCALE_X));
+				const auto max_length_total = get_direct<int>(text::e_integer::TOTAL_TEXT_MAX_LENGTH);
+				const auto max_length_line = get_direct<int>(text::e_integer::LINE_MAX_LENGTH);
+				const auto max_lines = get_direct<int>(text::e_integer::MAX_LINES_AMOUNT);
+				const auto scroll_on_line_limit = get_direct<bool>(text::e_boolean::SCROLL_INSTEAD_OF_MAX_LEN_SIZE_BLOCK);
+
+				if (max_length_total && p_str.size() > static_cast<size_t>(max_length_total)) return false;
+				if (max_lines) {
+					size_t num_lines = 1;
+					for (size_t _p = 0; _p < p_str.size();) {
+						if ((_p = p_str.substr(_p).find('\n')) != std::string::npos) {
+							if (++num_lines > static_cast<size_t>(max_lines)) return false;
+							_p++;
+						}
+					}
+				}
+				bool got_limited = false;
+
+				size_t arrp = 0;
+
+				size_t pos = 0;
+				while (((pos = p_str.find('\n')) != std::string::npos) || (max_length_line && p_str.size() > static_cast<size_t>(max_length_line)) || (max_length_line_size > 0.0 && fontt.get_width(p_str.s_str().c_str()) > max_length_line_size)) {
+
+					auto line = p_str.substr(0, pos);
+
+					if (max_length_line && line.size_utf8() > static_cast<size_t>(max_length_line)) {
+						while (line.size_utf8() > static_cast<size_t>(max_length_line)) line.pop_utf8();
+						pos = line.size();
+						if (pos) pos--; // last char is erased if not because of + 1 later there
+					}
+					if (max_length_line_size > 0.0 && !scroll_on_line_limit && fontt.get_width(line.s_str().c_str()) > max_length_line_size) {
+						while (fontt.get_width(line.s_str().c_str()) > max_length_line_size) line.pop_utf8();
+						pos = line.size();
+						if (pos) pos--; // last char is erased if not because of + 1 later there
+					}
+
+					if (max_lines && arrp >= static_cast<size_t>(max_lines)) {
+						return false;
+					}
+					arrp++;
+
+					if (pos >= p_str.size()) {
+						p_str.clear();
+						break;
+					}
+					p_str = std::move(p_str.substr(pos + 1));
+				}
+
+				if (p_str.size() > 0) {
+					if (max_lines && arrp >= static_cast<size_t>(max_lines)) {
+						return false;
+					}
+				}
+
+				return true;
+			}		
 
 			// implementation
 

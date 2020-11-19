@@ -7,6 +7,8 @@ namespace LSW {
 
 			void create_path(const std::string& s)
 			{
+				if (s.find('/') == std::string::npos) return; // raw filename
+
 				std::string str;
 				std::stringstream ss(s);
 				std::string token;
@@ -19,6 +21,7 @@ namespace LSW {
 #endif
 
 				// Windows likes \\ to paths, / to URLs, so the whole stuff is /, but Windows calls will be \\.
+
 
 				while (std::getline(ss, token, '/'))
 				{

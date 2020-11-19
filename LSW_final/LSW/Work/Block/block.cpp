@@ -45,7 +45,7 @@ namespace LSW {
 
 					set<std::chrono::milliseconds>(block::e_chronomillis_readonly::LAST_FRAME, last_time);
 
-					set(block::e_uintptr_t::FRAME, frame);
+					set<uintptr_t>(block::e_uintptr_t::FRAME, frame);
 				}
 				if (frame >= bitmaps.size()) frame = static_cast<int>(bitmaps.size() - 1);
 
