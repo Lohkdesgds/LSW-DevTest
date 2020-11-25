@@ -280,9 +280,6 @@
     <Filter Include="LSW\3. Work\Collisioner">
       <UniqueIdentifier>{c23226b9-543b-44bf-82d0-d6e3924f8fdc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LSW\3. Work\Layering">
-      <UniqueIdentifier>{0f5df191-9be2-4f89-bcaf-a0e0295dd012}</UniqueIdentifier>
-    </Filter>
     <Filter Include="LSW\3. Work\GameCore">
       <UniqueIdentifier>{c9e43f15-067e-4703-a2b1-50cb7017aa39}</UniqueIdentifier>
     </Filter>
@@ -507,5 +504,7 @@
     <ClInclude Include="..\LSW_final\LSW\Work\ShineFX\shinefx.h">
       <Filter>LSW\3. Work\ShineFX</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
   </ItemGroup>
 </Project>

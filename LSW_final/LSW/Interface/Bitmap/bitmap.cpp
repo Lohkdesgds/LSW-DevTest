@@ -159,6 +159,11 @@ namespace LSW {
 				return quick() == o.quick();
 			}
 
+			Bitmap::operator ALLEGRO_BITMAP*() const
+			{
+				return quick();
+			}
+
 			const bool Bitmap::empty() const
 			{
 				return !bitmap_orig;

@@ -39,10 +39,9 @@ namespace LSW {
 				Handling::init_basic();
 
 				if (!physfs_initialized_once) {
-					char myself[1024];
-					GetModuleFileNameA(NULL, myself, 1024);
+					auto path = Handling::get_app_path();
 
-					if (!PHYSFS_init(myself)) throw Handling::Abort(__FUNCSIG__, "Failed to setup physfs!");
+					if (!PHYSFS_init(path.c_str())) throw Handling::Abort(__FUNCSIG__, "Failed to setup physfs!");
 					al_set_physfs_file_interface();
 
 					physfs_initialized_once = true;

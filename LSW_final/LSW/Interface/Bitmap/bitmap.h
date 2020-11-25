@@ -123,6 +123,11 @@ namespace LSW {
 				const bool operator==(Bitmap&) const;
 
 				/// <summary>
+				/// <para>In rare cases you might want to cast this to a RAW BITMAP.</para>
+				/// </summary>
+				operator ALLEGRO_BITMAP*() const;
+
+				/// <summary>
 				/// <para>Checks if it's set.</para>
 				/// </summary>
 				/// <returns>{bool} True if empty.</returns>

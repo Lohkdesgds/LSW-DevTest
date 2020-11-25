@@ -183,6 +183,22 @@ namespace LSW {
 				create_path(path);
 			}
 
+			std::string get_app_path()
+			{
+#ifdef _WIN32
+				char myself[1024];
+				GetModuleFileNameA(NULL, myself, 1024);
+				return myself;
+#else
+				char arg1[20];
+				char exepath[PATH_MAX + 1] = { 0 };
+
+				sprintf(arg1, "/proc/%d/exe", getpid());
+				readlink(arg1, exepath, 1024);
+				return std::string(exepath);
+#endif
+			}
+
 		}
 	}
 }

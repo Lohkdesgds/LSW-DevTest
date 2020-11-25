@@ -27,6 +27,9 @@ void pathmngr_debug(Work::GameCore&, const Interface::PathManager&);
 int main() {
 
 	Work::GameCore core(logpath, configpath);
+
+	core.get_display().set_window_name("The Blast 2");
+
 	std::string _what_test = "Loading";
 
 	Tools::SuperResource<Work::ProgressBar> progressbar_source;
@@ -207,6 +210,7 @@ int main() {
 		auto lmao = source.create("_test");
 		auto dirt = source.create("_dirt");
 		auto mouse = source.create("_mouse");
+		auto icon = source.create("_icon");
 
 		// use .zip
 		pather.apply();
@@ -220,6 +224,7 @@ int main() {
 			gud = lmao->create_sub(atlas, 0, 1536, 512, 512);
 			gud = gud && dirt->create_sub(atlas, 0, 1024, 512, 512);
 			gud = gud && mouse->create_sub(atlas, 1536, 1024, 256, 256);
+			gud = gud && icon->create_sub(atlas, 1536, 1280, 256, 256);
 			if (!gud) {
 				logg << L::SLF << fsr(E::WARN) << "Failed to load sub bitmap from atlas." << L::ELF;
 			}
@@ -248,6 +253,16 @@ int main() {
 	progress->set(Work::progressbar::e_double::PROGRESS, 90e-2);
 
 	working_on.wait();
+
+	Tools::Resource<Bitmap> _icon;
+	if (!bmps.get("_icon", _icon)) {
+		logg << L::SLF << fsr(E::ERRR) << "Texture wasn't found somehow..." << L::ELF;
+		core.shutdown();
+		return -1;
+	}
+	else {
+		core.get_display().set_window_icon(_icon);
+	}
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	_what_test = "Done loading textures";

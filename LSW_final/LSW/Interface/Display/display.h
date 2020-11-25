@@ -52,13 +52,14 @@ namespace LSW {
 				size_t frames_per_second = 0;
 				size_t fails_out_of_range = 0; // out of range ignored because this is faster
 				size_t fails_unexpected = 0; // other error?
+				std::string window_name;
 
 				// target index
 				Interface::Target targ;
 
 				static Tools::SuperMutex sync_threads;
 				DisplayStrongPtr disp;
-				Bitmap dbuffer;
+				Bitmap dbuffer, icon;
 				EventHandler display_events{ Tools::superthread::performance_mode::LOW_POWER };
 
 				//PathManager pathing;
@@ -244,6 +245,18 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{bool}">Fullscreen?</param>
 				void set_fullscreen(const bool);
+
+				/// <summary>
+				/// <para>Sets future or actual window name.</para>
+				/// </summary>
+				/// <param name="{std::string}">Title name.</param>
+				void set_window_name(const std::string&);
+
+				/// <summary>
+				/// <para>Sets future or actual window icon.</para>
+				/// </summary>
+				/// <param name="{Bitmap}">Window icon.</param>
+				void set_window_icon(const Bitmap&);
 
 				/// <summary>
 				/// <para>Hide the mouse in screen.</para>

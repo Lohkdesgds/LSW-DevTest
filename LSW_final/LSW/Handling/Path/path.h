@@ -4,11 +4,14 @@
 #include <Windows.h>
 #else
 #include <sys/stat.h>
+#include <unistd.h>
+#include <limits.h>
 #endif
 
 #include <string>
 #include <vector>
 #include <sstream>
+
 
 namespace LSW {
 	namespace v5 {
@@ -96,6 +99,13 @@ namespace LSW {
 			/// </summary>
 			/// <param name="{std::string}">The path you want to create and interpret (and save interpretation)</param>
 			void handle_path(std::string&);
+
+			/// <summary>
+			/// <para>Gets the executable path.</para>
+			/// </summary>
+			/// <returns>{std::string} Full path.</returns>
+			std::string get_app_path();
+
 		}
 	}
 }

@@ -238,6 +238,8 @@ namespace LSW {
 				}
 				al_inhibit_screensaver(true);
 
+				if (window_name.length()) al_set_window_title(disp.get(), window_name.c_str());
+				if (icon) al_set_display_icon(disp.get(), icon);
 
 				if (hide_mouse_new) al_hide_mouse_cursor(disp.get());
 				else				al_show_mouse_cursor(disp.get());
@@ -381,7 +383,7 @@ namespace LSW {
 			{
 				if (xx >= display::minimum_display_size[0]) {
 					new_resolution[0] = xx;
-					if (disp.get()) al_resize_display(disp.get(), new_resolution[0], get_height());
+					if (disp) al_resize_display(disp.get(), new_resolution[0], get_height());
 				}
 			}
 						
@@ -389,7 +391,7 @@ namespace LSW {
 			{
 				if (yy >= display::minimum_display_size[1]) {
 					new_resolution[1] = yy;
-					if (disp.get()) al_resize_display(disp.get(), get_width(), new_resolution[1]);
+					if (disp) al_resize_display(disp.get(), get_width(), new_resolution[1]);
 				}
 			}
 						
@@ -417,19 +419,38 @@ namespace LSW {
 			bool Display::toggle_fullscreen()
 			{
 				is_fullscreen = !is_fullscreen;
-				if (disp.get()) al_toggle_display_flag(disp.get(), ALLEGRO_FULLSCREEN_WINDOW, is_fullscreen);
+				if (disp) al_toggle_display_flag(disp.get(), ALLEGRO_FULLSCREEN_WINDOW, is_fullscreen);
 				return is_fullscreen;
 			}
 						
 			void Display::set_fullscreen(const bool fullscr)
 			{
 				is_fullscreen = fullscr;
-				if (disp.get()) al_toggle_display_flag(disp.get(), ALLEGRO_FULLSCREEN_WINDOW, is_fullscreen);
+				if (disp) al_toggle_display_flag(disp.get(), ALLEGRO_FULLSCREEN_WINDOW, is_fullscreen);
+			}
+
+			void Display::set_window_name(const std::string& wn)
+			{
+				window_name = wn;
+				if (disp) {
+					al_set_window_title(disp.get(), window_name.c_str());
+				}
+			}
+
+			void Display::set_window_icon(const Bitmap& ic)
+			{
+				add_once_task([&, ic] {
+					icon.clone(ic);
+					if (disp && icon) {
+						al_set_display_icon(disp.get(), icon);
+					}
+					return 0;
+				});
 			}
 						
 			void Display::hide_mouse(const bool hid)
 			{
-				if (disp.get()) {
+				if (disp) {
 					if (hid) al_hide_mouse_cursor(disp.get());
 					else al_show_mouse_cursor(disp.get());
 				}
