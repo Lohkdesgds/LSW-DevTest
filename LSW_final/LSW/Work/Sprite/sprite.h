@@ -39,7 +39,11 @@ namespace LSW {
 				COL_MINDIST_... = the distance it has to move in ... (on a collision tick)
 				...UPDATE... = automatic smoothing based on collision calls
 				*/
-				enum class e_double_readonly { PERC_CALC_SMOOTH, SPEED_X, SPEED_Y, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */, LAST_DRAW, LAST_UPDATE, UPDATE_DELTA, POSX, POSY, PROJECTED_POSX, PROJECTED_POSY, ROTATION/*, COL_MINDIST_X, COL_MINDIST_Y*/, MOUSE_CLICK_LAST_X, MOUSE_CLICK_LAST_Y };
+				enum class e_double_readonly { PERC_CALC_SMOOTH, SPEED_X, SPEED_Y, LAST_COLLISION_TIME /* related to: COLLISION_COLLIDED */,
+					LAST_DRAW, LAST_UPDATE, UPDATE_DELTA, POSX, POSY, PROJECTED_POSX, PROJECTED_POSY, ROTATION/*, COL_MINDIST_X, COL_MINDIST_Y*/,
+					MOUSE_CLICK_LAST_X, MOUSE_CLICK_LAST_Y,
+					REALISTIC_RESULT_POSX, REALISTIC_RESULT_POSY, REALISTIC_RESULT_SCALE_X, REALISTIC_RESULT_SCALE_Y
+				};
 				enum class e_boolean_readonly { COLLISION_MOUSE_PRESSED, COLLISION_MOUSE_CLICK, COLLISION_COLLIDED /* related to: LAST_COLLISION_TIME */, INVALIDATE_MOUSE_NOMOVE };
 				enum class e_tief_readonly { LAST_STATE };
 
@@ -114,6 +118,10 @@ namespace LSW {
 					{0.0,															(e_double_readonly::ROTATION),						("rotation")}, // drawing ROTATION
 					{0.0,															(e_double_readonly::MOUSE_CLICK_LAST_X),			("mouse_click_last_x")},
 					{0.0,															(e_double_readonly::MOUSE_CLICK_LAST_Y),			("mouse_click_last_y")},
+					{0.0,															(e_double_readonly::REALISTIC_RESULT_POSX),			("realistic_result_x")}, // after affected_by_cam, how does it look for affected ones in position?
+					{0.0,															(e_double_readonly::REALISTIC_RESULT_POSY),			("realistic_result_y")}, // after affected_by_cam, how does it look for affected ones in position?
+					{0.0,															(e_double_readonly::REALISTIC_RESULT_SCALE_X),		("realistic_result_scale_x")}, // after affected_by_cam, how does it look for affected ones in scale?
+					{0.0,															(e_double_readonly::REALISTIC_RESULT_SCALE_Y),		("realistic_result_scale_y")}, // after affected_by_cam, how does it look for affected ones in scale?
 
 					{0.0,															(e_double::TARG_POSX),								("target_pos_x")},
 					{0.0,															(e_double::TARG_POSY),								("target_pos_y")},
@@ -191,6 +199,7 @@ namespace LSW {
 
 					int directions_cases[4] = { 0 };
 					bool was_col = false;
+					Interface::classic_2d latest_camera;
 
 					easier_collision_handle() = default;
 					easier_collision_handle(const easier_collision_handle&);
@@ -300,7 +309,7 @@ namespace LSW {
 				/// <param name="{T}">A key.</param>
 				/// <param name="{Sprite_Base}">A Sprite_Base with same key set to compare directly.</param>
 				/// <returns>{bool} True if equal right now.</returns>
-				template<typename V, typename T> inline bool is_eq(const T& e, const Sprite_Base& s) const { return get_direct<V>(e) == s.get_direct<V>(e); }
+				template<typename V, typename T> inline bool is_eq_s(const T& e, const Sprite_Base& s) const { return get_direct<V>(e) == s.get_direct<V>(e); }
 
 				/// <summary>
 				/// <para>Calculate and draw this (calls derived class implementation of draw_task. PLEASE DON'T OVERRIDE THIS).</para>

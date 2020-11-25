@@ -8,16 +8,16 @@ namespace LSW {
 			void Block::draw_task(Interface::Camera& c)
 			{
 				if (bitmaps.empty()) return;
-				{
+				/*{
 					const auto delta_t = get_direct<std::chrono::milliseconds>(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION);
 
 					if (const double _dd = get_direct<double>(block::e_double::TIE_SIZE_TO_DISPLAY_PROPORTION); _dd > 0.0 && (std::chrono::system_clock::now().time_since_epoch() > delta_t)) {
 						set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() + block::default_delta_t_frame_delay));
 
 						Interface::Target targ(get_direct<uintptr_t>(sprite::e_uintptrt::INDEX_TARGET_IN_USE));
-						for (auto& i : bitmaps) i.copy_attributes(targ.get(), true);
+						for (auto& i : bitmaps) i.copy_attributes(targ.get(), true, _dd);
 					}
-				}
+				}*/
 
 				size_t frame = static_cast<size_t>(get_direct<uintptr_t>(block::e_uintptr_t::FRAME));
 
@@ -47,9 +47,9 @@ namespace LSW {
 
 					set<uintptr_t>(block::e_uintptr_t::FRAME, frame);
 				}
-				if (frame >= bitmaps.size()) frame = static_cast<int>(bitmaps.size() - 1);
+				if (frame >= bitmaps.size()) frame = static_cast<size_t>(bitmaps.size() - 1);
 
-				auto rnn = bitmaps[frame];
+				Interface::Bitmap& rnn = bitmaps[frame];
 				if (!rnn) throw Handling::Abort(__FUNCSIG__, "Unexpected NULL on draw!");
 
 				// P.S.: Text copied this
@@ -96,18 +96,18 @@ namespace LSW {
 				set<double>(block::e_double_defaults);
 				set<bool>(block::e_boolean_defaults);
 				set<uintptr_t>(block::e_uintptr_t_defaults); // same as uintptr_t
-				set<std::chrono::milliseconds>(block::e_chronomillis_readonly_defaults);
+				set<std::chrono::milliseconds>(block::e_chronomillis_defaults);
 
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
-				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
+				//set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
 						
-			Block::Block(const Block& other) : Sprite_Base(other)
+			Block::Block(const Block& other)
 			{
 				*this = other;
 			}
 			
-			Block::Block(Block&& other) : Sprite_Base(std::move(other))
+			Block::Block(Block&& other) noexcept
 			{
 				*this = std::move(other);
 			}
@@ -122,10 +122,10 @@ namespace LSW {
 				bitmaps = oth.bitmaps;
 
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
-				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
+				//set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
 			
-			void Block::operator=(Block&& other)
+			void Block::operator=(Block&& other) noexcept
 			{
 				this->Sprite_Base::operator=(std::move(other));
 
@@ -135,7 +135,7 @@ namespace LSW {
 				bitmaps = std::move(other.bitmaps);
 
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
-				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
+				//set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
 			
 			void Block::clone(const Block& other)
@@ -148,7 +148,7 @@ namespace LSW {
 				bitmaps = other.bitmaps;
 
 				set(block::e_chronomillis_readonly::LAST_FRAME, MILLI_NOW);
-				set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
+				//set(block::e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION, MILLI_NOW);
 			}
 			
 			void Block::insert(const Interface::Bitmap& bmp)

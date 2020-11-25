@@ -26,7 +26,7 @@ namespace LSW {
 			}
 
 			template<typename T>
-			inline SuperPair<T>::SuperPair(SuperPair&& sp)
+			inline SuperPair<T>::SuperPair(SuperPair&& sp) noexcept
 			{
 				*this = std::move(sp);
 			}
@@ -53,7 +53,7 @@ namespace LSW {
 			}
 
 			template<typename T>
-			inline void SuperPair<T>::operator=(SuperPair&& sp)
+			inline void SuperPair<T>::operator=(SuperPair&& sp) noexcept
 			{
 				keys = std::move(sp.keys);
 				holding = std::move(sp.holding);

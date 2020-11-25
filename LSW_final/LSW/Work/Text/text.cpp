@@ -126,8 +126,14 @@ namespace LSW {
 
 				{
 					auto fl = get_direct<Sprite_Base>(text::e_sprite_ref::FOLLOWING); // safer
-					fl.get(sprite::e_double_readonly::POSX, off_x);
-					fl.get(sprite::e_double_readonly::POSY, off_y);
+					if (get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM) && !fl.is_eq_s<bool>(sprite::e_boolean::AFFECTED_BY_CAM, *this)) {
+						fl.get(sprite::e_double_readonly::REALISTIC_RESULT_POSX, off_x);
+						fl.get(sprite::e_double_readonly::REALISTIC_RESULT_POSY, off_y);
+					}
+					else {
+						fl.get(sprite::e_double_readonly::POSX, off_x);
+						fl.get(sprite::e_double_readonly::POSY, off_y);
+					}
 					fl.get(sprite::e_double_readonly::ROTATION, p_rotation_rad);
 					//set(sprite::e_boolean::AFFECTED_BY_CAM, fl.get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM));
 					p_rotation_rad *= ALLEGRO_PI / 180.0;
@@ -259,7 +265,7 @@ namespace LSW {
 						
 			Text::Text() : Sprite_Base()
 			{
-				set<std::chrono::milliseconds>(text::e_chronomillis_readonly_defaults);
+				set<std::chrono::milliseconds>(text::e_chronomillis_defaults);
 				set<Tools::Cstring>(text::e_string_defaults);
 				set<Sprite_Base>(text::e_sprite_ref_defaults);
 				set<double>(text::e_double_defaults);
@@ -272,12 +278,12 @@ namespace LSW {
 				set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
 			}
 						
-			Text::Text(const Text& other) : Sprite_Base(other)
+			Text::Text(const Text& other)
 			{
 				*this = other;
 			}
 						
-			Text::Text(Text&& other) : Sprite_Base(std::move(other))
+			Text::Text(Text&& other)
 			{
 				*this = std::move(other);
 			}

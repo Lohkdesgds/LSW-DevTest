@@ -62,7 +62,7 @@ namespace LSW {
 				/// <para>Move constructor.</para>
 				/// </summary>
 				/// <param name="{SuperPair}">A SuperPair of the same type to move.</param>
-				SuperPair(SuperPair&&);
+				SuperPair(SuperPair&&) noexcept;
 
 				/// <summary>
 				/// <para>A way to set the value and some keys already.</para>
@@ -88,7 +88,7 @@ namespace LSW {
 				/// <para>Move operator.</para>
 				/// </summary>
 				/// <param name="{SuperPair}">A SuperPair of the same type to move.</param>
-				void operator=(SuperPair&&);
+				void operator=(SuperPair&&) noexcept;
 
 
 

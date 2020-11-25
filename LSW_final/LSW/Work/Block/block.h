@@ -14,14 +14,17 @@ namespace LSW {
 
 			namespace block {
 
-				enum class e_chronomillis_readonly { LAST_FRAME, LAST_TIE_FRAME_VERIFICATION };
+				enum class e_chronomillis_readonly { 
+					LAST_FRAME//, // last time a frame was drawn
+					//LAST_TIE_FRAME_VERIFICATION // last time it verified reference bitmap size (target) 
+				};
 				enum class e_uintptr_t { FRAME };
 				enum class e_boolean { SET_FRAME_VALUE_READONLY };
-				enum class e_double { FRAMES_PER_SECOND, TIE_SIZE_TO_DISPLAY_PROPORTION };
+				enum class e_double { FRAMES_PER_SECOND/*, TIE_SIZE_TO_DISPLAY_PROPORTION*/ };
 
-				const Tools::SuperMap<Tools::FastFunction<std::chrono::milliseconds>>		e_chronomillis_readonly_defaults = {
+				const Tools::SuperMap<Tools::FastFunction<std::chrono::milliseconds>>		e_chronomillis_defaults = {
 					{std::chrono::milliseconds(0),																		(e_chronomillis_readonly::LAST_FRAME),					("last_frame")},
-					{std::chrono::milliseconds(0),																		(e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION),	("last_tie_verification")}
+					//{std::chrono::milliseconds(0),																		(e_chronomillis_readonly::LAST_TIE_FRAME_VERIFICATION),	("last_tie_verification")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<uintptr_t>>		e_uintptr_t_defaults = {
 					{(uintptr_t)0,																						(e_uintptr_t::FRAME),									("frame")}
@@ -30,8 +33,8 @@ namespace LSW {
 					{false,																								(e_boolean::SET_FRAME_VALUE_READONLY),					("set_frame_readonly")}
 				};
 				const Tools::SuperMap<Tools::FastFunction<double>>		e_double_defaults = {
-					{10.0,																								(e_double::FRAMES_PER_SECOND),							("frames_per_second")}, // FPS, not delta sec
-					{0.0,																								(e_double::TIE_SIZE_TO_DISPLAY_PROPORTION),				("tie_size_to_display_proportion")}
+					{10.0,																								(e_double::FRAMES_PER_SECOND),							("frames_per_second")}//, // FPS, not delta sec
+					//{0.0,																								(e_double::TIE_SIZE_TO_DISPLAY_PROPORTION),				("tie_size_to_display_proportion")}
 				};
 
 				constexpr size_t maximum_bitmap_amount = static_cast<size_t>(std::numeric_limits<int>::max());
@@ -57,7 +60,6 @@ namespace LSW {
 				using Sprite_Base::set;
 				using Sprite_Base::get;
 				using Sprite_Base::get_direct;
-				using Sprite_Base::operator=;
 				using Tools::SuperFunctionalMap<std::chrono::milliseconds>::set;
 				using Tools::SuperFunctionalMap<std::chrono::milliseconds>::get;
 				using Tools::SuperFunctionalMap<std::chrono::milliseconds>::get_direct;
@@ -77,7 +79,7 @@ namespace LSW {
 				/// <para>Constructor to move a Block to this (move).</para>
 				/// </summary>
 				/// <param name="{Block}">The one to move attributes from.</param>
-				Block(Block&&);
+				Block(Block&&) noexcept;
 
 				/// <summary>
 				/// <para>Reference a Block (not a copy).</para>
@@ -89,7 +91,7 @@ namespace LSW {
 				/// <para>Move a Block to this (move).</para>
 				/// </summary>
 				/// <param name="{Block}">The one to move attributes from.</param>
-				void operator=(Block&&);
+				void operator=(Block&&) noexcept;
 
 				/// <summary>
 				/// <para>Clone other Block attributes.</para>

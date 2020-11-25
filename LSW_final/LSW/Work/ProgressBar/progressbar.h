@@ -81,7 +81,6 @@ namespace LSW {
 				double beyond(const double, const double);
 
 				void draw_task(Interface::Camera&);
-				void think_task(const int) {}
 			public:
 				using Sprite_Base::set;
 				using Sprite_Base::get;

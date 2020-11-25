@@ -219,6 +219,8 @@ namespace LSW {
 				}
 				_cleancam.apply();
 
+				easy_collision.latest_camera = cam.get_classic();
+
 				// delta T calculation
 
 				double timee = al_get_time();
@@ -236,6 +238,8 @@ namespace LSW {
 					set(sprite::e_double_readonly::POSX, real_targ_posx);
 					set(sprite::e_double_readonly::POSY, real_targ_posy);
 					set(sprite::e_double_readonly::PERC_CALC_SMOOTH, 0.0);
+					set(sprite::e_double_readonly::REALISTIC_RESULT_POSX, real_targ_posx); // TIMEOUT
+					set(sprite::e_double_readonly::REALISTIC_RESULT_POSY, real_targ_posy); // TIMEOUT
 				}
 				else {
 					set(sprite::e_double_readonly::ROTATION, (1.0 - perc_run) * rotation_v + perc_run * targ_rotation);
@@ -306,6 +310,7 @@ namespace LSW {
 				}
 
 				const auto roughness = get_direct<double>(sprite::e_double::ROUGHNESS);
+				const auto affected_cam = get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM);
 				int nowgo = 0;
 
 				// delayed work to do (auto-clean)
@@ -408,7 +413,7 @@ namespace LSW {
 
 						is_mouse_pressed = conf.get_as<unsigned>("mouse", "press_count") > 0;
 
-						if (get_direct<bool>(sprite::e_boolean::AFFECTED_BY_CAM)) {
+						if (affected_cam) {
 							m[0] = conf.get_as<double>("mouse", "x");
 							m[1] = conf.get_as<double>("mouse", "y");
 						}
@@ -508,12 +513,30 @@ namespace LSW {
 
 				}
 
-				double scale_x, scale_y;
+				double scale_x, scale_y, targx, targy;
 
 				scale_x = get_direct<double>(sprite::e_double::SCALE_G) * get_direct<double>(sprite::e_double::SCALE_X);
 				scale_y = get_direct<double>(sprite::e_double::SCALE_G) * get_direct<double>(sprite::e_double::SCALE_Y);
+				targx = get_direct<double>(sprite::e_double::TARG_POSX);
+				targy = get_direct<double>(sprite::e_double::TARG_POSY);
 
-				easy_collision.setup(get_direct<double>(sprite::e_double::TARG_POSX), get_direct<double>(sprite::e_double::TARG_POSY), scale_x, scale_y);
+				if (!affected_cam) { // if not affected, inverse effect
+					Interface::classic_2d& cpy = easy_collision.latest_camera;
+
+					targx /= cpy.sx;
+					targy /= cpy.sy;
+					targx += cpy.x;
+					targy += cpy.y;
+					scale_x /= cpy.sx;
+					scale_y /= cpy.sy;
+				}
+
+				set(sprite::e_double_readonly::REALISTIC_RESULT_POSX, targx);
+				set(sprite::e_double_readonly::REALISTIC_RESULT_POSY, targy);
+				set(sprite::e_double_readonly::REALISTIC_RESULT_SCALE_X, scale_x);
+				set(sprite::e_double_readonly::REALISTIC_RESULT_SCALE_Y, scale_y);
+
+				easy_collision.setup(targx, targy, scale_x, scale_y);
 
 				think_task(nowgo);
 			}

@@ -132,6 +132,12 @@ namespace LSW {
 				classic_2d& get_classic();
 
 				/// <summary>
+				/// <para>Gets internal target used to transform the classic way.</para>
+				/// </summary>
+				/// <returns>{Bitmap} The reference Bitmap for transformations.</returns>
+				Bitmap get_target() const;
+
+				/// <summary>
 				/// <para>Rotates the matrix.</para>
 				/// </summary>
 				/// <param name="{float}">Angle (rad).</param>

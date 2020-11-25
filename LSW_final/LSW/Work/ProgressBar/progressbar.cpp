@@ -109,12 +109,12 @@ namespace LSW {
 				set<bool>(progressbar::e_boolean_defaults);
 			}
 
-			ProgressBar::ProgressBar(const ProgressBar& other) : Sprite_Base(other)
+			ProgressBar::ProgressBar(const ProgressBar& other)
 			{
 				*this = other;
 			}
 
-			ProgressBar::ProgressBar(ProgressBar&& other) : Sprite_Base(std::move(other))
+			ProgressBar::ProgressBar(ProgressBar&& other)
 			{
 				*this = std::move(other);
 			}

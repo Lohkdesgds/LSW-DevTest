@@ -31,7 +31,7 @@ namespace LSW {
 				/// <para>Move constructor.</para>
 				/// </summary>
 				/// <param name="{FastFunction}">Move.</param>
-				FastFunction(FastFunction&&);
+				FastFunction(FastFunction&&) noexcept;
 
 				/// <summary>
 				/// <para>Direct set.</para>
@@ -55,7 +55,7 @@ namespace LSW {
 				/// <para>Move operator.</para>
 				/// </summary>
 				/// <param name="{FastFunction}">Move.</param>
-				void operator=(FastFunction&&);
+				void operator=(FastFunction&&) noexcept;
 
 				/// <summary>
 				/// <para>Direct set.</para>

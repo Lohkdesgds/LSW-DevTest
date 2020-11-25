@@ -17,13 +17,13 @@ namespace LSW {
 			}
 
 			template<typename T>
-			inline Resource<T>::Resource(Resource&& a)
+			inline Resource<T>::Resource(Resource&& a) noexcept
 			{
 				*this = std::move(a);
 			}
 
 			template<typename T>
-			inline Resource<T>::Resource(std::shared_ptr<T>&& a)
+			inline Resource<T>::Resource(std::shared_ptr<T>&& a) noexcept
 			{
 				*this = std::move(a);
 			}
@@ -41,13 +41,13 @@ namespace LSW {
 			}
 
 			template<typename T>
-			inline void Resource<T>::operator=(Resource&& a)
+			inline void Resource<T>::operator=(Resource&& a) noexcept
 			{
 				r = std::move(a.r);
 			}
 
 			template<typename T>
-			inline void Resource<T>::operator=(std::shared_ptr<T>&& a)
+			inline void Resource<T>::operator=(std::shared_ptr<T>&& a) noexcept
 			{
 				r = std::move(a);
 			}

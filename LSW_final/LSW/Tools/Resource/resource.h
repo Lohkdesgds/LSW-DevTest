@@ -41,13 +41,13 @@ namespace LSW {
 				/// <para>Move constructor.</para>
 				/// </summary>
 				/// <param name="{Resource}">The Resource that will have data moved.</param>
-				Resource(Resource&&);
+				Resource(Resource&&) noexcept;
 
 				/// <summary>
 				/// <para>Move constructor.</para>
 				/// </summary>
 				/// <param name="{std::shared_ptr}">The smart pointer that will have data moved.</param>
-				Resource(std::shared_ptr<T>&&);
+				Resource(std::shared_ptr<T>&&) noexcept;
 
 				/// <summary>
 				/// <para>Reference operator.</para>
@@ -67,13 +67,13 @@ namespace LSW {
 				/// <para>Move operator.</para>
 				/// </summary>
 				/// <param name="{Resource}">The Resource that will have data moved.</param>
-				void operator=(Resource&&);
+				void operator=(Resource&&) noexcept;
 
 				/// <summary>
 				/// <para>Move operator.</para>
 				/// </summary>
 				/// <param name="{std::shared_ptr}">The smart pointer that will have data moved.</param>
-				void operator=(std::shared_ptr<T>&&);
+				void operator=(std::shared_ptr<T>&&) noexcept;
 
 				/// <summary>
 				/// <para>Check if internal data is present.</para>

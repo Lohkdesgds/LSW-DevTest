@@ -12,7 +12,7 @@ namespace LSW {
 			}
 
 			template<typename T>
-			inline FastFunction<T>::FastFunction(FastFunction&& o)
+			inline FastFunction<T>::FastFunction(FastFunction&& o) noexcept
 			{
 				*this = std::move(o);
 			}
@@ -40,7 +40,7 @@ namespace LSW {
 			}
 
 			template<typename T>
-			inline void FastFunction<T>::operator=(FastFunction&& o)
+			inline void FastFunction<T>::operator=(FastFunction&& o) noexcept
 			{
 				std::lock_guard<std::mutex> l1(gen_use);
 				std::lock_guard<std::mutex> l2(o.gen_use);

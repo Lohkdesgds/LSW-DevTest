@@ -93,6 +93,11 @@ namespace LSW {
 				return cl_2d;
 			}
 
+			Bitmap Camera::get_target() const
+			{
+				return last_targ;
+			}
+
 			void Camera::rotate(const float r)
 			{
 				al_rotate_transform(&t, r);

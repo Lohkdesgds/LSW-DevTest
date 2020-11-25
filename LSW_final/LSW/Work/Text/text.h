@@ -27,7 +27,7 @@ namespace LSW {
 				enum class e_boolean { USE_BITMAP_BUFFER, USE_COLOR_INSTEAD_OF_AUTO /*auto: &6gold&1blue*/, SCROLL_INSTEAD_OF_MAX_LEN_SIZE_BLOCK /*on max length in "pixels" but not in bytes, scroll?*/ };
 				enum class e_sprite_ref { FOLLOWING };
 
-				const Tools::SuperMap<Tools::FastFunction<std::chrono::milliseconds>>		e_chronomillis_readonly_defaults = {
+				const Tools::SuperMap<Tools::FastFunction<std::chrono::milliseconds>>		e_chronomillis_defaults = {
 					{std::chrono::milliseconds(0),																				(e_chronomillis_readonly::LAST_UPDATE_BITMAP),			("last_update_bitmap")},
 					{std::chrono::milliseconds(0),																				(e_chronomillis_readonly::LAST_UPDATE_STRING),			("last_update_string")}
 				};

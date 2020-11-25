@@ -23,7 +23,7 @@ namespace LSW {
 			}
 
 			template<typename T>
-			inline SuperMap<T>::SuperMap(SuperMap&& mp)
+			inline SuperMap<T>::SuperMap(SuperMap&& mp) noexcept
 			{
 				sps = std::move(mp.sps);
 			}
@@ -35,7 +35,7 @@ namespace LSW {
 			}
 
 			template<typename T>
-			inline void SuperMap<T>::operator=(SuperMap&& mp)
+			inline void SuperMap<T>::operator=(SuperMap&& mp) noexcept
 			{
 				sps = std::move(mp.sps);
 			}

@@ -4,6 +4,8 @@
 
 #include "Sprite/sprite.h"
 #include "Block/block.h"
+#include "BubbleFX/bubblefx.h"
+#include "ShineFX/shinefx.h"
 #include "Text/text.h"
 #include "Button/button.h"
 #include "TextInput/textinput.h"

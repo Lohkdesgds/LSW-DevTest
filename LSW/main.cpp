@@ -267,6 +267,9 @@ int main() {
 	_what_test = "Loading textures";
 
 	Tools::SuperResource<Work::Block> blocks;
+	Tools::SuperResource<Work::BubbleFX> bubbles;
+	Tools::SuperResource<Work::ShineFX> shiners;
+
 
 	auto working_on = core.get_display().add_once_task([pather] {
 		Logger logg;
@@ -390,6 +393,8 @@ int main() {
 	auto blk_zoom = blocks.create("_test_slidezoom");
 	auto blk_width = blocks.create("_test_slidey");
 	auto btn_switch = buttons.create("_test_switch");
+	auto bubblr = bubbles.create("_test_bubblr");
+	auto shinfx = shiners.create("_test_shinee");
 
 	blk0->insert(lmao);
 	blk_mouse->insert(mouse);
@@ -519,13 +524,13 @@ int main() {
 	});
 
 
-	blk_mouse->set<double>(Work::sprite::e_double::TARG_POSX, [&] { return core.get_config().get_as<double>("mouse", "x"); });
-	blk_mouse->set<double>(Work::sprite::e_double::TARG_POSY, [&] { return core.get_config().get_as<double>("mouse", "y"); });
+	blk_mouse->set<double>(Work::sprite::e_double::TARG_POSX, [&] { return core.get_config().get_as<double>("mouse", "rx"); });
+	blk_mouse->set<double>(Work::sprite::e_double::TARG_POSY, [&] { return core.get_config().get_as<double>("mouse", "ry"); });
 	blk_mouse->set<double>(Work::sprite::e_double::SCALE_G, 0.15);
 	blk_mouse->set<double>(Work::sprite::e_double::TARG_ROTATION, [] {return 30.0 * al_get_time(); });
 	blk_mouse->set(Work::sprite::e_integer::COLLISION_MODE, static_cast<int>(Work::sprite::e_collision_mode_cast::COLLISION_STATIC));
 	//blk_mouse->set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
-	//blk_mouse->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	blk_mouse->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
 
 
 
@@ -534,6 +539,15 @@ int main() {
 	blk3->set<double>(Work::sprite::e_double::SCALE_G, 0.20);
 	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);
 	//blk3->set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
+
+	bubblr->set(Work::sprite::e_double::SCALE_G, 2.0);
+	bubblr->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	bubblr->reset_positions(300);
+
+	shinfx->set(Work::sprite::e_double::SCALE_G, 2.0);
+	shinfx->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
+	shinfx->set<double>(Work::shinefx::e_double::CENTER_X, [] {return 0.5 * cos(al_get_time()); });
+	shinfx->set<double>(Work::shinefx::e_double::CENTER_Y, [] {return 0.5 * sin(al_get_time()); });
 
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -596,7 +610,7 @@ int main() {
 
 
 	Tools::Stopwatch sw; // noo need to mutex, []{} is called in sync with draw
-	sw.prepare(15);
+	sw.prepare(17);
 	size_t __c = 0;
 
 
@@ -627,7 +641,7 @@ int main() {
 	txtdebug->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] {
 		if (!__c) return std::string("&9Debug sync lost, please wait.");
 		return 
-			"&9DEBUG BMP/TEXT DRAW:\n" + sw.generate_table() + "\n&eTotal time draw: " + sw.get_string_between(0, sw.last_point_valid());
+			"&9DEBUG BMP/TEXT DRAW:\n" + sw.generate_table_statistics() + "\n&eTotal time draw: " + sw.get_string_between(0, sw.last_point_valid());
 	});
 	txtdebug->set(Work::sprite::e_double::TARG_POSX, -1.0);
 	txtdebug->set(Work::sprite::e_double::TARG_POSY, -0.69);
@@ -635,7 +649,7 @@ int main() {
 	//txtdebug->set(Work::sprite::e_double::SCALE_X, 0.35);
 	txtdebug->set(Work::text::e_double::LINE_ADJUST, 0.75);
 	txtdebug->set(Work::sprite::e_boolean::AFFECTED_BY_CAM, false);
-	txtdebug->set(Work::text::e_double::UPDATES_PER_SECOND, 2.0);
+	txtdebug->set(Work::text::e_double::UPDATES_PER_SECOND, 1.0);
 	txtdebug->set(Work::text::e_color::SHADOW_COLOR, Interface::Color(127, 0, 0));
 	txtdebug->set<bool>(Work::sprite::e_boolean::DRAW, [&] {return !__simple_texts; });
 	txtdebug->set(Work::text::e_double::SHADOW_DISTANCE_X, 0.0007);
@@ -705,6 +719,8 @@ int main() {
 	overlay_control.insert(txtdebug);
 	overlay_control.insert(txt0);
 
+	bool __use_bubble_instead = true;
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - TEXTS - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - ~~~~~ - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 
@@ -720,78 +736,45 @@ int main() {
 	{
 		core.get_display().remove_draw_task(_delete_drawtask);
 
-		core.get_display().add_draw_task([=, &__c, &sw, &testtin](const Camera& c) {
+		core.get_display().add_draw_task([=, &__use_bubble_instead, &__c, &sw, &testtin](const Camera& c) {
 			///got->draw((Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, (Tools::random() % 1000) * 1.0 / 1000.0 - 0.5, 0.3, 0.3);
 			
 			if (!__c) sw.start(); // 0
-			blk0->draw(c);
+			if (__use_bubble_instead) bubblr->draw(c);
+			else shinfx->draw(c);
 			if (!__c) sw.click_one(); // 1
-			blk1->draw(c);
-			if (!__c) sw.click_one(); // 2
-			blk_mouse->draw(c);
-			if (!__c) sw.click_one(); // 3
-			blk3->draw(c);
-			if (!__c) sw.click_one(); // 4
-			blk_height->draw(c);
-			if (!__c) sw.click_one(); // 5
-			blk_width->draw(c);
-			if (!__c) sw.click_one(); // 6
-			btn_switch->draw(c);
-			if (!__c) sw.click_one(); // 7
-			blk_zoom->draw(c);
-			if (!__c) sw.click_one(); // 8
-			txt0->draw(c);
-			if (!__c) sw.click_one(); // 9
-			txtu->draw(c);
-			if (!__c) sw.click_one(); // 10
-			txtmouse->draw(c);
-			if (!__c) sw.click_one(); // 11
-			txtf0->draw(c);
-			if (!__c) sw.click_one(); // 12
-			txtf1->draw(c);
-			if (!__c) sw.click_one(); // 13
-			txtdebug->draw(c);
-			if (!__c) sw.click_one(); // 14
-			testtin.draw(c);
-
-			if (++__c > 200) __c = 0;
-
-			/*
-			Tools::Stopwatch sw;
-			sw.prepare(14);
-
-			sw.start(); // 0
 			blk0->draw(c);
-			sw.click_one(); // 1
+			if (!__c) sw.click_one(); // 2
 			blk1->draw(c);
-			sw.click_one(); // 2
+			if (!__c) sw.click_one(); // 3
 			blk_mouse->draw(c);
-			sw.click_one(); // 3
+			if (!__c) sw.click_one(); // 4
 			blk3->draw(c);
-			sw.click_one(); // 4
+			if (!__c) sw.click_one(); // 5
 			blk_height->draw(c);
-			sw.click_one(); // 5
+			if (!__c) sw.click_one(); // 6
 			blk_width->draw(c);
-			sw.click_one(); // 6
+			if (!__c) sw.click_one(); // 7
+			btn_switch->draw(c);
+			if (!__c) sw.click_one(); // 8
+			blk_zoom->draw(c);
+			if (!__c) sw.click_one(); // 9
 			txt0->draw(c);
-			sw.click_one(); // 7
-			txt1->draw(c);
-			sw.click_one(); // 8
-			txt2->draw(c);
-			sw.click_one(); // 9
-			txt3->draw(c);
-			sw.click_one(); // 10
+			if (!__c) sw.click_one(); // 10
 			txtu->draw(c);
-			sw.click_one(); // 11
+			if (!__c) sw.click_one(); // 11
+			txtmouse->draw(c);
+			if (!__c) sw.click_one(); // 12
 			txtf0->draw(c);
-			sw.click_one(); // 12
+			if (!__c) sw.click_one(); // 13
 			txtf1->draw(c);
-			sw.click_one(); // ...
+			if (!__c) sw.click_one(); // 14
+			txtdebug->draw(c);
+			if (!__c) sw.click_one(); // 15
+			testtin.draw(c);
+			if (!__c) sw.click_one(); // 16
 
-			Logger logg;
-			logg << L::SL << fsr() << "Stopwatch said:\n" << sw.generate_table() << L::EL;
-			*/
-
+			if (++__c > 500) __c = 0;
 		});
 	}
 
@@ -820,13 +803,16 @@ int main() {
 	pather.unapply();
 
 
-	/*
+	
 	EventHandler fullscreen;
 	fullscreen.add(get_keyboard_event());
 	fullscreen.set_run_autostart([&](const RawEvent& ev) {
 		switch (ev.type())
 		{
 		case ALLEGRO_EVENT_KEY_DOWN:
+
+			if (testtin.main().get_direct<bool>(Work::textinput::e_boolean_readonly::SELECTED)) return;
+
 			switch (ev.keyboard_event().keycode) {
 			case ALLEGRO_KEY_F11:
 			{
@@ -839,6 +825,12 @@ int main() {
 				logg << L::SL << fsr() << "Current FPS: &a" << core.get_display().get_frames_per_second() << L::EL;
 				logg << L::SL << fsr() << "&eOut of range errors: &7" << core.get_display().debug_errors_out_of_range_skip() << L::EL;
 				logg << L::SL << fsr() << "&eUnexpected errors: &7" << core.get_display().debug_errors_unexpected() << L::EL;
+			}
+				break;
+			case ALLEGRO_KEY_H:
+			{
+				__use_bubble_instead = !__use_bubble_instead;
+				logg << L::SL << fsr() << "BubbleFX " << (__use_bubble_instead ? "<<" : ">>") << " ShineFX toggle" << L::EL;
 			}
 				break;
 			case ALLEGRO_KEY_P:
@@ -998,7 +990,7 @@ int main() {
 			break;
 		}
 	});
-	*/
+	
 	core.yield();
 
 	collision_control.set_stop();

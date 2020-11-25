@@ -118,6 +118,12 @@
     <ClCompile Include="..\LSW_final\LSW\Work\TextInput\textinput.cpp">
       <Filter>LSW\3. Work\TextInput</Filter>
     </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\BubbleFX\bubblefx.cpp">
+      <Filter>LSW\3. Work\BubbleFX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LSW_final\LSW\Work\ShineFX\shinefx.cpp">
+      <Filter>LSW\3. Work\ShineFX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -494,6 +500,12 @@
     </ClInclude>
     <ClInclude Include="..\LSW_final\LSW\Work\TextInput\textinput.h">
       <Filter>LSW\3. Work\TextInput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LSW_final\LSW\Work\BubbleFX\bubblefx.h">
+      <Filter>LSW\3. Work\BubbleFX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LSW_final\LSW\Work\ShineFX\shinefx.h">
+      <Filter>LSW\3. Work\ShineFX</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

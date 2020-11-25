@@ -15,6 +15,7 @@ namespace LSW {
 			/// </summary>
 			class Stopwatch {
 				std::vector<std::chrono::steady_clock::time_point> stops;
+				std::vector<double> max_diffs;
 				size_t point = 0, reserved = 0;
 			public:
 				/// <summary>
@@ -22,6 +23,11 @@ namespace LSW {
 				/// </summary>
 				/// <param name="{size_t}">Amount of points in time.</param>
 				void prepare(const size_t);
+
+				/// <summary>
+				/// <para>Reset to 0 the max differences.</para>
+				/// </summary>
+				void reset_max();
 
 				/// <summary>
 				/// <para>Reset to 0 and click once already.</para>
@@ -66,12 +72,26 @@ namespace LSW {
 				std::chrono::seconds get_seconds_between(const size_t, const size_t);
 
 				/// <summary>
+				/// <para>Maximum difference in time between two points (first, first + 1).</para>
+				/// </summary>
+				/// <param name="{size_t}">Call index, starting in 0 when start().</param>
+				/// <returns>{double} The difference, in seconds.</returns>
+				double get_max_between_p(const size_t);
+
+				/// <summary>
 				/// <para>Difference in time between two points (first, last) automatic range to string.</para>
 				/// </summary>
 				/// <param name="{size_t}">Call index, starting in 0 when start().</param>
 				/// <param name="{size_t}">Call index, starting in 0 when start().</param>
 				/// <returns>{std::string} Difference in time.</returns>
 				std::string get_string_between(const size_t, const size_t);
+
+				/// <summary>
+				/// <para>Maximum difference in time between two points (first, first + 1) automatic range to string.</para>
+				/// </summary>
+				/// <param name="{size_t}">Call index, starting in 0 when start().</param>
+				/// <returns>{std::string} Max difference in time.</returns>
+				std::string get_string_between_p(const size_t);
 
 				/// <summary>
 				/// <para>If you prepare(5), this will return 4, because [4] == 5th point, got it?</para>
@@ -83,7 +103,7 @@ namespace LSW {
 				/// <para>Generates table onw by one with automatic scale, one per line.</para>
 				/// </summary>
 				/// <returns>{std::string} Table.</returns>
-				std::string generate_table();
+				std::string generate_table_statistics();
 			};
 
 		}

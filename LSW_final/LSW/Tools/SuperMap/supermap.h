@@ -64,7 +64,7 @@ namespace LSW {
 				/// <para>Move constructor.</para>
 				/// </summary>
 				/// <param name="{SuperMap}">The other SuperMap to move.</param>
-				SuperMap(SuperMap&&);
+				SuperMap(SuperMap&&) noexcept;
 
 				/// <summary>
 				/// <para>Copy operator.</para>
@@ -76,7 +76,7 @@ namespace LSW {
 				/// <para>Move operator.</para>
 				/// </summary>
 				/// <param name="{SuperMap}">The other SuperMap to move.</param>
-				void operator=(SuperMap&&);
+				void operator=(SuperMap&&) noexcept;
 
 
 				/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
