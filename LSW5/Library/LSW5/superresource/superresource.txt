@@ -1,2 +1,0 @@
-SuperResource is a smart "database" that can keep data everywhere to anyone.
-When the core (.init()) dies, data is lost (no memory leak).
