@@ -4,8 +4,7 @@ This is a huge library I've been working on since 2019. It's a graphic almost fu
 <hr>
 
 ## Latest releases
-You might want to see the latest and greatest I've done so far (if you're up to dev stuff). You can see it here: [working_on branch](https://github.com/Lohkdesgds/LSW/tree/working_on).
-Releases are being made [HERE](https://github.com/Lohkdesgds/LSW/releases)! You can use them already! (or just download and build the whole library yourself)
+THIS REPO IS NOT USED FOR RELEASES ANYMORE! PLEASE TAKE A LOOK AT [THIS ONE](https://github.com/Lohkdesgds/LSW). This is more like a experimental repo that I make sure everything works. This also build the libs in the LSW.
 
 <hr>
 

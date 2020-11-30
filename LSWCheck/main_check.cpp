@@ -1,6 +1,8 @@
-#include "../LSW_final/LSW/LSWv5.h"
+#include "../LSW_Shared/LSW/LSWv5.h"
 
 // this is just a stable copy, not the original main
+
+#define TESTING_ALL
 
 #include <iostream>
 
@@ -62,7 +64,7 @@ int main() {
 
 	auto _text_early = texts.create("__loading");
 	_text_early->set(Work::sprite::e_boolean::DRAW, false);
-	_text_early->set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	//_text_early->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	_text_early->set(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
 	_text_early->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return "&9" + _what_test + [] {std::string s; for (int u = 0; u < ((int)(al_get_time() * 1.4)) % 3; u++) s += '.'; return '.' + s; }(); });
 	_text_early->set(Work::sprite::e_double::TARG_POSX, 0.0);
@@ -78,7 +80,7 @@ int main() {
 
 	auto _text_early2 = texts.create("__loading2");
 	_text_early2->set(Work::sprite::e_boolean::DRAW, false);
-	_text_early2->set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	//_text_early2->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	_text_early2->set(Work::text::e_integer::STRING_MODE, static_cast<int>(Work::text::e_text_modes::CENTER));
 	_text_early2->set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return "&f" + Tools::sprintf_a("%04.1lf%c", 100.0 * progress->get_direct<double>(Work::progressbar::e_double_readonly::PROGRESS_SMOOTH), '%'); });
 	_text_early2->set(Work::sprite::e_double::TARG_POSX, 0.0);
@@ -271,7 +273,7 @@ int main() {
 
 	Work::TextInput testtin;
 	testtin.get_text().set(sfont);
-	testtin.get_text().set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	//testtin.get_text().set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	testtin.get_text().set<Tools::Cstring>(Work::text::e_cstring::STRING, "insert here");
 	//testtin.get_text().set(Work::sprite::e_double::TARG_POSY, 0.1);
 	testtin.get_text().set(Work::sprite::e_double::SCALE_G, 0.12);
@@ -353,7 +355,7 @@ int main() {
 
 
 	btn_switch->get_text().set(sfont);
-	btn_switch->get_text().set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	//btn_switch->get_text().set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	btn_switch->get_text().set<Tools::Cstring>(Work::text::e_cstring::STRING, [&] { return __simple_texts ? "&6SWITCH" : "&dSWITCH"; });
 	//btn_switch->get_text().set(Work::sprite::e_double::TARG_POSY, 0.1);
 	btn_switch->get_text().set(Work::sprite::e_double::SCALE_G, 0.10);
@@ -541,12 +543,12 @@ int main() {
 	txtf0->set(sfont);
 	txtf1->set(sfont);
 
-	txt0->set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	/*txt0->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	txtdebug->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	txtu->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	txtmouse->set(Work::text::e_integer::FONT_SIZE, font_size_set);
 	txtf0->set(Work::text::e_integer::FONT_SIZE, font_size_set);
-	txtf1->set(Work::text::e_integer::FONT_SIZE, font_size_set);
+	txtf1->set(Work::text::e_integer::FONT_SIZE, font_size_set);*/
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	_what_test = "Setting up Texts";

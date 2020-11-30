@@ -22,11 +22,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\LSW_final\LSW\**\*.h" />
-    <ClInclude Include="..\LSW_final\LSW\**\*.ipp" />
+    <ClInclude Include="..\LSW_Shared\LSW\**\*.h" />
+    <ClInclude Include="..\LSW_Shared\LSW\**\*.ipp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\LSW_final\LSW\**\*.cpp" />
+    <ClCompile Include="..\LSW_Shared\LSW\**\*.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -99,7 +99,7 @@
     <Allegro_AddonColor>true</Allegro_AddonColor>
     <Allegro_AddonVideo>true</Allegro_AddonVideo>
     <Allegro_LibraryType>DynamicDebug</Allegro_LibraryType>
-    <OutDir>$(SolutionDir)LSW_final\LIB\x86\</OutDir>
+    <OutDir>$(SolutionDir)LSW_Shared\LIB\x86\</OutDir>
     <TargetName>LSW_dynamic_debug_x86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,7 +118,7 @@
     <Allegro_AddonColor>true</Allegro_AddonColor>
     <Allegro_AddonVideo>true</Allegro_AddonVideo>
     <Allegro_LibraryType>StaticMonolithRelease</Allegro_LibraryType>
-    <OutDir>$(SolutionDir)LSW_final\LIB\x86\</OutDir>
+    <OutDir>$(SolutionDir)LSW_Shared\LIB\x86\</OutDir>
     <TargetName>LSW_static_release_x86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -137,7 +137,7 @@
     <Allegro_AddonColor>true</Allegro_AddonColor>
     <Allegro_AddonVideo>true</Allegro_AddonVideo>
     <Allegro_LibraryType>DynamicDebug</Allegro_LibraryType>
-    <OutDir>$(SolutionDir)LSW_final\LIB\x64\</OutDir>
+    <OutDir>$(SolutionDir)LSW_Shared\LIB\x64\</OutDir>
     <TargetName>LSW_dynamic_debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -156,7 +156,7 @@
     <Allegro_AddonColor>true</Allegro_AddonColor>
     <Allegro_AddonVideo>true</Allegro_AddonVideo>
     <Allegro_LibraryType>StaticMonolithRelease</Allegro_LibraryType>
-    <OutDir>$(SolutionDir)LSW_final\LIB\x64\</OutDir>
+    <OutDir>$(SolutionDir)LSW_Shared\LIB\x64\</OutDir>
     <TargetName>LSW_static_release</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

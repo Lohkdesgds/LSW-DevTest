@@ -144,7 +144,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>F:\Cloud Services\OneDrive\New Main\_OFICIAL_GIT_STUFF\LSW\LSW_final\LIB\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>F:\Cloud Services\OneDrive\New Main\_OFICIAL_GIT_STUFF\LSW_devtest\LSW_Shared\LIB\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -165,7 +165,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>F:\Cloud Services\OneDrive\New Main\_OFICIAL_GIT_STUFF\LSW\LSW_final\LIB\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>F:\Cloud Services\OneDrive\New Main\_OFICIAL_GIT_STUFF\LSW_devtest\LSW_Shared\LIB\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -182,7 +182,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>F:\Cloud Services\OneDrive\New Main\_OFICIAL_GIT_STUFF\LSW\LSW_final\LIB\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>F:\Cloud Services\OneDrive\New Main\_OFICIAL_GIT_STUFF\LSW_devtest\LSW_Shared\LIB\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -203,7 +203,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>F:\Cloud Services\OneDrive\New Main\_OFICIAL_GIT_STUFF\LSW\LSW_final\LIB\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>F:\Cloud Services\OneDrive\New Main\_OFICIAL_GIT_STUFF\LSW_devtest\LSW_Shared\LIB\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

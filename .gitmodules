@@ -1,0 +1,3 @@
+[submodule "LSW_Shared"]
+	path = LSW_Shared
+	url = https://github.com/Lohkdesgds/LSW
