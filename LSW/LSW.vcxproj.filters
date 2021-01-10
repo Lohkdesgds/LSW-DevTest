@@ -124,6 +124,9 @@
     <ClCompile Include="..\LSW_Shared\LSW\Work\ShineFX\shinefx.cpp">
       <Filter>LSW\3. Work\ShineFX</Filter>
     </ClCompile>
+    <ClCompile Include="..\LSW_Shared\LSW\Tools\Any\any.cpp">
+      <Filter>LSW\1. Tools\Any</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -504,7 +507,5 @@
     <ClInclude Include="..\LSW_Shared\LSW\Work\ShineFX\shinefx.h">
       <Filter>LSW\3. Work\ShineFX</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="resource1.h" />
   </ItemGroup>
 </Project>

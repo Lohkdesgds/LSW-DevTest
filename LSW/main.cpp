@@ -6,6 +6,8 @@
 #ifndef _DEBUG
 #define TESTING_ALL
 #endif
+
+#define TESTING_ALL
 //#define LOLTEST
 
 using namespace LSW::v5;
@@ -553,6 +555,7 @@ int main() {
 	blk3->set<double>(Work::sprite::e_double::TARG_POSY, -0.5);
 	blk3->set<double>(Work::sprite::e_double::SCALE_G, 0.20);
 	blk3->set<double>(Work::sprite::e_double::SCALE_X, 0.85);
+	blk3->set<double>(Work::sprite::e_double::DISTANCE_DRAWING_SCALE, 0.6);
 	//blk3->set(Work::sprite::e_boolean::DRAW_COLOR_BOX, true);
 
 	bubblr->set(Work::sprite::e_double::SCALE_G, 2.0);
@@ -1119,6 +1122,11 @@ void multitask_test(Work::GameCore& core)
 
 }
 
+struct __socketsys_test_struct {
+	int good = 0;
+	float data = 1.4f;
+};
+
 void socketsys_test(Work::GameCore& core, double* progression)
 {
 	*progression = 0e-2;
@@ -1130,6 +1138,14 @@ void socketsys_test(Work::GameCore& core, double* progression)
 
 		*progression = 05e-2;
 		Hosting host;
+
+		host.overwrite_handle_new_connection([&](auto ptr) {
+			logg << L::SLF << fsr() << "Woo hoo new connection lmao!" << L::ELF;
+		});
+		host.overwrite_handle_disconnected([&](auto ptr) {
+			logg << L::SLF << fsr() << "Disconnected wooo!" << L::ELF;
+		});
+
 		*progression = 10e-2;
 
 		logg << L::SLF << fsr() << "Initialized. Trying to create a client to connect to this host..." << L::ELF;
@@ -1169,14 +1185,50 @@ void socketsys_test(Work::GameCore& core, double* progression)
 			logg << L::SLF << fsr() << "Sending from server to client..." << L::ELF;
 
 			host_c->send_package(second_msg);
-			*progression = 55e-2;
+			*progression = 52e-2;
 
 			while (!client.has_package()) std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			*progression = 60e-2;
+			*progression = 55e-2;
 
 			res = client.get_next();
 
 			logg << L::SLF << fsr() << "Did they match? " << ((res == second_msg) ? "YES" : "NO") << L::ELF;
+
+			{
+				logg << L::SLF << fsr() << "Sending complex data from server to client..." << L::ELF;
+
+				__socketsys_test_struct some_data;
+				some_data.data = 2.5f;
+				some_data.good = static_cast<int>(Tools::random());
+
+				host_c->send_package(Interface::transform_any_to_package(&some_data, sizeof(some_data)));
+
+				while (!client.has_package()) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+				*progression = 57e-2;
+
+				res = client.get_next();
+
+				__socketsys_test_struct result_data;
+
+				if (transform_any_package_back(&result_data, sizeof(result_data), res)) {
+					logg << L::SLF << fsr() << "Data type match (size-wide)..." << L::ELF;
+
+					if (result_data.data == some_data.data && result_data.good == some_data.good) {
+						logg << L::SLF << fsr() << "ALL DATA MATCH!" << L::ELF;
+					}
+					else {
+						logg << L::SLF << fsr(E::WARN) << "Data got messed up while converting." << L::ELF;
+					}
+				}
+				else {
+					logg << L::SLF << fsr(E::WARN) << "Complex data failed to be converted back." << L::ELF;
+				}
+
+				*progression = 60e-2;
+			}
+
+
 
 			for (size_t pingin = 0; pingin < 6; pingin++) {
 				logg << L::SLF << fsr() << "Local ping try #" << pingin << ": " << L::ELF;
@@ -1185,6 +1237,10 @@ void socketsys_test(Work::GameCore& core, double* progression)
 				*progression = 60e-2 + 40e-2 * ((pingin + 1) * 1.0 / 6);
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 			}
+
+			client.close();
+
+			//std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		}
 	}
 	logg << L::SLF << fsr() << "&e> > > > > END OF SOCKET TEST < < < < <" << L::ELF;
