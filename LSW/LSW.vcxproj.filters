@@ -310,6 +310,9 @@
     <Filter Include="LSW\3. Work\TextInput">
       <UniqueIdentifier>{e01b41e2-8120-432a-a09e-d9559a77799d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LSW\_.Macros">
+      <UniqueIdentifier>{20c83387-5464-40d1-b8c9-810b4a1f59a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\LSW_Shared\LSW\Handling\Abort\abort.h">
@@ -506,6 +509,12 @@
     </ClInclude>
     <ClInclude Include="..\LSW_Shared\LSW\Work\ShineFX\shinefx.h">
       <Filter>LSW\3. Work\ShineFX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MainShared\main_shared.ipp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LSW_Shared\LSW\_Macros\system_work.h">
+      <Filter>LSW\_.Macros</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -322,6 +322,8 @@
     <ClInclude Include="..\LSW_Shared\LSW\Work\TextInput\textinput.h" />
     <ClInclude Include="..\LSW_Shared\LSW\Work\Text\text.h" />
     <ClInclude Include="..\LSW_Shared\LSW\Work\Work.h" />
+    <ClInclude Include="..\LSW_Shared\LSW\_Macros\system_work.h" />
+    <ClInclude Include="..\MainShared\main_shared.ipp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
