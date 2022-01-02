@@ -1,3 +1,5 @@
+# THIS IS NOW ARCHIVED. There's no reason to use this. Please search for Lunaris (or Lunaris Template) instead.
+
 # LSW v5
 This is a huge library I've been working on since 2019. It's a graphic almost fully complete project to do any 2D stuff, like games, applications and stuff online, based on the Allegro library.
 
